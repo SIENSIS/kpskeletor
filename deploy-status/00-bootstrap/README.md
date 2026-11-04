@@ -234,10 +234,10 @@ page.
 ## Plan summary
 
 `docs/plan.md` describes sessions 01–36 (goal, files, tables, commands, tests, dependencies,
-risks) and ends with **56 contradictions or open questions**, each with a proposal; 13 are marked
-**(decide)** because they change a public convention or security (module discovery namespaces,
-`Config\Modules`, password-length setting, remember-me, "my" screens, permission names, web server
-writing code/config, release signing, private news reader…).
+risks) and ends with **56 contradictions or open questions**, each with a proposal; 7 are marked
+**(decide)** because they change a public convention or security (3 module discovery
+namespaces, 5 `Config\Modules`, 14 remember-me, 17 "my" screens, 18 permission names, 33 web server
+writing code/config, 42 private news reader).
 
 ## Known issues
 

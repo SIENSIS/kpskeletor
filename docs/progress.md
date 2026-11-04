@@ -30,7 +30,7 @@ pull request open), *merged* (in `main`).
   (`deploy/setup.sh` retries with `--prefer-source`). `phpstan/phpstan` (dist only) needed its
   zip seeded into Composer's cache from a git checkout.
 - 56 contradictions / open questions in the specification are listed in `docs/plan.md`
-  (13 need the owner's decision).
+  (7 marked **(decide)** need the owner's decision).
 
 ## Notes for the next session
 
