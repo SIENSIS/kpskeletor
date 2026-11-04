@@ -21,9 +21,14 @@
 //     { "url": "/backend", "name": "02-dashboard-phone", "width": 390, "height": 844 },
 //     { "url": "/backend", "name": "03-dashboard-dark", "dark": true },
 //     { "url": "/", "name": "04-home-guest", "login": false, "fullPage": true },
-//     { "url": "/backend/news", "name": "05-news-editor", "login": { "user": "editor@example.com", "password": "…" } }
+//     { "url": "/backend/news", "name": "05-news-editor", "login": { "user": "editor@example.com", "password": "…" } },
+//     { "url": "/demo", "name": "06-modal", "click": ["[data-open]"], "waitFor": ".modal.show" }
 //   ]
 // }
+//
+// Every capture fails (non-zero exit) when the page scrolls horizontally (unless the shot sets
+// "allowOverflow": true) or when the browser reports a Content-Security-Policy violation.
+// "click": selectors clicked in order before the capture ("wait": extra milliseconds).
 //
 // --shot syntax: "<url>=<name>[@<width>x<height>][:dark][:full][:guest]".
 // Dark mode uses prefers-color-scheme: dark and, for themes with a manual switch, sets
@@ -125,9 +130,21 @@ async function main() {
 
             const page = await context.newPage();
             const target = new URL(shot.url, baseURL).href;
+            const violations = [];
+            page.on('console', (message) => {
+                if (/Content Security Policy|Refused to (execute|load|apply)/i.test(message.text())) violations.push(message.text());
+            });
             try {
                 const response = await page.goto(target, { waitUntil: 'networkidle' });
+                for (const selector of shot.click ?? []) {
+                    await page.click(selector);
+                    await page.waitForTimeout(250);
+                }
                 if (shot.waitFor) await page.waitForSelector(shot.waitFor);
+                if (shot.wait) await page.waitForTimeout(shot.wait);
+                const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+                if (overflow > 0 && !shot.allowOverflow) throw new Error(`horizontal overflow of ${overflow}px at ${width}px`);
+                if (violations.length) throw new Error(`CSP violation: ${violations[0]}`);
                 const file = join(outDir, `${shot.name.replace(/\.png$/, '')}.png`);
                 await page.screenshot({ path: file, fullPage: shot.fullPage ?? false });
                 console.log(`${response?.status() ?? '---'}  ${target}  ->  ${file}`);

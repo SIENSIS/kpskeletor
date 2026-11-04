@@ -8,6 +8,9 @@ class Home extends BaseController
 {
     public function index(): string
     {
-        return view('welcome_message');
+        return theme_view('App\Views\home', [
+            'title' => lang('Core.home.title'),
+            'meta'  => ['description' => lang('Core.home.text'), 'og' => true],
+        ]);
     }
 }

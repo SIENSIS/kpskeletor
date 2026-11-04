@@ -114,11 +114,15 @@ final class ThemeOptions
     }
 
     /**
-     * CSS custom properties set by colour options: `--bs-primary` and `--bs-primary-rgb`.
+     * CSS custom properties set by colour options: `--bs-primary` and `--bs-primary-rgb`. An
+     * option with `'mode' => 'dark'` sets its property in dark mode only (an empty value keeps
+     * the light one).
+     *
+     * @param 'dark'|'light' $mode
      *
      * @return array<string, string>
      */
-    public function cssVariables(): array
+    public function cssVariables(string $mode = 'light'): array
     {
         $variables = [];
 
@@ -126,6 +130,10 @@ final class ThemeOptions
             $property = $definition['css'] ?? null;
 
             if (! is_string($property) || preg_match('/^--[a-z0-9-]+$/', $property) !== 1 || ($definition['type'] ?? null) !== 'color') {
+                continue;
+            }
+
+            if ((($definition['mode'] ?? 'light') === 'dark') !== ($mode === 'dark')) {
                 continue;
             }
 
@@ -137,29 +145,37 @@ final class ThemeOptions
 
             $variables[$property]          = strtolower($value);
             $variables[$property . '-rgb'] = implode(', ', self::rgb($value));
+
+            if ($property === '--bs-primary') {
+                // Lighter primary for text and links on dark backgrounds (WCAG AA).
+                $variables['--kp-primary-light-rgb'] = implode(', ', array_map(static fn (int $c): int => (int) round($c * 0.55 + 255 * 0.45), self::rgb($value)));
+            }
         }
 
         return $variables;
     }
 
     /**
-     * The `:root { … }` rule printed by the layouts (empty when no option sets a variable).
+     * The rules printed by the layouts: `:root { … }` and `[data-bs-theme=dark] { … }` (empty
+     * when no option sets a variable).
      */
     public function css(): string
     {
-        $variables = $this->cssVariables();
+        $rules = [];
 
-        if ($variables === []) {
-            return '';
+        foreach ([':root' => 'light', '[data-bs-theme=dark]' => 'dark'] as $selector => $mode) {
+            $lines = [];
+
+            foreach ($this->cssVariables($mode) as $property => $value) {
+                $lines[] = $property . ': ' . $value . ';';
+            }
+
+            if ($lines !== []) {
+                $rules[] = $selector . ' { ' . implode(' ', $lines) . ' }';
+            }
         }
 
-        $lines = [];
-
-        foreach ($variables as $property => $value) {
-            $lines[] = $property . ': ' . $value . ';';
-        }
-
-        return ':root { ' . implode(' ', $lines) . ' }';
+        return implode(' ', $rules);
     }
 
     /**

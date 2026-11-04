@@ -7,6 +7,8 @@ namespace Modules\Core\Theme;
 use Closure;
 use Config\Theme as ThemeConfig;
 use InvalidArgumentException;
+use Modules\Core\Frontend\AssetPublisher;
+use Modules\Core\Frontend\ThemeMode;
 use Throwable;
 
 /**
@@ -32,6 +34,9 @@ final class ThemeManager
 
     /** @var array<string, ThemeOptions> */
     private array $options = [];
+
+    /** @var array<string, ThemeMode> */
+    private array $modes = [];
 
     private readonly Regions $regions;
 
@@ -88,7 +93,7 @@ final class ThemeManager
         }
 
         $chain = $this->registry->chain($slug);
-        unset($this->resolvers[$area], $this->options[$area]);
+        unset($this->resolvers[$area], $this->options[$area], $this->modes[$area]);
         $this->chains[$area] = $chain;
     }
 
@@ -205,6 +210,16 @@ final class ThemeManager
         return $this->options[$area] ??= new ThemeOptions($this->slug($area), $this->manifests($area));
     }
 
+    /**
+     * The light/dark/auto mode of the area's pages (theme options, user choice, cookie).
+     */
+    public function mode(?string $area = null): ThemeMode
+    {
+        $area ??= $this->area;
+
+        return $this->modes[$area] ??= new ThemeMode($this->options($area));
+    }
+
     public function regions(): Regions
     {
         return $this->regions;
@@ -269,7 +284,8 @@ final class ThemeManager
     /**
      * URL of a theme asset (path relative to `Assets/`, or `vendor:<path>` under
      * `public/assets/vendor/`), found along the chain from the active theme; null when no theme
-     * of the chain ships it. Theme assets are published to `public/themes/<slug>/`.
+     * of the chain ships it. Theme assets are published to `public/themes/<slug>/` by
+     * `assets:publish` and versioned with the asset manifest's hash.
      */
     public function assetUrl(string $path, ?string $area = null): ?string
     {
@@ -284,6 +300,7 @@ final class ThemeManager
         $this->chains    = [];
         $this->resolvers = [];
         $this->options   = [];
+        $this->modes     = [];
         $this->regions->clear();
     }
 
@@ -326,14 +343,16 @@ final class ThemeManager
         if (str_starts_with($path, 'vendor:')) {
             $relative = substr($path, 7);
 
-            return is_file(FCPATH . 'assets/vendor/' . $relative) ? base_url('assets/vendor/' . $relative) : null;
+            return service('assets')->vendorUrl($relative);
         }
 
         foreach ($chain as $slug) {
             $source = $this->registry->path($slug) . '/Assets/' . $path;
 
             if (is_file($source)) {
-                return base_url('themes/' . $slug . '/' . $path) . '?v=' . substr((string) md5_file($source), 0, 10);
+                // Hash from the asset manifest (assets:publish); before the first publish, the source's.
+                return service('assets')->url('theme:' . $slug . '::' . $path)
+                    ?? base_url('themes/' . $slug . '/' . $path) . '?v=' . AssetPublisher::hash($source);
             }
         }
 

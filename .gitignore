@@ -127,7 +127,10 @@ _modules/*
 .php-cs-fixer.cache
 /public/assets/modules/
 /public/themes/
+# assets:publish output (copies of modules/*/Assets and themes/*/Assets) and the PWA icons
 /public/uploads/*
 !/public/uploads/index.html
 /test-results/
 /playwright-report/
+/public/assets/core/
+/public/assets/manifest.json

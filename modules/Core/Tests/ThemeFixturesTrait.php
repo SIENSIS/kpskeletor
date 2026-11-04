@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\Core\Tests;
 
+use Modules\Core\Frontend\AssetManifest;
+use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Theme\ThemeRegistry;
 
 /**
@@ -118,8 +120,13 @@ trait ThemeFixturesTrait
             }
         }
 
+        $published               = $this->realThemeFixtures !== [];
         $this->themesRoot        = '';
         $this->realThemeFixtures = [];
         ThemeRegistry::reset();
+
+        if ($published && is_file(FCPATH . AssetManifest::FILE)) {
+            (new AssetPublisher())->publish(); // drop the fixtures from the real asset manifest
+        }
     }
 }

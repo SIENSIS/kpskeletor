@@ -12,8 +12,8 @@ use Modules\Core\Config\ModuleManifest;
 
 /**
  * The declarations of the manifests that later services use at runtime: settings, dashboard
- * widgets, scheduled tasks, notification types, menu link types, calendars, calendar providers
- * and API resources (`module_declarations` table).
+ * widgets, scheduled tasks, notification types, menu link types, calendars, calendar providers,
+ * API resources and Content-Security-Policy sources (`module_declarations` table).
  *
  * `modules:sync` stores them (step 6) so that regular requests never load the manifests. Readers
  * see only the declarations of enabled modules, except settings (their defaults stay readable).
@@ -21,10 +21,10 @@ use Modules\Core\Config\ModuleManifest;
  */
 final class DeclarationRegistry
 {
-    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'api'];
+    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'api', 'csp'];
 
     /** Kinds declared as maps: their keys are qualified with the module ("News.perPage"). */
-    public const MAP_KINDS = ['setting', 'calendar', 'api'];
+    public const MAP_KINDS = ['setting', 'calendar', 'api', 'csp'];
 
     /** Cache scope of each kind. */
     private const SCOPES = ['setting' => 'settings', 'widget' => 'widgets'];
@@ -62,6 +62,7 @@ final class DeclarationRegistry
                 'setting'  => $manifest->settings,
                 'calendar' => $manifest->calendars,
                 'api'      => $manifest->api,
+                'csp'      => $manifest->csp,
             ];
 
             foreach ($maps as $kind => $map) {
@@ -209,6 +210,28 @@ final class DeclarationRegistry
     public function apiResources(): array
     {
         return $this->all('api');
+    }
+
+    /**
+     * Extra Content-Security-Policy sources of enabled modules, merged: directive => sources.
+     *
+     * @return array<string, list<string>>
+     */
+    public function cspSources(): array
+    {
+        $sources = [];
+
+        foreach ($this->all('csp') as $key => $declaration) {
+            $directive = substr($key, strpos($key, '.') + 1);
+
+            foreach ($declaration['definition'] as $source) {
+                if (is_string($source) && ! in_array($source, $sources[$directive] ?? [], true)) {
+                    $sources[$directive][] = $source;
+                }
+            }
+        }
+
+        return $sources;
     }
 
     /**

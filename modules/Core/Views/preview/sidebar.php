@@ -11,9 +11,9 @@ $items = [
 ?>
 <ul class="nav flex-column gap-1">
     <?php foreach ($items as [$icon, $label, $active]): ?>
-        <li class="nav-item"><a class="nav-link<?= $active ? ' active' : '' ?>" href="#"<?= $active ? ' aria-current="page"' : '' ?>><i class="bi <?= $icon ?>" aria-hidden="true"></i><?= esc(lang($label)) ?></a></li>
+        <li class="nav-item"><a class="nav-link<?= $active ? ' active' : '' ?>" href="#" title="<?= esc(lang($label)) ?>"<?= $active ? ' aria-current="page"' : '' ?>><i class="bi <?= $icon ?>" aria-hidden="true"></i><span class="nav-text"><?= esc(lang($label)) ?></span></a></li>
     <?php endforeach ?>
     <li class="nav-heading"><?= esc(lang('Core.preview.menu.admin')) ?></li>
-    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people" aria-hidden="true"></i><?= esc(lang('Core.preview.menu.users')) ?></a></li>
-    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear" aria-hidden="true"></i><?= esc(lang('Core.preview.menu.settings')) ?></a></li>
+    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people" aria-hidden="true"></i><span class="nav-text"><?= esc(lang('Core.preview.menu.users')) ?></span></a></li>
+    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear" aria-hidden="true"></i><span class="nav-text"><?= esc(lang('Core.preview.menu.settings')) ?></span></a></li>
 </ul>

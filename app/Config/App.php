@@ -199,6 +199,9 @@ class App extends BaseConfig
      *
      * @see http://www.html5rocks.com/en/tutorials/security/content-security-policy/
      * @see http://www.w3.org/TR/CSP/
+     *
+     * Always on (strict policy with nonces, see Config\ContentSecurityPolicy); test a change with
+     * `contentsecuritypolicy.reportOnly = true` instead of disabling it.
      */
-    public bool $CSPEnabled = false;
+    public bool $CSPEnabled = true;
 }

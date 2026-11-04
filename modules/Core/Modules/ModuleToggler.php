@@ -6,6 +6,7 @@ namespace Modules\Core\Modules;
 
 use CodeIgniter\I18n\Time;
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Models\ModuleModel;
 
 /**
@@ -14,8 +15,8 @@ use Modules\Core\Models\ModuleModel;
  * Disabling hides a module at once (routes 404, registries, permissions) without deleting any
  * data or grant; enabling it again restores everything. Core modules cannot be disabled, nor a
  * module that enabled modules depend on; enabling a module whose dependencies are disabled needs
- * them enabled too (`$withDependencies`). Enabling runs the module's pending migrations; if they
- * fail the module stays disabled.
+ * them enabled too (`$withDependencies`). Enabling runs the module's pending migrations (if they
+ * fail the module stays disabled) and publishes its assets.
  */
 final class ModuleToggler
 {
@@ -27,6 +28,7 @@ final class ModuleToggler
         private readonly ModuleMigrator $migrator = new ModuleMigrator(),
         private readonly CacheInvalidator $caches = new CacheInvalidator(),
         private readonly ?ModuleModel $registry = null,
+        private readonly ?AssetPublisher $assets = null,
     ) {
     }
 
@@ -99,6 +101,7 @@ final class ModuleToggler
         foreach ($order as $module) {
             $this->migrator->migrate('Modules\\' . $module);
             $this->setEnabled($known[$module]['id'], true);
+            ($this->assets ?? new AssetPublisher())->publish(AssetPublisher::ownerOf($module));
         }
 
         $this->caches->invalidate();

@@ -9,13 +9,13 @@ use CodeIgniter\I18n\Time;
 use Config\Database;
 use Modules\Core\Config\ModuleManifest;
 use Modules\Core\Demo\DemoDataManager;
+use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Models\ModuleModel;
 use Modules\Core\Permissions\CatalogueBuilder;
 use Modules\Core\Permissions\DefaultGrants;
 use Modules\Core\Permissions\PermissionCatalogue;
 use Modules\Core\Registry\ApiRouteChecker;
 use Modules\Core\Registry\DeclarationRegistry;
-use Modules\Core\Theme\ThemeAssetPublisher;
 use Modules\Core\Theme\ThemeValidator;
 
 /**
@@ -26,8 +26,8 @@ use Modules\Core\Theme\ThemeValidator;
  * invalidates the derived caches. Idempotent: a second run changes nothing.
  *
  * Every check (manifests, dependencies, duplicate permissions, `$api` routes) runs before
- * anything is written, the themes included (ThemeValidator). Step 7 publishes the themes' assets
- * (ThemeAssetPublisher); module assets arrive with the front-end session.
+ * anything is written, the themes included (ThemeValidator). Step 7 publishes the assets of the
+ * Core, the modules and the themes and writes the asset manifest (AssetPublisher).
  */
 final class ModuleSynchronizer
 {
@@ -41,7 +41,7 @@ final class ModuleSynchronizer
         private readonly DeclarationRegistry $declarations = new DeclarationRegistry(),
         private readonly ?DemoDataManager $demo = null,
         private readonly ?ThemeValidator $themes = null,
-        private readonly ?ThemeAssetPublisher $themeAssets = null,
+        private readonly ?AssetPublisher $assets = null,
     ) {
     }
 
@@ -155,8 +155,8 @@ final class ModuleSynchronizer
 
         $report->declarationsChanged = $this->declarations->store($this->declarations->build($ordered));
 
-        // 7. Theme assets (module assets: front-end session).
-        $report->themeAssets = array_filter(($this->themeAssets ?? new ThemeAssetPublisher())->publishAll());
+        // 7. Assets of the Core, the modules and the themes, and the asset manifest.
+        $report->assets = ($this->assets ?? new AssetPublisher())->publish();
 
         // 8. Invalidate the caches derived from the manifests.
         if ($report->hasChanges()) {

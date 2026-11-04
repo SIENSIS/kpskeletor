@@ -6,7 +6,6 @@ namespace Modules\Core\Tests;
 
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\StreamFilterTrait;
-use Modules\Core\Theme\ThemeAssetPublisher;
 use Modules\Core\Theme\ThemeGenerator;
 use Modules\Core\Theme\ThemeRegistry;
 use Modules\Core\Theme\ThemeValidator;
@@ -92,30 +91,5 @@ final class ThemeGeneratorTest extends CIUnitTestCase
         $this->resetStreamFilterBuffer();
         command('make:theme Other' . $name . ' --parent=nowhere');
         $this->assertStringContainsString('The parent theme "nowhere" does not exist', $this->getStreamFilterBuffer());
-    }
-
-    public function testPublisherCopiesChangesAndRemovesStaleFiles(): void
-    {
-        $slug   = $this->uniqueSlug('pub');
-        $target = $this->themesRoot() . '/public';
-        $this->makeBaseTheme($slug, '', [
-            'Assets/css/theme.css' => 'a{}',
-            'Assets/img/logo.png'  => 'png',
-            'Assets/evil.php'      => '<?php echo 1;',
-        ]);
-        $publisher = new ThemeAssetPublisher(new ThemeRegistry($this->themesRoot()), $target);
-
-        $this->assertSame(2, $publisher->publish($slug));
-        $this->assertFileExists("{$target}/{$slug}/css/theme.css");
-        $this->assertFileDoesNotExist("{$target}/{$slug}/evil.php");
-        $this->assertSame(0, $publisher->publish($slug));
-
-        unlink($this->themesRoot() . "/{$slug}/Assets/img/logo.png");
-        file_put_contents($this->themesRoot() . "/{$slug}/Assets/css/theme.css", 'b{}');
-
-        $this->assertSame(2, $publisher->publish($slug));
-        $this->assertSame('b{}', file_get_contents("{$target}/{$slug}/css/theme.css"));
-        $this->assertDirectoryDoesNotExist("{$target}/{$slug}/img");
-        $this->assertSame(0, $publisher->publish('../etc'));
     }
 }

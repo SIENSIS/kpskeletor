@@ -11,10 +11,11 @@
  * @var string|null           $cancelUrl
  * @var array<string, string> $hidden
  * @var bool|null             $multipart
+ * @var bool|null             $dirtyGuard  warn before leaving with unsaved changes (core/forms/dirty-guard.js)
  */
 $method = strtolower($method ?? 'post') === 'get' ? 'get' : 'post';
 ?>
-<form action="<?= esc(ui_safe_url($action ?? '')) ?>" method="<?= $method ?>" class="card form-layout shadow-sm"<?= ! empty($multipart) ? ' enctype="multipart/form-data"' : '' ?>>
+<form action="<?= esc(ui_safe_url($action ?? '')) ?>" method="<?= $method ?>" class="card form-layout shadow-sm"<?= ! empty($multipart) ? ' enctype="multipart/form-data"' : '' ?><?= ! empty($dirtyGuard) ? ' data-dirty-guard' : '' ?>>
     <?php if ($method === 'post'): ?><?= csrf_field() ?><?php endif ?>
     <?php foreach ($hidden ?? [] as $name => $value): ?>
         <input type="hidden" name="<?= esc($name) ?>" value="<?= esc($value) ?>">

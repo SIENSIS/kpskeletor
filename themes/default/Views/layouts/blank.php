@@ -8,7 +8,7 @@
 $font = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
 ?>
 <!doctype html>
-<html lang="<?= esc(service('request')->getLocale()) ?>">
+<html lang="<?= esc(service('request')->getLocale()) ?>"<?= theme_mode()->attributes() ?>>
 <head>
 <?= $this->include(theme_resolve('partials/head')) ?>
 </head>

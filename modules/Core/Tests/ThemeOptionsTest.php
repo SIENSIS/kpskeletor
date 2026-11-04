@@ -75,10 +75,12 @@ final class ThemeOptionsTest extends CIUnitTestCase
         $this->assertSame([
             '--bs-primary'     => '#6f42c1',
             '--bs-primary-rgb' => '111, 66, 193',
+            // lighter primary for dark mode
+            '--kp-primary-light-rgb' => '176, 151, 221',
             '--kp-accent'      => '#abc',
             '--kp-accent-rgb'  => '170, 187, 204',
         ], $css);
-        $this->assertSame(':root { --bs-primary: #6f42c1; --bs-primary-rgb: 111, 66, 193; --kp-accent: #abc; --kp-accent-rgb: 170, 187, 204; }', $this->options()->css());
+        $this->assertSame(':root { --bs-primary: #6f42c1; --bs-primary-rgb: 111, 66, 193; --kp-primary-light-rgb: 176, 151, 221; --kp-accent: #abc; --kp-accent-rgb: 170, 187, 204; }', $this->options()->css());
     }
 
     public function testAnInvalidSavedColourNeverReachesTheCss(): void

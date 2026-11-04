@@ -156,7 +156,7 @@ final class ThemeManagerTest extends CIUnitTestCase
             $this->assertStringContainsString('<title>Layout ' . $layout, $html, $layout);
             $this->assertStringNotContainsString(' style="', $html, $layout);
             $this->assertStringNotContainsString(' onclick=', $html, $layout);
-            $this->assertDoesNotMatchRegularExpression('/<script(?![^>]*\bsrc=)[^>]*>/', $html, $layout);
+            $this->assertDoesNotMatchRegularExpression('/<script(?![^>]*\b(?:src=|type="application\/json"|type="importmap"))[^>]*>/', $html, $layout);
         }
     }
 

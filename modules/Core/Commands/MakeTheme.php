@@ -6,7 +6,7 @@ namespace Modules\Core\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
-use Modules\Core\Theme\ThemeAssetPublisher;
+use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Theme\ThemeGenerator;
 use Modules\Core\Theme\ThemeValidator;
 
@@ -63,7 +63,7 @@ final class MakeTheme extends BaseCommand
             CLI::error($message);
         }
 
-        (new ThemeAssetPublisher())->publish($slug);
+        (new AssetPublisher())->publish('theme:' . $slug);
 
         CLI::write(lang('Core.theme.make.created', [$slug, clean_path($path)]), 'green');
         CLI::write(lang('Core.theme.make.next', [$slug]));

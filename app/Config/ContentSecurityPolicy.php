@@ -7,13 +7,19 @@ namespace Config;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Stores the default settings for the ContentSecurityPolicy, if you
- * choose to use it. The values here will be read in and set as defaults
- * for the site. If needed, they can be overridden on a page-by-page basis.
+ * Strict Content-Security-Policy of every response (enabled in Config\App::$CSPEnabled), see
+ * docs/security.md and the specification, "Security baseline":
  *
- * Suggested reference for explanations:
+ *   default-src 'self'; script-src 'self' 'nonce-…'; style-src 'self' 'nonce-…';
+ *   img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self';
+ *   form-action 'self'; frame-ancestors 'none'
  *
- * @see https://www.html5rocks.com/en/tutorials/security/content-security-policy/
+ * Never `unsafe-inline` or `unsafe-eval`: views have no inline code, handlers or style
+ * attributes; the import map, the theme-variables <style> and library blocks carry the nonce
+ * (`csp_script_nonce()`, `csp_style_nonce()`). Modules add sources in their manifest (`$csp`,
+ * applied by the Core `cspmodules` filter). Every value can be overridden from `.env`
+ * (`contentsecuritypolicy.reportOnly = true` sends Content-Security-Policy-Report-Only instead,
+ * to test a change before enforcing it).
  */
 class ContentSecurityPolicy extends BaseConfig
 {
@@ -54,7 +60,7 @@ class ContentSecurityPolicy extends BaseConfig
      *
      * @var list<string>|string|null
      */
-    public $defaultSrc;
+    public $defaultSrc = 'self';
 
     /**
      * Lists allowed scripts' URLs.
@@ -72,11 +78,11 @@ class ContentSecurityPolicy extends BaseConfig
 
     /**
      * Specifies valid sources for JavaScript inline event
-     * handlers and JavaScript URLs.
+     * handlers and JavaScript URLs: none (no on*="" attributes).
      *
      * @var list<string>|string
      */
-    public array|string $scriptSrcAttr = 'self';
+    public array|string $scriptSrcAttr = 'none';
 
     /**
      * Lists allowed stylesheets' URLs.
@@ -93,19 +99,19 @@ class ContentSecurityPolicy extends BaseConfig
     public array|string $styleSrcElem = 'self';
 
     /**
-     * Specifies valid sources for stylesheets inline
-     * style attributes and `<style>` elements.
+     * Specifies valid sources for inline style attributes: none (no style="";
+     * scripts set styles through the CSSOM).
      *
      * @var list<string>|string
      */
-    public array|string $styleSrcAttr = 'self';
+    public array|string $styleSrcAttr = 'none';
 
     /**
      * Defines the origins from which images can be loaded.
      *
      * @var list<string>|string
      */
-    public $imageSrc = 'self';
+    public $imageSrc = ['self', 'data:'];
 
     /**
      * Restricts the URLs that can appear in a page's `<base>` element.
@@ -114,7 +120,7 @@ class ContentSecurityPolicy extends BaseConfig
      *
      * @var list<string>|string|null
      */
-    public $baseURI;
+    public $baseURI = 'self';
 
     /**
      * Lists the URLs for workers and embedded frame contents
@@ -136,7 +142,7 @@ class ContentSecurityPolicy extends BaseConfig
      *
      * @var list<string>|string
      */
-    public $fontSrc;
+    public $fontSrc = 'self';
 
     /**
      * Lists valid endpoints for submission from `<form>` tags.
@@ -153,7 +159,7 @@ class ContentSecurityPolicy extends BaseConfig
      *
      * @var list<string>|string|null
      */
-    public $frameAncestors;
+    public $frameAncestors = 'none';
 
     /**
      * The frame-src directive restricts the URLs which may
@@ -175,17 +181,17 @@ class ContentSecurityPolicy extends BaseConfig
      *
      * @var list<string>|string
      */
-    public $objectSrc = 'self';
+    public $objectSrc = 'none';
 
     /**
      * @var list<string>|string|null
      */
-    public $manifestSrc;
+    public $manifestSrc = 'self';
 
     /**
      * @var list<string>|string
      */
-    public array|string $workerSrc = [];
+    public array|string $workerSrc = 'self';
 
     /**
      * Limits the kinds of plugins a page may invoke.
