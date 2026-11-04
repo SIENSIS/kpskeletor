@@ -54,7 +54,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   (their own resources, granted to every group by `defaultGrants`); every `api/v1/` route has the
   `kpapy` filter or is declared public. Default deny.
 - **Database:** one migration per table, Forge / Query Builder only, `down()` always implemented,
-  released migrations never edited. Demo data only in `<Name>DemoSeeder` through `DemoData`.
+  released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
+  `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.
+  Module routes point at controllers (a disabled module answers 404 through its controller namespace).
 - **Front end:** Bootstrap 5.3 served locally, native ES modules in `modules/<Name>/Assets/js`,
   components by `data-component`. **No inline `<script>`, `on*=` handlers or `style=""`** (strict
   CSP with nonces). Never edit `public/assets/modules/…` (published copies).

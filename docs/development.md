@@ -17,7 +17,7 @@ How to install, run and check kpskeletor while developing. Per-computer setup:
 composer install
 cp env .env              # then set CI_ENVIRONMENT, app.baseURL, app.maskKey and the database
 php spark key:generate
-php spark migrate --all  # later: php spark modules:sync
+php spark modules:sync   # migrations, registry, permissions, settings; --demo loads demo data
 npm ci                   # optional, Playwright
 ```
 
