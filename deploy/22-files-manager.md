@@ -7,23 +7,25 @@
 ## Before starting: bring `main` up to date
 
 1. `git fetch --all --prune && git checkout main && git pull`.
-2. **Merge every finished session branch into `main`**, in order: for each branch `session-NN-*`
-   (NN < 22) not yet contained in `main` (`git branch -r --no-merged origin/main`; a session may
-   have used another branch name: then it is the head branch of the pull request "Session NN: …"):
+2. **Merge every finished session into `main`**, in order. A session is identified by its pull
+   request title "Session NN: …" and by the branch recorded for it in `docs/progress.md` (it may
+   be `session-NN-<slug>` or a branch assigned by the environment). For each session NN < 22
+   whose branch is not yet contained in `main` (`git branch -r --no-merged origin/main`):
    - check it is finished: its `docs/progress.md` marks the session "done" and its
      `deploy-status/NN-*/README.md` exists; if not, stop and tell me to run
      `deploy/continue.md NN` first;
-   - `git merge --no-ff origin/session-NN-<slug> -m "Merge session NN: <title>"`; resolve trivial
+   - `git merge --no-ff origin/<its branch> -m "Merge session NN: <title>"`; resolve trivial
      conflicts (e.g. `docs/progress.md`); if a conflict touches code, stop and tell me;
    - run the checks (`composer install`, `vendor/bin/phpunit`, PHPStan, php-cs-fixer); if they fail,
      fix them on `main` in a separate commit or stop and tell me;
    - in `docs/progress.md` change that session's status to **merged**;
-   - `git push origin main` (if pushing to `main` is refused, stop and tell me to merge the pull
-     request on GitHub, then run this file again).
+   - `git push origin main`, never with `--force`; if pushing to `main` is refused, stop and tell
+     me to merge the pull request "Session NN: …" on GitHub, then run this file again.
 3. Check that session 21 is now in `main` (marked merged in `docs/progress.md`). If it is not,
    stop and tell me which session must be finished first.
-4. Create the branch `session-22-files-manager` from the updated `main` (if this environment already
-   assigned you a working branch, use that one and say so in the pull request).
+4. Work on a branch based on the updated `main`: if this environment assigned you a working branch,
+   use it (merge `origin/main` into it if it does not contain it yet); otherwise create
+   `session-22-files-manager`. Record the branch name for session 22 in `docs/progress.md`.
 5. Run `composer install` if needed, and the checks once to know the starting state.
 6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
    `deploy-status/` report, and these sections of `docs/specification.md`: "Modules" › "Files" (manager, metadata, ACL, spaces, quotas, serving).
@@ -41,7 +43,7 @@ A file manager over the storage service with inherited folder permissions.
 - Browse, folders CRUD, upload (multiple, drag and drop, progress), rename, move, trash and
   restore, download, preview, public URL; metadata table; search and filters; list/grid views.
 - Folder ACL with inheritance, subjects and rights, predefined spaces (personal, modules, shared),
-  personal space per group setting, quotas, `FileAccessPolicy` registration.
+  personal space `users/{user_id}/` per group setting, quotas, `FileAccessPolicy` registration.
 - Tests: ACL inheritance, traversal, quotas.
 
 ## Out of scope
@@ -86,8 +88,10 @@ File picker (session 23).
      screen (e.g. a console command), include the console output in the README instead; if
      screenshots are impossible in this environment, say why in the README.
 3. Update `docs/progress.md`: status of session 22 = **done**, decisions, deviations, known
-   issues, notes for the next session, and the link to `deploy-status/22-files-manager/`.
-4. Commit in small commits on the session branch, push it and open a pull request titled
+   issues, notes for the next session, the session's branch name and the link to
+   `deploy-status/22-files-manager/`.
+4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
+   request titled exactly
    "Session 22: Files module: file manager and folder ACL" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and

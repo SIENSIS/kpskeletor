@@ -7,23 +7,25 @@
 ## Before starting: bring `main` up to date
 
 1. `git fetch --all --prune && git checkout main && git pull`.
-2. **Merge every finished session branch into `main`**, in order: for each branch `session-NN-*`
-   (NN < 04) not yet contained in `main` (`git branch -r --no-merged origin/main`; a session may
-   have used another branch name: then it is the head branch of the pull request "Session NN: …"):
+2. **Merge every finished session into `main`**, in order. A session is identified by its pull
+   request title "Session NN: …" and by the branch recorded for it in `docs/progress.md` (it may
+   be `session-NN-<slug>` or a branch assigned by the environment). For each session NN < 04
+   whose branch is not yet contained in `main` (`git branch -r --no-merged origin/main`):
    - check it is finished: its `docs/progress.md` marks the session "done" and its
      `deploy-status/NN-*/README.md` exists; if not, stop and tell me to run
      `deploy/continue.md NN` first;
-   - `git merge --no-ff origin/session-NN-<slug> -m "Merge session NN: <title>"`; resolve trivial
+   - `git merge --no-ff origin/<its branch> -m "Merge session NN: <title>"`; resolve trivial
      conflicts (e.g. `docs/progress.md`); if a conflict touches code, stop and tell me;
    - run the checks (`composer install`, `vendor/bin/phpunit`, PHPStan, php-cs-fixer); if they fail,
      fix them on `main` in a separate commit or stop and tell me;
    - in `docs/progress.md` change that session's status to **merged**;
-   - `git push origin main` (if pushing to `main` is refused, stop and tell me to merge the pull
-     request on GitHub, then run this file again).
+   - `git push origin main`, never with `--force`; if pushing to `main` is refused, stop and tell
+     me to merge the pull request "Session NN: …" on GitHub, then run this file again.
 3. Check that session 03 is now in `main` (marked merged in `docs/progress.md`). If it is not,
    stop and tell me which session must be finished first.
-4. Create the branch `session-04-frontend` from the updated `main` (if this environment already
-   assigned you a working branch, use that one and say so in the pull request).
+4. Work on a branch based on the updated `main`: if this environment assigned you a working branch,
+   use it (merge `origin/main` into it if it does not contain it yet); otherwise create
+   `session-04-frontend`. Record the branch name for session 04 in `docs/progress.md`.
 5. Run `composer install` if needed, and the checks once to know the starting state.
 6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
    `deploy-status/` report, and these sections of `docs/specification.md`: "Front-end assets and JavaScript", "Themes" ("Light and dark mode", "Responsive design", "Minimal PWA"), "Security baseline" (CSP part).
@@ -39,15 +41,20 @@ The asset pipeline and the core JavaScript, with a strict CSP from the start.
 ## Scope
 
 - `assets:publish [--watch]` (CodeIgniter Publisher) to `public/assets/core|modules/<name>`,
-  `public/themes/<theme>`; asset manifest with hashes; `asset()` helper; development serving rule.
+  `public/themes/<theme>`; asset manifest with hashes; `asset()` helper; development serving rule;
+  the import map lists every published JS file with its hashed URL (test: the map changes when a
+  file changes).
 - Import map printed by the layout (with nonce); core JS: `app.js`, `components.js`, `http.js`
   (CSRF header, JSON errors → toasts), `ui/` (confirm, toast, modal, sidebar, tabs-memory,
   theme-switch), `forms/` (dirty-guard, date; editor and file-picker are stubs filled later).
 - `data-component` loading with dynamic `import()`, JSON data blocks.
 - CSP with nonces, configurable (`Config\ContentSecurityPolicy`, report-only mode); no inline code.
 - Light/dark/auto mode without flash, responsive layout rules (offcanvas sidebar, compact top bar),
-  minimal PWA manifest and service worker (no caching of authenticated responses, setting).
-- CI: CSP check of views (no inline scripts/handlers/styles), published assets up to date,
+  minimal PWA: `/manifest.webmanifest` and `/sw.js` routed by the Core, PNG icons (192/512)
+  generated with GD from the logo, no caching of authenticated responses, setting.
+- CI: CSP check of the project's views in `app/`, `modules/` and `themes/` (no inline
+  scripts/handlers/styles; nonce'd blocks rendered by kpcrudy/kpapy are the only exception),
+  published assets up to date,
   `vendor.json` checksums.
 
 ## Out of scope
@@ -93,8 +100,10 @@ Rich-text editor and calendar libraries (sessions 20 and 24).
      screen (e.g. a console command), include the console output in the README instead; if
      screenshots are impossible in this environment, say why in the README.
 3. Update `docs/progress.md`: status of session 04 = **done**, decisions, deviations, known
-   issues, notes for the next session, and the link to `deploy-status/04-frontend/`.
-4. Commit in small commits on the session branch, push it and open a pull request titled
+   issues, notes for the next session, the session's branch name and the link to
+   `deploy-status/04-frontend/`.
+4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
+   request titled exactly
    "Session 04: Front-end assets, JavaScript, CSP, dark mode, responsive and PWA" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and

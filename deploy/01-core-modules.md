@@ -7,23 +7,25 @@
 ## Before starting: bring `main` up to date
 
 1. `git fetch --all --prune && git checkout main && git pull`.
-2. **Merge every finished session branch into `main`**, in order: for each branch `session-NN-*`
-   (NN < 01) not yet contained in `main` (`git branch -r --no-merged origin/main`; a session may
-   have used another branch name: then it is the head branch of the pull request "Session NN: …"):
+2. **Merge every finished session into `main`**, in order. A session is identified by its pull
+   request title "Session NN: …" and by the branch recorded for it in `docs/progress.md` (it may
+   be `session-NN-<slug>` or a branch assigned by the environment). For each session NN < 01
+   whose branch is not yet contained in `main` (`git branch -r --no-merged origin/main`):
    - check it is finished: its `docs/progress.md` marks the session "done" and its
      `deploy-status/NN-*/README.md` exists; if not, stop and tell me to run
      `deploy/continue.md NN` first;
-   - `git merge --no-ff origin/session-NN-<slug> -m "Merge session NN: <title>"`; resolve trivial
+   - `git merge --no-ff origin/<its branch> -m "Merge session NN: <title>"`; resolve trivial
      conflicts (e.g. `docs/progress.md`); if a conflict touches code, stop and tell me;
    - run the checks (`composer install`, `vendor/bin/phpunit`, PHPStan, php-cs-fixer); if they fail,
      fix them on `main` in a separate commit or stop and tell me;
    - in `docs/progress.md` change that session's status to **merged**;
-   - `git push origin main` (if pushing to `main` is refused, stop and tell me to merge the pull
-     request on GitHub, then run this file again).
+   - `git push origin main`, never with `--force`; if pushing to `main` is refused, stop and tell
+     me to merge the pull request "Session NN: …" on GitHub, then run this file again.
 3. Check that session 00 is now in `main` (marked merged in `docs/progress.md`). If it is not,
    stop and tell me which session must be finished first.
-4. Create the branch `session-01-core-modules` from the updated `main` (if this environment already
-   assigned you a working branch, use that one and say so in the pull request).
+4. Work on a branch based on the updated `main`: if this environment assigned you a working branch,
+   use it (merge `origin/main` into it if it does not contain it yet); otherwise create
+   `session-01-core-modules`. Record the branch name for session 01 in `docs/progress.md`.
 5. Run `composer install` if needed, and the checks once to know the starting state.
 6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
    `deploy-status/` report, and these sections of `docs/specification.md`: "Directory layout", "The module contract", "Common module base", "Database schema: migrations per table", "Module lifecycle", "Versioning".
@@ -38,16 +40,23 @@ The module system works end to end with an empty module: discovery, typed manife
 
 ## Scope
 
-- Autoload `Modules\\` and `Themes\\` (PSR-4, static), CodeIgniter discovery only.
+- Autoload `Modules\\` and `Themes\\` (PSR-4, static), CodeIgniter discovery only, plus one PSR-4
+  namespace per module (`Modules\News` → `modules/News`) from the generated static file
+  `app/Config/ModuleNamespaces.php`, merged by `app/Config/Autoload.php` and rewritten by
+  `make:module` and `modules:sync` (later also `modules:install`); no scanning at runtime. Test that
+  a new module's `Config/Routes.php` is discovered after `modules:sync`.
 - `modules/Core` with `Config/Module.php`, `Config/Version.php` and the `ModuleManifest` base class
-  (every manifest key of the specification, typed, with defaults) and its validator (clear errors).
+  (every manifest key of the specification, typed, with defaults, including the optional resource
+  `'name'`) and its validator (clear errors; reserved module names `Security` and `Update`; module
+  config files named `Events`, `Routes`, `Registrar`, `Filters`, `Modules` or `Services` refused).
 - Module registry (`modules` table, migration per table), dependency and version checks.
 - `modules:sync` steps 1–3 and 8 (discover, validate, migrate per module namespace, seed on first
   install, registry upsert, cache invalidation hook), idempotent; `modules:list`, `modules:status`.
 - Base classes: `BaseModel` (timestamps, soft deletes, `created_by`/`updated_by`), `BaseEntity`,
   `BackendController` and `FrontendController` skeletons (filled in later sessions).
 - `make:module <Name>` generating an empty module from templates (manifest, routes, language
-  files ca/es/en, controller, view, asset folders, migration stub, a test).
+  files ca/es/en, controller, view, asset folders, migration stub, a widget stub, a scheduled-task
+  stub, a test), and writing its namespace into `app/Config/ModuleNamespaces.php`.
 - Tests: manifest validation, sync idempotency, migration up/down/up for Core.
 
 ## Out of scope
@@ -93,8 +102,10 @@ Permissions, menus, settings, themes and assets registration (later sessions); d
      screen (e.g. a console command), include the console output in the README instead; if
      screenshots are impossible in this environment, say why in the README.
 3. Update `docs/progress.md`: status of session 01 = **done**, decisions, deviations, known
-   issues, notes for the next session, and the link to `deploy-status/01-core-modules/`.
-4. Commit in small commits on the session branch, push it and open a pull request titled
+   issues, notes for the next session, the session's branch name and the link to
+   `deploy-status/01-core-modules/`.
+4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
+   request titled exactly
    "Session 01: Core kernel: modules, manifest and sync" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and

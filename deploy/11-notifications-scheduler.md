@@ -7,23 +7,25 @@
 ## Before starting: bring `main` up to date
 
 1. `git fetch --all --prune && git checkout main && git pull`.
-2. **Merge every finished session branch into `main`**, in order: for each branch `session-NN-*`
-   (NN < 11) not yet contained in `main` (`git branch -r --no-merged origin/main`; a session may
-   have used another branch name: then it is the head branch of the pull request "Session NN: …"):
+2. **Merge every finished session into `main`**, in order. A session is identified by its pull
+   request title "Session NN: …" and by the branch recorded for it in `docs/progress.md` (it may
+   be `session-NN-<slug>` or a branch assigned by the environment). For each session NN < 11
+   whose branch is not yet contained in `main` (`git branch -r --no-merged origin/main`):
    - check it is finished: its `docs/progress.md` marks the session "done" and its
      `deploy-status/NN-*/README.md` exists; if not, stop and tell me to run
      `deploy/continue.md NN` first;
-   - `git merge --no-ff origin/session-NN-<slug> -m "Merge session NN: <title>"`; resolve trivial
+   - `git merge --no-ff origin/<its branch> -m "Merge session NN: <title>"`; resolve trivial
      conflicts (e.g. `docs/progress.md`); if a conflict touches code, stop and tell me;
    - run the checks (`composer install`, `vendor/bin/phpunit`, PHPStan, php-cs-fixer); if they fail,
      fix them on `main` in a separate commit or stop and tell me;
    - in `docs/progress.md` change that session's status to **merged**;
-   - `git push origin main` (if pushing to `main` is refused, stop and tell me to merge the pull
-     request on GitHub, then run this file again).
+   - `git push origin main`, never with `--force`; if pushing to `main` is refused, stop and tell
+     me to merge the pull request "Session NN: …" on GitHub, then run this file again.
 3. Check that session 10 is now in `main` (marked merged in `docs/progress.md`). If it is not,
    stop and tell me which session must be finished first.
-4. Create the branch `session-11-notifications-scheduler` from the updated `main` (if this environment already
-   assigned you a working branch, use that one and say so in the pull request).
+4. Work on a branch based on the updated `main`: if this environment assigned you a working branch,
+   use it (merge `origin/main` into it if it does not contain it yet); otherwise create
+   `session-11-notifications-scheduler`. Record the branch name for session 11 in `docs/progress.md`.
 5. Run `composer install` if needed, and the checks once to know the starting state.
 6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
    `deploy-status/` report, and these sections of `docs/specification.md`: "Notifications", "Scheduled tasks".
@@ -39,9 +41,12 @@ Cross-module notifications and the single-cron scheduler.
 ## Scope
 
 - `notify()`, `notifyGroup()`, `notifyPermission()`, notification types from manifests, channels
-  `database` and `email` (queued, sent by the scheduler), user preferences, mandatory types, bell
-  UI, list page (kpcrudy, own records).
-- Scheduler: `TaskInterface`, schedule helpers, locks (`withoutOverlapping`), `schedule:run|list`,
+  `database` and `email` (queued, sent by the scheduler; transactional security emails such as
+  reset links and 2FA codes stay inline with a short timeout and are logged), user preferences,
+  mandatory types, bell UI, list page (kpcrudy, own records; resource `core-notifications` granted
+  to every group through `defaultGrants`).
+- Scheduler (called "scheduled tasks" in texts and docs, never just "tasks"): `TaskInterface`,
+  schedule helpers, locks (`withoutOverlapping`), `schedule:run|list`,
   task runs tables, back-office page with "run now", failure notification, disabled modules
   skipped, poor man's cron fallback.
 - Wire the 2FA-reset notification from session 06.
@@ -85,8 +90,10 @@ Cross-module notifications and the single-cron scheduler.
      screen (e.g. a console command), include the console output in the README instead; if
      screenshots are impossible in this environment, say why in the README.
 3. Update `docs/progress.md`: status of session 11 = **done**, decisions, deviations, known
-   issues, notes for the next session, and the link to `deploy-status/11-notifications-scheduler/`.
-4. Commit in small commits on the session branch, push it and open a pull request titled
+   issues, notes for the next session, the session's branch name and the link to
+   `deploy-status/11-notifications-scheduler/`.
+4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
+   request titled exactly
    "Session 11: Notifications and scheduler" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and

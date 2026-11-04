@@ -53,9 +53,11 @@ Busca quina és la sessió següent i l'executa. També pots executar-ne una de 
 **Cada sessió, en començar, unifica les branques a `main`:** fusiona (`merge --no-ff`) a `main`,
 per ordre, les branques de les sessions anteriors que estiguin acabades i encara no hi siguin;
 passa les proves després de cada fusió, marca la sessió com a *merged* a `docs/progress.md`, fa
-`push` de `main` i només llavors crea la seva branca. Si una branca no està acabada, si hi ha un
-conflicte en el codi o si les proves fallen, s'atura i t'ho diu. Si vols revisar una fase abans
-que es fusioni, fes-ho abans d'executar la sessió següent (la pull request de cada sessió queda a
+`push` de `main` (mai amb `--force`) i només llavors crea la seva branca. Les sessions
+s'identifiquen pel títol de la pull request («Session NN: …») i per la branca anotada a
+`docs/progress.md`: si l'entorn assigna un nom de branca propi, la sessió l'usa. Si una branca no
+està acabada, si hi ha un conflicte en el codi o si les proves fallen, s'atura i t'ho diu. Si vols
+revisar una fase abans que es fusioni, fes-ho abans d'executar la sessió següent (la pull request de cada sessió queda a
 GitHub i es marca com a fusionada sola).
 
 > Perquè les sessions puguin fer `push` a `main`, la branca no ha d'estar protegida contra els

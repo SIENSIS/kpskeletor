@@ -7,23 +7,25 @@
 ## Before starting: bring `main` up to date
 
 1. `git fetch --all --prune && git checkout main && git pull`.
-2. **Merge every finished session branch into `main`**, in order: for each branch `session-NN-*`
-   (NN < 08) not yet contained in `main` (`git branch -r --no-merged origin/main`; a session may
-   have used another branch name: then it is the head branch of the pull request "Session NN: …"):
+2. **Merge every finished session into `main`**, in order. A session is identified by its pull
+   request title "Session NN: …" and by the branch recorded for it in `docs/progress.md` (it may
+   be `session-NN-<slug>` or a branch assigned by the environment). For each session NN < 08
+   whose branch is not yet contained in `main` (`git branch -r --no-merged origin/main`):
    - check it is finished: its `docs/progress.md` marks the session "done" and its
      `deploy-status/NN-*/README.md` exists; if not, stop and tell me to run
      `deploy/continue.md NN` first;
-   - `git merge --no-ff origin/session-NN-<slug> -m "Merge session NN: <title>"`; resolve trivial
+   - `git merge --no-ff origin/<its branch> -m "Merge session NN: <title>"`; resolve trivial
      conflicts (e.g. `docs/progress.md`); if a conflict touches code, stop and tell me;
    - run the checks (`composer install`, `vendor/bin/phpunit`, PHPStan, php-cs-fixer); if they fail,
      fix them on `main` in a separate commit or stop and tell me;
    - in `docs/progress.md` change that session's status to **merged**;
-   - `git push origin main` (if pushing to `main` is refused, stop and tell me to merge the pull
-     request on GitHub, then run this file again).
+   - `git push origin main`, never with `--force`; if pushing to `main` is refused, stop and tell
+     me to merge the pull request "Session NN: …" on GitHub, then run this file again.
 3. Check that session 07 is now in `main` (marked merged in `docs/progress.md`). If it is not,
    stop and tell me which session must be finished first.
-4. Create the branch `session-08-menus-security` from the updated `main` (if this environment already
-   assigned you a working branch, use that one and say so in the pull request).
+4. Work on a branch based on the updated `main`: if this environment assigned you a working branch,
+   use it (merge `origin/main` into it if it does not contain it yet); otherwise create
+   `session-08-menus-security`. Record the branch name for session 08 in `docs/progress.md`.
 5. Run `composer install` if needed, and the checks once to know the starting state.
 6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
    `deploy-status/` report, and these sections of `docs/specification.md`: "Menus", "Security baseline (must be on by default)" (headers, rate limits, redirects, outbound requests).
@@ -40,11 +42,13 @@ Generated back-office menus and the rest of the security baseline.
 
 - Menu builder from enabled manifests (zones, parents, order, permission filter, active entry,
   breadcrumbs, cache per group set).
-- Security headers (`Config\SecurityHeaders`: HSTS in production, Referrer-Policy,
-  Permissions-Policy, nosniff, frame options), configurable; rate-limit service with the
+- Security headers: a Core `SecurityHeaders` filter driven by `Config\SecurityHeaders` (HSTS in
+  production, Referrer-Policy, Permissions-Policy, nosniff, frame options), configurable, replacing
+  CodeIgniter's `secureheaders` filter (never both); rate-limit service with the
   settings listed in the specification; `safe_redirect()`.
 - `OutboundClient` (HTTPS only, allow-list from `Config\Outbound` + manifests + settings, private IP
-  refusal after DNS and redirects, timeouts, size limit, logging).
+  refusal after DNS and redirects, timeouts, size limit, logging); the mail service checks SMTP
+  hosts against the same allow-list.
 - Tests: menu filtering, headers on every response, open redirect refused, outbound refusals.
 
 ## Out of scope
@@ -89,8 +93,10 @@ Menus editor (session 21); Settings › Security UI (session 14).
      screen (e.g. a console command), include the console output in the README instead; if
      screenshots are impossible in this environment, say why in the README.
 3. Update `docs/progress.md`: status of session 08 = **done**, decisions, deviations, known
-   issues, notes for the next session, and the link to `deploy-status/08-menus-security/`.
-4. Commit in small commits on the session branch, push it and open a pull request titled
+   issues, notes for the next session, the session's branch name and the link to
+   `deploy-status/08-menus-security/`.
+4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
+   request titled exactly
    "Session 08: Back-office menus and the security baseline" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and

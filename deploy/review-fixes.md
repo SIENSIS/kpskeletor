@@ -4,7 +4,8 @@
 > the review comments of the pull request).
 
 1. `git fetch --all --prune`. If the branch of session NN is **not merged** into `main` yet, work on
-   it. If it is already merged, create `session-NN-fixes` from `main`.
+   it. If it is already merged, work on a branch based on `main`: the one this environment
+   assigned you, or `session-NN-fixes`; record its name in `docs/progress.md`.
 2. Read `CLAUDE.md`, `docs/progress.md`, `deploy/NN-*.md` and `deploy-status/NN-*/README.md`.
    Collect the feedback: the comments given with the command and the unresolved review comments
    of the session's pull request.
@@ -12,6 +13,6 @@
    public convention or weakening security.
 4. Run all checks; update `deploy-status/NN-*/README.md` (a "Review fixes" section, and new
    screenshots if the screens changed) and `docs/progress.md`.
-5. Push (to the same branch, or open a pull request "Session NN: review fixes"), and reply on the
-   pull request and to me with what changed for each comment. If you created `session-NN-fixes`,
-   the next session merges it like any other session branch.
+5. Push, never with `--force` (to the same branch, or open a pull request "Session NN: review
+   fixes"), and reply on the pull request and to me with what changed for each comment. If you
+   used a new branch, the next session merges it like any other session branch.
