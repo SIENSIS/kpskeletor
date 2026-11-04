@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Config;
 
 use CodeIgniter\Config\BaseService;
+use Modules\Core\Frontend\AssetManifest;
 use Modules\Core\Theme\ThemeManager;
 
 /**
@@ -23,5 +24,17 @@ class Services extends BaseService
         }
 
         return new ThemeManager();
+    }
+
+    /**
+     * The asset manifest (published URLs and hashes); refreshes stale assets in development.
+     */
+    public static function assets(bool $getShared = true): AssetManifest
+    {
+        if ($getShared) {
+            return static::getSharedInstance('assets');
+        }
+
+        return AssetManifest::create();
     }
 }

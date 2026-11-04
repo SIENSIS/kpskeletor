@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Tests;
 
+use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Modules\ModuleDiscovery;
 use Modules\Core\Modules\ModuleGenerator;
 use Modules\Core\Modules\ModuleSynchronizer;
@@ -63,9 +64,17 @@ trait ModuleFixturesTrait
 
     private function synchronizer(): ModuleSynchronizer
     {
+        // Assets go to a throw-away public folder (CodeIgniter's Publisher only writes inside ROOTPATH).
+        $public = WRITEPATH . 'tests/public-' . md5($this->tempRoot());
+
+        if (! is_dir($public)) {
+            mkdir($public, 0777, true);
+        }
+
         return new ModuleSynchronizer(
             new ModuleDiscovery([ROOTPATH . 'modules', $this->tempRoot()]),
             new NamespaceFile($this->tempRoot() . '/ModuleNamespaces.php'),
+            assets: new AssetPublisher($public),
         );
     }
 
