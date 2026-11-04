@@ -1,11 +1,3 @@
-# Prompt: Build a Modular CodeIgniter 4 Application Skeleton
-
-> Copy everything below the line into a new conversation with an AI coding assistant (or hand
-> it to a developer) to build the application skeleton **from scratch**. Nothing is reused from
-> any previous project: this document is the whole specification.
-
----
-
 ## Role and goal
 
 You are a senior PHP / CodeIgniter 4 architect. Build **a reusable, themeable application

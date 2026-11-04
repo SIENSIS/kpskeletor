@@ -1,16 +1,6 @@
-<!--
-CLAUDE.md suggerit per al nou esquelet. Ús: al repositori nou i buit, copia aquest fitxer com a
-CLAUDE.md (sense aquest comentari) en el primer commit, i després dona a Claude Code el prompt
-de prompt_new.md. Claude Code llegeix CLAUDE.md a cada sessió, de manera que aquestes normes
-es mantenen encara que el prompt inicial ja no sigui a la conversa.
-
-Per desenvolupar mòduls en sessions noves de Claude Code (al núvol), l'entorn ha de tenir PHP 8.2+
-amb intl, mbstring, sqlite3, gd i zip, Composer, accés de xarxa a Packagist i GitHub, i un script
-d'inici que faci `composer install`. Cada mòdul té el seu propi modules/<Name>/CLAUDE.md, i les
-ordres /new-module i /check-module són a .claude/commands/ (el prompt demana crear-los).
--->
-
 # CLAUDE.md
+
+Session prompts live in `deploy/` (run them in order: `deploy/next.md`); do not edit them unless asked. Each session merges the finished session branches into `main` first and ends with a report and screenshots in `deploy-status/NN-<slug>/`.
 
 Modular CodeIgniter 4 application skeleton. The full specification is in `docs/specification.md`
 (the build prompt); read the relevant section before changing a feature.
