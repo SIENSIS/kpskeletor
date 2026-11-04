@@ -29,7 +29,8 @@ records the owner's decisions; they override the specification when they disagre
 ```bash
 composer install
 php spark modules:sync            # migrations, seeds, permissions, settings, assets
-php spark assets:publish --watch  # while editing modules/*/Assets
+php spark assets:publish --watch  # while editing modules/*/Assets (--check: CI)
+php spark csp:check               # no inline scripts, handlers or styles in views
 vendor/bin/phpunit                # tests (SQLite)
 vendor/bin/phpstan analyse        # level 6
 vendor/bin/php-cs-fixer fix --dry-run --diff
@@ -63,8 +64,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   hard-code a theme path; a theme overrides a module view in
   `themes/<slug>/Views/overrides/<Module>/…` and colours through CSS variables or option defaults
   (`docs/themes.md`, `php spark make:theme <Name>`).
-- **Front end:** Bootstrap 5.3 served locally, native ES modules in `modules/<Name>/Assets/js`,
-  components by `data-component`. **No inline `<script>`, `on*=` handlers or `style=""`** (strict
+- **Front end:** Bootstrap 5.3 served locally, native ES modules in `modules/<Name>/Assets/js`
+  imported with bare specifiers (`core/…`, `<module>/…`; never relative paths), components by
+  `data-component`, URLs with `asset('<owner>::<path>')` (`docs/frontend.md`). **No inline `<script>`, `on*=` handlers or `style=""`** (strict
   CSP with nonces). Never edit `public/assets/modules/…` (published copies).
 - **Languages:** code, comments and docs in English; UI texts only in language files, complete in
   `ca`, `es` and `en` (same keys; CI checks it). Catalan is the default, Spanish the fallback.

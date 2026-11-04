@@ -133,16 +133,52 @@ the Settings screen arrives in session 14). Colour options with a `css` key beco
 properties (`--bs-primary` and `--bs-primary-rgb`) printed by the layouts in one `<style>` with
 the CSP nonce; only validated hex colours reach it (D-00-25).
 
-Default theme options: `logo`, `primaryColor`, `sidebarColor`, `font` (system, serif, mono),
-`footerText`, `cookieNotice`.
+An option with `'mode' => 'dark'` sets its property only in dark mode (`[data-bs-theme=dark]`);
+an empty value keeps the light one. For `--bs-primary` the layouts also print
+`--kp-primary-light-rgb`, the lighter primary used for links and text on dark backgrounds.
+
+Default theme options: `logo`, `logoDark` (logo for dark backgrounds), `primaryColor`,
+`primaryColorDark`, `defaultMode` (auto, light, dark), `forceMode` (empty, light, dark: forces a
+mode and hides the switch), `modeSwitch` (show the light/dark switch), `sidebarColor`, `font`
+(system, serif, mono), `footerText`, `cookieNotice`.
+
+## Light and dark mode
+
+Three choices: light, dark and auto (the default, following `prefers-color-scheme`), with
+Bootstrap 5.3 colour modes. `Modules\Core\Frontend\ThemeMode` picks the mode: `forceMode`, then
+the user's stored preference (the profile, once the Users module stores it), then the `kp_theme`
+cookie written by the switch, then `defaultMode`. Layouts print it on `<html>` with
+`theme_mode()->attributes()` (`data-bs-theme` for an explicit mode, so there is no flash), and
+`core::js/theme-mode.js` (in `<head>` with the nonce, before the stylesheets) resolves `auto`
+before the first paint and follows system changes. The switch is `partials/theme_switch`
+(back-office top bar and public header). Print layouts are always light. Dark-specific colours
+live under `[data-bs-theme=dark]` in the theme CSS; child themes inherit both modes by overriding
+variables only.
+
+## Responsive layout
+
+Reference widths: phone ≥ 360 px, tablet ≥ 768 px, desktop ≥ 1200 px; no horizontal page scroll
+(the screenshot helper fails on overflow). The back-office sidebar is an offcanvas below 768 px,
+an icon-only bar from 768 to 1199 px and a full sidebar from 1200 px; the top-bar button
+(`[data-sidebar-toggle]`) switches between icon-only and full and the choice is remembered in the
+`kp_sidebar` cookie (`theme_sidebar_class()` prints it on `<body>`). Menu links put their label in
+`<span class="nav-text">` so the icon-only bar can hide it. On phones long breadcrumbs keep their
+last two items, modals are full-screen and, on touch screens, targets are at least 44 × 44 px.
 
 ## Assets
 
 Bootstrap 5.3 and Bootstrap Icons are vendored in `public/assets/vendor/` with
 `vendor.json` (version, licence, source and SHA-256 per file; a test checks them). Theme assets are
-copied from `themes/<slug>/Assets/` to `public/themes/<slug>/` by `modules:sync` and `make:theme`
-(never edit the copies); session 04 folds this into `assets:publish`. A declared asset is looked
+copied from `themes/<slug>/Assets/` to `public/themes/<slug>/` by `assets:publish` (also run by
+`modules:sync` and `make:theme`; never edit the copies) and versioned with the asset manifest's
+hash; `asset('theme::css/x.css')` looks a file up along the chain and the import map exposes the
+active theme's `js/` files as `theme/<path>` (see `docs/frontend.md`). A declared asset is looked
 up from the theme that declares it, so a child's `css/theme.css` never hides its parent's.
+
+A layout written from scratch keeps: `theme_mode()->attributes()` on `<html>`, the
+`core::js/theme-mode.js` script in `<head>`, and before `</body>` the `kp-config` data block, the
+nonce'd import map and `core::js/app.js` (copy `partials/head.php` and `partials/scripts.php`, or
+the `make:theme --parent=none` layout template).
 
 All colours are CSS custom properties: a child theme changes colours by overriding variables
 (`:root { --kp-sidebar-bg: #312e81; }`) or option defaults, without copying the parent's CSS.
@@ -158,6 +194,11 @@ and one view in `themes/corporate/Views/components/page_header.php`, run `php sp
 and select it with `theme.backend = corporate` in `.env` (or the setting).
 
 ## Theme preview
+
+`/theme-preview/components` (same conditions) is the JavaScript components demo: a
+`data-component` with options and a JSON data block, toasts, confirmations, modals, JSON requests
+with `core/http.js` and the form helpers, all under the enforced CSP.
+
 
 In development, with `theme.preview = true` in `.env`, `/theme-preview/<layout>` shows every
 layout (`backend`, `public`, `auth`, `blank`, `print`) and `errors-403|404|500` with sample

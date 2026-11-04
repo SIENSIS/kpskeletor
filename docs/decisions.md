@@ -84,6 +84,16 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-03-07 | 03 | Site name before the Settings session | Accepted (proposal) |
 | D-03-08 | 03 | What `BackendController::render()` adds | Accepted (proposal) |
 | D-03-09 | 03 | `--name=value` options in the module commands | Accepted (proposal) |
+| D-04-01 | 04 | Where the front-end PHP classes live | Accepted (proposal) |
+| D-04-02 | 04 | Development serving rule for edited assets | Accepted (proposal) |
+| D-04-03 | 04 | Asset manifest format and owners | Accepted (proposal) |
+| D-04-04 | 04 | Details of the strict CSP | Accepted (proposal) |
+| D-04-05 | 04 | Module CSP sources at runtime | Accepted (proposal) |
+| D-04-06 | 04 | Where the light/dark choice is stored before the profile exists | Accepted (proposal) |
+| D-04-07 | 04 | Breakpoints and state of the back-office sidebar | Accepted (proposal) |
+| D-04-08 | 04 | PWA settings, icons and worker | Accepted (proposal) |
+| D-04-09 | 04 | CSRF token for scripts without sessions for every visitor | Accepted (proposal) |
+| D-04-10 | 04 | Project views with inline code from CodeIgniter | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -864,3 +874,103 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-04):** applied by session 03 (fix of a session 02 gap).
 - **Applied in:** session 03 (`modules/Core/Commands/ModulesSync.php`)
+
+## D-04-01 — Where the front-end PHP classes live
+
+- **Where:** plan (`modules/Core/Assets/AssetPublisher.php`, `AssetManifest.php`, `ImportMap.php`)
+- **Problem:** `modules/Core/Assets/` is the Core's asset *source* folder (published to `public/assets/core/`); mixing PHP classes into it blurs the rule "Assets/ holds only publishable files".
+- **Proposal:** the classes live in `modules/Core/Frontend/` (`Modules\Core\Frontend\AssetPublisher`, `AssetManifest`, `ImportMap`, `ThemeMode`, `Pwa`, `CspViewScanner`); `Assets/` only holds JS/CSS/images. `ThemeAssetPublisher` (session 03) is folded into `AssetPublisher` and removed.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`modules/Core/Frontend/`, `docs/frontend.md`)
+
+## D-04-02 — Development serving rule for edited assets
+
+- **Where:** spec "Front-end assets" ("the asset helper can serve a module's file directly when it is newer than the published copy")
+- **Problem:** Sources under `modules/` are not web-reachable; serving them through PHP would add a route that reads code folders.
+- **Proposal:** in development only (`assets.devRefresh`, default on), the first asset lookup of a request republishes everything when a source file or folder is newer than the manifest (the web user may write `public/assets/*` and `public/themes`, D-00-33). Production never checks the sources.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`AssetManifest::create()`, `AssetPublisher::isStale()`)
+
+## D-04-03 — Asset manifest format and owners
+
+- **Where:** spec "Front-end assets" (`asset('events::js/calendar.js')`, manifest with hashes)
+- **Problem:** Owners, theme files and vendored files need a key scheme.
+- **Proposal:** `public/assets/manifest.json` (git-ignored) maps `<owner>::<path>` to `{url, hash}` (SHA-256, 12 hex): owners `core`, `<module>` (kebab case of the module name) and `theme:<slug>`; `asset()` also accepts `theme::` (active chain) and `vendor::` (hash from `vendor.json`). `core`, `theme` and `vendor` are reserved module owners. The import map is built from the manifest (bare specifiers `core/…`, `<module>/…`, `theme/…`; relative imports are refused by a test).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`modules/Core/Frontend/`, `modules/Core/Helpers/asset_helper.php`)
+
+## D-04-04 — Details of the strict CSP
+
+- **Where:** spec "Security baseline" (CSP list), deploy/04 (report-only)
+- **Problem:** The spec lists the main directives; CodeIgniter also sends `*-elem`/`*-attr` directives and needs values for fonts, workers and the manifest; a report endpoint would be an unauthenticated write.
+- **Proposal:** `CSPEnabled = true`; `default-src`, `script-src`, `style-src`, `connect-src`, `font-src`, `manifest-src`, `worker-src`, `child-src`, `base-uri`, `form-action` = `'self'`; `img-src 'self' data:` (Bootstrap's CSS icons); `object-src`, `frame-ancestors`, `script-src-attr`, `style-src-attr` = `'none'`; nonces added automatically. Report-only and `reportURI` only through `.env` (`contentsecuritypolicy.*`); no built-in report endpoint (log flooding).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`app/Config/ContentSecurityPolicy.php`, `app/Config/App.php`)
+
+## D-04-05 — Module CSP sources at runtime
+
+- **Where:** spec "Configuring headers and CSP" (modules add sources in their manifest)
+- **Problem:** `$csp` was validated since session 01 but not applied, and requests must not load manifests.
+- **Proposal:** `modules:sync` stores `$csp` as declarations of kind `csp`; a global before filter `cspmodules` adds the sources of enabled modules to the policy (`script-src`/`style-src` also to their `-elem` directive, `'none'` and forbidden sources skipped).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`DeclarationRegistry::cspSources()`, `modules/Core/Filters/ContentSecurity.php`, `app/Config/Filters.php`)
+
+## D-04-06 — Where the light/dark choice is stored before the profile exists
+
+- **Where:** spec "Light and dark mode" (logged-in users in their profile, visitors in a cookie)
+- **Problem:** There is no user profile until the Auth/Users sessions.
+- **Proposal:** everyone's choice goes to the `kp_theme` cookie for now; `ThemeMode` already takes a user-preference reader that the Users session plugs in. Theme options `defaultMode` (auto), `forceMode` (empty), `modeSwitch` (on), `primaryColorDark` and `logoDark` (empty = same as light); option definitions accept `'mode' => 'dark'` and empty colour defaults.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`modules/Core/Frontend/ThemeMode.php`, `themes/default/Theme.php`)
+
+## D-04-07 — Breakpoints and state of the back-office sidebar
+
+- **Where:** spec "Responsive design" (offcanvas on phones, icon-only on tablets, remembers its state)
+- **Problem:** Session 03 switched to the offcanvas below 992 px and had no icon-only state.
+- **Proposal:** offcanvas below 768 px, icon-only bar 768–1199 px, full from 1200 px; a top-bar toggle switches icon-only/full and is remembered in the `kp_sidebar` cookie, printed by the server as a body class (no flash). Menu labels go in `<span class="nav-text">` (contract for session 08).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`themes/default/`, `core/ui/sidebar.js`)
+
+## D-04-08 — PWA settings, icons and worker
+
+- **Where:** spec "Minimal PWA", D-00-27
+- **Problem:** Where icons are written, the setting names and the start URL.
+- **Proposal:** settings `Core.pwa` (bool, off by default) and `Core.pwaStart` (`public`/`backend`); icons generated with GD from the public theme's local raster logo (never SVG or remote) into `writable/pwa/`, file name hashed on logo and primary colour, served by `/pwa/icon-<192\|512>.png`; `/sw.js` caches nothing; all routes 404 while off. Declaring Core settings also generates `settings.core` (automatic, like any module with settings).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`modules/Core/Frontend/Pwa.php`, `modules/Core/Controllers/Pwa.php`, `modules/Core/Config/Module.php`)
+
+## D-04-09 — CSRF token for scripts without sessions for every visitor
+
+- **Where:** spec "Front-end assets" (`http.js` with the CSRF header and token refresh)
+- **Problem:** With session-based CSRF, printing the token on every page would start a session (cookie) for every anonymous visitor.
+- **Proposal:** the head prints `csrf-header`/`csrf-token` meta tags only when a session is already active (back office, forms); `http.js` sends the header on unsafe methods and takes a refreshed token from the response header when present.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`themes/default/Views/partials/head.php`, `core/http.js`)
+
+## D-04-10 — Project views with inline code from CodeIgniter
+
+- **Where:** deploy/04 (CI CSP check of `app/`)
+- **Problem:** `app/Views/welcome_message.php`, `errors/html/error_400.php` and `error_exception.php` (CodeIgniter's) have inline styles, scripts and handlers.
+- **Proposal:** the welcome page is replaced by a themed home page (`app/Views/home.php`, until the Pages module), `error_400` loses its `<style>`, the development debug page gets nonces and is the only listed exception of `csp:check`.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 04 as proposed.
+- **Applied in:** session 04 (`app/Views/`, `modules/Core/Frontend/CspViewScanner.php`)

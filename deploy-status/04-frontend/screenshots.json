@@ -1,0 +1,20 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/04-frontend/screenshots",
+  "deviceScaleFactor": 2,
+  "shots": [
+    { "url": "/theme-preview/components", "name": "01-components-demo", "width": 1440, "height": 900, "login": false, "click": ["[data-demo-action=increment]", "[data-demo-action=toast]", "[data-demo-action=http-error]"], "waitFor": ".toast-danger", "wait": 400 },
+    { "url": "/theme-preview/components", "name": "02-confirm-modal", "width": 1440, "height": 900, "login": false, "click": ["[data-demo-action=confirm]"], "waitFor": ".modal.show", "wait": 400 },
+    { "url": "/theme-preview/components", "name": "03-components-dark", "width": 1440, "height": 900, "dark": true, "login": false, "click": ["[data-demo-action=increment]", "[data-theme-switch] > button"], "waitFor": ".theme-switch .dropdown-menu.show", "wait": 300 },
+    { "url": "/theme-preview/backend", "name": "04-backend-tablet-icon-sidebar", "width": 768, "height": 1024, "login": false },
+    { "url": "/theme-preview/backend", "name": "05-backend-desktop-collapsed", "width": 1280, "height": 800, "login": false, "click": ["[data-sidebar-toggle]"], "wait": 400 },
+    { "url": "/theme-preview/backend", "name": "06-backend-desktop-dark", "width": 1440, "height": 900, "dark": true, "login": false },
+    { "url": "/theme-preview/backend", "name": "07-backend-phone", "width": 360, "height": 780, "login": false },
+    { "url": "/theme-preview/backend", "name": "08-backend-phone-dark-menu", "width": 360, "height": 780, "dark": true, "login": false, "click": ["button[data-bs-toggle=offcanvas]"], "waitFor": ".sidebar.show", "wait": 400 },
+    { "url": "/theme-preview/components", "name": "09-modal-phone", "width": 360, "height": 780, "login": false, "click": ["[data-demo-action=modal]"], "waitFor": ".modal.show", "wait": 400 },
+    { "url": "/theme-preview/public", "name": "10-public-dark", "width": 1200, "height": 800, "dark": true, "login": false },
+    { "url": "/theme-preview/public", "name": "11-public-phone", "width": 360, "height": 780, "login": false },
+    { "url": "/", "name": "12-home-dark-phone", "width": 360, "height": 780, "dark": true, "login": false },
+    { "url": "/theme-preview/auth", "name": "13-auth-dark", "width": 768, "height": 900, "dark": true, "login": false }
+  ]
+}
