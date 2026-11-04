@@ -1,0 +1,17 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/03-themes/screenshots",
+  "deviceScaleFactor": 2,
+  "shots": [
+    { "url": "/theme-preview/backend", "name": "01-backend-standard-views", "width": 1440, "height": 900, "fullPage": true, "login": false },
+    { "url": "/theme-preview/backend", "name": "02-backend-phone", "width": 390, "height": 844, "login": false },
+    { "url": "/theme-preview/public", "name": "03-public-layout", "width": 1440, "height": 900, "login": false },
+    { "url": "/theme-preview/public", "name": "04-public-phone", "width": 390, "height": 844, "login": false },
+    { "url": "/theme-preview/auth", "name": "05-auth-layout", "width": 1280, "height": 800, "login": false },
+    { "url": "/theme-preview/print", "name": "06-print-layout", "width": 1280, "height": 800, "login": false },
+    { "url": "/this-page-does-not-exist", "name": "07-error-404", "width": 1280, "height": 800, "login": false },
+    { "url": "/theme-preview/errors-403", "name": "08-error-403", "width": 1280, "height": 800, "login": false },
+    { "url": "/theme-preview/backend?theme=corporate", "name": "09-child-theme-backend", "width": 1440, "height": 900, "login": false },
+    { "url": "/theme-preview/public?theme=corporate", "name": "10-child-theme-public", "width": 1440, "height": 900, "login": false }
+  ]
+}

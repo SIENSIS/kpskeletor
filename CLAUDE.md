@@ -57,6 +57,12 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.
   Module routes point at controllers (a disabled module answers 404 through its controller namespace).
+- **Views and themes:** render through the active theme (`BackendController::render()` /
+  `theme_view()`, `$this->extend($layout)`), compose the standard views and components
+  (`theme_component('page_header'|'card'|'form_layout'…)`, `ui_badge()`, `ui_date()`…) and never
+  hard-code a theme path; a theme overrides a module view in
+  `themes/<slug>/Views/overrides/<Module>/…` and colours through CSS variables or option defaults
+  (`docs/themes.md`, `php spark make:theme <Name>`).
 - **Front end:** Bootstrap 5.3 served locally, native ES modules in `modules/<Name>/Assets/js`,
   components by `data-component`. **No inline `<script>`, `on*=` handlers or `style=""`** (strict
   CSP with nonces). Never edit `public/assets/modules/…` (published copies).

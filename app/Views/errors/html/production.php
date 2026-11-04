@@ -1,25 +1,6 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="robots" content="noindex">
-
-    <title><?= lang('Errors.whoops') ?></title>
-
-    <style>
-        <?= preg_replace('#[\r\n\t ]+#', ' ', file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'debug.css')) ?>
-    </style>
-</head>
-<body>
-
-    <div class="container text-center">
-
-        <h1 class="headline"><?= lang('Errors.whoops') ?></h1>
-
-        <p class="lead"><?= lang('Errors.weHitASnag') ?></p>
-
-    </div>
-
-</body>
-
-</html>
+<?php
+/**
+ * 500 page in production: the active theme's `errors/500` view (Modules\Core\Theme\ErrorPage),
+ * with a plain fallback; never shows the exception.
+ */
+echo Modules\Core\Theme\ErrorPage::render(500);

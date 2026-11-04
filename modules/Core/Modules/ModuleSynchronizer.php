@@ -15,6 +15,8 @@ use Modules\Core\Permissions\DefaultGrants;
 use Modules\Core\Permissions\PermissionCatalogue;
 use Modules\Core\Registry\ApiRouteChecker;
 use Modules\Core\Registry\DeclarationRegistry;
+use Modules\Core\Theme\ThemeAssetPublisher;
+use Modules\Core\Theme\ThemeValidator;
 
 /**
  * `modules:sync` (see "Module lifecycle"): discovers and validates the modules, rewrites the
@@ -24,7 +26,8 @@ use Modules\Core\Registry\DeclarationRegistry;
  * invalidates the derived caches. Idempotent: a second run changes nothing.
  *
  * Every check (manifests, dependencies, duplicate permissions, `$api` routes) runs before
- * anything is written. Step 7 (assets) arrives with the front-end session.
+ * anything is written, the themes included (ThemeValidator). Step 7 publishes the themes' assets
+ * (ThemeAssetPublisher); module assets arrive with the front-end session.
  */
 final class ModuleSynchronizer
 {
@@ -37,6 +40,8 @@ final class ModuleSynchronizer
         private readonly PermissionCatalogue $permissions = new PermissionCatalogue(),
         private readonly DeclarationRegistry $declarations = new DeclarationRegistry(),
         private readonly ?DemoDataManager $demo = null,
+        private readonly ?ThemeValidator $themes = null,
+        private readonly ?ThemeAssetPublisher $themeAssets = null,
     ) {
     }
 
@@ -62,6 +67,8 @@ final class ModuleSynchronizer
         if ($errors === []) {
             $errors = (new ApiRouteChecker())->check($manifests);
         }
+
+        $errors = [...$errors, ...($this->themes ?? new ThemeValidator())->validateAll()];
 
         if ($errors !== []) {
             throw new SyncFailedException($errors);
@@ -147,6 +154,9 @@ final class ModuleSynchronizer
         }
 
         $report->declarationsChanged = $this->declarations->store($this->declarations->build($ordered));
+
+        // 7. Theme assets (module assets: front-end session).
+        $report->themeAssets = array_filter(($this->themeAssets ?? new ThemeAssetPublisher())->publishAll());
 
         // 8. Invalidate the caches derived from the manifests.
         if ($report->hasChanges()) {

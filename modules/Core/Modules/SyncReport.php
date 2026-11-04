@@ -46,6 +46,13 @@ final class SyncReport
 
     public bool $declarationsChanged = false;
 
+    /**
+     * Theme assets published: slug => files written or removed (only themes with changes).
+     *
+     * @var array<string, int>
+     */
+    public array $themeAssets = [];
+
     /** @var list<string> modules whose demo data was loaded */
     public array $demoLoaded = [];
 
@@ -60,7 +67,8 @@ final class SyncReport
             || $this->permissionsUpdated !== []
             || $this->pruned !== []
             || $this->grantsApplied !== []
-            || $this->declarationsChanged;
+            || $this->declarationsChanged
+            || $this->themeAssets !== [];
     }
 
     /**
@@ -112,6 +120,10 @@ final class SyncReport
 
         if ($this->declarationsChanged) {
             $lines[] = lang('Core.sync.declarations');
+        }
+
+        foreach ($this->themeAssets as $theme => $count) {
+            $lines[] = lang('Core.sync.themeAssets', [$theme, $count]);
         }
 
         if ($this->pruned !== []) {

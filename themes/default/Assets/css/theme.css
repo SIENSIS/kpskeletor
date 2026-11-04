@@ -1,0 +1,196 @@
+/*
+ * Default theme (Bootstrap 5.3). Every colour is a CSS custom property: theme options print
+ * `--bs-primary`/`--bs-primary-rgb` and `--kp-sidebar-bg`, and child themes only override
+ * variables (see docs/themes.md). Bootstrap compiles some component colours as literals, so the
+ * rules below point them back at the variables.
+ */
+
+:root {
+    --kp-sidebar-width: 16rem;
+    --kp-sidebar-bg: #1e293b;
+    --kp-sidebar-color: rgba(255, 255, 255, 0.82);
+    --kp-sidebar-active-bg: rgba(255, 255, 255, 0.12);
+    --kp-topbar-height: 3.5rem;
+    --kp-primary-hover: color-mix(in srgb, var(--bs-primary) 85%, #000);
+    --kp-primary-active: color-mix(in srgb, var(--bs-primary) 75%, #000);
+    --kp-font-system: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+    --kp-font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+    --kp-font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Fonts (theme option `font`) */
+.theme-font-system { --bs-body-font-family: var(--kp-font-system); }
+.theme-font-serif { --bs-body-font-family: var(--kp-font-serif); }
+.theme-font-mono { --bs-body-font-family: var(--kp-font-mono); }
+
+/* Primary colour from the variables */
+:root,
+[data-bs-theme] {
+    --bs-link-color: var(--bs-primary);
+    --bs-link-color-rgb: var(--bs-primary-rgb);
+    --bs-link-hover-color: var(--kp-primary-hover);
+    --bs-link-hover-color-rgb: var(--bs-primary-rgb);
+    --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: var(--kp-primary-hover);
+    --bs-btn-hover-border-color: var(--kp-primary-hover);
+    --bs-btn-active-bg: var(--kp-primary-active);
+    --bs-btn-active-border-color: var(--kp-primary-active);
+    --bs-btn-disabled-bg: var(--bs-primary);
+    --bs-btn-disabled-border-color: var(--bs-primary);
+    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: var(--bs-primary);
+    --bs-btn-hover-border-color: var(--bs-primary);
+    --bs-btn-active-bg: var(--bs-primary);
+    --bs-btn-active-border-color: var(--bs-primary);
+    --bs-btn-disabled-color: var(--bs-primary);
+    --bs-btn-disabled-border-color: var(--bs-primary);
+    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+}
+
+.nav-pills { --bs-nav-pills-link-active-bg: var(--bs-primary); }
+.pagination {
+    --bs-pagination-active-bg: var(--bs-primary);
+    --bs-pagination-active-border-color: var(--bs-primary);
+}
+.dropdown-menu { --bs-dropdown-link-active-bg: var(--bs-primary); }
+.list-group { --bs-list-group-active-bg: var(--bs-primary); --bs-list-group-active-border-color: var(--bs-primary); }
+.progress, .progress-stacked { --bs-progress-bar-bg: var(--bs-primary); }
+.form-check-input:checked { background-color: var(--bs-primary); border-color: var(--bs-primary); }
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Accessibility */
+.skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 1080;
+    padding: 0.5rem 1rem;
+    background: var(--bs-body-bg);
+    border: 2px solid var(--bs-primary);
+    border-radius: var(--bs-border-radius);
+}
+:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
+.min-w-0 { min-width: 0; }
+
+/* Brand */
+.brand { color: inherit; }
+.brand-icon { color: var(--bs-primary); font-size: 1.4em; }
+.brand-logo { max-height: 2.25rem; width: auto; }
+
+/* Back office */
+.layout-backend { background-color: var(--bs-tertiary-bg); }
+.backend-shell { display: flex; min-height: 100vh; }
+.backend-main { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+.backend-content { padding: 1rem; }
+.topbar { min-height: var(--kp-topbar-height); }
+
+.sidebar {
+    --bs-offcanvas-width: var(--kp-sidebar-width);
+    --bs-offcanvas-bg: var(--kp-sidebar-bg);
+    --bs-offcanvas-color: var(--kp-sidebar-color);
+    background-color: var(--kp-sidebar-bg);
+    color: var(--kp-sidebar-color);
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-header { min-height: var(--kp-topbar-height); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.sidebar .brand { color: #fff; }
+.sidebar .brand-icon { color: #fff; }
+.sidebar-nav .nav-link {
+    color: var(--kp-sidebar-color);
+    border-radius: var(--bs-border-radius);
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+}
+.sidebar-nav .nav-link:hover,
+.sidebar-nav .nav-link:focus-visible { color: #fff; background-color: var(--kp-sidebar-active-bg); }
+.sidebar-nav .nav-link.active { color: #fff; background-color: var(--bs-primary); }
+.sidebar-nav .nav-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+    padding: 1rem 0.75rem 0.25rem;
+}
+
+@media (min-width: 992px) {
+    /* Bootstrap makes .offcanvas-lg transparent from lg up. */
+    .sidebar.offcanvas-lg { background-color: var(--kp-sidebar-bg) !important; }
+    .sidebar {
+        position: sticky;
+        top: 0;
+        width: var(--kp-sidebar-width);
+        height: 100vh;
+        flex-shrink: 0;
+    }
+    .backend-content { padding: 1.5rem 2rem; }
+}
+
+/* Public site */
+.site-header .navbar-brand { color: var(--bs-body-color); }
+.cookie-notice {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 1050;
+    max-width: 40rem;
+}
+
+/* Authentication */
+.auth-container { max-width: 26rem; }
+.layout-auth { background-color: var(--bs-tertiary-bg); }
+
+/* Print */
+@media print {
+    .layout-print { font-size: 11pt; }
+    .btn, .skip-link { display: none !important; }
+}
+
+/* Components */
+.page-header h1 { line-height: 1.3; }
+.breadcrumb { --bs-breadcrumb-margin-bottom: 0; font-size: 0.875rem; }
+.empty-state-icon { font-size: 3rem; }
+.error-page-icon { font-size: 4rem; }
+.status-dot { font-size: 0.5em; vertical-align: middle; }
+.crud-container .table-responsive-wrapper { overflow-x: auto; }
+.form-layout .form-actions { position: sticky; bottom: 0; background-color: var(--bs-body-bg); z-index: 2; }
+.tabs-component .nav-tabs { scrollbar-width: thin; }
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 600;
+    color: #fff;
+    object-fit: cover;
+    user-select: none;
+}
+.avatar-sm { width: 1.75rem; height: 1.75rem; font-size: 0.7rem; }
+.avatar-md { width: 2.5rem; height: 2.5rem; font-size: 0.9rem; }
+.avatar-lg { width: 4rem; height: 4rem; font-size: 1.4rem; }
+.avatar-c1 { background-color: #1d4ed8; }
+.avatar-c2 { background-color: #047857; }
+.avatar-c3 { background-color: #b91c1c; }
+.avatar-c4 { background-color: #7c3aed; }
+.avatar-c5 { background-color: #a16207; }
+.avatar-c6 { background-color: #0e7490; }
+.avatar-c7 { background-color: #be185d; }
+.avatar-c8 { background-color: #4b5563; }

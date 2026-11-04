@@ -66,6 +66,16 @@ CI_ENVIRONMENT = production
 # packages.allowDemoInProduction = false
 
 #--------------------------------------------------------------------
+#--------------------------------------------------------------------
+# THEMES (Modules\Core\Config\Theme; the Settings UI overrides them)
+#--------------------------------------------------------------------
+
+# theme.backend = default
+# theme.public = default
+# Theme preview pages /theme-preview/<layout> (development only; off by default).
+# theme.preview = false
+
+#--------------------------------------------------------------------
 # ENCRYPTION
 #--------------------------------------------------------------------
 
