@@ -74,6 +74,25 @@ GitHub i es marca com a fusionada sola).
 La sessió 00 crea `deploy-status/README.md` (el format) i `deploy-status/screenshot.mjs` (l'script
 de captures que reutilitzen totes les sessions).
 
+**Dubtes i decisions.** Quan una sessió troba una contradicció o un dubte, l'anota a
+`docs/decisions.md` (amb un identificador `D-NN-xx`, el problema, la seva proposta i alternatives).
+Els que canvien una convenció pública o la seguretat queden **oberts** perquè decideixis tu; la
+resta els aplica amb la proposta. En acabar, la sessió et diu quants n'hi ha d'oberts. Per
+respondre'ls:
+
+```
+executa deploy/decide.md
+```
+
+Claude et fa **una pregunta per a cada dubte**, en català: on apareix, el problema, la seva
+proposta (marcada com a recomanada) i una o dues alternatives amb les conseqüències. Tries una
+opció o escrius la teva resposta, i l'anota a l'instant. Pots dir en qualsevol moment **"accepta
+la resta"**, **"atura"** (continuaràs un altre dia) o **"explica-m'ho"**. Al final aplica totes
+les decisions a l'especificació, als fitxers de `deploy/` afectats, a `CLAUDE.md` i al codi ja
+fet, i obre una pull request. Les sessions següents llegeixen `docs/decisions.md` abans de
+començar (té prioritat sobre l'especificació) i, si queda algun dubte obert que les afecta,
+s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou.
+
 **Altres casos:**
 
 - **Una sessió s'ha aturat a mitges** (context ple, límit de temps): `executa deploy/next.md` la
@@ -123,8 +142,9 @@ de captures que reutilitzen totes les sessions).
 | 35 | `35-quality.md` | Proves end-to-end, accessibilitat i CI | |
 | 36 | `36-release.md` | Acceptació final i versió 1.0.0 | **Fita 3: plantilla lliurada** |
 
-Fitxers auxiliars: `next.md` (executa la sessió següent), `continue.md` (reprèn una sessió
-inacabada) i `review-fixes.md` (aplica els comentaris d'una revisió).
+Fitxers auxiliars: `next.md` (executa la sessió següent), `decide.md` (et pregunta els dubtes
+oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió inacabada) i
+`review-fixes.md` (aplica els comentaris d'una revisió).
 
 ## Temps orientatiu
 
