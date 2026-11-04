@@ -33,6 +33,27 @@ final class Module extends ModuleManifest
         ],
     ];
 
+    /**
+     * Minimal PWA (web app manifest, icons, a service worker that caches nothing): off by default.
+     */
+    public array $settings = [
+        'pwa' => [
+            'type'    => 'bool',
+            'default' => false,
+            'label'   => 'Core.settings.pwa',
+            'help'    => 'Core.settings.pwaHelp',
+        ],
+        'pwaStart' => [
+            'type'    => 'select',
+            'default' => 'public',
+            'label'   => 'Core.settings.pwaStart',
+            'options' => [
+                'public'  => 'Core.settings.pwaStartPublic',
+                'backend' => 'Core.settings.pwaStartBackend',
+            ],
+        ],
+    ];
+
     /** upload, uninstall and demo stay with the superadmin (who bypasses the checks). */
     public array $defaultGrants = [
         'admin' => ['modules.list', 'modules.toggle', 'modules.sync'],
