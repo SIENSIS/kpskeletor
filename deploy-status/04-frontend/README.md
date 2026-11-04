@@ -1,6 +1,6 @@
 # Session 04 — Front-end assets, JavaScript, CSP, dark mode, responsive and PWA
 
-Branch: `claude/funny-goldberg-9n764h` (assigned by the environment) · Pull request: "Session 04: Front-end assets, JavaScript, CSP, dark mode, responsive and PWA" (link in `docs/progress.md`) · Date: 2026-11-04
+Branch: `claude/funny-goldberg-9n764h` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) "Session 04: Front-end assets, JavaScript, CSP, dark mode, responsive and PWA" · Date: 2026-11-04
 
 ## What was built
 
