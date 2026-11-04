@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.zip  binary
+
+/.gitattributes export-ignore
+/.github        export-ignore
+/deploy         export-ignore
+/deploy-status  export-ignore
+/tests          export-ignore

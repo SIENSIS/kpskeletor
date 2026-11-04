@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Checks (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, mbstring, json, openssl, fileinfo, zip, gd, sodium, sqlite3, pdo_sqlite, mysqli, curl, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Security audit
+        run: composer audit
+
+      - name: Coding style (php-cs-fixer)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Static analysis (PHPStan)
+        run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+      - name: Tests (SQLite)
+        run: vendor/bin/phpunit
+
+  mariadb:
+    name: Tests on MariaDB (PHP 8.3)
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: ci4_test
+          MARIADB_USER: ci4
+          MARIADB_PASSWORD: ci4
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      database.tests.DBDriver: MySQLi
+      database.tests.hostname: 127.0.0.1
+      database.tests.port: 3306
+      database.tests.database: ci4_test
+      database.tests.username: ci4
+      database.tests.password: ci4
+      database.tests.charset: utf8mb4
+      database.tests.DBCollat: utf8mb4_general_ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, mbstring, json, openssl, fileinfo, zip, gd, sodium, sqlite3, pdo_sqlite, mysqli, curl, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-8.3-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-8.3-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Tests (MariaDB)
+        run: vendor/bin/phpunit

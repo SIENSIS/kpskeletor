@@ -7,23 +7,25 @@
 ## Before starting: bring `main` up to date
 
 1. `git fetch --all --prune && git checkout main && git pull`.
-2. **Merge every finished session branch into `main`**, in order: for each branch `session-NN-*`
-   (NN < 05) not yet contained in `main` (`git branch -r --no-merged origin/main`; a session may
-   have used another branch name: then it is the head branch of the pull request "Session NN: …"):
+2. **Merge every finished session into `main`**, in order. A session is identified by its pull
+   request title "Session NN: …" and by the branch recorded for it in `docs/progress.md` (it may
+   be `session-NN-<slug>` or a branch assigned by the environment). For each session NN < 05
+   whose branch is not yet contained in `main` (`git branch -r --no-merged origin/main`):
    - check it is finished: its `docs/progress.md` marks the session "done" and its
      `deploy-status/NN-*/README.md` exists; if not, stop and tell me to run
      `deploy/continue.md NN` first;
-   - `git merge --no-ff origin/session-NN-<slug> -m "Merge session NN: <title>"`; resolve trivial
+   - `git merge --no-ff origin/<its branch> -m "Merge session NN: <title>"`; resolve trivial
      conflicts (e.g. `docs/progress.md`); if a conflict touches code, stop and tell me;
    - run the checks (`composer install`, `vendor/bin/phpunit`, PHPStan, php-cs-fixer); if they fail,
      fix them on `main` in a separate commit or stop and tell me;
    - in `docs/progress.md` change that session's status to **merged**;
-   - `git push origin main` (if pushing to `main` is refused, stop and tell me to merge the pull
-     request on GitHub, then run this file again).
+   - `git push origin main`, never with `--force`; if pushing to `main` is refused, stop and tell
+     me to merge the pull request "Session NN: …" on GitHub, then run this file again.
 3. Check that session 04 is now in `main` (marked merged in `docs/progress.md`). If it is not,
    stop and tell me which session must be finished first.
-4. Create the branch `session-05-auth` from the updated `main` (if this environment already
-   assigned you a working branch, use that one and say so in the pull request).
+4. Work on a branch based on the updated `main`: if this environment assigned you a working branch,
+   use it (merge `origin/main` into it if it does not contain it yet); otherwise create
+   `session-05-auth`. Record the branch name for session 05 in `docs/progress.md`.
 5. Run `composer install` if needed, and the checks once to know the starting state.
 6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
    `deploy-status/` report, and these sections of `docs/specification.md`: "Authentication (Shield)" (everything except 2FA), "Security baseline" (cookies, rate limits for auth).
@@ -40,13 +42,18 @@ Login, logout, password reset, magic link and hardened sessions.
 
 - Shield session authenticator with the specified defaults (registration off, magic link,
   per-IP and per-account throttling, remember-me, forced reset).
-- Passwords: local validators only, minimum length setting `Auth.minPasswordLength` (default 8).
+- Passwords: local validators only, minimum length setting `Auth.minimumPasswordLength` (Shield's
+  name, default 8), copied into the shared `config('Auth')` instance early in every request; a test
+  checks that a password shorter than the setting is refused.
 - Captcha (optional, every environment), generic messages (no enumeration).
 - Sessions: secure cookies, id regeneration on login/logout/privilege change, idle lock and absolute
-  lifetime, "my sessions" with remote logout, password change ends other sessions, new-device email
-  (hashed device cookie).
+  lifetime (it ends the session; remember-me may re-create it only up to its own lifetime setting,
+  e.g. 14 days; tests for expiry with and without remember-me), "my sessions" with remote logout,
+  password change ends other sessions, new-device email (hashed device cookie).
 - Auth views in the theme's auth layout; Auth module with profile page (name, email, language,
-  time zone, theme mode, password).
+  time zone, theme mode, password; profile fields in an Auth-owned `user_profiles` table).
+- The profile and "my sessions" are their own resources (`auth-profile`, `auth-sessions`) granted to
+  every group through `defaultGrants`; their routes get `can:` filters (enforced from session 07).
 - Groups `superadmin`, `admin`, `editor`, `user` and the superadmin rules.
 - Tests for every rule.
 
@@ -92,8 +99,10 @@ Login, logout, password reset, magic link and hardened sessions.
      screen (e.g. a console command), include the console output in the README instead; if
      screenshots are impossible in this environment, say why in the README.
 3. Update `docs/progress.md`: status of session 05 = **done**, decisions, deviations, known
-   issues, notes for the next session, and the link to `deploy-status/05-auth/`.
-4. Commit in small commits on the session branch, push it and open a pull request titled
+   issues, notes for the next session, the session's branch name and the link to
+   `deploy-status/05-auth/`.
+4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
+   request titled exactly
    "Session 05: Authentication (Shield) and session hardening" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and

@@ -1,11 +1,3 @@
-# Prompt: Build a Modular CodeIgniter 4 Application Skeleton
-
-> Copy everything below the line into a new conversation with an AI coding assistant (or hand
-> it to a developer) to build the application skeleton **from scratch**. Nothing is reused from
-> any previous project: this document is the whole specification.
-
----
-
 ## Role and goal
 
 You are a senior PHP / CodeIgniter 4 architect. Build **a reusable, themeable application
@@ -131,8 +123,8 @@ package, and never copy their code into the project.
    `php spark kpcrudy:make --namespace "Modules\<Name>"`), API resources from `Kpapy\Resource`
    (`php spark kpapy:make`); permissions through their `PermissionResolver` interfaces; custom
    operations with `addOperation()`; `hideFields()`, `where()`, `setTranslations()`,
-   `multiselect`; their masked ids, signed URLs, upload handling, CSP-friendly views and
-   translations. Write custom code only for what they do not cover (the screens listed as
+   `multiselect`; their masked ids, signed URLs, CSP-friendly views and translations (but not
+   their upload field types, which bypass the Storage service: see "CRUDs with kpcrudy"). Write custom code only for what they do not cover (the screens listed as
    hand-written in "CRUDs with kpcrudy").
 4. **Configure, extend, never patch:** configuration goes in `app/Config/Kpcrudy.php` and
    `app/Config/Kpapy.php` (or the Core's config classes that extend them); behaviour is changed by
@@ -211,10 +203,16 @@ tests/                    PHPUnit (unit + feature), SQLite test DB
 ```
 
 * **Autoloading:** `Modules\\` → `modules/` and `Themes\\` → `themes/` (PSR-4), registered once
-  in `app/Config/Autoload.php`. Do **not** build the namespace list dynamically at runtime.
+  in `app/Config/Autoload.php`, plus **one PSR-4 namespace per module** (`Modules\News` →
+  `modules/News`) read from a generated static file, `app/Config/ModuleNamespaces.php`, which
+  `Autoload.php` merges. The file is written by `make:module`, `modules:sync` and
+  `modules:install` (never edited by hand); a module folder copied by hand becomes loadable after
+  `php spark modules:sync`. Do **not** build the namespace list dynamically at runtime (no scan of
+  `modules/` per request).
 * **Discovery:** CodeIgniter's module discovery (routes, filters, languages, commands,
-  registrars, services) is the **only** loading mechanism. Never `require` module route files
-  by hand as well.
+  registrars, services) over those per-module namespaces is the **only** loading mechanism (it
+  only looks at `<namespace root>/Config/Routes.php` and the like, hence one namespace per
+  module). Never `require` module route files by hand as well.
 
 ## The module contract
 
@@ -235,7 +233,9 @@ Notifications/             Notification types (implement NotificationType)
 ```
 
 The **manifest** is a typed PHP class: the single source of truth for everything the skeleton
-needs to know. Use typed arrays, validated on sync (fail loudly with clear messages):
+needs to know. Use typed arrays, validated on sync (fail loudly with clear messages). The module
+names `Security` and `Update` are reserved (their settings permissions would clash with
+`settings.security` and `settings.update`):
 
 ```php
 final class Module extends ModuleManifest
@@ -250,8 +250,9 @@ final class Module extends ModuleManifest
 
     /**
      * Resources: one per CRUD or screen (not per table). Permission names are
-     * "<module>-<resource>.<operation>" (lower case), e.g. "news-posts.edit". A module with
-     * a single resource may use the module name as resource key: "news.edit".
+     * "<module>-<resource>.<operation>" (lower case), e.g. "news-posts.edit". Optional 'name'
+     * overrides the generated prefix, only for Core resources and single-resource modules
+     * (e.g. 'name' => 'files' gives "files.list"); duplicates in the catalogue are refused.
      *
      *  - type 'crud': kpcrudy's operations (list, show, add, edit, delete, export, import,
      *    trash, restore, purge) minus 'except', plus 'extra'
@@ -272,12 +273,17 @@ final class Module extends ModuleManifest
             'except' => ['trash', 'restore', 'purge', 'import'],
         ],
         'stats' => ['label' => 'News.res.stats', 'type' => 'page'],
+        'read'  => ['label' => 'News.res.read',  'type' => 'page'],   // reader screen for every user
     ];
 
-    /** Default grants per group (atomic names or Shield wildcards), first install only */
+    /**
+     * Default grants per group (atomic names or Shield wildcards), first install only. They are
+     * completed with the implied permissions (see "RBAC"); the validator warns about incomplete sets.
+     */
     public array $defaultGrants = [
-        'admin'  => ['news-posts.*', 'news-categories.*', 'news-stats.*'],
-        'editor' => ['news-posts.list', 'news-posts.add', 'news-posts.edit', 'news-posts.publish', 'news-categories.list'],
+        'admin'  => ['news-posts.*', 'news-categories.*', 'news-stats.*', 'news-read.*'],
+        'editor' => ['news-posts.list', 'news-posts.show', 'news-posts.add', 'news-posts.edit', 'news-posts.publish', 'news-categories.list', 'news-read.view'],
+        'user'   => ['news-read.view'],
     ];
 
     /**
@@ -310,12 +316,12 @@ final class Module extends ModuleManifest
     /** Content the module contributes to backups beyond its tables (paths relative to storage) */
     public array $backup = ['files' => ['news']];
 
-    /** Calendars the module publishes events to, and on-the-fly event providers (see Events) */
-    public array $calendars         = ['notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545', 'permission' => 'news-posts.list']];
+    /** Calendars the module publishes events to ('permission' optional), and on-the-fly event providers (see Events) */
+    public array $calendars         = ['notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545']];
     public array $calendarProviders = [];
 
-    /** API resources (kpapy) the module exposes under /api/v1 (see "JSON API") */
-    public array $api = ['posts' => ['path' => 'news', 'handler' => \Modules\News\Api\Posts::class]];
+    /** API resources (kpapy) under /api/v1: metadata checked against Config/Routes.php (see "JSON API") */
+    public array $api = ['posts' => ['path' => 'news', 'handler' => '\Modules\News\Api\Posts::index']];
 
     /** Extra CSP sources and outbound hosts the module needs (see "Security baseline") */
     public array $csp           = [];                         // e.g. ['frame-src' => ['https://www.youtube-nocookie.com']]
@@ -341,10 +347,13 @@ writes what is specific to it:
   `perm.*`, `settings.*` keys; route names `<module>-<resource>`; table prefix optional; assets
   under `Assets/`.
 * **`make:module <Name> [--crud=<table>]`** generates the complete empty module (manifest,
-  routes, language files, base controller, views, asset folders, migration stub, a test) from
-  templates that follow these conventions. With `--crud`, it also generates a kpcrudy controller
-  from an existing table (reusing `kpcrudy:make --namespace "Modules\<Name>"`) and adds the
-  resource to the manifest. With `--api`, it also generates the kpapy resource (reusing
+  routes, language files, base controller, views, asset folders, migration stub, a widget stub, a
+  scheduled-task stub, a test) from templates that follow these conventions, and adds the module's
+  namespace to `app/Config/ModuleNamespaces.php`. With `--crud`, it also generates a kpcrudy
+  controller from an existing table (reusing `kpcrudy:make --namespace "Modules\<Name>" --extends
+  "Modules\Core\Controllers\BackendController" --as <module>-<resource> --filter backend`, then
+  rewriting the generated route line to `CrudFactory::routes()` and the constructor to
+  `CrudFactory::make()`) and adds the resource to the manifest. With `--api`, it also generates the kpapy resource (reusing
   `kpapy:make`) and declares it in `$api`. It always writes the module's `CLAUDE.md` from a
   template (see "AI-assisted module development"); with `--standalone`, also the files needed to
   develop the module in its own repository.
@@ -357,8 +366,10 @@ build and evolve their own tables with CodeIgniter migrations:
 * **Each module owns its tables** and its migrations live in `Database/Migrations/` of that
   module (namespace `Modules\<Name>\Database\Migrations`), so installing, upgrading or
   uninstalling a module only touches its own schema. The Core does the same for the kernel
-  tables (modules, permissions, grants, settings, notifications, tasks, activity log, files…),
-  and Shield's and Settings' own migrations are run as they ship.
+  tables (modules, permissions, grants, groups, settings, notifications, tasks, activity log,
+  files…). The migrations shipped by `CodeIgniter\Shield`, `CodeIgniter\Settings` and `Kpapy`
+  are run as they ship, by `modules:sync` before the modules'; uninstalls and rollbacks never
+  touch them.
 * **One migration per table** for its creation (`2026-01-10-000001_CreateNewsCategories`,
   `…000002_CreateNews`), in dependency order so foreign keys can be created; a junction table
   gets its own migration after both sides.
@@ -403,7 +414,7 @@ translations, even in modules with multilingual content (only the Catalan row is
     have demo data loaded (and a banner "This site contains demo data" in the back office).
 * **Safety:** permission `modules.demo` (superadmin by default); with
   `CI_ENVIRONMENT=production` the buttons are hidden and the commands refuse unless the setting
-  `Modules.allowDemoInProduction` is enabled; a confirmation is always required; demo users get
+  `Packages.allowDemoInProduction` is enabled (see "Package validation" for `Config\Packages`); a confirmation is always required; demo users get
   random passwords shown once (never fixed passwords); everything is written to the activity
   log. Backups mark whether they contain demo data.
 
@@ -411,15 +422,20 @@ translations, even in modules with multilingual content (only the Catalan row is
 
 `php spark modules:sync`, and the same action from the back office, must:
 
-1. Discover the module folders, validate the manifests and check dependencies and versions.
-2. Run pending migrations per module namespace, and the seeder on first install.
+1. Discover the module folders, validate the manifests and check dependencies and versions;
+   rewrite `app/Config/ModuleNamespaces.php` when the set of modules changed.
+2. Run pending migrations (first those of Shield, Settings and kpapy, then per module namespace),
+   and the seeder on first install.
 3. Upsert the module registry (`modules`: name, version, enabled, installed_at, updated_at).
 4. Generate and upsert the permission catalogue from the manifests' `resources`
-   (`permissions`: module, resource, operation, name, description). Remove permissions of
-   deleted modules or resources only after confirmation (`--prune`).
-5. Apply `defaultGrants` only on first install of a module.
-6. Register settings definitions (no values are overwritten), widgets, tasks, notification
-   types and menu link types.
+   (`permissions`: module, resource, operation, name, description), honouring a resource's
+   `'name'` and refusing duplicate names. Remove permissions of deleted modules or resources only
+   after confirmation (`--prune`).
+5. Apply `defaultGrants` (completed with the implied permissions) only on first install of a
+   module, and rewrite Shield's computed groups, permissions and matrix (see "RBAC").
+6. Register settings definitions and their defaults (no values are overwritten), widgets, tasks,
+   notification types and menu link types; check that each `$api` entry matches a route in the
+   module's `Config/Routes.php`.
 7. **Publish assets** (`assets:publish`): module `Assets/` → `public/assets/modules/<name>/`,
    theme assets → `public/themes/<theme>/`, core assets → `public/assets/core/`.
 8. Invalidate the caches: permissions, menus, settings, widgets, asset manifest.
@@ -432,8 +448,9 @@ Other requirements:
   module's routes answer 404 and its menu, permissions, widgets and tasks are hidden),
   `make:module <Name>` and `assets:publish`.
 * **Sync must be idempotent and safe** to run on every deploy.
-* **Never derive permissions** by parsing route handlers, and never require a scan just to make
-  a new route reachable.
+* **Never derive permissions** by parsing route handlers, and never require a runtime scan just
+  to make a new route reachable (a new module needs one `modules:sync`, which writes its
+  namespace to the generated file).
 
 ### Modules screen (back office)
 
@@ -465,7 +482,11 @@ A hand-written screen in Core (`modules.*` permissions) to manage modules withou
 ### Installing and uninstalling modules and themes
 
 Modules and themes are **code** (PHP classes and views), so the web server never writes into
-`modules/` or `themes/`. Three ways to install them, all ending in the same validation and
+`modules/` or `themes/`. The web server user may write only `writable/`, `public/assets/modules`,
+`public/assets/core`, `public/themes` and `public/uploads` (publishing assets when a module is
+enabled or from Settings); everything else, the project root and `.env` included, is written only
+from the console. `docs/security.md` documents the risk of published JavaScript and
+`security:check` verifies the folder permissions. Three ways to install them, all ending in the same validation and
 `modules:sync`:
 
 1. **Copy the folder** (the usual way): upload `modules/<Name>/` or `themes/<name>/` (SFTP, git,
@@ -498,7 +519,9 @@ with an existing module from another vendor; no absolute paths, `..` segments or
 maximum **uncompressed** size and compression ratio (zip bombs); a `<url>` source is only
 downloaded over HTTPS from an allowed host (see "Outbound requests"); PHP files
 syntax-checked (`php -l`) before installing; optional **signature check** (packages signed by a
-trusted publisher key listed in `Config\Modules`), required when a setting asks for it.
+trusted publisher key listed in `Modules\Core\Config\Packages`, overridable by
+`app/Config/Packages.php` and `.env`; CodeIgniter's own `Config\Modules` is never extended),
+required when a setting asks for it. Reserved module names (`Security`, `Update`) are refused.
 
 **Uninstalling:** `php spark modules:uninstall <Name> [--keep-data]` (and a button that creates
 a pending uninstall, like staged installs): makes a backup, disables the module, rolls back its
@@ -516,16 +539,21 @@ fonts, footer…) is always available, because those are settings, not code.
   * registration **disabled**, email activation if it is enabled;
   * magic-link login;
   * per-IP **and** per-account throttling of login attempts;
-  * remember-me;
+  * remember-me, limited by its own lifetime (see "Session handling");
   * forced password reset;
   * `strong_password` validators, **local only** (Shield's composition, dictionary and
     personal-information validators; never the "pwned passwords" API, which would be an outbound
-    call); minimum length **8** by default (setting `Auth.minPasswordLength`), and the
-    documentation recommends **12**.
+    call); minimum length **8** by default (setting `Auth.minimumPasswordLength`, Shield's own
+    name), and the documentation recommends **12**. Shield reads `config('Auth')` directly, so the
+    Core copies the stored setting into the shared `Config\Auth` instance early in every request; a
+    test checks that a password shorter than the setting is refused.
 * **Two-factor authentication**, chosen by each user in their profile:
-  * **Email** (Shield's `Email2FA` action), or **authenticator app** (TOTP, RFC 6238: Google
+  * **Email** (Shield's `Email2FA` logic), or **authenticator app** (TOTP, RFC 6238: Google
     Authenticator, Microsoft Authenticator, Aegis, 1Password…), implemented as a Shield
     authentication action.
+  * Shield has a single global `login` action, so the Core sets its own `UserTwoFactorAction`
+    there, which dispatches to the email logic, the TOTP action or none according to the user's
+    method; the kpapy 2FA providers read the user's method the same way.
   * Enabling TOTP: show a QR code (generated locally as SVG) and the secret, and require a valid
     code before saving. The secret is stored **encrypted** (CI4 Encryption).
   * **Recovery codes** (10 single-use codes, stored hashed), shown once and regenerable.
@@ -533,8 +561,10 @@ fonts, footer…) is always available, because those are settings, not code.
   * **Policy per group** (setting): 2FA optional or required. A user in a required group is
     forced to set it up after login.
   * Admins can reset a user's 2FA (logged in the activity log, and the user is notified).
-* **Captcha** (optional, setting): enforced in every environment, compared with `hash_equals`
-  and invalidated after use. Never skipped because the environment is `development`.
+* **Captcha** (optional, setting): a local image or arithmetic captcha rendered with GD (no
+  external service), with the answer hashed in the session, enforced in every environment,
+  compared with `hash_equals` and invalidated after one check. Never skipped because the
+  environment is `development`.
 * **Generic messages** for login and reset, so users can't be enumerated.
 * **Auth views** use the theme's authentication layout.
 * **Session handling:**
@@ -542,13 +572,19 @@ fonts, footer…) is always available, because those are settings, not code.
   * regenerate the session id on login, logout and any privilege change (groups, permissions,
     impersonation);
   * optional idle-timeout lock screen (setting) **and** an absolute session lifetime (setting,
-    e.g. 12 hours) after which the user must log in again;
+    e.g. 12 hours) that ends the session; remember-me may re-create it, but only up to its own
+    lifetime (security setting, e.g. 14 days), after which the user must log in again, and
+    sensitive actions still require re-authentication (tests cover expiry with and without
+    remember-me);
   * changing or resetting the password ends every other session and revokes the tokens obtained
     by app logins; the user's personal API tokens are listed with the option to revoke them;
   * an email notice when the account signs in from a new device or browser (remembered by a
     hashed device cookie), with a link to "my sessions";
-  * a "my sessions" list with remote logout. Any geo lookup is **local only** (no third-party
-    HTTP calls per request).
+  * a "my sessions" list with remote logout (resource `auth-sessions`, granted to every group).
+    Any geo lookup is **local only** (no third-party HTTP calls per request).
+* **Security emails** (magic links, password resets, 2FA and API email codes, new-device notices)
+  are sent inline with a short timeout and logged; the queued email channel of "Notifications"
+  does not apply to them.
 * **Re-authentication ("sudo mode"):** sensitive actions ask again for the password and, when
   the user has 2FA, a 2FA code; the confirmation lasts 15 minutes (setting) for that session.
   It protects: the permission matrix, groups and individual permissions, impersonation,
@@ -556,7 +592,9 @@ fonts, footer…) is always available, because those are settings, not code.
   enabling/disabling, uploading and uninstalling modules, and the security settings. A
   `reauth` filter (`['filter' => 'reauth']`) and a `$this->requireReauth()` helper make it
   reusable by modules.
-* **Groups:** `superadmin`, `admin`, `editor`, `user`.
+* **Groups:** `superadmin`, `admin`, `editor`, `user`, stored in a Core `groups` table (name,
+  title, description, reserved, 2FA policy) and mirrored into `setting('AuthGroups.groups')`,
+  like the matrix (see "RBAC").
   * `superadmin` bypasses RBAC.
   * The group cannot be renamed or deleted, and only a superadmin can assign it.
 
@@ -567,24 +605,37 @@ trash, restore, purge, custom operations and action permissions), and the skelet
 granularity instead of collapsing it into read/create/update/delete.
 
 * **Permission names:** `<module>-<resource>.<operation>`, lower case (`news-posts.edit`,
-  `news-categories.delete`, `news-posts.publish`). Two levels on purpose: Shield only expands
-  the wildcard in the first part, so `news-posts.*` grants a whole resource in one go. A
-  single-resource module may use `<module>.<operation>` (`settings.update`).
+  `news-categories.delete`, `news-posts.publish`). Two levels on purpose: `news-posts.*` grants a
+  whole resource in one go (Shield also matches prefix and multi-segment wildcards; a test checks
+  that `news-posts.*` does not match `news-postsx.edit`). A resource may declare `'name'` in the
+  manifest to override the generated prefix, only for Core resources and single-resource modules
+  (`settings.update`, `files.list`, `backup.restore`, `modules.toggle`, `security.check`,
+  `api.docs`); the validator refuses duplicate names in the catalogue.
 * **The catalogue is generated**, never written by hand: for each resource, kpcrudy's operations
   (`type: crud`) or `view` (`type: page`), minus `except`, plus `extra`. `search`, `filters`
   and `bulk` are not separate permissions: the resolver treats them as part of `list`.
-* **Group grants** live in a table (`group_permissions`: group, permission). They may be atomic
-  names or Shield wildcards. Build Shield's `AuthGroups::$permissions` and `$matrix` from the
-  catalogue and that table, and cache them (invalidate on change).
-* **Implied permissions:** when a grant is saved, add the permissions it presupposes with
+* **Group grants** live in a table (`group_permissions`: group, permission), the source of truth.
+  They may be atomic names or Shield wildcards. Shield reads its groups, permissions and matrix
+  with `setting('AuthGroups.…')` and refuses unknown names, so after every sync or grant change
+  the Core computes them from the catalogue, the `groups` table and `group_permissions` and writes
+  them with `setting()->set('AuthGroups.…')` (cached by Settings); a test checks that both agree.
+* **Personal screens** (profile, my sessions, my activity, notifications, dashboard home…) are
+  resources of their own (`auth-profile`, `auth-sessions`, `activity-mine`, `core-notifications`,
+  `dashboard`…) granted to every group through `defaultGrants`, so the rule "every `backend/`
+  route has `can:`" has no exceptions.
+* **Implied permissions:** when a grant is saved (including `defaultGrants`), add the
+  permissions it presupposes with
   `Kpcrudy\Crud::impliedPermissions()` (`edit` → `list`, `show`; `restore`/`purge` → `trash`;
   `export` → `list`...), so the matrix can never hold a useless combination.
-* **Users** can also get individual permissions (Shield `users_permissions`).
+* **Users** can also get individual permissions (Shield's `addPermission()`, stored in its
+  `auth_permissions_users` table).
 * **One resolver for every CRUD and every API resource:** the Core provides `CrudPermissions`,
   shared by kpcrudy and kpapy (see "JSON API" for how it implements both interfaces), with
   `$denyByDefault = true`:
-  * it maps `(resource, operation)` to `auth()->user()->can("{$resource}.{$operation}")`
-    (`search`/`filters`/`bulk` → `.list`); superadmins bypass it;
+  * it maps `(resource, operation)` to `Authorization::for($user)->can("{$resource}.{$operation}")`
+    (`search`/`filters`/`bulk` → `.list`); superadmins bypass it. The user comes from kpapy's
+    `Context` (API) or the session (web); iCal feeds, notifications by permission, scheduled
+    tasks and the CLI pass the user explicitly, never relying on a session;
   * kpcrudy and kpapy call it for every operation, button, action, bulk action and custom
     operation, and cache the answers that do not depend on a record;
   * **masked ids are not access control:** every request is still checked by the resolver and
@@ -614,8 +665,9 @@ granularity instead of collapsing it into read/create/update/delete.
     disabled-module check, maintenance mode, activity log, idle lock and throttling.
   * **Default deny:** a back-office route without a `can:` filter fails a CI test (a
     `RoutesSecurityTest` that walks every route under `backend/`); the same test checks that
-    every route under `api/v1/` has the `kpapy` filter (token required) or is explicitly
-    declared public (`kpapy:public`, read-only, rate-limited).
+    every route under `api/v1/` has the `kpapy` filter (`kpapy`, `kpapy:optional` or
+    `kpapy:hmac`), `kpapy:login` (only kpapy's `auth/token*` login routes) or is explicitly
+    declared public (`kpapy:public`, GET only, read-only, rate-limited).
 * **Inside controllers and views:** use `can('news-posts.publish')` (helper), `$this->can(...)`
   or `$crud->isAllowed('publish', $row)`. The UI only hides what the server also enforces.
 * **Escalation rules**, all covered by tests:
@@ -715,7 +767,9 @@ granularity instead of collapsing it into read/create/update/delete.
   and dark mode, `display: standalone`, start URL the back office or the public home) so the site
   can be installed on a phone's home screen and opens full-screen. A minimal service worker only
   where required for installability, **without offline caching of pages or data** (it never
-  caches authenticated responses). Enabled by a setting.
+  caches authenticated responses). The Core routes `/manifest.webmanifest` and `/sw.js` (a
+  service worker only controls its own folder, so it is served from the root), and generates PNG
+  icons (192 and 512 px) with GD whenever the logo changes. Enabled by a setting.
 * **`make:theme <Name> [--parent=default]`** creates a child theme that only overrides what it
   needs. Theme assets are published like module assets.
 
@@ -724,15 +778,25 @@ granularity instead of collapsing it into read/create/update/delete.
 **No JavaScript inside the HTML** (no inline `<script>` code, no `on*=""` attributes, no
 `style=""`): this keeps the code maintainable and allows a strict Content-Security-Policy.
 
+* **Exceptions:** the nonce'd `<script>`/`<style>` blocks rendered by kpcrudy and kpapy's own
+  views (overriding them would copy library code; a library request asks for external assets),
+  and one nonce'd `<style>` in the layout with the theme option variables (or a generated CSS
+  file). The CI check covers the project's views (`app/`, `modules/`, `themes/`).
+* **Styles without `style=""`:** dynamic widths (progress bars…) are set from JavaScript through
+  the CSSOM or with utility classes; the vendored editor and calendar must work under the
+  enforced CSP without `unsafe-inline` (tested); HTMLPurifier drops `style` attributes and maps
+  alignment to classes.
 * **Where the files live:** each module keeps its own assets in `modules/<Name>/Assets/`, so a
   module is self-contained. `assets:publish` (CodeIgniter's `Publisher`, run by `modules:sync`
   and on deploy) copies them to `public/assets/modules/<name>/`; the core's to
   `public/assets/core/`; themes' to `public/themes/<theme>/`. The web server serves static files;
   the copies in `public/` are never edited by hand (git-ignored; a test checks they are in sync).
 * **Format:** native **ES modules** (`<script type="module">`), no bundler required. The layout
-  prints an **import map** (with the CSP nonce) that maps prefixes to the published folders:
-  `core/` → `/assets/core/js/`, `<module>/` → `/assets/modules/<module>/js/`, `theme/` → the
-  active theme's JS. Modules import shared code: `import { confirm } from 'core/ui/confirm.js'`.
+  prints an **import map** (with the CSP nonce), generated from the asset manifest, that lists
+  **every published JS file with its hashed URL** under the prefixes `core/` (→
+  `/assets/core/js/`), `<module>/` (→ `/assets/modules/<module>/js/`) and `theme/` (the active
+  theme's JS), so imported files are cache-busted too (a test checks that the map changes when a
+  file changes). Modules import shared code: `import { confirm } from 'core/ui/confirm.js'`.
 * **Organisation of the core JS** (`modules/Core/Assets/js/`):
   * `app.js`: entry point; starts the components found on the page;
   * `http.js`: `fetch` wrapper with the CSRF header and token refresh, JSON errors → toasts;
@@ -759,11 +823,16 @@ granularity instead of collapsing it into read/create/update/delete.
 ## Configuration and settings
 
 * **Static configuration:** CI4 `Config` classes. Every module may ship
-  `Config/<Name>.php`, overridable from `.env` (`<name>.<key>`).
+  `Config/<Name>.php`, overridable from `.env` (`<name>.<key>`). CodeIgniter gives some file
+  names a special meaning, so the validator refuses module config classes named `Events`,
+  `Routes`, `Registrar`, `Filters`, `Modules` or `Services` (the Events module uses
+  `Config/Calendar.php`).
 * **Secrets:** only in `.env`, never in tracked files. Provide an `env` template with no real
   values.
 * **Runtime settings:** `codeigniter4/settings`, namespaced per module (`setting('News.perPage')`).
   * Definitions come from the manifests (type, default, validation rules, label, help, group).
+    The Core registers the manifest defaults so `setting('News.perPage')` returns the default
+    before any value is saved (a test checks every declared key).
   * The `Settings` module **generates the forms** from those definitions, one tab per module
     (and one for the active theme's options), with server-side validation and typed casting.
   * Permissions: `settings.update` opens the Settings UI; for every module that declares
@@ -773,7 +842,7 @@ granularity instead of collapsing it into read/create/update/delete.
 * **Site-wide settings** (Core): site name, logo, default locale, available locales, time zone,
   maintenance mode, idle lock, captcha on/off, 2FA policy per group, mail transport, themes.
 * **Settings › Security** (Core, `settings.security` + re-authentication): minimum password
-  length, session lifetimes, re-authentication window, rate limits, extra CSP origins per
+  length (`Auth.minimumPasswordLength`), session lifetimes (absolute and remember-me), re-authentication window, rate limits, extra CSP origins per
   directive, the outbound allow-list, upload rules (SVG, re-encoding) and `Api.publicSpec`.
   File configuration (`Config\…` and `.env`) sets the defaults; the UI only stores overrides,
   and values that would weaken the baseline (e.g. `unsafe-inline`) are refused.
@@ -783,20 +852,26 @@ granularity instead of collapsing it into read/create/update/delete.
 ### Notifications
 
 * `notify(User|int|array $recipients, NotificationType $notification)` or by group / permission
-  (`notifyGroup('admin', …)`, `notifyPermission('backup.restore', …)`).
+  (`notifyGroup('admin', …)`, `notifyPermission('backup.restore', …)`, which checks each user
+  with `Authorization::for($user)`).
 * **Notification types** are classes declared by modules (`$notifications` in the manifest):
   key, title, icon, default channels, a `render()` for the bell and an email template.
 * **Channels:** `database` (the bell) and `email` (queued or sent by the scheduler, never
-  inline in the request). Users choose per type which channels they want (preferences page);
+  inline in the request; transactional security emails are not notifications, see
+  "Authentication"). Users choose per type which channels they want (preferences page);
   some types can be marked mandatory.
 * **UI:** bell with unread count in the top bar, dropdown with the latest, "mark all as read",
-  and a full list page (kpcrudy, `where(user_id)`).
+  and a full list page (kpcrudy, `where(user_id)`; resource `core-notifications`, granted to
+  every group).
 * **Examples:** a new private notice (News), an event reminder (Events), a failed backup
   (Backup), a new version available (Updates), 2FA reset by an admin (Auth).
 
 ### Scheduled tasks
 
 * A **single cron entry** runs everything: `* * * * * php /path/spark schedule:run`.
+* Naming: modules keep scheduled tasks in `Tasks/` and the tutorial module is also called
+  `Tasks`; docs and language keys always say "scheduled task" (or "to-do task" in the tutorial
+  module), never just "task".
 * Modules register tasks in their manifest (`$tasks`): classes implementing `TaskInterface`
   with `name()`, `schedule()` (cron expression or helpers: `daily('03:00')`, `hourly()`,
   `everyMinutes(15)`), `run(): TaskResult`, and options such as `withoutOverlapping()` (lock)
@@ -852,7 +927,8 @@ granularity instead of collapsing it into read/create/update/delete.
 * **Redirects:** "return to" parameters and post-login redirects only accept internal paths
   (open-redirect protection), with a shared `safe_redirect()` helper.
 * **Filesystem level:** `writable/storage` and `writable/backups` are outside `public/`, only
-  accessible to the web server user (folders `0750`, files `0640`), never executable and never
+  accessible to the web server user (folders `0750`, files `0640`, or stricter, e.g. the
+  libraries' `0600` key files; CodeIgniter's logger writes `0640`), never executable and never
   served directly. Application access control never relies on operating-system permissions:
   every read of a private file goes through the permission-checking controller.
 * **Folder permissions** (ACL) and the **file picker** rules are described in "Modules › Files";
@@ -861,7 +937,7 @@ granularity instead of collapsing it into read/create/update/delete.
 ### Versioning
 
 * The core version lives in `modules/Core/Config/Version.php` (semantic versioning), module
-  versions in their manifests. `about` / `version` commands and the footer of the back office
+  versions in their manifests. The Core's `about` command and the footer of the back office
   show them.
 
 ## CRUDs with kpcrudy
@@ -873,8 +949,10 @@ granularity instead of collapsing it into read/create/update/delete.
   1-N and N-N relations, a translations child table), and the same table may be managed by two
   CRUDs with different permissions (e.g. an admin list and a read-only view).
 * **Core integration** provides:
-  * `Config\Kpcrudy`: theme `bootstrap5`, `maskIds = true`, local assets, upload paths from
-    the Storage service, `layout` = the theme's back-office layout with `layoutSection =
+  * `Config\Kpcrudy`: theme `bootstrap5`, `maskIds = true`, local assets, `uploadPath` set to a
+    non-public, unused folder (kpcrudy's and kpapy's upload fields bypass the Storage service, so
+    modules never use them: file fields use the file picker backed by the Storage service, see
+    "Files"; the gap is in `docs/library-requests.md`), `layout` = the theme's back-office layout with `layoutSection =
     'content'`, `showTitle = false` (the layout prints title and breadcrumbs), `flashKeys`
     mapped to the layout's toasts, `permissionResolver = CrudPermissions::class` and
     `denyByDefault = true`.
@@ -890,10 +968,14 @@ granularity instead of collapsing it into read/create/update/delete.
     route, declared as `extra` permissions of the resource (no extra routes);
   * action and bulk action `permission` options, also declared as `extra`;
   * `hideFields()` for sensitive data, `where()` for "own records only";
-  * `setTranslations()` for multilingual content, `multiselect` for lists of values;
+  * `setTranslations()` for multilingual content (kpcrudy lists show an empty cell when a
+    translation is missing, so `listLocale` is the user's locale only when that locale is
+    complete, otherwise `ca`), `multiselect` for lists of values (relations that must be queried,
+    e.g. "visible to any of my groups", use a junction table with `setRelationNN()`);
   * `afterWrite()` for the activity log and cache invalidation;
   * the `kpcrudy:confirm` event to use the theme's confirmation modal;
-  * strict CSP: kpcrudy's templates carry the nonce and have no inline handlers.
+  * strict CSP: kpcrudy's templates carry the nonce and have no inline handlers (their nonce'd
+    blocks are the accepted exception, see "Front-end assets and JavaScript").
 * **Ids in URLs are masked** and every custom action is checked server-side.
 
 ## JSON API (kpapy)
@@ -914,8 +996,11 @@ and kpapy do not depend on each other: the skeleton is what makes them share per
   a record has the same id in both **only if they get the same key**. The Core sets
   `Config\Kpcrudy::$maskKey` and `Config\Kpapy::$maskKey` from one `.env` value
   (`app.maskKey`, 64 random hex characters generated by the installer, included in backups,
-  checked by `security:check`). Never leave it empty: each library would then generate its own
-  key file and the ids would differ. A test checks that a record has the same id in both.
+  checked by `security:check`). Never leave it empty: both libraries would fall back to
+  CodeIgniter's encryption key (ids change when it is rotated) and then to their own key files;
+  the application refuses to boot in production when it is empty. Masked ids also depend on a
+  context (the table name by default), so never set a custom `maskIds($context)` on one side
+  only. A test checks that a record has the same id in both.
 * **Authentication:** Shield access tokens (`Authorization: Bearer`), never cookies; the API
   route group is excluded from CSRF.
   * **Personal tokens** are created (after re-authentication) and revoked in the user's web
@@ -939,12 +1024,16 @@ and kpapy do not depend on each other: the skeleton is what makes them share per
     `restricted` audiences respected;
   * `notifications`: list, unread count, mark one/all as read;
   * `public/news` and `public/events`: public read-only endpoints without a token (rate-limited).
-* **Modules expose their own resources** by declaring them in the manifest (`$api`); `modules:sync`
-  registers their routes under `/api/v1/<path>`, and the permission catalogue is checked the same
-  way as for CRUDs (an undeclared operation fails in development).
+* **Modules expose their own resources** with routes in their own `Config/Routes.php` under
+  `api/v1/<path>` (written by `kpapy:make` or `make:module --api`), and declare them in the
+  manifest (`$api`: path and the handling controller method). `$api` is metadata: `modules:sync`
+  and `permissions:check` check that routes and manifest match, disabled modules answer 404
+  through the module filter, and the permission catalogue is checked the same way as for CRUDs
+  (an undeclared operation fails in development).
 * **Cross-cutting:** rate limiting per token and per IP (settings), CORS allow-list (setting,
   empty by default), problem+json errors translated (ca/es/en), ETags and `304`, `If-Match` for
-  writes, every write and every login in the activity log.
+  writes supported (`412` on mismatch) but not required by default, every write and every login
+  in the activity log.
 * **Documentation (back office only):** kpapy's `DocsController` is registered at
   `backend/api/docs` with the `backend` and `can:api.docs` filters, `docsInProduction = true`
   and `docsTryIt = true`: the page lists every endpoint and lets admins **try** requests with
@@ -957,10 +1046,12 @@ and kpapy do not depend on each other: the skeleton is what makes them share per
 
 ### Auth
 
-As described in "Authentication". Profile page: name, email, avatar (file picker in `upload`
-mode, stored on the **private** disk in the user's personal space), language,
-time zone, theme mode, password change, 2FA method (none / email / app) with recovery codes,
-notification preferences, and "my sessions".
+As described in "Authentication". Profile page (resource `auth-profile`, granted to every
+group): name, email, avatar (file picker in `upload` mode, stored on the **private** disk in the
+user's personal space), language, time zone, theme mode, password change, 2FA method (none /
+email / app) with recovery codes, notification preferences, and "my sessions". Shield's `users`
+table has none of the profile fields, so Auth owns a `user_profiles` table (one migration: name,
+language, time zone, theme mode, avatar, an optional `birth_date`).
 
 ### Users
 
@@ -972,15 +1063,19 @@ notification preferences, and "my sessions".
   limited in time (setting, e.g. 30 minutes), with a visible banner and a way back; sensitive
   actions (re-authentication, password, 2FA, tokens) are refused while impersonating; start and
   end are written to the activity log.
-* Groups CRUD with kpcrudy, the permission matrix (hand-written), and the 2FA policy per group.
+* Groups CRUD with kpcrudy over the Core `groups` table (mirrored into
+  `setting('AuthGroups.groups')`), the permission matrix (hand-written), and the 2FA policy per
+  group. A new group receives the personal-screen grants every group has.
 
 ### Settings
 
 The generated forms described above (one tab per module and one for the theme), plus actions:
-"send a test email", "clear caches", "publish assets".
+"send a test email", "clear caches", "publish assets" (into `public/assets/…` and
+`public/themes/` only, see "Installing and uninstalling modules and themes").
 
 ### Dashboard
 
+* The dashboard home is the resource `dashboard`, granted to every group.
 * **Configurable from the UI, per group:** for each group, the admin chooses which widgets are
   available, their default order and size, and their options. A widget not enabled for any of
   the user's groups is never shown (also not through its async URL).
@@ -1001,7 +1096,8 @@ The generated forms described above (one tab per module and one for the theme), 
 * A read-only **kpcrudy** CRUD over `activity_log` (`readOnly()`): columns date, user, module,
   action, record and summary; filters by user, module, action and date range; search;
   CSV export; the details page shows the before/after changes as a table (`callbackColumn`).
-* "My activity" screen for every user: the same CRUD with `where('user_id', me)`.
+* "My activity" screen for every user: its own resource `activity-mine` (granted to every group),
+  the same CRUD with `where('user_id', me)`.
 * IP and user agent hidden with `hideFields()` from users without `activity-log.network`.
 * Permissions: `activity-log.list`, `activity-log.show`, `activity-log.export`,
   `activity-log.network`; purge only by the retention task.
@@ -1009,7 +1105,8 @@ The generated forms described above (one tab per module and one for the theme), 
 ### Pages
 
 * Pages for the public site: title, slug (unique per parent and language), parent (tree),
-  template (from the theme's page templates), body (rich text, sanitised with HTMLPurifier),
+  template (from the theme's page templates), body (rich text, sanitised with HTMLPurifier,
+  which drops `style` attributes and maps alignment to classes),
   summary, featured image (file picker), status (draft / published / scheduled with
   `publish_at`), **visibility** (public, logged-in users, selected groups), SEO fields (meta
   title, description, canonical, noindex), order, author, timestamps, soft deletes.
@@ -1102,7 +1199,7 @@ its own (`folder_permissions`: folder, subject, rights):
 
   | Space | Path | Default rights |
   |---|---|---|
-  | **Personal** | `users/{id}/` (private disk) | The owner has every right; nobody else (except `files.all`) |
+  | **Personal** | `users/{user_id}/` (private disk) | The owner has every right; nobody else (except `files.all`) |
   | **Modules** | `modules/<module>/` | Only the module's code writes there (Storage service); read-only or hidden in the file manager, as the module declares |
   | **Shared** | created by administrators | The rights assigned to groups or users |
 
@@ -1146,22 +1243,27 @@ field declares how it works:
   scheduled, `published_at`, `expires_at`, author, timestamps, soft deletes) and
   `news_categories`; multilingual with `setTranslations()`.
 * **Visibility:** `public` (public site), `private` (logged-in users only) or `groups`
-  (selected groups, a `multiselect` or a junction table).
+  (selected groups, in a `news_groups` junction table edited with kpcrudy's `setRelationNN()`,
+  so "visible to any of my groups" is a portable query).
 * **Type:** `article` or `notice`. Notices have a **priority** (info, warning, critical), can be
   **pinned**, and expire (`expires_at`). They appear in the *Notices* dashboard widget of the
   users who can see them; publishing a private notice sends a notification to its audience.
 * **Read receipts:** `news_reads` (user, news, read_at); "mark as read" from the widget and the
-  detail page; authors can see how many users have read a notice (`news-posts.readers`).
+  detail page of the reader screen; authors can see how many users have read a notice (`news-posts.readers`).
 * Back office with kpcrudy: resources `posts` (with `extra`: `publish` for the publish
   operation and bulk action, `author` which hides the author fields with `hideFields()`,
   `readers`) and `categories`; authors only change their own posts (per-record rule), and a
   "my posts" screen shows the `where()` pattern. HTML sanitised with HTMLPurifier in a
   `before*` hook, slug hook, cover image through the file picker.
+* **Reader screen:** a read-only back-office screen (resource `news-read`, `type: page`,
+  permission `news-read.view` granted to every group) that lists the posts the user may see, with
+  the detail page and "mark as read"; ordinary users never need `news-posts.list`.
 * Public routes (`/news`, `/news/{slug}`, `/news/category/{slug}`, RSS feed) for public news;
-  private news only in the back office and the dashboard.
+  private news only in the back office (reader screen) and the dashboard.
 * Widgets *Notices* and *Latest news*, a task that expires notices, two settings, the menu link
   type "news category", and the `news.notices` calendar (notices with an event date are published
-  to the calendar; see "Calendar API").
+  to the calendar with their visibility, `groups` mapped to `restricted`, and no calendar
+  permission; see "Calendar API").
 
 ### Events (calendar)
 
@@ -1177,7 +1279,10 @@ field declares how it works:
   number of occurrences, and exceptions (skipped dates). Occurrences are expanded when queried
   for a date range, not stored.
 * **Administration** with kpcrudy (list, filters by category, date range and visibility,
-  duplicate operation, CSV import/export).
+  duplicate operation, CSV import/export; kpcrudy does not import translated fields, so a
+  `callbackImport()` writes the Catalan translation).
+* Configuration in `Config/Calendar.php` (a `Config/Events.php` would be loaded by CodeIgniter as
+  an event-listener file).
   * **Form:** a visibility selector; when `restricted`, a groups field (multiselect) and a users
     field (searchable, AJAX), saved to `event_audience`. The groups offered are only those the
     user may assign (an editor cannot create an event only for superadmins), validated
@@ -1257,7 +1362,7 @@ both supported:
   `$calendarProviders`. They must return **stable keys** (used as iCal `UID`) and only events the
   user may see; results are cached per user and range for a few minutes.
 * **Calendars:** each module declares its calendars in the manifest (`$calendars`: label, colour,
-  required permission). In the calendar view each user toggles the calendars they want to see
+  and an optional required permission; without it, each event's visibility decides). In the calendar view each user toggles the calendars they want to see
   (saved as a preference); the personal iCal feed can be filtered by calendars as well as
   categories. Categories remain for events created by hand.
 * **Consistency:** events and providers of a disabled module are hidden; uninstalling a module
@@ -1269,8 +1374,8 @@ both supported:
   * **News (push):** a notice may have an optional event date; saving it publishes the event to
     the `news.notices` calendar with the notice's visibility, and unpublishing or deleting the
     notice removes it.
-  * **Users (pull):** a "Birthdays" provider (read-only, enabled by a setting, only the day and
-    month, only to logged-in users) shows the provider mode without storing anything.
+  * **Users (pull):** a "Birthdays" provider (read-only, enabled by a setting, from the optional
+    `user_profiles.birth_date`, only the day and month, only to logged-in users) shows the provider mode without storing anything.
 
 ### Updates
 
@@ -1287,26 +1392,33 @@ both supported:
 * **Updating:** `php spark app:update` guides the process: checks for local changes, puts the
   application in maintenance mode, makes a backup (Backup module), updates the code (`git pull`
   of the tag, or downloads the release archive), and **verifies it before applying anything**:
-  the archive's SHA-256 **and** its signature with a publisher key listed in `Config\Updates`
-  (or a signed git tag, `git verify-tag`); an unverified release is refused. Then it runs `composer
+  the archive's SHA-256 **and** its **Ed25519 signature** (libsodium, minisign-compatible) with
+  the public key shipped in `Config\Updates` (or a signed git tag, `git verify-tag`, for `git pull`
+  installs); an unverified release is refused. The owner generates the key pair on their own
+  computer and the private key never leaves it (never in the repository or CI);
+  `docs/updates.md` documents the signing procedure for every release and key rotation. Then it runs `composer
   install --no-dev`, `modules:sync` (migrations, assets), clears caches, and leaves maintenance
   mode. On failure it stops, keeps maintenance mode, and explains how to restore the backup.
   `--dry-run` shows the plan.
-* Downloads only over HTTPS from the allowed hosts (see "Outbound requests").
+* Downloads only over HTTPS from the allowed hosts (see "Outbound requests"); `git` and
+  `composer` use their own clients, run only from the console, and are documented as exceptions
+  in `docs/outbound-requests.md`.
 * Permissions: `updates.view`, `updates.check`.
 
 ### Backup
 
 * **Content of a backup:** the database (all tables, portable dump generated with the Query
   Builder in chunks, or `mysqldump` when available), the files of both storage disks,
-  `writable/uploads`, the module registry and versions, **`.env` and the encryption key**, and
+  `writable/uploads` (only if not empty), the module registry and versions, **`.env` and the encryption key**, and
   the extra paths declared by modules (`$backup`). A `manifest.json` records the application
   and module versions, date, contents and SHA-256 checksums.
 * **Always encrypted with a password.** Because the backup contains the encryption key and
   other secrets, a password is **mandatory**: the archive cannot be created without one, and the
   password is never stored; scheduled backups use a password from `.env` (`backup.password`).
-  * **Authenticated encryption:** AES-256-GCM (or a ZIP with AES-256 plus an HMAC-SHA256 of the
-    archive), so a modified file is detected before anything is restored.
+  * **Authenticated, streaming encryption** (archives may not fit in memory): libsodium
+    `crypto_secretstream_xchacha20poly1305`, or chunked AES-256-GCM with a tag per chunk and a
+    header MAC; the format version is recorded in the archive header. A modified file is detected
+    before anything is restored.
   * **Key derivation:** Argon2id (`sodium_crypto_pwhash`) or PBKDF2-SHA256 with at least 600,000
     iterations and a random salt stored in the header.
   * **Password strength:** at least 12 characters (checked in the UI and the console).
@@ -1314,7 +1426,10 @@ both supported:
     zip-slip and zip-bomb checks as module packages.
 * **Console and UI** with the same service:
   * `php spark backup:create [--only=db|files] [--password]`, `backup:list`,
-    `backup:restore <file> [--only=db|files]`, `backup:verify <file>`, `backup:prune`;
+    `backup:restore <file> [--only=db|files] [--with-env]`, `backup:verify <file>`, `backup:prune`;
+    `--password` takes no value: it asks for the password with a hidden prompt (never on the
+    command line, where it would end up in the shell history and the process list);
+    non-interactive runs read `backup.password` from `.env` or an environment variable;
   * a back-office page: list of backups (date, size, type, result, who), create now,
     download (re-authentication required), verify, delete, upload a backup file, and restore.
 * **Storage and retention:** in `writable/backups` (outside `public/`), with retention rules
@@ -1326,6 +1441,11 @@ both supported:
     an older installation);
   * makes an automatic safety backup first, enters maintenance mode, restores database and
     files (optionally only one of them), runs `modules:sync`, and leaves maintenance mode;
+  * keeps the current `.env` (database credentials and base URL of the new server) and, after a
+    confirmation, merges only the secrets from the backup (`encryption.key`, `app.maskKey`,
+    `backup.password`); `--with-env` restores the whole `.env` (console only). From the UI, when
+    the project root is not writable by the web server (the recommended setup), the merged `.env`
+    content is shown to copy;
   * long restores from the UI run as a background job with progress; the console is the
     recommended way for large sites.
 * Notifications on success/failure of scheduled backups; everything goes to the activity log.
@@ -1341,8 +1461,11 @@ both supported:
     `default-src 'self'`; `script-src 'self' 'nonce-…'`; `style-src 'self' 'nonce-…'`;
     `img-src 'self' data:`; `connect-src 'self'`; `object-src 'none'`; `base-uri 'self'`;
     `form-action 'self'`; `frame-ancestors 'none'`; never `unsafe-inline` or `unsafe-eval`. No
-    inline scripts, handlers or style attributes in any module or theme;
-  * `secureheaders` filter plus: `Strict-Transport-Security` (production, `max-age` ≥ 1 year),
+    inline scripts, handlers or style attributes in any module or theme (the exceptions are listed
+    in "Front-end assets and JavaScript");
+  * a Core `SecurityHeaders` filter driven by `Config\SecurityHeaders`, which replaces
+    CodeIgniter's `secureheaders` filter (it hard-codes other values; never stack both):
+    `Strict-Transport-Security` (production, `max-age` ≥ 1 year),
     `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff`,
     `Permissions-Policy` (camera, microphone, geolocation… disabled), `X-Frame-Options: DENY`
     for old browsers;
@@ -1379,7 +1502,9 @@ both supported:
   logged; updating the code is **console only**; modules and themes are installed by copying
   their folder or from the console, and a ZIP uploaded in the UI is only **staged** (validated,
   approved, then installed by a console command or a privileged scheduled job): the web server
-  never writes code. There is no file editor and no self-update from the browser.
+  never writes code and writes only `writable/`, `public/assets/modules`, `public/assets/core`,
+  `public/themes` and `public/uploads`. There is no file editor and no self-update from the
+  browser.
 * **API:** token authentication only (the API never reads the session cookie, and no web route
   is exempted from CSRF), scopes intersected with permissions (also for superadmins), API login
   with the user's active 2FA or an email code, rate limits per token and IP, CORS closed by
@@ -1400,7 +1525,9 @@ both supported:
   timeouts and a maximum response size. The allow-list is configured in a file
   (`Config\Outbound`, overridable from `.env`), extended by modules in their manifest
   (`$outboundHosts`, shown before enabling the module) and editable in **Settings › Security**
-  (`settings.security` + re-authentication); every request is logged. Documented in
+  (`settings.security` + re-authentication); every request is logged. SMTP is not HTTP: the mail
+  service checks the SMTP host against the same allow-list. `git` and `composer` (console-only
+  `app:update`) use their own clients and are documented exceptions. Documented in
   `docs/outbound-requests.md` with examples (GitHub releases for Updates, an SMTP relay, a
   module calling a weather API).
 * **Supply chain:** `composer.lock` committed, `composer audit` in CI and in `security:check`,
@@ -1424,15 +1551,21 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     `backup.password` set when scheduled backups are on, `.env` not readable by other users,
     no secret found in tracked files;
   * **installation:** `writable/install.lock` present (web installer closed), no demo data
-    loaded, permissions of `writable/` (`0750` folders, `0640` files), `public/` contains no
-    `.env`, `writable` or PHP files outside `index.php`;
+    loaded, permissions of `writable/` (`0750` folders, `0640` files; stricter modes accepted),
+    the web server user can write only `writable/`, `public/assets/modules`, `public/assets/core`,
+    `public/themes` and `public/uploads` (not the project root, `.env`, `modules/` or `themes/`),
+    `public/` contains no `.env`, `writable` or PHP files outside `index.php`;
   * **accounts:** superadmins without 2FA (warning), groups where 2FA is optional (info), the
     minimum password length (warning below 12), users with personal tokens without expiry
     (info);
-  * **dependencies:** `composer audit` (offline cache when there is no network) and the
-    `vendor.json` checksums;
+  * **dependencies:** the last `composer audit` result (it has no offline mode: the daily task or
+    CI runs it and stores the result with its date; the check reports "last checked on …" and
+    warns when it is older than 7 days) and the `vendor.json` checksums;
   * **outbound:** the allow-list, and hosts added by modules;
-  * **`--probe=<url>`** (optional, requests to the site itself, never to third parties): the
+  * **`--probe=<url>`** (optional, requests to the site itself, never to third parties, through a
+    dedicated client limited to the configured base URL host and the site's own
+    `allowedHostnames`, with plain HTTP allowed only for the redirect check; not the
+    `OutboundClient`, which refuses loopback and private addresses): the
     security headers are present; `/.env`, `/writable/…` and `/modules/…` are not served; a PHP
     file in `uploads/` is not executed (a harmless probe file created and removed); an external
     `return` URL is not followed (open redirect); the login is throttled; HTTP redirects to
@@ -1458,7 +1591,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
 * **Optional web installer:** available only while the application has not been configured,
   by the web or by the console: it answers 404 as soon as `.env` or `writable/install.lock`
   exists, and also refuses to run when the database already has tables. It warns when the
-  page is not served over HTTPS. It uses the same service as the CLI.
+  page is not served over HTTPS. It uses the same service as the CLI. When the project root is
+  not writable by the web server (the recommended setup), it shows the `.env` content for the
+  operator to copy instead of writing it.
 * **Commands** (all documented in `docs/commands.md`):
   * modules and themes: `modules:sync|list|status|enable|disable|install|uninstall|demo`,
     `themes:install|uninstall`, `make:module`, `make:theme`, `assets:publish [--watch]`;
@@ -1468,7 +1603,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     `app:update`;
   * calendar and API: `calendar:resync <module>`, `kpapy:openapi`, `kpapy:routes`,
     `kpapy:token`;
-  * application: `app:install`, `about`, `cache:clear` hooks.
+  * application: `app:install`, `about` (Core) and `app:cache-clear` (Core caches plus
+    CodeIgniter's cache; CodeIgniter's own `cache:clear` cannot be replaced, so modules listen to
+    a `cache.cleared` event).
 
 ## Quality, tests and delivery
 
@@ -1504,10 +1641,13 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     the CSP and security headers; the route-security test covers `backend/` and `api/v1/`; each
     rate limit answers `429`; outbound requests to a non-allowed host, a private IP or plain HTTP
     are refused; zip bombs are refused; a modified backup fails authentication before restoring;
-    `security:check` reports errors on a development configuration and passes on a hardened one.
+    `security:check` reports errors on a development configuration and passes on a hardened one;
+    a password shorter than `Auth.minimumPasswordLength` is refused; a session re-created by
+    remember-me never outlives the remember-me lifetime; every declared setting returns its
+    manifest default; Shield's computed `AuthGroups` settings match `group_permissions`.
 * **GitHub Actions:** PHP 8.2/8.3/8.4, composer validate + audit, php-cs-fixer (dry run),
   PHPStan, PHPUnit with SQLite and MariaDB, a check that published assets are up to date, a CSP
-  check (no inline scripts/handlers/styles in views), the `vendor.json` checksums, secret
+  check (no inline scripts/handlers/styles in the views of `app/`, `modules/` and `themes/`), the `vendor.json` checksums, secret
   scanning (e.g. gitleaks), and Dependabot for Composer and GitHub Actions.
 
 ## Documentation (English)
@@ -1524,8 +1664,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
 * `docs/installing-modules.md`: the three ways to install modules and themes (folder, console
   ZIP, staged upload), package validation and signatures, the cron line for pending installs,
   upgrading, uninstalling and what happens to the data;
-* `docs/permissions.md`: resources, names, wildcards, implied permissions, own records, hidden
-  fields, the matrix;
+* `docs/permissions.md`: resources, names (and the `'name'` override), wildcards (how Shield
+  matches them), implied permissions, personal screens granted to every group, own records,
+  hidden fields, the matrix;
 * `docs/themes.md` (includes responsive rules and the PWA manifest): theme structure and manifest, layouts, regions, menu locations, options,
   view overrides, child themes, `make:theme`;
 * `docs/frontend.md`: assets, publishing, import map, components with `data-component`, the
@@ -1589,19 +1730,21 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   web server rules;
 * `docs/backup-restore.md`: what is included, passwords and key handling, console and UI usage,
   retention, restoring on a new server, disaster recovery checklist;
-* `docs/updates.md`: release process (tags, release notes), checking for updates, `app:update`
-  step by step, rolling back;
+* `docs/updates.md`: release process (tags, release notes, signing the release archive with the
+  owner's Ed25519 key, key rotation), checking for updates, `app:update` step by step, rolling
+  back;
 * `docs/security.md`: the security baseline; a **threat model** (who attacks what: anonymous
   visitors, logged-in users trying to escalate, stolen tokens or passwords, malicious module
   packages or uploads, a compromised server) and the control that answers each threat; 2FA
   (policy and recovery), re-authentication, sessions and passwords (8 minimum, 12 recommended);
   **configuring headers and CSP** with examples; rate limits; web server configuration (Apache
-  and Nginx); the **production checklist** with `security:check` and the Security status page;
+  and Nginx), the folders the web server may write and the risk of published JavaScript;
+  `app.maskKey` (its fallbacks and why it must be set); the **production checklist** with `security:check` and the Security status page;
   **incident response** (revoke tokens and sessions, rotate the encryption key and `app.maskKey`,
   restore a backup, read the activity log);
 * `docs/outbound-requests.md`: why outbound calls are restricted (SSRF), the `OutboundClient`,
-  the allow-list in `Config\Outbound`, in module manifests and in Settings › Security, with
-  examples;
+  the allow-list in `Config\Outbound`, in module manifests and in Settings › Security, SMTP hosts,
+  the console-only exceptions (`git`, `composer`) and the `--probe` client, with examples;
 * `docs/dependencies.md`: Composer constraints, `composer audit`, Dependabot, vendored
   front-end libraries (`vendor.json`, checksums, licences) and how to add or update one;
 * `docs/user-guide.md`: back-office user manual (profile, 2FA, dashboard, notifications, files,
@@ -1630,12 +1773,14 @@ with the tests that cover it, and the `Tasks` module's tests run in CI.
 6. **Talking to other modules:** a notification type sent to the assignees, publishing due dates
    to the calendar (push) or offering them as a provider (pull), and listening to an event of
    another module.
-7. **A scheduled task:** a daily reminder of overdue tasks: schedule, `withoutOverlapping()`,
+7. **A scheduled task:** a daily reminder of overdue to-do tasks: schedule, `withoutOverlapping()`,
    result and output in the scheduled tasks screen, and its test.
 8. **A new setting:** declaring it in `$settings`, validation, reading it with `setting()`, and
    seeing it in the Settings UI.
 9. **A child theme:** `make:theme`, changing colours and logo, overriding a view of the `Tasks`
-   module, and adding the theme's own CSS.
+   module, and adding the theme's own CSS. The finished theme ships as `themes/tasks-demo/`
+   (child of `default`), kept in the repository as tutorial material (themes live in `themes/`,
+   not inside the module).
 10. **Uploading files in a form:** a file-picker field (module folder, allowed types), attachments
     on the private disk served with permissions, and a `FileAccessPolicy` that follows the
     task's visibility.
@@ -1716,11 +1861,10 @@ with the tests that cover it, and the `Tasks` module's tests run in CI.
     `docs/tutorials/` can be followed from a fresh install, and the `Tasks` module (enabled with
     its demo data) contains the finished code and passes its tests.
 
-Work in small, reviewable commits: `CLAUDE.md`, `docs/specification.md` and `composer require` of
-the required libraries →
-Core kernel → assets and themes → Auth (+2FA) → RBAC → menus
-→ settings → notifications and scheduler → activity log → kpcrudy integration → kpapy
-integration and core API → security baseline and `security:check` → Users →
-Settings UI → Dashboard and widgets → Files → Pages → Menus editor → News → Events → Backup →
-Updates → installer/CLI → tests/CI → docs → `Tasks` tutorial module and tutorials. Before each step, state the plan and the files you
-will create. After each step, run the tests and show the results.
+Work in small, reviewable commits, in the order of the session prompts in `deploy/` (session 00:
+`CLAUDE.md`, `docs/specification.md` and `composer require` of the required libraries; then the
+Core kernel, assets and themes, Auth, RBAC, menus and security, the kpcrudy and kpapy
+integrations, the cross-module services, the MVP modules and installer, the remaining modules,
+`security:check`, i18n, the `Tasks` tutorial module, docs, tutorials, quality and release).
+Before each step, state the plan and the files you will create. After each step, run the tests
+and show the results.

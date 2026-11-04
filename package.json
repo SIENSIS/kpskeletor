@@ -1,0 +1,13 @@
+{
+  "name": "kpskeletor",
+  "private": true,
+  "description": "Development tools for kpskeletor (Playwright screenshots and end-to-end tests).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "screenshots": "node deploy-status/screenshot.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
