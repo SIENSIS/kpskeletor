@@ -1,0 +1,1 @@
+Fusiona la pull request d'aquesta sessió a main (si no pots fer push a main, fes-ho amb el merge de la pull request de GitHub). Després comprova que a main hi ha docs/progress.md amb la sessió marcada com a feta i la carpeta deploy-status de la sessió.
