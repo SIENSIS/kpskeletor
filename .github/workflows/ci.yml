@@ -59,6 +59,12 @@ jobs:
       - name: Tests (SQLite)
         run: vendor/bin/phpunit
 
+      - name: CSP check of the project views (no inline scripts, handlers or styles)
+        run: php spark csp:check
+
+      - name: Published assets up to date (assets:publish is idempotent, manifest in sync)
+        run: php spark assets:publish && php spark assets:publish --check
+
   mariadb:
     name: Tests on MariaDB (PHP 8.3)
     runs-on: ubuntu-latest

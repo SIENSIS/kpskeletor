@@ -75,6 +75,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             'moduleenabled', // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
+            'cspmodules',    // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
