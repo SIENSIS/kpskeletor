@@ -7,7 +7,7 @@ pull request open), *merged* (in `main`).
 
 | Session | Title | Status | Branch | Pull request | Report |
 |---|---|---|---|---|---|
-| 00 | Bootstrap | done | `claude/modest-goldberg-jjs8kp` | "Session 00: Bootstrap" | [`deploy-status/00-bootstrap/`](../deploy-status/00-bootstrap/README.md) |
+| 00 | Bootstrap | done | `claude/modest-goldberg-jjs8kp` | [SIENSIS/kpskeletor#1](https://github.com/SIENSIS/kpskeletor/pull/1) | [`deploy-status/00-bootstrap/`](../deploy-status/00-bootstrap/README.md) |
 
 ## Decisions
 

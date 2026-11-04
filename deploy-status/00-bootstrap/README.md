@@ -1,7 +1,7 @@
 # Session 00 — Bootstrap
 
 Branch: `claude/modest-goldberg-jjs8kp` (assigned by the environment instead of
-`session-00-bootstrap`) · Pull request: "Session 00: Bootstrap" · Date: 2026-11-04
+`session-00-bootstrap`) · Pull request: [SIENSIS/kpskeletor#1](https://github.com/SIENSIS/kpskeletor/pull/1) · Date: 2026-11-04
 
 ## What was built
 
@@ -119,7 +119,7 @@ $ node deploy-status/screenshot.mjs --shot "/=01-home" --shot "/=02-home-phone@3
 200  http://localhost:8080/  ->  …/02-home-phone.png
 ```
 
-CI: see the pull request checks.
+CI on GitHub Actions: all 4 jobs green (PHP 8.2, 8.3, 8.4 and MariaDB).
 
 ### `php spark`
 
