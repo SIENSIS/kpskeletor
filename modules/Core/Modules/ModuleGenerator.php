@@ -25,6 +25,7 @@ final class ModuleGenerator
         'Language.en.php.tpl' => 'Language/en/{{Name}}.php',
         'Migration.php.tpl'   => 'Database/Migrations/{{date}}-000001_Create{{Name}}Items.php',
         'Seeder.php.tpl'      => 'Database/Seeds/{{Name}}Seeder.php',
+        'DemoSeeder.php.tpl'  => 'Database/Seeds/{{Name}}DemoSeeder.php',
         'Widget.php.tpl'      => 'Widgets/{{Name}}Widget.php',
         'Task.php.tpl'        => 'Tasks/{{Name}}Task.php',
         'Test.php.tpl'        => 'Tests/{{Name}}ModuleTest.php',
