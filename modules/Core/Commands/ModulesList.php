@@ -6,6 +6,7 @@ namespace Modules\Core\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
+use Modules\Core\Demo\DemoDataManager;
 use Modules\Core\Models\ModuleModel;
 use Modules\Core\Modules\ModuleDiscovery;
 
@@ -28,6 +29,7 @@ final class ModulesList extends BaseCommand
     {
         $modules  = (new ModuleDiscovery())->discover();
         $registry = db_connect()->tableExists('modules') ? model(ModuleModel::class, false)->allByName() : [];
+        $demo     = db_connect()->tableExists('demo_records') ? (new DemoDataManager())->loadedModules() : [];
         $rows     = [];
 
         foreach ($modules as $name => $module) {
@@ -47,11 +49,12 @@ final class ModulesList extends BaseCommand
                 $installed['version'] ?? '-',
                 $installed === null ? '-' : lang($installed['enabled'] ? 'Core.list.yes' : 'Core.list.no'),
                 $status,
+                in_array($name, $demo, true) ? lang('Core.list.yes') : '-',
             ];
         }
 
         foreach (array_diff_key($registry, $modules) as $name => $installed) {
-            $rows[] = [$name, '-', $installed['version'], lang($installed['enabled'] ? 'Core.list.yes' : 'Core.list.no'), lang('Core.list.statusMissing')];
+            $rows[] = [$name, '-', $installed['version'], lang($installed['enabled'] ? 'Core.list.yes' : 'Core.list.no'), lang('Core.list.statusMissing'), in_array($name, $demo, true) ? lang('Core.list.yes') : '-'];
         }
 
         if ($rows === []) {
@@ -66,6 +69,7 @@ final class ModulesList extends BaseCommand
             lang('Core.list.installed'),
             lang('Core.list.enabled'),
             lang('Core.list.status'),
+            lang('Core.list.demo'),
         ]);
 
         return EXIT_SUCCESS;

@@ -4,18 +4,27 @@ declare(strict_types=1);
 
 namespace Modules\Core\Modules;
 
+use Closure;
 use CodeIgniter\I18n\Time;
 use Config\Database;
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Demo\DemoDataManager;
 use Modules\Core\Models\ModuleModel;
+use Modules\Core\Permissions\CatalogueBuilder;
+use Modules\Core\Permissions\DefaultGrants;
+use Modules\Core\Permissions\PermissionCatalogue;
+use Modules\Core\Registry\ApiRouteChecker;
+use Modules\Core\Registry\DeclarationRegistry;
 
 /**
- * `modules:sync`: discovers and validates the modules, rewrites the generated namespaces file,
- * runs migrations (packages first, then modules in dependency order), seeds new modules, upserts
- * the registry and invalidates the derived caches. Idempotent: a second run changes nothing.
+ * `modules:sync` (see "Module lifecycle"): discovers and validates the modules, rewrites the
+ * generated namespaces file, runs migrations (packages first, then modules in dependency order),
+ * seeds new modules, upserts the registry, the permission catalogue, the default grants (first
+ * install only) and the declarations (settings, widgets, tasks…), optionally loads demo data and
+ * invalidates the derived caches. Idempotent: a second run changes nothing.
  *
- * Steps 4–7 (permissions, grants, settings/widgets/tasks registration, assets) are added by
- * later sessions.
+ * Every check (manifests, dependencies, duplicate permissions, `$api` routes) runs before
+ * anything is written. Step 7 (assets) arrives with the front-end session.
  */
 final class ModuleSynchronizer
 {
@@ -25,19 +34,34 @@ final class ModuleSynchronizer
         private readonly ModuleMigrator $migrator = new ModuleMigrator(),
         private readonly CacheInvalidator $caches = new CacheInvalidator(),
         private readonly ?ModuleModel $registry = null,
+        private readonly PermissionCatalogue $permissions = new PermissionCatalogue(),
+        private readonly DeclarationRegistry $declarations = new DeclarationRegistry(),
+        private readonly ?DemoDataManager $demo = null,
     ) {
     }
 
     /**
+     * @param bool                               $prune        Remove permissions no manifest generates any more…
+     * @param Closure(list<string>): bool|null   $confirmPrune …after this confirmation (required with $prune)
+     * @param list<string>|null                  $demo         Load the demo data of these modules (null: none; []: every enabled module with a demo seeder)
+     *
      * @throws SyncFailedException when a manifest or a dependency is invalid (nothing is changed)
      */
-    public function sync(): SyncReport
+    public function sync(bool $prune = false, ?Closure $confirmPrune = null, ?array $demo = null): SyncReport
     {
         $report = new SyncReport();
 
-        // 1. Discover, validate, check dependencies.
+        // 1. Discover, validate, check dependencies, permissions and API routes.
         $modules = $this->discovery->discover();
         [$manifests, $errors] = $this->validate($modules);
+
+        $builder   = new CatalogueBuilder();
+        $catalogue = $builder->build($manifests);
+        $errors    = [...$errors, ...$builder->errors()];
+
+        if ($errors === []) {
+            $errors = (new ApiRouteChecker())->check($manifests);
+        }
 
         if ($errors !== []) {
             throw new SyncFailedException($errors);
@@ -91,9 +115,54 @@ final class ModuleSynchronizer
 
         $report->missing = array_values(array_diff(array_keys($known), array_keys($modules)));
 
+        // 4. Permission catalogue; stale permissions are removed only with --prune + confirmation.
+        $result                     = $this->permissions->upsert($catalogue);
+        $report->permissionsAdded   = $result['added'];
+        $report->permissionsUpdated = $result['updated'];
+        $report->stalePermissions   = $result['stale'];
+
+        if ($prune && $result['stale'] !== [] && $confirmPrune !== null && $confirmPrune($result['stale'])) {
+            $this->permissions->prune($result['stale']);
+            $report->pruned           = $result['stale'];
+            $report->stalePermissions = [];
+        }
+
+        // 5. Default grants (completed with the implied permissions), only once per module.
+        $grants = new DefaultGrants();
+
+        foreach ($registry->allByName() as $name => $row) {
+            if ($row['grants_applied'] || ! isset($manifests[$name])) {
+                continue;
+            }
+
+            $report->grantsApplied[$name] = $this->permissions->grant($grants->expand($manifests[$name]));
+            $registry->update($row['id'], ['grants_applied' => 1]);
+        }
+
+        // 6. Settings definitions, widgets, tasks, notification types, menu link types, calendars, API.
+        $ordered = [];
+
+        foreach ($report->order as $name) {
+            $ordered[$name] = $manifests[$name];
+        }
+
+        $report->declarationsChanged = $this->declarations->store($this->declarations->build($ordered));
+
         // 8. Invalidate the caches derived from the manifests.
         if ($report->hasChanges()) {
             $this->caches->invalidate();
+        }
+
+        // Demo data (optional): after the caches, so the registry is current.
+        if ($demo !== null) {
+            $manager = $this->demo ?? new DemoDataManager();
+            $manager->assertAllowed();
+
+            foreach ($demo === [] ? $manager->modulesWithDemo() : $demo as $module) {
+                if ($manager->load($module)) {
+                    $report->demoLoaded[] = $module;
+                }
+            }
         }
 
         return $report;

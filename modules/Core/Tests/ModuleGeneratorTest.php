@@ -37,7 +37,7 @@ final class ModuleGeneratorTest extends CIUnitTestCase
         foreach ([
             'Config/Module.php', 'Config/Routes.php', 'Controllers/Home.php', 'Views/index.php',
             "Language/ca/{$name}.php", "Language/es/{$name}.php", "Language/en/{$name}.php",
-            "Database/Seeds/{$name}Seeder.php", "Widgets/{$name}Widget.php", "Tasks/{$name}Task.php",
+            "Database/Seeds/{$name}Seeder.php", "Database/Seeds/{$name}DemoSeeder.php", "Widgets/{$name}Widget.php", "Tasks/{$name}Task.php",
             "Tests/{$name}ModuleTest.php", 'Assets/js/.gitkeep', 'Assets/css/.gitkeep', 'Assets/img/.gitkeep',
         ] as $file) {
             $this->assertFileExists($path . '/' . $file);

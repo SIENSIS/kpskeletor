@@ -14,11 +14,11 @@ final class ModuleModel extends Model
     protected $table         = 'modules';
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
-    protected $allowedFields = ['name', 'version', 'enabled', 'installed_at', 'updated_at'];
+    protected $allowedFields = ['name', 'version', 'enabled', 'grants_applied', 'installed_at', 'updated_at'];
     protected $useTimestamps = false;
 
     /**
-     * @return array<string, array{id: int, name: string, version: string, enabled: bool, installed_at: string|null, updated_at: string|null}>
+     * @return array<string, array{id: int, name: string, version: string, enabled: bool, grants_applied: bool, installed_at: string|null, updated_at: string|null}>
      */
     public function allByName(): array
     {
@@ -29,7 +29,8 @@ final class ModuleModel extends Model
                 'id'           => (int) $row['id'],
                 'name'         => (string) $row['name'],
                 'version'      => (string) $row['version'],
-                'enabled'      => (bool) $row['enabled'],
+                'enabled'        => (bool) $row['enabled'],
+                'grants_applied' => (bool) ($row['grants_applied'] ?? false),
                 'installed_at' => $row['installed_at'] === null ? null : (string) $row['installed_at'],
                 'updated_at'   => $row['updated_at'] === null ? null : (string) $row['updated_at'],
             ];

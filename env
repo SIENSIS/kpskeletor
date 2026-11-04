@@ -59,6 +59,13 @@ CI_ENVIRONMENT = production
 # database.tests.port = 3306
 
 #--------------------------------------------------------------------
+# MODULE PACKAGES (Modules\Core\Config\Packages)
+#--------------------------------------------------------------------
+
+# Allow loading/removing demo data when CI_ENVIRONMENT = production (off by default).
+# packages.allowDemoInProduction = false
+
+#--------------------------------------------------------------------
 # ENCRYPTION
 #--------------------------------------------------------------------
 

@@ -67,6 +67,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-01-03 | 01 | Registered modules whose folder disappeared | Accepted (proposal) |
 | D-01-04 | 01 | Allowed values in the manifest | Accepted (proposal) |
 | D-01-05 | 01 | Core version during development | Accepted (proposal) |
+| D-02-01 | 02 | One table for the manifest declarations | Accepted (proposal) |
+| D-02-02 | 02 | Manifest defaults through a Settings handler | Accepted (proposal) |
+| D-02-03 | 02 | Disabled modules answer 404 through a global filter | Accepted (proposal) |
+| D-02-04 | 02 | Default grants applied once: a flag in `modules` | Accepted (proposal) |
+| D-02-05 | 02 | Core resource `modules` and its default grants | Accepted (proposal) |
+| D-02-06 | 02 | Demo data: confirmations, seeder base class and stub | Accepted (proposal) |
+| D-02-07 | 02 | Cache scopes with version keys | Accepted (proposal) |
+| D-02-08 | 02 | Activity log entries before the Activity session | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -677,3 +685,83 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-04):** applied by session 01 as proposed (not a public convention change nor a security weakening).
 - **Applied in:** session 01 (`modules/Core`)
+
+## D-02-01 — One table for the manifest declarations
+
+- **Where:** specification "Module lifecycle" step 6, deploy/02 ("Registries for widgets, tasks, notification types, menu link types, calendars, API resources"), plan session 02 (one class per registry)
+- **Problem:** Regular requests must not load the manifests, so the declarations have to be stored somewhere; the plan lists one registry class per kind but no tables.
+- **Proposal:** One `module_declarations` table (module, kind, key, JSON definition) written by `modules:sync` and read through `Modules\Core\Registry\DeclarationRegistry` (`widgets()`, `tasks()`, `notificationTypes()`, `menuLinkTypes()`, `calendars()`, `calendarProviders()`, `apiResources()`) and `SettingsRegistry`. Readers hide disabled modules, except settings, whose defaults stay readable. Map keys are qualified with the module (`News.perPage`, `News.notices`). Later sessions may add typed wrappers.
+- **Alternatives:** A) One table per registry (six tables with the same shape). B) A generated PHP file like `ModuleNamespaces.php` (no database, but one more generated file to keep in sync per installation).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-02 — Manifest defaults through a Settings handler
+
+- **Where:** specification "Configuration and settings", D-00-06
+- **Problem:** `setting('News.perPage')` must return the manifest default before a value is saved, without a wrapper that every caller must remember.
+- **Proposal:** A read-only codeigniter4/settings handler (`Modules\Core\Settings\ManifestDefaultsHandler`, alias `manifest`) placed after the database handler in `app/Config/Settings.php`. A real config class property with the same name (e.g. `Config\Auth::$minimumPasswordLength`) keeps priority, so file configuration and `.env` still set those defaults (D-00-07). `SettingCaster` and `SettingsRegistry::value()` give typed values; a test checks every declared key.
+- **Alternatives:** A) A Core `settings()` wrapper used everywhere instead of `setting()` (easy to forget; third-party code would still see `null`).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-03 — Disabled modules answer 404 through a global filter
+
+- **Where:** specification "Module lifecycle" ("a disabled module's routes answer 404"), D-00-08
+- **Problem:** Routes stay in each module's `Config/Routes.php`, which never queries the database, so disabled modules' routes are still registered.
+- **Proposal:** A global `before` filter `moduleenabled` (`Modules\Core\Filters\ModuleEnabled`, in `app/Config/Filters.php`) maps the matched controller (`Modules\<Name>\…`) to its module and throws a 404 when the module is disabled (registry state cached in the "modules" scope). Closure routes cannot be mapped to a module: modules must use controllers (already the convention).
+- **Alternatives:** A) A `module:<Name>` route filter declared on every route (one more rule for every module to remember).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-04 — Default grants applied once: a flag in `modules`
+
+- **Where:** specification "Module lifecycle" step 5, plan session 02 ("`default_grants_applied` or a flag in `modules`")
+- **Problem:** Default grants must be applied only on a module's first install, also for installations whose registry existed before this session.
+- **Proposal:** A new migration adds `modules.grants_applied`; `modules:sync` applies the expanded `defaultGrants` of every module whose flag is 0 and sets it. Grants removed by the owner are never re-added. Shield's computed `AuthGroups` arrays are written by the RBAC session (07).
+- **Alternatives:** A) A separate `default_grants_applied` table.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-05 — Core resource `modules` and its default grants
+
+- **Where:** specification "Modules screen" (permissions `modules.list`, `modules.toggle`, `modules.sync`, `modules.upload`, `modules.uninstall`), "Demo data" (`modules.demo`)
+- **Problem:** The Core must generate these permissions from its manifest; the specification only says the last two (and `modules.demo`) are superadmin only by default.
+- **Proposal:** The Core manifest declares a `crud` resource `modules` with `'name' => 'modules'`, every crud operation but `list` excluded, and the extras `toggle`, `sync`, `upload`, `uninstall`, `demo`. Default grants: `admin` gets `modules.list`, `modules.toggle`, `modules.sync`; superadmins bypass the checks (session 07).
+- **Alternatives:** A) A `page` resource (it would also generate `modules.view`, not in the specification).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-06 — Demo data: confirmations, seeder base class and stub
+
+- **Where:** specification "Demo data"
+- **Problem:** The specification says a confirmation is always required and that seeders write through `DemoData`, but not how a seeder receives it nor how the console confirms.
+- **Proposal:** Demo seeders extend `Modules\Core\Demo\DemoSeeder` and implement `load(DemoData $demo)`; running one with `db:seed` is refused (it would not be tracked). `modules:demo` and `modules:sync --demo` always ask y/n (no flag skips it; the non-interactive installer comes in session 18). Loading runs in a transaction; removal goes newest first, keeps and reports rows that other data depends on, and deletes recorded files only inside `writable/`. `make:module` generates a `<Name>DemoSeeder` stub.
+- **Alternatives:** A) Plain CodeIgniter seeders that call `DemoData` themselves (nothing guarantees they are tracked).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-07 — Cache scopes with version keys
+
+- **Where:** deploy/02 ("Caches (permissions, menus, settings, widgets, assets) with one invalidation service")
+- **Problem:** CodeIgniter's cache has no tags, and the file handler cannot delete by prefix.
+- **Proposal:** `Modules\Core\Cache\CoreCache` stores each scope's version in the cache and puts it in every key; `CacheInvalidator` (the only invalidation service) bumps the versions and then fires `modules.cacheInvalidate`. A sixth scope, `modules`, holds the enabled state and the declarations.
+- **Alternatives:** A) `cache()->clean()` on every change (drops unrelated caches such as rate limits). B) `deleteMatching()` (not supported by every handler).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
+
+## D-02-08 — Activity log entries before the Activity session
+
+- **Where:** specification "Modules screen" and "Demo data" ("written to the activity log")
+- **Problem:** The activity log arrives in session 12.
+- **Proposal:** Enable/disable and demo-data actions are written to the application log (`log_message('notice')`) for now; session 12 replaces those calls with activity log entries (noted in `docs/progress.md`).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 02 (`modules/Core`)
