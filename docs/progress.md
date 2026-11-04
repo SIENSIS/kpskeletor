@@ -10,7 +10,7 @@ pull request open), *merged* (in `main`).
 | 00 | Bootstrap | merged | `claude/modest-goldberg-jjs8kp` | [SIENSIS/kpskeletor#1](https://github.com/SIENSIS/kpskeletor/pull/1) | [`deploy-status/00-bootstrap/`](../deploy-status/00-bootstrap/README.md) |
 | 01 | Core kernel: modules, manifest and sync | merged | `claude/modest-goldberg-jjs8kp` | [SIENSIS/kpskeletor#4](https://github.com/SIENSIS/kpskeletor/pull/4) | [`deploy-status/01-core-modules/`](../deploy-status/01-core-modules/README.md) |
 | 02 | Core kernel: catalogue, settings registry, enable/disable and demo data | merged | `claude/clever-lovelace-i36pbh` | [SIENSIS/kpskeletor#5](https://github.com/SIENSIS/kpskeletor/pull/5) | [`deploy-status/02-core-registry/`](../deploy-status/02-core-registry/README.md) |
-| 03 | Themes and standard views | done | `claude/tender-ride-z9y4vv` | Session 03: Themes and standard views | [`deploy-status/03-themes/`](../deploy-status/03-themes/README.md) |
+| 03 | Themes and standard views | done | `claude/tender-ride-z9y4vv` | [SIENSIS/kpskeletor#6](https://github.com/SIENSIS/kpskeletor/pull/6) | [`deploy-status/03-themes/`](../deploy-status/03-themes/README.md) |
 
 ## Decisions
 

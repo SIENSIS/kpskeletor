@@ -1,6 +1,6 @@
 # Session 03 — Themes and standard views
 
-Branch: `claude/tender-ride-z9y4vv` (assigned by the environment) · Pull request: "Session 03: Themes and standard views" (link in `docs/progress.md`) · Date: 2026-11-04
+Branch: `claude/tender-ride-z9y4vv` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#6](https://github.com/SIENSIS/kpskeletor/pull/6) "Session 03: Themes and standard views" · Date: 2026-11-04
 
 ## What was built
 
