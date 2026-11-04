@@ -3,7 +3,8 @@
 Session prompts live in `deploy/` (run them in order: `deploy/next.md`); do not edit them unless asked. Each session merges the finished session branches into `main` first and ends with a report and screenshots in `deploy-status/NN-<slug>/`.
 
 Modular CodeIgniter 4 application skeleton. The full specification is in `docs/specification.md`
-(the build prompt); read the relevant section before changing a feature.
+(the build prompt); read the relevant section before changing a feature. `docs/decisions.md`
+records the owner's decisions; they override the specification when they disagree.
 
 ## Required libraries (never replace them)
 
@@ -43,10 +44,15 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   `Config/Module.php` (resources, menus, settings, widgets, tasks, notifications, api, csp,
   outboundHosts). Never hard-code a module in the Core.
 - Loading only through CodeIgniter discovery; never `require` route files; `Routes.php` never
-  queries the database.
+  queries the database. Each module has its own namespace (`Modules\News` → `modules/News`) listed
+  in the generated `app/Config/ModuleNamespaces.php` (written by `make:module`, `modules:sync` and
+  `modules:install`; never edit it by hand). A module copied by hand needs `php spark modules:sync`.
 - **Permissions:** `<module>-<resource>.<operation>` (e.g. `news-posts.edit`), generated from the
-  manifest, never written by hand. Every `backend/` route has a `can:` filter; every `api/v1/`
-  route has the `kpapy` filter or is declared public. Default deny.
+  manifest, never written by hand. Only Core and single-resource modules may override the prefix
+  with the resource `'name'` (e.g. `backup.*`); duplicates are rejected and `Security`/`Update` are
+  reserved module names. Every `backend/` route has a `can:` filter, personal screens included
+  (their own resources, granted to every group by `defaultGrants`); every `api/v1/` route has the
+  `kpapy` filter or is declared public. Default deny.
 - **Database:** one migration per table, Forge / Query Builder only, `down()` always implemented,
   released migrations never edited. Demo data only in `<Name>DemoSeeder` through `DemoData`.
 - **Front end:** Bootstrap 5.3 served locally, native ES modules in `modules/<Name>/Assets/js`,
@@ -99,9 +105,17 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 
 ## Workflow
 
-- Small, reviewable commits following the order in the specification; before each step, state the
-  plan and the files; after it, run the checks.
+- Small, reviewable commits following the order of the session files in `deploy/` (it takes
+  precedence over the order at the end of the specification); before each step, state the plan
+  and the files; after it, run the checks.
+- Branches: use the branch the environment assigns (or `session-NN-<slug>`) and record it in
+  `docs/progress.md`; sessions are identified by the pull request title "Session NN: …". Never
+  force-push; if `main` cannot be pushed, stop and ask the owner to merge the pull request.
 - Keep `docs/` in sync with the code (including `docs/commands.md` for every new command) and
   update this file when a convention changes.
 - Ask before: adding a dependency, changing a public convention (permission names, manifest keys,
-  URLs), or anything that weakens security.
+  URLs), or anything that weakens security. Libraries named in the specification (TOTP, QR code,
+  HTMLPurifier, Flysystem) and an MIT/BSD-licensed rich-text editor and calendar are
+  pre-approved; install them in the session that uses them.
+- Open questions go to `docs/decisions.md` (status Open); the owner answers them with
+  `deploy/decide.md`.
