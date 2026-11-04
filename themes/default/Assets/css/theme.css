@@ -1,12 +1,16 @@
 /*
  * Default theme (Bootstrap 5.3). Every colour is a CSS custom property: theme options print
- * `--bs-primary`/`--bs-primary-rgb` and `--kp-sidebar-bg`, and child themes only override
- * variables (see docs/themes.md). Bootstrap compiles some component colours as literals, so the
- * rules below point them back at the variables.
+ * `--bs-primary`/`--bs-primary-rgb` and `--kp-sidebar-bg` (and their dark-mode values under
+ * `[data-bs-theme=dark]`), and child themes only override variables (see docs/themes.md).
+ * Bootstrap compiles some component colours as literals, so the rules below point them back at
+ * the variables. Mobile first: phone ≥ 360 px, tablet ≥ 768 px, desktop ≥ 1200 px, no
+ * horizontal page scroll at any width.
  */
 
 :root {
     --kp-sidebar-width: 16rem;
+    --kp-sidebar-icon-width: 4.5rem;
+    --kp-primary-light-rgb: 122, 175, 254; /* printed from the primary colour by the theme options */
     --kp-sidebar-bg: #1e293b;
     --kp-sidebar-color: rgba(255, 255, 255, 0.82);
     --kp-sidebar-active-bg: rgba(255, 255, 255, 0.12);
@@ -32,6 +36,31 @@
     --bs-link-hover-color-rgb: var(--bs-primary-rgb);
     --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
 }
+
+/* Dark mode: links and text in the primary colour are lightened for WCAG AA contrast on dark
+   backgrounds; buttons keep the primary colour with white text. */
+[data-bs-theme=dark] {
+    --kp-primary-light: rgb(var(--kp-primary-light-rgb));
+    --bs-link-color: var(--kp-primary-light);
+    --bs-link-color-rgb: var(--kp-primary-light-rgb);
+    --bs-link-hover-color: var(--kp-primary-light);
+    --bs-link-hover-color-rgb: var(--kp-primary-light-rgb);
+    --kp-sidebar-bg: #0f172a;
+}
+[data-bs-theme=dark] .brand-icon,
+[data-bs-theme=dark] .text-primary { color: var(--kp-primary-light) !important; }
+[data-bs-theme=dark] .btn-outline-primary {
+    --bs-btn-color: var(--kp-primary-light);
+    --bs-btn-border-color: var(--kp-primary-light);
+}
+[data-bs-theme=dark] .layout-backend { background-color: var(--bs-body-bg); }
+[data-bs-theme=dark] .backend-main .topbar,
+[data-bs-theme=dark] .site-header { background-color: var(--bs-tertiary-bg) !important; }
+
+/* Logo for dark backgrounds (theme option logoDark) */
+.brand-logo-dark { display: none; }
+[data-bs-theme=dark] .brand-logo-light { display: none; }
+[data-bs-theme=dark] .brand-logo-dark { display: inline-block; }
 
 .btn-primary {
     --bs-btn-bg: var(--bs-primary);
@@ -107,6 +136,7 @@
     flex-direction: column;
 }
 .sidebar-header { min-height: var(--kp-topbar-height); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.sidebar-header .brand { min-width: 0; }
 .sidebar .brand { color: #fff; }
 .sidebar .brand-icon { color: #fff; }
 .sidebar-nav .nav-link {
@@ -129,17 +159,61 @@
     padding: 1rem 0.75rem 0.25rem;
 }
 
-@media (min-width: 992px) {
-    /* Bootstrap makes .offcanvas-lg transparent from lg up. */
-    .sidebar.offcanvas-lg { background-color: var(--kp-sidebar-bg) !important; }
+/* Sidebar: offcanvas on phones (< 768 px), icon-only bar on tablets (768–1199 px) and a full
+   sidebar on desktops; the toggle (core/ui/sidebar.js) switches with body.sidebar-collapsed /
+   body.sidebar-expanded, remembered in the kp_sidebar cookie. Menu links put their label in
+   <span class="nav-text">. */
+@media (min-width: 768px) {
+    /* Bootstrap makes .offcanvas-md transparent from md up. */
+    .sidebar.offcanvas-md { background-color: var(--kp-sidebar-bg) !important; }
     .sidebar {
         position: sticky;
         top: 0;
         width: var(--kp-sidebar-width);
         height: 100vh;
         flex-shrink: 0;
+        transition: width 0.2s ease;
     }
+    .backend-content { padding: 1.5rem; }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .layout-backend:not(.sidebar-expanded) .sidebar { width: var(--kp-sidebar-icon-width); }
+    .layout-backend:not(.sidebar-expanded) .sidebar .nav-text,
+    .layout-backend:not(.sidebar-expanded) .sidebar .brand-name {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+    }
+    .layout-backend:not(.sidebar-expanded) .sidebar .nav-heading { font-size: 0; padding: 0.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.12); margin: 0.5rem 0.75rem; }
+    .layout-backend:not(.sidebar-expanded) .sidebar-nav .nav-link,
+    .layout-backend:not(.sidebar-expanded) .sidebar-header { justify-content: center !important; }
+    .layout-backend:not(.sidebar-expanded) .sidebar-nav .nav-link .bi { font-size: 1.15rem; }
+}
+
+@media (min-width: 1200px) {
+    .layout-backend.sidebar-collapsed .sidebar { width: var(--kp-sidebar-icon-width); }
+    .layout-backend.sidebar-collapsed .sidebar .nav-text,
+    .layout-backend.sidebar-collapsed .sidebar .brand-name {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+    }
+    .layout-backend.sidebar-collapsed .sidebar .nav-heading { font-size: 0; padding: 0.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.12); margin: 0.5rem 0.75rem; }
+    .layout-backend.sidebar-collapsed .sidebar-nav .nav-link,
+    .layout-backend.sidebar-collapsed .sidebar-header { justify-content: center !important; }
+    .layout-backend.sidebar-collapsed .sidebar-nav .nav-link .bi { font-size: 1.15rem; }
     .backend-content { padding: 1.5rem 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar { transition: none; }
 }
 
 /* Public site */
@@ -166,6 +240,46 @@
 /* Components */
 .page-header h1 { line-height: 1.3; }
 .breadcrumb { --bs-breadcrumb-margin-bottom: 0; font-size: 0.875rem; }
+
+/* Phones: long breadcrumbs keep the last two items, the rest becomes "…" */
+@media (max-width: 575.98px) {
+    .breadcrumb { flex-wrap: nowrap; min-width: 0; }
+    .breadcrumb-item { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .breadcrumb-item:not(:nth-last-child(-n+2)) { display: none; }
+    .breadcrumb-item:nth-last-child(2):not(:first-child)::before { content: "\2026\00a0/\00a0"; padding-right: 0; }
+    .page-header .btn-toolbar, .page-header .page-actions { width: 100%; }
+}
+
+/* Touch: targets of at least 44 × 44 px on touch screens */
+@media (pointer: coarse) {
+    .btn, .nav-link, .dropdown-item, .form-control, .form-select, .page-link { min-height: 44px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; }
+    .form-check-input { width: 1.4em; height: 1.4em; }
+    .btn-close { min-width: 44px; min-height: 44px; background-position: center; }
+}
+
+/* Toasts */
+.toast-container { z-index: 1090; }
+.toast-success { --bs-toast-bg: var(--bs-success-bg-subtle); --bs-toast-color: var(--bs-success-text-emphasis); }
+.toast-danger { --bs-toast-bg: var(--bs-danger-bg-subtle); --bs-toast-color: var(--bs-danger-text-emphasis); }
+.toast-warning { --bs-toast-bg: var(--bs-warning-bg-subtle); --bs-toast-color: var(--bs-warning-text-emphasis); }
+.toast-info { --bs-toast-bg: var(--bs-info-bg-subtle); --bs-toast-color: var(--bs-info-text-emphasis); }
+
+/* Theme switch */
+.theme-switch .dropdown-item.active { background-color: var(--bs-primary); color: #fff; }
+.site-header .navbar { flex-wrap: wrap; }
+/* .navbar's padding would cancel the .container gutter on the same element */
+.site-header .navbar.container { padding-left: calc(var(--bs-gutter-x, 1.5rem) * 0.5); padding-right: calc(var(--bs-gutter-x, 1.5rem) * 0.5); }
+.site-theme-switch { order: 0; }
+@media (max-width: 767.98px) {
+    .site-header .navbar-brand { margin-right: auto; }
+    .site-theme-switch { order: 1; }
+    .site-header .navbar-toggler { order: 2; }
+    .site-header .navbar-collapse { order: 3; }
+}
+
+/* Demo component of the theme preview (progress width set through the CSSOM) */
+.demo-progress .progress-bar { width: 0; transition: width 0.3s ease; }
 .empty-state-icon { font-size: 3rem; }
 .error-page-icon { font-size: 4rem; }
 .status-dot { font-size: 0.5em; vertical-align: middle; }

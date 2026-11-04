@@ -7,6 +7,8 @@ declare(strict_types=1);
  * Loaded by app/Config/Autoload.php ($helpers).
  */
 
+use CodeIgniter\HTTP\IncomingRequest;
+use Modules\Core\Frontend\ThemeMode;
 use Modules\Core\Theme\ThemeManager;
 
 if (! function_exists('theme')) {
@@ -101,5 +103,35 @@ if (! function_exists('theme_option')) {
     function theme_option(string $key): mixed
     {
         return theme()->options()->get($key);
+    }
+}
+
+if (! function_exists('theme_mode')) {
+    /**
+     * The colour mode of the current page (light, dark or auto): `theme_mode()->attributes()`
+     * prints the `<html>` attributes, `theme_mode()->switchVisible()` tells whether to show the
+     * switch.
+     */
+    function theme_mode(): ThemeMode
+    {
+        return theme()->mode();
+    }
+}
+
+if (! function_exists('theme_sidebar_class')) {
+    /**
+     * Body class of the back-office sidebar state remembered by `core/ui/sidebar.js`
+     * (`sidebar-collapsed`, `sidebar-expanded` or none: icon-only on tablets, full on desktops).
+     */
+    function theme_sidebar_class(): string
+    {
+        $request = service('request');
+        $state   = $request instanceof IncomingRequest ? $request->getCookie('kp_sidebar') : null;
+
+        return match ($state) {
+            'collapsed' => 'sidebar-collapsed',
+            'expanded'  => 'sidebar-expanded',
+            default     => '',
+        };
     }
 }

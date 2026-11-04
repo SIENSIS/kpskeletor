@@ -2,7 +2,7 @@
 /**
  * Public layout: header with the site logo and the `primary` menu location, content with an
  * optional sidebar region, footer with the `footer` menu location, SEO meta tags ($meta) and the
- * cookie notice (theme option). Regions: header, sidebar, footer, home.
+ * cookie notice (theme option), theme switch. Regions: header, sidebar, footer, home.
  *
  * @var string|null $title
  */
@@ -10,7 +10,7 @@ $font       = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
 $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public', 'sidebar');
 ?>
 <!doctype html>
-<html lang="<?= esc(service('request')->getLocale()) ?>">
+<html lang="<?= esc(service('request')->getLocale()) ?>"<?= theme_mode()->attributes() ?>>
 <head>
 <?= $this->include(theme_resolve('partials/head')) ?>
 </head>
@@ -25,6 +25,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
         <div class="collapse navbar-collapse" id="site-menu" data-menu-location="primary">
             <?= theme_region('public', 'header') ?>
         </div>
+        <?= theme_partial('theme_switch', ['switchClass' => 'site-theme-switch ms-md-2']) ?>
     </nav>
 </header>
 <main id="main" class="site-main flex-grow-1 py-4" tabindex="-1">

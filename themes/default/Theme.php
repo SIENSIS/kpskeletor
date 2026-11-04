@@ -8,7 +8,7 @@ use Modules\Core\Theme\ThemeManifest;
 
 /**
  * The default theme: Bootstrap 5.3 (served locally from public/assets/vendor), every colour a
- * CSS custom property so options and child themes only change variables.
+ * CSS custom property so options and child themes only change variables, in light and dark mode.
  */
 final class Theme extends ThemeManifest
 {
@@ -52,6 +52,46 @@ final class Theme extends ThemeManifest
             'default' => '#0d6efd',
             'label'   => 'ThemeDefault.options.primaryColor',
             'css'     => '--bs-primary',
+        ],
+        'primaryColorDark' => [
+            'type'    => 'color',
+            'default' => '',
+            'label'   => 'ThemeDefault.options.primaryColorDark',
+            'help'    => 'ThemeDefault.options.primaryColorDarkHelp',
+            'css'     => '--bs-primary',
+            'mode'    => 'dark',
+        ],
+        'logoDark' => [
+            'type'    => 'string',
+            'default' => '',
+            'label'   => 'ThemeDefault.options.logoDark',
+            'help'    => 'ThemeDefault.options.logoDarkHelp',
+        ],
+        'defaultMode' => [
+            'type'    => 'select',
+            'default' => 'auto',
+            'label'   => 'ThemeDefault.options.defaultMode',
+            'options' => [
+                'auto'  => 'Core.mode.auto',
+                'light' => 'Core.mode.light',
+                'dark'  => 'Core.mode.dark',
+            ],
+        ],
+        'forceMode' => [
+            'type'    => 'select',
+            'default' => '',
+            'label'   => 'ThemeDefault.options.forceMode',
+            'help'    => 'ThemeDefault.options.forceModeHelp',
+            'options' => [
+                ''      => 'ThemeDefault.options.forceModeNone',
+                'light' => 'Core.mode.light',
+                'dark'  => 'Core.mode.dark',
+            ],
+        ],
+        'modeSwitch' => [
+            'type'    => 'bool',
+            'default' => true,
+            'label'   => 'ThemeDefault.options.modeSwitch',
         ],
         'sidebarColor' => [
             'type'    => 'color',

@@ -6,6 +6,7 @@ namespace Modules\Core\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\Exceptions\PageNotFoundException;
+use CodeIgniter\HTTP\ResponseInterface;
 use Config\Theme as ThemeConfig;
 use Modules\Core\Theme\ErrorPage;
 use Modules\Core\Theme\ThemeManifest;
@@ -13,7 +14,8 @@ use Modules\Core\Theme\ThemeNotFoundException;
 
 /**
  * Theme preview for theme authors: every layout with the standard views and components and sample
- * content (`/theme-preview/<layout>?theme=<slug>`, or `errors-403|404|500`).
+ * content (`/theme-preview/<layout>?theme=<slug>`, `errors-403|404|500`, or `components`: the
+ * JavaScript components demo, with the JSON endpoints `ping` and `ping-error`).
  *
  * Answers 404 unless the environment is development and Config\Theme::$preview is enabled: no
  * data is read, but it is not a page for production.
@@ -22,12 +24,10 @@ final class ThemePreview extends BaseController
 {
     public function show(string $layout = 'backend'): string
     {
-        if (ENVIRONMENT !== 'development' || ! config(ThemeConfig::class)->preview) {
-            throw PageNotFoundException::forPageNotFound();
-        }
+        $this->assertEnabled();
 
         $theme = service('theme');
-        $area  = $layout === 'backend' ? 'backend' : 'public';
+        $area  = in_array($layout, ['backend', 'components'], true) ? 'backend' : 'public';
         $theme->setArea($area);
 
         $slug = $this->request->getGet('theme');
@@ -47,7 +47,7 @@ final class ThemePreview extends BaseController
             return ErrorPage::render($code);
         }
 
-        if (! in_array($layout, ThemeManifest::LAYOUTS, true)) {
+        if (! in_array($layout, [...ThemeManifest::LAYOUTS, 'components'], true)) {
             throw PageNotFoundException::forPageNotFound();
         }
 
@@ -56,8 +56,26 @@ final class ThemePreview extends BaseController
             $theme->chain(),
         );
 
-        if ($layout === 'backend') {
+        if ($area === 'backend') {
             $theme->regions()->add('sidebar', $theme->render('preview/sidebar', [], ['saveData' => false]));
+        }
+
+        if ($layout === 'components') {
+            return $theme->render('preview/components', [
+                'layout'     => $theme->layout('backend'),
+                'title'      => lang('Core.preview.js.title'),
+                'pageHeader' => [
+                    'title'       => lang('Core.preview.js.title'),
+                    'subtitle'    => lang('Core.preview.js.subtitle'),
+                    'icon'        => 'bi-braces',
+                    'breadcrumbs' => [
+                        ['label' => lang('Core.ui.backOffice'), 'url' => base_url('backend')],
+                        ['label' => lang('Core.preview.themes'), 'url' => null],
+                        ['label' => lang('Core.preview.title'), 'url' => base_url('theme-preview')],
+                        ['label' => lang('Core.preview.js.title'), 'url' => null],
+                    ],
+                ],
+            ]);
         }
 
         if ($layout === 'public') {
@@ -86,5 +104,32 @@ final class ThemePreview extends BaseController
             ] : null,
             'meta' => ['description' => lang('Core.preview.subtitle', [$theme->slug()]), 'robots' => 'noindex'],
         ]);
+    }
+
+    /**
+     * JSON answer of the demo's http button.
+     */
+    public function ping(): ResponseInterface
+    {
+        $this->assertEnabled();
+
+        return $this->response->setJSON(['message' => lang('Core.preview.js.pong', [date('H:i:s')])]);
+    }
+
+    /**
+     * JSON error of the demo's error button (http.js shows it as a toast).
+     */
+    public function pingError(): ResponseInterface
+    {
+        $this->assertEnabled();
+
+        return $this->response->setStatusCode(422)->setJSON(['message' => lang('Core.preview.js.pongError')]);
+    }
+
+    private function assertEnabled(): void
+    {
+        if (ENVIRONMENT !== 'development' || ! config(ThemeConfig::class)->preview) {
+            throw PageNotFoundException::forPageNotFound();
+        }
     }
 }

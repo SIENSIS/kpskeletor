@@ -191,7 +191,12 @@ final class ThemeValidator
                 }
             }
 
-            if ($type === 'color' && is_string($definition['default'] ?? null) && preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $definition['default']) !== 1) {
+            if (isset($definition['mode']) && ! in_array($definition['mode'], ['light', 'dark'], true)) {
+                $this->error("{$name}['mode']", 'oneOf', ['light, dark']);
+            }
+
+            // An empty colour means "not set" (e.g. a dark-mode value that keeps the light one).
+            if ($type === 'color' && is_string($definition['default'] ?? null) && $definition['default'] !== '' && preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $definition['default']) !== 1) {
                 $this->error("{$name}['default']", 'color');
             }
         }
