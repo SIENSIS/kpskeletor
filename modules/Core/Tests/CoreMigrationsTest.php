@@ -28,20 +28,42 @@ final class CoreMigrationsTest extends CIUnitTestCase
         $this->dropAllTables();
     }
 
+    private const TABLES = ['modules', 'permissions', 'group_permissions', 'module_declarations', 'demo_records'];
+
+    private const MIGRATIONS = [
+        '2026-11-04-000001_CreateModules',
+        '2026-11-04-000002_CreatePermissions',
+        '2026-11-04-000003_CreateGroupPermissions',
+        '2026-11-04-000004_AddGrantsAppliedToModules',
+        '2026-11-04-000005_CreateModuleDeclarations',
+        '2026-11-04-000006_CreateDemoRecords',
+    ];
+
     public function testUpDownUp(): void
     {
         $migrator = new ModuleMigrator();
+        $count    = count(self::MIGRATIONS);
 
-        $this->assertSame(1, $migrator->migrate('Modules\Core'));
-        $this->assertTrue($this->db->tableExists('modules'));
+        $this->assertSame($count, $migrator->migrate('Modules\Core'));
+        $this->assertTablesExist(true);
+        $this->assertTrue($this->db->fieldExists('grants_applied', 'modules'));
         $this->assertSame([], $migrator->pending('Modules\Core'));
 
-        $this->assertSame(1, $migrator->rollback('Modules\Core'));
-        $this->assertFalse($this->db->tableExists('modules'));
-        $this->assertSame(['2026-11-04-000001_CreateModules'], $migrator->pending('Modules\Core'));
+        $this->assertSame($count, $migrator->rollback('Modules\Core'));
+        $this->assertTablesExist(false);
+        $this->assertSame(self::MIGRATIONS, $migrator->pending('Modules\Core'));
 
-        $this->assertSame(1, $migrator->migrate('Modules\Core'));
-        $this->assertTrue($this->db->tableExists('modules'));
+        $this->assertSame($count, $migrator->migrate('Modules\Core'));
+        $this->assertTablesExist(true);
+    }
+
+    private function assertTablesExist(bool $exist): void
+    {
+        $this->db->resetDataCache();
+
+        foreach (self::TABLES as $table) {
+            $this->assertSame($exist, $this->db->tableExists($table), $table);
+        }
     }
 
     public function testPackageMigrationsAreNeverRolledBack(): void
