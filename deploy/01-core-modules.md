@@ -25,8 +25,12 @@
 4. Create the branch `session-01-core-modules` from the updated `main` (if this environment already
    assigned you a working branch, use that one and say so in the pull request).
 5. Run `composer install` if needed, and the checks once to know the starting state.
-6. Read `CLAUDE.md`, `docs/plan.md`, `docs/progress.md`, the previous `deploy-status/` report, and
-   these sections of `docs/specification.md`: "Directory layout", "The module contract", "Common module base", "Database schema: migrations per table", "Module lifecycle", "Versioning".
+6. Read `CLAUDE.md`, `docs/decisions.md`, `docs/plan.md`, `docs/progress.md`, the previous
+   `deploy-status/` report, and these sections of `docs/specification.md`: "Directory layout", "The module contract", "Common module base", "Database schema: migrations per table", "Module lifecycle", "Versioning".
+   **Decisions in `docs/decisions.md` override the specification.**
+7. If `docs/decisions.md` has **Open** entries marked (decide) that affect this session, stop and
+   ask me to run `deploy/decide.md` first. Other open entries: list them in one line as a reminder
+   and carry on.
 
 ## Goal
 
@@ -62,9 +66,14 @@ Permissions, menus, settings, themes and assets registration (later sessions); d
   and the documentation of kpcrudy / kpapy in `vendor/siensis/` before using them.
 - Stay inside this session's scope. If you find a gap in an earlier session's work, fix it only
   if it blocks this session, and note it in `docs/progress.md`.
-- When the specification is ambiguous, take the most secure and simplest option consistent with
-  it and record the decision in `docs/progress.md` ("Decisions"). Stop and ask only if the
-  decision changes a public convention (permission names, manifest keys, URLs) or weakens security.
+- When the specification is ambiguous or contradictory, add an entry to `docs/decisions.md`
+  (ID `D-01-01`, `D-01-02`…, with where, problem, proposal and alternatives; format in
+  `deploy/decide.md`):
+  - if it changes a public convention (permission names, manifest keys, URLs, settings names) or
+    security, mark it **(decide)**, leave it **Open** and, if possible, build this session so the
+    decision can still be changed (or stop if you cannot continue without it);
+  - otherwise apply the most secure and simplest option consistent with the specification and
+    record it as **Accepted (proposal)**.
 - Texts in `ca`, `es` and `en` from the start; no inline JavaScript; tests for every rule you add.
 
 ## Finish
@@ -88,5 +97,6 @@ Permissions, menus, settings, themes and assets registration (later sessions); d
 4. Commit in small commits on the session branch, push it and open a pull request titled
    "Session 01: Core kernel: modules, manifest and sync" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
-5. Reply with a short report: done, not done (and why), risks, anything I must decide, and the
-   next step: "run `deploy/next.md`".
+5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and
+   titles), and the next step: "run `deploy/decide.md`" when there are open (decide) entries,
+   otherwise "run `deploy/next.md`".

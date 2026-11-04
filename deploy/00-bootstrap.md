@@ -70,7 +70,9 @@ Then:
 2. Create `CLAUDE.md` from `claude_suggest.md` without the HTML comment at the top, add this line
    under the title: "Session prompts live in `deploy/` (run them in order: `deploy/next.md`); do not
    edit them unless asked. Each session merges the finished session branches into `main` first and
-   ends with a report and screenshots in `deploy-status/NN-<slug>/`." Delete `claude_suggest.md`.
+   ends with a report and screenshots in `deploy-status/NN-<slug>/`. Decisions in
+   `docs/decisions.md` override `docs/specification.md`; open questions are answered with
+   `deploy/decide.md`." Delete `claude_suggest.md`.
 
 ## 4. CodeIgniter project
 
@@ -140,18 +142,23 @@ fixed, packages installed, CI, plan summary; no screenshots needed: include the 
 ## 8. Plan and progress
 
 1. **`docs/plan.md`:** for every session file in `deploy/` (01–36): goal, the files, tables,
-   commands and tests it will create, dependencies, risks. Flag anything in the specification that
-   looks contradictory and propose a solution for each.
-2. **`docs/progress.md`:** sections "Status" (a table: session, title, status, pull request),
+   commands and tests it will create, dependencies, risks.
+2. **`docs/decisions.md`** (format in `deploy/decide.md`): every contradiction, ambiguity or doubt
+   found in the specification, the libraries or the session files, one entry each (`D-00-01`,
+   `D-00-02`…) with where, problem, proposal and alternatives; mark **(decide)** the ones that
+   change a public convention or security and leave them **Open**; record the others as
+   **Accepted (proposal)**.
+3. **`docs/progress.md`:** sections "Status" (a table: session, title, status, pull request),
    "Decisions", "Deviations from the specification", "Known issues", "Notes for the next session".
    Add session 00 as "done" with a link to `deploy-status/00-bootstrap/`.
-3. **`docs/library-requests.md`:** empty template (library, missing feature, why, workaround).
+4. **`docs/library-requests.md`:** empty template (library, missing feature, why, workaround).
 
 ## Done when
 
 - `composer install` works from scratch; `vendor/bin/phpunit`, PHPStan and php-cs-fixer pass;
   the CI workflow is green on the pull request.
-- `CLAUDE.md`, `docs/specification.md`, `docs/plan.md`, `docs/progress.md`, `deploy/setup.sh`,
+- `CLAUDE.md`, `docs/specification.md`, `docs/plan.md`, `docs/decisions.md`, `docs/progress.md`,
+  `deploy/setup.sh`,
   `deploy/setup-local.md`,
   `deploy-status/README.md`, `deploy-status/screenshot.mjs` and `deploy-status/00-bootstrap/README.md`
   exist; `composer.json` requires `siensis/kpcrudy` and `siensis/kpapy` with `^1.0`.
@@ -163,6 +170,6 @@ fixed, packages installed, CI, plan summary; no screenshots needed: include the 
    "Session 00: Bootstrap" with a summary. Session 01 will merge it into `main` when it starts
    (review it before if you want).
 3. Reply with: where you ran (cloud or local) and what the environment needed, what I must
-   configure (the cloud setup script, or the local steps), the plan summary, the
-   contradictions or doubts found in the specification (with your proposal for each), anything I
-   must decide, and the next step: "run `deploy/next.md`".
+   configure (the cloud setup script, or the local steps), the plan summary, how many entries
+   `docs/decisions.md` has (open (decide) and accepted), and the next step: "run
+   `deploy/decide.md`" when there are open (decide) entries, otherwise "run `deploy/next.md`".
