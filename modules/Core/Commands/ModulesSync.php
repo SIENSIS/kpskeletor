@@ -99,6 +99,16 @@ final class ModulesSync extends BaseCommand
         $value = array_key_exists($name, $params) ? ($params[$name] ?? true) : CLI::getOption($name);
 
         if ($value === null) {
+            // CodeIgniter's parser keeps "--name=value" as an option named "name=value".
+            foreach (array_merge(array_keys($params), array_keys(CLI::getOptions())) as $key) {
+                if (is_string($key) && str_starts_with($key, $name . '=')) {
+                    $value = substr($key, strlen($name) + 1);
+                    break;
+                }
+            }
+        }
+
+        if ($value === null) {
             return null;
         }
 
