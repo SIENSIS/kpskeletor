@@ -1,8 +1,7 @@
 # Session 02 — Core kernel: catalogue, settings registry, enable/disable and demo data
 
-Branch: `claude/clever-lovelace-i36pbh` (assigned by the environment) · Pull request: see
-`docs/progress.md` "Session 02: Core kernel: catalogue, settings registry, enable/disable and demo
-data" · Date: 2026-11-04
+Branch: `claude/clever-lovelace-i36pbh` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#5](https://github.com/SIENSIS/kpskeletor/pull/5)
+"Session 02: Core kernel: catalogue, settings registry, enable/disable and demo data" · Date: 2026-11-04
 
 ## What was built
 
