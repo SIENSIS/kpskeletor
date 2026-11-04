@@ -75,6 +75,15 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-02-06 | 02 | Demo data: confirmations, seeder base class and stub | Accepted (proposal) |
 | D-02-07 | 02 | Cache scopes with version keys | Accepted (proposal) |
 | D-02-08 | 02 | Activity log entries before the Activity session | Accepted (proposal) |
+| D-03-01 | 03 | Theme folders, namespaces and loading | Accepted (proposal) |
+| D-03-02 | 03 | Where theme option values are stored | Open |
+| D-03-03 | 03 | Theme assets before `assets:publish` | Accepted (proposal) |
+| D-03-04 | 03 | Error pages and the 403 of `can:` | Accepted (proposal) |
+| D-03-05 | 03 | Theme preview pages | Open |
+| D-03-06 | 03 | "The assets it loads" in the theme manifest | Accepted (proposal) |
+| D-03-07 | 03 | Site name before the Settings session | Accepted (proposal) |
+| D-03-08 | 03 | What `BackendController::render()` adds | Accepted (proposal) |
+| D-03-09 | 03 | `--name=value` options in the module commands | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -765,3 +774,93 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-04):** applied by session 02 as proposed (not a public convention change nor a security weakening).
 - **Applied in:** session 02 (`modules/Core`)
+
+## D-03-01 — Theme folders, namespaces and loading
+
+- **Where:** specification "Themes" (`themes/<name>/`, manifest `Themes\<Name>\Theme`), "Directory layout" (`Themes\` → `themes/` in PSR-4, D-00-03)
+- **Problem:** Theme folders are lower-case (`themes/default`, `themes/tasks-demo` in D-00-32) but PSR-4 maps `Themes\Default` to `themes/Default` and a hyphen cannot be part of a namespace; CodeIgniter's view locator needs the theme's namespace to find `Themes\Default\Views\…`.
+- **Proposal:** a theme slug is lower-case letters, digits and hyphens; its namespace is the StudlyCase slug (`tasks-demo` → `Themes\TasksDemo`). `ThemeRegistry` registers that namespace with the autoloader when it loads the theme (only the active chain per request, no scan of `themes/`), so hand-copied themes work without a sync and the generated `ModuleNamespaces.php` stays modules-only. The `Themes\` entry is removed from `composer.json` (Composer warned that the lower-case folders do not comply); `app/Config/Autoload.php` keeps it.
+- **Alternatives:** A) StudlyCase folders (`themes/Default`, against the specification). B) Theme namespaces in the generated namespaces file (one more step after copying a theme).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 03 (`modules/Core/Theme/ThemeRegistry.php`, `composer.json`)
+
+## D-03-02 — Where theme option values are stored (decide)
+
+- **Where:** specification "Themes" ("options … declared like settings and edited from the Settings UI"), "Configuration and settings"
+- **Problem:** Options belong to a theme (a child redeclares the parent's defaults, two themes may be active at once for the back office and the public site), and the specification does not name the settings. A settings name is a public convention.
+- **Proposal:** store them with codeigniter4/settings as `Theme.<option>` with the context `theme:<slug>` (`service('settings')->set('Theme.primaryColor', '#6f42c1', 'theme:corporate')`); the default is the merged manifest default. Built behind `ThemeOptions` (one closure reads the stored value), so the storage can change without touching the views.
+- **Alternatives:** A) One settings class per theme, `Theme<Studly>.<option>` without context (`ThemeCorporate.primaryColor`). B) One JSON setting `Theme.options` per theme context.
+- **Status:** Open
+- **Decision (YYYY-MM-DD):** …
+- **Applied in:** session 03 builds the proposal (`modules/Core/Theme/ThemeOptions.php`, `docs/themes.md`)
+
+## D-03-03 — Theme assets before `assets:publish`
+
+- **Where:** specification "Themes" ("theme assets are published like module assets"), deploy/04 (`assets:publish`)
+- **Problem:** The default theme's CSS must be reachable from `public/themes/<slug>/` now; the asset pipeline (hashes, asset manifest, `--watch`) arrives in session 04.
+- **Proposal:** `ThemeAssetPublisher` mirrors `themes/<slug>/Assets/` to `public/themes/<slug>/` (only allowed extensions: no PHP or HTML; changed files copied, stale files removed), run by `modules:sync` (step 7) and `make:theme`. URLs carry a `?v=` content hash. Session 04 folds it into `assets:publish`.
+- **Alternatives:** A) A `themes:publish` command (one more public command to retire later).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 as proposed.
+- **Applied in:** session 03 (`modules/Core/Theme/ThemeAssetPublisher.php`, `ModuleSynchronizer`)
+
+## D-03-04 — Error pages and the 403 of `can:`
+
+- **Where:** specification "Common module base" (403/404/500 pages), "Security baseline"
+- **Problem:** The specification does not say which layout the error pages use; the `can:` filter answered 403 with plain text; CodeIgniter's 404 and production 500 views have inline `<style>` blocks (against the CSP rules).
+- **Proposal:** standard views `errors/403|404|500` in the theme's `blank` layout (no menus, which need a user and permissions), rendered by `ErrorPage`, with a plain fallback page when the theme itself fails; `app/Views/errors/html/error_404.php` and `production.php` use it (the exception message is shown only outside production); the `can:` filter answers with the themed 403, or JSON (`{"error": …}`) when the client asks for `application/json`.
+- **Alternatives:** A) The back-office or public layout (needs the menu and the user, which may be what failed).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 as proposed.
+- **Applied in:** session 03 (`modules/Core/Theme/ErrorPage.php`, `modules/Core/Filters/Can.php`, `app/Views/errors/html/`)
+
+## D-03-05 — Theme preview pages (decide)
+
+- **Where:** specification "Themes" (theme authors), deploy/03 (screenshots of the standard views)
+- **Problem:** The standard views and the layouts have no screen yet that shows them all (menus, users and CRUDs come later), and theme authors need one to check an override. A new URL is a public convention.
+- **Proposal:** `GET /theme-preview/<layout>` (`backend`, `public`, `auth`, `blank`, `print`, `errors-403|404|500`) with sample content and `?theme=<slug>`, answering 404 unless `CI_ENVIRONMENT = development` **and** `theme.preview = true` (off by default; it reads no data). Easy to remove: one controller, two routes, one config property.
+- **Alternatives:** A) No preview: screenshots only once real screens exist. B) A back-office page `backend/themes/preview` behind a `can:` permission (needs RBAC, session 07).
+- **Status:** Open
+- **Decision (YYYY-MM-DD):** …
+- **Applied in:** session 03 builds the proposal (`modules/Core/Controllers/ThemePreview.php`, `modules/Core/Config/Routes.php`, `Config\Theme::$preview`)
+
+## D-03-06 — "The assets it loads" in the theme manifest
+
+- **Where:** specification "Themes" (manifest: name, version, author, parent, layouts, regions, menu locations, the assets it loads, options)
+- **Problem:** The specification names the content of the manifest but not the property names.
+- **Proposal:** `$name`, `$version`, `$author`, `$parent`, `$layouts`, `$regions` (layout → regions), `$menuLocations` (location → label key), `$styles` and `$scripts` (paths under `Assets/`, or `vendor:<path>` under `public/assets/vendor/`; loaded after the parent's) and `$options` (setting definitions plus `css` for colour options). A child declares only what it adds or changes.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 as proposed.
+- **Applied in:** session 03 (`modules/Core/Theme/ThemeManifest.php`, `docs/themes.md`)
+
+## D-03-07 — Site name before the Settings session
+
+- **Where:** specification "Configuration and settings" (site name is a site-wide setting, session 14)
+- **Problem:** The layouts print the site name in the title, the brand and the footer.
+- **Proposal:** the language line `Core.app.name` ("KP Skeletor") until session 14 adds the site settings; the logo is the theme option `logo`.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 as proposed (deviation until session 14).
+- **Applied in:** session 03 (`themes/default/Views/partials/`)
+
+## D-03-08 — What `BackendController::render()` adds
+
+- **Where:** specification "Common module base" (`BackendController`: layout, breadcrumbs…)
+- **Problem:** Every back-office view needs the layout, breadcrumbs and a page header.
+- **Proposal:** `render()` resolves the view through the theme and adds `layout` (`theme_layout('backend')`), `breadcrumbs` ("Back office" + `breadcrumb()` calls) and, when the data has a `title`, `pageHeader` (title, subtitle, icon, breadcrumbs, actions) that the layout prints; anything given in the data wins. `flash()` stores a message for the layout. `FrontendController` adds `meta()` (SEO) and `region()`.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 as proposed.
+- **Applied in:** session 03 (`modules/Core/Controllers/`)
+
+## D-03-09 — `--name=value` options in the module commands
+
+- **Where:** `docs/commands.md` (`modules:sync --demo[=A,B]`, `make:theme --parent=default`)
+- **Problem:** CodeIgniter's CLI parser keeps `--demo=News` as an option named `demo=News`, so the documented `--name=value` form of session 02 was ignored.
+- **Proposal:** the shared option reader (`ModulesSync::option()`) also accepts `--name=value`; both forms are documented.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 03 (fix of a session 02 gap).
+- **Applied in:** session 03 (`modules/Core/Commands/ModulesSync.php`)
