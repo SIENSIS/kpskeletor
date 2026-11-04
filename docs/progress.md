@@ -11,6 +11,8 @@ pull request open), *merged* (in `main`).
 
 ## Decisions
 
+- **Decisions 00:** the 56 open questions of `docs/plan.md` were answered with `deploy/decide.md` (9 decided by the owner, 47 accepted proposals) and applied to the specification, the session files, `CLAUDE.md` and the code; see `docs/decisions.md`. Bootstrap §3 (specification and `CLAUDE.md`) is done; `prompt_new.md`/`claude_suggest.md` no longer exist.
+
 - **00:** PHPUnit 11.5 with `config.platform.php = 8.2.0` so one lock file installs on PHP
   8.2–8.4.
 - **00:** tests on SQLite in memory by default; MariaDB selected with `database.tests.*`
@@ -29,13 +31,11 @@ pull request open), *merged* (in `main`).
 - Cloud egress proxy refuses `api.github.com` zip downloads; Composer uses git sources
   (`deploy/setup.sh` retries with `--prefer-source`). `phpstan/phpstan` (dist only) needed its
   zip seeded into Composer's cache from a git checkout.
-- 56 contradictions / open questions in the specification are listed in `docs/plan.md`
-  (7 marked **(decide)** need the owner's decision).
+- The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
 
-- Session 01 (Core modules): decide module discovery (plan, contradiction 3) before writing the
-  manifest loader; `Modules\` → `modules/` alone does not make CodeIgniter discover
-  `modules/<Name>/Config/Routes.php`.
+- Session 01 (Core modules): module discovery uses the generated `app/Config/ModuleNamespaces.php`
+  (D-00-03); read `docs/decisions.md` before starting.
 - Recreate `.env` from `env` in a new container; `bash deploy/setup.sh` installs MariaDB and the
   dependencies.

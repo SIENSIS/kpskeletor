@@ -123,8 +123,8 @@ package, and never copy their code into the project.
    `php spark kpcrudy:make --namespace "Modules\<Name>"`), API resources from `Kpapy\Resource`
    (`php spark kpapy:make`); permissions through their `PermissionResolver` interfaces; custom
    operations with `addOperation()`; `hideFields()`, `where()`, `setTranslations()`,
-   `multiselect`; their masked ids, signed URLs, upload handling, CSP-friendly views and
-   translations. Write custom code only for what they do not cover (the screens listed as
+   `multiselect`; their masked ids, signed URLs, CSP-friendly views and translations (but not
+   their upload field types, which bypass the Storage service: see "CRUDs with kpcrudy"). Write custom code only for what they do not cover (the screens listed as
    hand-written in "CRUDs with kpcrudy").
 4. **Configure, extend, never patch:** configuration goes in `app/Config/Kpcrudy.php` and
    `app/Config/Kpapy.php` (or the Core's config classes that extend them); behaviour is changed by
@@ -786,7 +786,6 @@ granularity instead of collapsing it into read/create/update/delete.
   the CSSOM or with utility classes; the vendored editor and calendar must work under the
   enforced CSP without `unsafe-inline` (tested); HTMLPurifier drops `style` attributes and maps
   alignment to classes.
-
 * **Where the files live:** each module keeps its own assets in `modules/<Name>/Assets/`, so a
   module is self-contained. `assets:publish` (CodeIgniter's `Publisher`, run by `modules:sync`
   and on deploy) copies them to `public/assets/modules/<name>/`; the core's to
@@ -1445,7 +1444,8 @@ both supported:
   * keeps the current `.env` (database credentials and base URL of the new server) and, after a
     confirmation, merges only the secrets from the backup (`encryption.key`, `app.maskKey`,
     `backup.password`); `--with-env` restores the whole `.env` (console only). From the UI, when
-    the project root is not writable, the merged `.env` content is shown to copy;
+    the project root is not writable by the web server (the recommended setup), the merged `.env`
+    content is shown to copy;
   * long restores from the UI run as a background job with progress; the console is the
     recommended way for large sites.
 * Notifications on success/failure of scheduled backups; everything goes to the activity log.
@@ -1461,8 +1461,11 @@ both supported:
     `default-src 'self'`; `script-src 'self' 'nonce-…'`; `style-src 'self' 'nonce-…'`;
     `img-src 'self' data:`; `connect-src 'self'`; `object-src 'none'`; `base-uri 'self'`;
     `form-action 'self'`; `frame-ancestors 'none'`; never `unsafe-inline` or `unsafe-eval`. No
-    inline scripts, handlers or style attributes in any module or theme;
-  * `secureheaders` filter plus: `Strict-Transport-Security` (production, `max-age` ≥ 1 year),
+    inline scripts, handlers or style attributes in any module or theme (the exceptions are listed
+    in "Front-end assets and JavaScript");
+  * a Core `SecurityHeaders` filter driven by `Config\SecurityHeaders`, which replaces
+    CodeIgniter's `secureheaders` filter (it hard-codes other values; never stack both):
+    `Strict-Transport-Security` (production, `max-age` ≥ 1 year),
     `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff`,
     `Permissions-Policy` (camera, microphone, geolocation… disabled), `X-Frame-Options: DENY`
     for old browsers;
@@ -1499,7 +1502,9 @@ both supported:
   logged; updating the code is **console only**; modules and themes are installed by copying
   their folder or from the console, and a ZIP uploaded in the UI is only **staged** (validated,
   approved, then installed by a console command or a privileged scheduled job): the web server
-  never writes code. There is no file editor and no self-update from the browser.
+  never writes code and writes only `writable/`, `public/assets/modules`, `public/assets/core`,
+  `public/themes` and `public/uploads`. There is no file editor and no self-update from the
+  browser.
 * **API:** token authentication only (the API never reads the session cookie, and no web route
   is exempted from CSRF), scopes intersected with permissions (also for superadmins), API login
   with the user's active 2FA or an email code, rate limits per token and IP, CORS closed by
@@ -1520,7 +1525,9 @@ both supported:
   timeouts and a maximum response size. The allow-list is configured in a file
   (`Config\Outbound`, overridable from `.env`), extended by modules in their manifest
   (`$outboundHosts`, shown before enabling the module) and editable in **Settings › Security**
-  (`settings.security` + re-authentication); every request is logged. Documented in
+  (`settings.security` + re-authentication); every request is logged. SMTP is not HTTP: the mail
+  service checks the SMTP host against the same allow-list. `git` and `composer` (console-only
+  `app:update`) use their own clients and are documented exceptions. Documented in
   `docs/outbound-requests.md` with examples (GitHub releases for Updates, an SMTP relay, a
   module calling a weather API).
 * **Supply chain:** `composer.lock` committed, `composer audit` in CI and in `security:check`,
@@ -1544,15 +1551,21 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     `backup.password` set when scheduled backups are on, `.env` not readable by other users,
     no secret found in tracked files;
   * **installation:** `writable/install.lock` present (web installer closed), no demo data
-    loaded, permissions of `writable/` (`0750` folders, `0640` files), `public/` contains no
-    `.env`, `writable` or PHP files outside `index.php`;
+    loaded, permissions of `writable/` (`0750` folders, `0640` files; stricter modes accepted),
+    the web server user can write only `writable/`, `public/assets/modules`, `public/assets/core`,
+    `public/themes` and `public/uploads` (not the project root, `.env`, `modules/` or `themes/`),
+    `public/` contains no `.env`, `writable` or PHP files outside `index.php`;
   * **accounts:** superadmins without 2FA (warning), groups where 2FA is optional (info), the
     minimum password length (warning below 12), users with personal tokens without expiry
     (info);
-  * **dependencies:** `composer audit` (offline cache when there is no network) and the
-    `vendor.json` checksums;
+  * **dependencies:** the last `composer audit` result (it has no offline mode: the daily task or
+    CI runs it and stores the result with its date; the check reports "last checked on …" and
+    warns when it is older than 7 days) and the `vendor.json` checksums;
   * **outbound:** the allow-list, and hosts added by modules;
-  * **`--probe=<url>`** (optional, requests to the site itself, never to third parties): the
+  * **`--probe=<url>`** (optional, requests to the site itself, never to third parties, through a
+    dedicated client limited to the configured base URL host and the site's own
+    `allowedHostnames`, with plain HTTP allowed only for the redirect check; not the
+    `OutboundClient`, which refuses loopback and private addresses): the
     security headers are present; `/.env`, `/writable/…` and `/modules/…` are not served; a PHP
     file in `uploads/` is not executed (a harmless probe file created and removed); an external
     `return` URL is not followed (open redirect); the login is throttled; HTTP redirects to
@@ -1578,7 +1591,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
 * **Optional web installer:** available only while the application has not been configured,
   by the web or by the console: it answers 404 as soon as `.env` or `writable/install.lock`
   exists, and also refuses to run when the database already has tables. It warns when the
-  page is not served over HTTPS. It uses the same service as the CLI.
+  page is not served over HTTPS. It uses the same service as the CLI. When the project root is
+  not writable by the web server (the recommended setup), it shows the `.env` content for the
+  operator to copy instead of writing it.
 * **Commands** (all documented in `docs/commands.md`):
   * modules and themes: `modules:sync|list|status|enable|disable|install|uninstall|demo`,
     `themes:install|uninstall`, `make:module`, `make:theme`, `assets:publish [--watch]`;
@@ -1588,7 +1603,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     `app:update`;
   * calendar and API: `calendar:resync <module>`, `kpapy:openapi`, `kpapy:routes`,
     `kpapy:token`;
-  * application: `app:install`, `about`, `cache:clear` hooks.
+  * application: `app:install`, `about` (Core) and `app:cache-clear` (Core caches plus
+    CodeIgniter's cache; CodeIgniter's own `cache:clear` cannot be replaced, so modules listen to
+    a `cache.cleared` event).
 
 ## Quality, tests and delivery
 
@@ -1624,10 +1641,13 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     the CSP and security headers; the route-security test covers `backend/` and `api/v1/`; each
     rate limit answers `429`; outbound requests to a non-allowed host, a private IP or plain HTTP
     are refused; zip bombs are refused; a modified backup fails authentication before restoring;
-    `security:check` reports errors on a development configuration and passes on a hardened one.
+    `security:check` reports errors on a development configuration and passes on a hardened one;
+    a password shorter than `Auth.minimumPasswordLength` is refused; a session re-created by
+    remember-me never outlives the remember-me lifetime; every declared setting returns its
+    manifest default; Shield's computed `AuthGroups` settings match `group_permissions`.
 * **GitHub Actions:** PHP 8.2/8.3/8.4, composer validate + audit, php-cs-fixer (dry run),
   PHPStan, PHPUnit with SQLite and MariaDB, a check that published assets are up to date, a CSP
-  check (no inline scripts/handlers/styles in views), the `vendor.json` checksums, secret
+  check (no inline scripts/handlers/styles in the views of `app/`, `modules/` and `themes/`), the `vendor.json` checksums, secret
   scanning (e.g. gitleaks), and Dependabot for Composer and GitHub Actions.
 
 ## Documentation (English)
@@ -1644,8 +1664,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
 * `docs/installing-modules.md`: the three ways to install modules and themes (folder, console
   ZIP, staged upload), package validation and signatures, the cron line for pending installs,
   upgrading, uninstalling and what happens to the data;
-* `docs/permissions.md`: resources, names, wildcards, implied permissions, own records, hidden
-  fields, the matrix;
+* `docs/permissions.md`: resources, names (and the `'name'` override), wildcards (how Shield
+  matches them), implied permissions, personal screens granted to every group, own records,
+  hidden fields, the matrix;
 * `docs/themes.md` (includes responsive rules and the PWA manifest): theme structure and manifest, layouts, regions, menu locations, options,
   view overrides, child themes, `make:theme`;
 * `docs/frontend.md`: assets, publishing, import map, components with `data-component`, the
@@ -1709,19 +1730,21 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   web server rules;
 * `docs/backup-restore.md`: what is included, passwords and key handling, console and UI usage,
   retention, restoring on a new server, disaster recovery checklist;
-* `docs/updates.md`: release process (tags, release notes), checking for updates, `app:update`
-  step by step, rolling back;
+* `docs/updates.md`: release process (tags, release notes, signing the release archive with the
+  owner's Ed25519 key, key rotation), checking for updates, `app:update` step by step, rolling
+  back;
 * `docs/security.md`: the security baseline; a **threat model** (who attacks what: anonymous
   visitors, logged-in users trying to escalate, stolen tokens or passwords, malicious module
   packages or uploads, a compromised server) and the control that answers each threat; 2FA
   (policy and recovery), re-authentication, sessions and passwords (8 minimum, 12 recommended);
   **configuring headers and CSP** with examples; rate limits; web server configuration (Apache
-  and Nginx); the **production checklist** with `security:check` and the Security status page;
+  and Nginx), the folders the web server may write and the risk of published JavaScript;
+  `app.maskKey` (its fallbacks and why it must be set); the **production checklist** with `security:check` and the Security status page;
   **incident response** (revoke tokens and sessions, rotate the encryption key and `app.maskKey`,
   restore a backup, read the activity log);
 * `docs/outbound-requests.md`: why outbound calls are restricted (SSRF), the `OutboundClient`,
-  the allow-list in `Config\Outbound`, in module manifests and in Settings › Security, with
-  examples;
+  the allow-list in `Config\Outbound`, in module manifests and in Settings › Security, SMTP hosts,
+  the console-only exceptions (`git`, `composer`) and the `--probe` client, with examples;
 * `docs/dependencies.md`: Composer constraints, `composer audit`, Dependabot, vendored
   front-end libraries (`vendor.json`, checksums, licences) and how to add or update one;
 * `docs/user-guide.md`: back-office user manual (profile, 2FA, dashboard, notifications, files,
@@ -1750,12 +1773,14 @@ with the tests that cover it, and the `Tasks` module's tests run in CI.
 6. **Talking to other modules:** a notification type sent to the assignees, publishing due dates
    to the calendar (push) or offering them as a provider (pull), and listening to an event of
    another module.
-7. **A scheduled task:** a daily reminder of overdue tasks: schedule, `withoutOverlapping()`,
+7. **A scheduled task:** a daily reminder of overdue to-do tasks: schedule, `withoutOverlapping()`,
    result and output in the scheduled tasks screen, and its test.
 8. **A new setting:** declaring it in `$settings`, validation, reading it with `setting()`, and
    seeing it in the Settings UI.
 9. **A child theme:** `make:theme`, changing colours and logo, overriding a view of the `Tasks`
-   module, and adding the theme's own CSS.
+   module, and adding the theme's own CSS. The finished theme ships as `themes/tasks-demo/`
+   (child of `default`), kept in the repository as tutorial material (themes live in `themes/`,
+   not inside the module).
 10. **Uploading files in a form:** a file-picker field (module folder, allowed types), attachments
     on the private disk served with permissions, and a `FileAccessPolicy` that follows the
     task's visibility.
@@ -1836,11 +1861,10 @@ with the tests that cover it, and the `Tasks` module's tests run in CI.
     `docs/tutorials/` can be followed from a fresh install, and the `Tasks` module (enabled with
     its demo data) contains the finished code and passes its tests.
 
-Work in small, reviewable commits: `CLAUDE.md`, `docs/specification.md` and `composer require` of
-the required libraries →
-Core kernel → assets and themes → Auth (+2FA) → RBAC → menus
-→ settings → notifications and scheduler → activity log → kpcrudy integration → kpapy
-integration and core API → security baseline and `security:check` → Users →
-Settings UI → Dashboard and widgets → Files → Pages → Menus editor → News → Events → Backup →
-Updates → installer/CLI → tests/CI → docs → `Tasks` tutorial module and tutorials. Before each step, state the plan and the files you
-will create. After each step, run the tests and show the results.
+Work in small, reviewable commits, in the order of the session prompts in `deploy/` (session 00:
+`CLAUDE.md`, `docs/specification.md` and `composer require` of the required libraries; then the
+Core kernel, assets and themes, Auth, RBAC, menus and security, the kpcrudy and kpapy
+integrations, the cross-module services, the MVP modules and installer, the remaining modules,
+`security:check`, i18n, the `Tasks` tutorial module, docs, tutorials, quality and release).
+Before each step, state the plan and the files you will create. After each step, run the tests
+and show the results.
