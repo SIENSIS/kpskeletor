@@ -74,6 +74,7 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
+            'moduleenabled', // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
