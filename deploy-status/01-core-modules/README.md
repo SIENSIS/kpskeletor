@@ -1,6 +1,6 @@
 # Session 01 — Core kernel: modules, manifest and sync
 
-Branch: `claude/modest-goldberg-jjs8kp` (assigned by the environment) · Pull request: "Session 01:
+Branch: `claude/modest-goldberg-jjs8kp` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#4](https://github.com/SIENSIS/kpskeletor/pull/4) "Session 01:
 Core kernel: modules, manifest and sync" · Date: 2026-11-04
 
 ## What was built
