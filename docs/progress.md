@@ -14,7 +14,7 @@ pull request open), *merged* (in `main`).
 
 ## Decisions
 
-- **03:** theme slug ↔ `Themes\<Studly>` namespace registered on demand; theme assets published by `modules:sync`/`make:theme` until `assets:publish`; error pages in the `blank` layout and themed/JSON 403 from `can:`; manifest `$styles`/`$scripts`; `Core.app.name` until site settings; `BackendController::render()` adds layout/breadcrumbs/page header; `--name=value` options (D-03-01, 03, 04, 06–09). **Open (decide):** D-03-02 theme option storage, D-03-05 theme preview URL.
+- **03:** theme slug ↔ `Themes\<Studly>` namespace registered on demand; theme assets published by `modules:sync`/`make:theme` until `assets:publish`; error pages in the `blank` layout and themed/JSON 403 from `can:`; manifest `$styles`/`$scripts`; `Core.app.name` until site settings; `BackendController::render()` adds layout/breadcrumbs/page header; `--name=value` options (D-03-01, 03, 04, 06–09). D-03-02 (theme option storage) and D-03-05 (theme preview URL) decided by the owner as proposed and applied.
 
 - **02:** one `module_declarations` table for every registry; manifest defaults through a read-only Settings handler; disabled modules answer 404 through the global `moduleenabled` filter; `modules.grants_applied` flag; Core resource `modules`; `DemoSeeder` base class and y/n confirmations; cache scopes with version keys; application log until the activity log exists (D-02-01 … D-02-08).
 

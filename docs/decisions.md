@@ -76,10 +76,10 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-02-07 | 02 | Cache scopes with version keys | Accepted (proposal) |
 | D-02-08 | 02 | Activity log entries before the Activity session | Accepted (proposal) |
 | D-03-01 | 03 | Theme folders, namespaces and loading | Accepted (proposal) |
-| D-03-02 | 03 | Where theme option values are stored | Open |
+| D-03-02 | 03 | Where theme option values are stored | Applied |
 | D-03-03 | 03 | Theme assets before `assets:publish` | Accepted (proposal) |
 | D-03-04 | 03 | Error pages and the 403 of `can:` | Accepted (proposal) |
-| D-03-05 | 03 | Theme preview pages | Open |
+| D-03-05 | 03 | Theme preview pages | Applied |
 | D-03-06 | 03 | "The assets it loads" in the theme manifest | Accepted (proposal) |
 | D-03-07 | 03 | Site name before the Settings session | Accepted (proposal) |
 | D-03-08 | 03 | What `BackendController::render()` adds | Accepted (proposal) |
@@ -791,9 +791,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Options belong to a theme (a child redeclares the parent's defaults, two themes may be active at once for the back office and the public site), and the specification does not name the settings. A settings name is a public convention.
 - **Proposal:** store them with codeigniter4/settings as `Theme.<option>` with the context `theme:<slug>` (`service('settings')->set('Theme.primaryColor', '#6f42c1', 'theme:corporate')`); the default is the merged manifest default. Built behind `ThemeOptions` (one closure reads the stored value), so the storage can change without touching the views.
 - **Alternatives:** A) One settings class per theme, `Theme<Studly>.<option>` without context (`ThemeCorporate.primaryColor`). B) One JSON setting `Theme.options` per theme context.
-- **Status:** Open
-- **Decision (YYYY-MM-DD):** …
-- **Applied in:** session 03 builds the proposal (`modules/Core/Theme/ThemeOptions.php`, `docs/themes.md`)
+- **Status:** Applied (decided)
+- **Decision (2026-11-04):** «Theme.opció + context (recomanada)». Theme option values are stored with codeigniter4/settings as `Theme.<option>` with the context `theme:<slug>`; the default is the merged manifest default.
+- **Applied in:** `docs/specification.md` ("Themes"); code built by session 03 (`modules/Core/Theme/ThemeOptions.php`, `docs/themes.md`, `ThemeOptionsTest`)
 
 ## D-03-03 — Theme assets before `assets:publish`
 
@@ -821,9 +821,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The standard views and the layouts have no screen yet that shows them all (menus, users and CRUDs come later), and theme authors need one to check an override. A new URL is a public convention.
 - **Proposal:** `GET /theme-preview/<layout>` (`backend`, `public`, `auth`, `blank`, `print`, `errors-403|404|500`) with sample content and `?theme=<slug>`, answering 404 unless `CI_ENVIRONMENT = development` **and** `theme.preview = true` (off by default; it reads no data). Easy to remove: one controller, two routes, one config property.
 - **Alternatives:** A) No preview: screenshots only once real screens exist. B) A back-office page `backend/themes/preview` behind a `can:` permission (needs RBAC, session 07).
-- **Status:** Open
-- **Decision (YYYY-MM-DD):** …
-- **Applied in:** session 03 builds the proposal (`modules/Core/Controllers/ThemePreview.php`, `modules/Core/Config/Routes.php`, `Config\Theme::$preview`)
+- **Status:** Applied (decided)
+- **Decision (2026-11-04):** «Només desenvolupament (recomanada)». Keep `GET /theme-preview/<layout>` (and `?theme=<slug>`), answering 404 unless `CI_ENVIRONMENT = development` and `theme.preview = true` (off by default); it reads no data.
+- **Applied in:** `docs/specification.md` ("Themes"); code built by session 03 (`ErrorPagesTest`, `modules/Core/Controllers/ThemePreview.php`, `modules/Core/Config/Routes.php`, `Config\Theme::$preview`)
 
 ## D-03-06 — "The assets it loads" in the theme manifest
 

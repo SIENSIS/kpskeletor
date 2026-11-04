@@ -41,7 +41,7 @@ demand, so no folder is scanned per request (D-03-01). `ViewResolver` turns a vi
 namespaced name CodeIgniter's `view()` renders, following the order above.
 
 Theme options merge along the chain (`ThemeOptions`), saved values are read with
-`service('settings')->get('Theme.<key>', 'theme:<slug>')` (D-03-02, Open), and colour options with
+`service('settings')->get('Theme.<key>', 'theme:<slug>')` (D-03-02, decided), and colour options with
 `css` become `--bs-primary`/`--bs-primary-rgb` in one nonce'd `<style>` (only validated hex values).
 The default theme's CSS points Bootstrap's compiled component colours (buttons, pagination,
 nav pills, form checks, focus rings) back at the variables, so changing `--bs-primary` recolours
@@ -78,7 +78,7 @@ error stops the sync before anything is written.
 
 - No new tables, permissions or events.
 - Routes: `GET theme-preview` and `GET theme-preview/(:segment)` (404 unless development and
-  `theme.preview = true`, D-03-05, Open).
+  `theme.preview = true`, D-03-05, decided).
 - Settings: `Theme.backend`, `Theme.public` (default `default`), `Theme.fallback`,
   `Theme.preview` (config only); theme options `Theme.<option>` in context `theme:<slug>`.
 - Command: `make:theme <Name> [--parent=…]`; `modules:sync` validates themes and publishes their
@@ -88,12 +88,12 @@ error stops the sync before anything is written.
 
 - **D-03-01** Theme slug ↔ `Themes\<Studly>` namespace registered on demand; `Themes\` removed
   from `composer.json` (Composer warned about the lower-case folders).
-- **D-03-02 (decide, Open)** Theme option values stored as `Theme.<option>` with context
+- **D-03-02 (decided)** Theme option values stored as `Theme.<option>` with context
   `theme:<slug>`.
 - **D-03-03** Theme assets published by `modules:sync`/`make:theme` until `assets:publish`
   (session 04).
 - **D-03-04** Error pages in the `blank` layout; `can:` 403 themed or JSON.
-- **D-03-05 (decide, Open)** Theme preview URL `/theme-preview/<layout>` (development only, off by
+- **D-03-05 (decided)** Theme preview URL `/theme-preview/<layout>` (development only, off by
   default).
 - **D-03-06** Manifest "assets" as `$styles`/`$scripts` (`vendor:` prefix for vendored files).
 - **D-03-07** Site name from `Core.app.name` until the Settings session (deviation).
@@ -219,4 +219,4 @@ debug toolbar (development only). There is no demo data yet: the preview pages u
   and `showTitle(false)` with a `pageHeader`; wrap kpcrudy with `components/crud_container` if useful.
 - Session 14: Settings UI for `Theme.backend`, `Theme.public` and the theme options
   (`ThemeManager::options()->definitions()`, stored per D-03-02); site name replaces `Core.app.name`.
-- Owner: answer D-03-02 and D-03-05 with `deploy/decide.md`.
+- D-03-02 and D-03-05 were decided by the owner as proposed (`deploy/decide.md`).

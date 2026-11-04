@@ -706,7 +706,10 @@ granularity instead of collapsing it into read/create/update/delete.
   name, version, author, parent theme (optional), **layouts** (`backend`, `public`, `auth`,
   `blank`, `print`), **regions** (header, sidebar, footer, home blocks…), **menu locations**
   (`primary`, `footer`, `social`…), the assets it loads, and its **options** (logo, colours,
-  fonts, dark mode, footer text) declared like settings and edited from the `Settings` UI.
+  fonts, dark mode, footer text) declared like settings and edited from the `Settings` UI. Their
+  values are stored with codeigniter4/settings as `Theme.<option>` with the context
+  `theme:<slug>` (e.g. `Theme.primaryColor` for `theme:corporate`); until a value is saved, the
+  default declared in the theme (or inherited from its parent) applies.
 * **Structure:** `Views/layouts/`, `Views/partials/`, `Views/components/`, `Views/overrides/<Module>/…`
   (module view overrides), `Assets/css`, `Assets/js`, `Assets/img`, `Language/`.
 * **View resolution:** active theme override → parent theme override → module view → Core
@@ -772,6 +775,10 @@ granularity instead of collapsing it into read/create/update/delete.
   icons (192 and 512 px) with GD whenever the logo changes. Enabled by a setting.
 * **`make:theme <Name> [--parent=default]`** creates a child theme that only overrides what it
   needs. Theme assets are published like module assets.
+* **Theme preview** for theme authors: `GET /theme-preview/<layout>` (`backend`, `public`, `auth`,
+  `blank`, `print`, `errors-403|404|500`, optional `?theme=<slug>`) shows every layout and
+  standard component with sample content. It reads no data and answers 404 unless
+  `CI_ENVIRONMENT = development` and `theme.preview = true` (off by default).
 
 ## Front-end assets and JavaScript
 
