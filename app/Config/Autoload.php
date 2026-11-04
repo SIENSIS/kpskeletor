@@ -41,6 +41,8 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
+        'Modules'     => ROOTPATH . 'modules',
+        'Themes'      => ROOTPATH . 'themes',
     ];
 
     /**
@@ -91,4 +93,29 @@ class Autoload extends AutoloadConfig
      * @var list<string>
      */
     public $helpers = ['auth', 'setting'];
+
+    /**
+     * Merges the per-module namespaces (`Modules\News` => `modules/News`) from the generated
+     * file `ModuleNamespaces.php`, so that CodeIgniter's discovery finds each module's
+     * `Config/Routes.php`, `Config/Registrar.php`, commands and language files. The file is
+     * written by `php spark modules:sync` and `make:module`; nothing is scanned at runtime.
+     */
+    public function __construct()
+    {
+        $file = __DIR__ . '/ModuleNamespaces.php';
+
+        if (is_file($file)) {
+            $namespaces = require $file;
+
+            if (is_array($namespaces)) {
+                foreach ($namespaces as $namespace => $path) {
+                    if (is_string($namespace) && is_string($path)) {
+                        $this->psr4[$namespace] = $path;
+                    }
+                }
+            }
+        }
+
+        parent::__construct();
+    }
 }
