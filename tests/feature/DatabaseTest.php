@@ -18,7 +18,7 @@ final class DatabaseTest extends CIUnitTestCase
     use DatabaseTestTrait;
 
     protected $migrate     = true;
-    protected $migrateOnce = true;
+    protected $migrateOnce = false;
     protected $refresh     = true;
     protected $namespace   = null;
 

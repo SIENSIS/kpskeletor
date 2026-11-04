@@ -8,8 +8,11 @@ pull request open), *merged* (in `main`).
 | Session | Title | Status | Branch | Pull request | Report |
 |---|---|---|---|---|---|
 | 00 | Bootstrap | merged | `claude/modest-goldberg-jjs8kp` | [SIENSIS/kpskeletor#1](https://github.com/SIENSIS/kpskeletor/pull/1) | [`deploy-status/00-bootstrap/`](../deploy-status/00-bootstrap/README.md) |
+| 01 | Core kernel: modules, manifest and sync | done | `claude/modest-goldberg-jjs8kp` | [SIENSIS/kpskeletor#4](https://github.com/SIENSIS/kpskeletor/pull/4) | [`deploy-status/01-core-modules/`](../deploy-status/01-core-modules/README.md) |
 
 ## Decisions
+
+- **01:** module namespaces generated in `app/Config/ModuleNamespaces.php`; default-deny `can:` filter before RBAC; `make:module` creates an example migration; missing module folders are reported, not deleted; Core version 0.1.0 (D-01-01 … D-01-05).
 
 - **Decisions 00:** the 56 open questions of `docs/plan.md` were answered with `deploy/decide.md` (9 decided by the owner, 47 accepted proposals) and applied to the specification, the session files, `CLAUDE.md` and the code; see `docs/decisions.md`. Bootstrap §3 (specification and `CLAUDE.md`) is done; `prompt_new.md`/`claude_suggest.md` no longer exist.
 
@@ -23,6 +26,8 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **01:** none; session 01 decisions D-01-01 … D-01-05 (accepted proposals) are in `docs/decisions.md`.
+
 - **00:** branch `claude/modest-goldberg-jjs8kp` (assigned by the environment) instead of
   `session-00-bootstrap`. Later sessions: find this session's branch through this table.
 
@@ -35,7 +40,8 @@ pull request open), *merged* (in `main`).
 
 ## Notes for the next session
 
-- Session 01 (Core modules): module discovery uses the generated `app/Config/ModuleNamespaces.php`
-  (D-00-03); read `docs/decisions.md` before starting.
-- Recreate `.env` from `env` in a new container; `bash deploy/setup.sh` installs MariaDB and the
-  dependencies.
+- Session 02: extend `ModuleSynchronizer::sync()` with steps 4–7 (catalogue, grants, settings,
+  widgets/tasks, demo data) after the registry upsert, and keep `ModulesSyncTest`'s
+  "second sync changes nothing" assertion true. Use `ModuleManifest::permissionPrefix()`.
+- `bash deploy/setup.sh` starts MariaDB in a new container; `.env` must be recreated from `env`.
+- Earlier notes (session 00): read `docs/decisions.md` before starting.
