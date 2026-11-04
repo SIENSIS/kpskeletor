@@ -1,0 +1,29 @@
+includes:
+    - vendor/codeigniter/phpstan-codeigniter/extension.neon
+
+parameters:
+    level: 6
+    phpVersion: 80200
+    paths:
+        - app
+        - modules
+        - themes
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - app/Views/*
+            - modules/*/Views/*
+            - themes/*/Views/*
+    bootstrapFiles:
+        - vendor/codeigniter4/framework/system/Test/bootstrap.php
+    scanDirectories:
+        - vendor/codeigniter4/framework/system/Helpers
+    tmpDir: build/phpstan
+    codeigniter:
+        additionalConfigNamespaces:
+            - CodeIgniter\Config\
+            - CodeIgniter\Shield\Config\
+            - CodeIgniter\Settings\Config\
+        additionalModelNamespaces:
+            - CodeIgniter\Shield\Models\
+        schemaCacheDirectory: build/phpstan-schema
