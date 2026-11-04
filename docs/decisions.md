@@ -62,6 +62,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-00-54 | 00 | `If-Match` for writes | Applied |
 | D-00-55 | 00 | Brand-new required libraries | Applied |
 | D-00-56 | 00 | Tasks module vs scheduled tasks naming | Applied |
+| D-01-01 | 01 | The `can:` filter before RBAC exists | Accepted (proposal) |
+| D-01-02 | 01 | Migration stub of `make:module` | Accepted (proposal) |
+| D-01-03 | 01 | Registered modules whose folder disappeared | Accepted (proposal) |
+| D-01-04 | 01 | Allowed values in the manifest | Accepted (proposal) |
+| D-01-05 | 01 | Core version during development | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -622,3 +627,53 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Applied (accepted proposal)
 - **Decision (2026-11-04):** «accepta la resta»: the proposal above is accepted.
 - **Applied in:** `docs/specification.md`, deploy/11, deploy/32
+
+## D-01-01 — The `can:` filter before RBAC exists
+
+- **Where:** deploy/01 scope ("Permissions … later sessions"), `make:module` routes, `CLAUDE.md` ("every `backend/` route has a `can:` filter")
+- **Problem:** Generated module routes must declare `can:`, but the alias does not exist until the RBAC session; an unknown filter alias makes CodeIgniter fail on the route.
+- **Proposal:** Register a `can` filter now in the Core registrar (`Modules\Core\Filters\Can`) that denies by default (guests and missing permissions get 403) and checks Shield's `can()`; the RBAC session replaces the check with the central resolver.
+- **Alternatives:** A) Generate routes without a filter until session 07 (breaks the rule). B) Generate routes with Shield's `permission` filter (a different convention to migrate later).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 01 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 01 (`modules/Core`)
+
+## D-01-02 — Migration stub of `make:module`
+
+- **Where:** specification "Common module base" ("migration stub")
+- **Problem:** A stub migration that does nothing teaches nothing; an empty folder does not test the per-module migrations.
+- **Proposal:** `make:module` generates a real example migration (`<name>_items`: id, name, author and timestamp columns, soft delete) with `down()`, to be renamed or deleted before the module's first release.
+- **Alternatives:** A) An empty `Database/Migrations/` folder. B) A migration with empty `up()`/`down()`.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 01 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 01 (`modules/Core`)
+
+## D-01-03 — Registered modules whose folder disappeared
+
+- **Where:** specification "Module lifecycle"
+- **Problem:** The specification does not say what `modules:sync` does with a registry row whose module folder no longer exists.
+- **Proposal:** `modules:sync` and `modules:list` report it as "folder missing" and keep the row; removing tables and rows is `modules:uninstall`'s job.
+- **Alternatives:** A) Delete the registry row on sync (loses the installed version; tables stay orphaned).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 01 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 01 (`modules/Core`)
+
+## D-01-04 — Allowed values in the manifest
+
+- **Where:** specification "The module contract"
+- **Problem:** The specification lists the manifest keys but not every allowed value (setting types, CSP directives and sources, path formats).
+- **Proposal:** Setting types: string, text, int, float, bool, select, email, url, color, json; CSP: only https hosts, `'self'`, `'none'` and `blob:` (never `unsafe-inline`, `unsafe-eval`, `*`, `http:` or `data:`); API paths relative without slashes at the ends; backup paths relative without `..`. Later sessions may add values, never remove them.
+- **Alternatives:** A) Accept any value and let each consumer fail later (unclear errors).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 01 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 01 (`modules/Core`)
+
+## D-01-05 — Core version during development
+
+- **Where:** specification "Versioning"
+- **Problem:** The Core is not released yet; generated modules require the Core with a caret constraint.
+- **Proposal:** The Core starts at `0.1.0`; `make:module` writes `'Core' => '^<major>.<minor>'` from the current Core version. The release session sets `1.0.0`.
+- **Alternatives:** A) Start at `1.0.0` now (claims a stability the code does not have yet).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-04):** applied by session 01 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 01 (`modules/Core`)
