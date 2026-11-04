@@ -127,5 +127,7 @@ _modules/*
 .php-cs-fixer.cache
 /public/assets/modules/
 /public/themes/
+/public/uploads/*
+!/public/uploads/index.html
 /test-results/
 /playwright-report/
