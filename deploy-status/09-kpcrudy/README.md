@@ -1,6 +1,6 @@
 # Session 09 — kpcrudy integration
 
-Branch: `claude/determined-pasteur-d6pdme` (assigned by the environment) · Pull request: "Session 09: kpcrudy integration" (link in `docs/progress.md`) · Date: 2026-11-05
+Branch: `claude/determined-pasteur-d6pdme` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) "Session 09: kpcrudy integration" · Date: 2026-11-05
 
 ## What was built
 
