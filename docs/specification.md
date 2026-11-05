@@ -587,6 +587,8 @@ fonts, footer…) is always available, because those are settings, not code.
   does not apply to them.
 * **Re-authentication ("sudo mode"):** sensitive actions ask again for the password and, when
   the user has 2FA, a 2FA code; the confirmation lasts 15 minutes (setting) for that session.
+  A login with the password (and its 2FA step) opens that window; a magic-link login, a session
+  re-created by remember-me and unlocking the idle lock do not.
   It protects: the permission matrix, groups and individual permissions, impersonation,
   resetting another user's 2FA, creating personal API tokens, downloading and restoring backups,
   enabling/disabling, uploading and uninstalling modules, and the security settings. A

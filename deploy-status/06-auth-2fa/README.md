@@ -51,7 +51,7 @@ Branch: `claude/ecstatic-davinci-goi31r` (assigned by the environment) · Pull r
   the action issues the token after the code.
 - `Reauth` keeps `{user, at}` in the PHP session. `LoginController` marks a password login and
   `LoginListener` turns it into a fresh confirmation when the `login` event fires (after the 2FA
-  step); magic links, remember-me and the idle lock do not count (D-06-04, open). Login and logout
+  step); magic links, remember-me and the idle lock do not count (D-06-04, decided by the owner: option A). Login and logout
   forget the confirmation.
 - `RequireReauth` (`reauth`): a GET is remembered and sent to `auth/reauth`, which returns to it;
   other methods are never replayed (the user confirms and repeats; the Referer is the return path
@@ -101,7 +101,7 @@ No new permissions (the screens belong to `auth-profile`). New settings (Auth 0.
 - **D-06-02** (accepted): tables, TOTP parameters, QR as `data:` SVG, recovery-code format.
 - **D-06-03** (accepted): remember-me issued only after the 2FA step; remember-me logins skip the
   code (trusted device) but not re-authentication.
-- **D-06-04 (decide, Open):** a password login (with its 2FA step) counts as re-authentication;
+- **D-06-04 (decide; decided by the owner after the session: option A, as built):** a password login (with its 2FA step) counts as re-authentication;
   magic links and remember-me do not. Built so it can change in one line.
 - **D-06-05** (accepted): interim settings for the group policy and the window until the
   `groups` table (session 15).
@@ -227,8 +227,8 @@ otphp). No CSP violations and no horizontal overflow.
 
 ## Notes for the next session
 
-- **D-06-04 is Open (decide):** run `deploy/decide.md` (whether a password login counts as
-  re-authentication).
+- **D-06-04** was decided with `deploy/decide.md` (option A: a password login counts as
+  re-authentication); nothing else is open.
 - Protect sensitive routes with `'filter' => ['can:…', 'reauth']` (permission matrix, groups,
   individual permissions, impersonation, 2FA reset, personal tokens, backups, modules, security
   settings) or `$this->requireReauth()` (`docs/auth.md`).

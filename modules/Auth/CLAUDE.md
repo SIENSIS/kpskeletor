@@ -30,8 +30,8 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
 
 ## Decisions
 
-D-05-01 … D-05-08 and D-06-01 … D-06-06 in `docs/decisions.md` (D-06-04, a password login
-counting as re-authentication, is open for the owner).
+D-05-01 … D-05-08 and D-06-01 … D-06-06 in `docs/decisions.md` (D-06-04: a password login counts
+as re-authentication, decided by the owner).
 
 ## Open tasks
 

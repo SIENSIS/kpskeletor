@@ -105,7 +105,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-06-01 | 06 | Email codes through the Core action | Accepted (proposal) |
 | D-06-02 | 06 | 2FA storage, TOTP and recovery codes | Accepted (proposal) |
 | D-06-03 | 06 | Remember-me and the 2FA step | Accepted (proposal) |
-| D-06-04 | 06 | A password login counts as re-authentication (decide) | Open |
+| D-06-04 | 06 | A password login counts as re-authentication | Applied (decided) |
 | D-06-05 | 06 | 2FA group policy and re-authentication settings | Accepted (proposal) |
 | D-06-06 | 06 | Re-authentication screen, URLs and non-GET requests | Accepted (proposal) |
 
@@ -1105,8 +1105,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Right after typing the password (and the 2FA code) at the login, a sensitive action (for example the forced 2FA set-up of a required group) would ask for them again.
 - **Proposal:** a password login, with its 2FA step, opens the re-authentication window for `Auth.reauthMinutes`; a magic-link login, a remember-me session and an unlocked idle lock do not. Changing it is one line in `LoginListener::login()`.
 - **Alternatives:** A) no login counts: every sensitive action asks again, also just after logging in (stricter, one more prompt). B) magic links count too (weaker: the email account alone would give sudo mode).
-- **Status:** Open
-- **Applied in:** built as proposed by session 06 (`modules/Auth/Services/LoginListener.php`)
+- **Status:** Applied (decided)
+- **Decision (2026-11-05):** «A) Sí, compta (recomanada)». A password login, with its 2FA step, opens the re-authentication window for `Auth.reauthMinutes`; magic-link logins, sessions re-created by remember-me and unlocking the idle lock do not.
+- **Applied in:** `modules/Auth/Services/LoginListener.php` (built by session 06; tests `ReauthTest::testPasswordLoginOpensTheWindowForFifteenMinutes`, `TwoFactorLoginTest::testEmailCodeLogin`, `TwoFactorLoginTest::testMagicLinkLoginAlsoAsksForTheCode`, `ReauthTest::testSessionRecreatedByRememberMeStillRequiresIt`), `docs/specification.md`
 
 ## D-06-05 — 2FA group policy and re-authentication settings
 
