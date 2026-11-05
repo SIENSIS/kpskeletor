@@ -80,8 +80,11 @@ final class RegistrySyncTest extends CIUnitTestCase
         $this->assertContains("{$prefix}-items.list", $report->permissionsAdded);
 
         $catalogue = new PermissionCatalogue();
-        $this->assertSame(["{$prefix}-items.*", "{$prefix}-stats.view", 'modules.list', 'modules.sync', 'modules.toggle'], $catalogue->grants('admin'));
-        $this->assertSame(["{$prefix}-items.edit", "{$prefix}-items.list", "{$prefix}-items.publish", "{$prefix}-items.show"], $catalogue->grants('editor'));
+        // Only the fixture's and the Core's grants (other installed modules add their own).
+        $ownGrants = array_values(array_filter($catalogue->grants('admin'), static fn (string $name): bool => str_starts_with($name, "{$prefix}-") || str_starts_with($name, 'modules.')));
+        $this->assertSame(["{$prefix}-items.*", "{$prefix}-stats.view", 'modules.list', 'modules.sync', 'modules.toggle'], $ownGrants);
+        $editorGrants = array_values(array_filter($catalogue->grants('editor'), static fn (string $name): bool => str_starts_with($name, "{$prefix}-")));
+        $this->assertSame(["{$prefix}-items.edit", "{$prefix}-items.list", "{$prefix}-items.publish", "{$prefix}-items.show"], $editorGrants);
         $this->assertSame(6, $report->grantsApplied[$name]);
 
         $registry = new DeclarationRegistry();

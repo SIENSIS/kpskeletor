@@ -153,6 +153,11 @@ return [
     'app' => [
         'name' => 'KP Skeletor',
     ],
+    'user' => [
+        'profile'  => 'Mi perfil',
+        'sessions' => 'Mis sesiones',
+        'logout'   => 'Cerrar sesión',
+    ],
     'ui' => [
         'backOffice'      => 'Back office',
         'breadcrumbs'     => 'Ruta de navegación',

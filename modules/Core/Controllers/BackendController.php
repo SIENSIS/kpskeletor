@@ -31,13 +31,13 @@ abstract class BackendController extends BaseController
     }
 
     /**
-     * Whether the current user has a permission (default deny for guests).
+     * Whether the current user has a permission (default deny for guests; superadmins bypass).
      */
     protected function can(string $permission): bool
     {
         $user = auth()->user();
 
-        return $user !== null && $user->can($permission);
+        return $user !== null && ($user->inGroup('superadmin') || $user->can($permission));
     }
 
     /**

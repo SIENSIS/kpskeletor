@@ -13,9 +13,10 @@ use Modules\Core\Theme\ErrorPage;
 /**
  * `can:<permission>[,<permission>…]`: lets the request through only when the logged-in user has
  * one of the permissions. Default deny: guests and requests without arguments get 403.
+ * Superadmins bypass the check (docs/specification.md, "Groups").
  *
- * The central permission resolver, the login redirect and the activity log are added by the
- * RBAC and authentication sessions.
+ * The central permission resolver and the activity log are added by the RBAC session; guests
+ * of `backend/*` are sent to the login by Shield's `session` filter before this one runs.
  */
 final class Can implements FilterInterface
 {
@@ -29,6 +30,10 @@ final class Can implements FilterInterface
         $user = auth()->user();
 
         if ($user !== null && $arguments !== null && $arguments !== []) {
+            if ($user->inGroup('superadmin')) {
+                return null;
+            }
+
             foreach ($arguments as $permission) {
                 if ($user->can($permission)) {
                     return null;
