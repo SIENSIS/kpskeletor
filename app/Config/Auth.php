@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Config;
 
+use CodeIgniter\Shield\Authentication\Authenticators\AccessTokens;
+use CodeIgniter\Shield\Authentication\Authenticators\HmacSha256;
 use CodeIgniter\Shield\Authentication\Passwords\CompositionValidator;
 use CodeIgniter\Shield\Authentication\Passwords\DictionaryValidator;
 use CodeIgniter\Shield\Authentication\Passwords\NothingPersonalValidator;
 use CodeIgniter\Shield\Config\Auth as ShieldAuth;
+use Modules\Auth\Authentication\SessionAuthenticator;
+use Modules\Auth\Authentication\UserTwoFactorAction;
 
 /**
  * Shield's configuration with the skeleton's defaults (docs/specification.md, "Authentication").
@@ -55,6 +59,30 @@ class Auth extends ShieldAuth
     ];
 
     /** Accounts are created by administrators (Users module). */
+    /**
+     * Shield has one global `login` action: the Auth module's `UserTwoFactorAction` dispatches to
+     * the email code, the authenticator app (TOTP) or nothing according to each user's method
+     * (decision D-00-13).
+     *
+     * @var array<string, class-string<\CodeIgniter\Shield\Authentication\Actions\ActionInterface>|null>
+     */
+    public array $actions = [
+        'register' => null,
+        'login'    => UserTwoFactorAction::class,
+    ];
+
+    /**
+     * Shield's authenticators; `session` is the Auth module's subclass that issues remember-me
+     * only after the 2FA step (decision D-06-03).
+     *
+     * @var array<string, class-string<\CodeIgniter\Shield\Authentication\AuthenticatorInterface>>
+     */
+    public array $authenticators = [
+        'tokens'  => AccessTokens::class,
+        'session' => SessionAuthenticator::class,
+        'hmac'    => HmacSha256::class,
+    ];
+
     public bool $allowRegistration = false;
 
     public bool $allowMagicLinkLogins = true;
@@ -124,4 +152,16 @@ class Auth extends ShieldAuth
 
     /** Magic-link and password-reset emails sent per account and hour (extra requests are silent). */
     public int $emailLinksPerAccount = 3;
+
+    /**
+     * Minutes a re-authentication ("sudo mode") lasts for the session.
+     */
+    public int $reauthMinutes = 15;
+
+    /**
+     * 2FA policy per group: group name => 'required' | 'optional' (a missing group is optional).
+     *
+     * @var array<string, string>
+     */
+    public array $twoFactorPolicy = [];
 }

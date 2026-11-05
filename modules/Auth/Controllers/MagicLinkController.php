@@ -9,6 +9,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Authentication\Authenticators\Session;
 use Modules\Auth\Services\LinkTokens;
+use Modules\Auth\Services\Reauth;
 
 /**
  * Magic-link login: a single-use link (hashed token, `Auth.magicLinkLifetime`) sent by email.
@@ -75,6 +76,9 @@ final class MagicLinkController extends AuthController
         if ($authenticator->loggedIn()) {
             $authenticator->logout();
         }
+
+        // A magic link is not a re-authentication (only a password login is).
+        session()->remove(Reauth::PASSWORD_LOGIN_KEY);
 
         if ($authenticator->startUpAction('login', $user) && $authenticator->hasAction($user->id)) {
             $authenticator->setPendingLoginMethod(Session::ID_TYPE_MAGIC_LINK);

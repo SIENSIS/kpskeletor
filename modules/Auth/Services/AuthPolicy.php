@@ -101,6 +101,61 @@ final class AuthPolicy
         return max(60, $this->int('magicLinkLifetime', HOUR));
     }
 
+    /**
+     * How long a re-authentication ("sudo mode") lasts, in seconds (`Auth.reauthMinutes`).
+     */
+    public function reauthWindow(): int
+    {
+        return min(240, max(1, $this->int('reauthMinutes', 15))) * MINUTE;
+    }
+
+    /**
+     * 2FA policy per group (`Auth.twoFactorPolicy`): group name => `required` | `optional`;
+     * a group that is not listed is optional.
+     *
+     * @return array<string, string>
+     */
+    public function twoFactorPolicy(): array
+    {
+        $value = $this->read('twoFactorPolicy');
+
+        if (is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $policy = [];
+
+        foreach ($value as $group => $rule) {
+            if (is_string($group) && in_array($rule, ['required', 'optional'], true)) {
+                $policy[$group] = $rule;
+            }
+        }
+
+        return $policy;
+    }
+
+    /**
+     * Whether any of these groups requires two-factor authentication.
+     *
+     * @param list<string> $groups
+     */
+    public function twoFactorRequiredFor(array $groups): bool
+    {
+        $policy = $this->twoFactorPolicy();
+
+        foreach ($groups as $group) {
+            if (($policy[$group] ?? 'optional') === 'required') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function int(string $key, int $default): int
     {
         $value = $this->read($key);
