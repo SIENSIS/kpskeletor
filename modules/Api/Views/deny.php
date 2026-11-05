@@ -10,7 +10,6 @@
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
-<h1 class="h4 text-center mb-3"><?= esc(lang('Api.deny.title')) ?></h1>
 <?php if ($denied): ?>
     <p class="text-center"><i class="bi bi-shield-check display-6 text-success" aria-hidden="true"></i></p>
     <p><?= esc(lang('Api.deny.done')) ?></p>

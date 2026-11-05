@@ -47,6 +47,16 @@ a controller sets on its response is kept (a page that may be framed sets its ow
 The Content-Security-Policy is described in `docs/frontend.md` and `Config\ContentSecurityPolicy`
 (strict, nonces, module sources from the manifests, `reportOnly` to test a change).
 
+## API
+
+Token authentication only (`Authorization: Bearer`): the API never starts a session nor reads
+its cookie and is excluded from CSRF; scopes are intersected with permissions (superadmins too);
+app logins need the user's authenticator app or an emailed code (with a link to stop the
+sign-in); wrong passwords count in Auth's `LoginThrottle`; CORS closed; plain HTTP refused in
+production; the documentation only in the back office (`api.docs`). Details: `docs/api.md`.
+Rotating `app.maskKey` changes every masked id of the API too; to revoke every token, delete the
+`access_token` rows of `auth_identities` (or per user in Settings › API tokens).
+
 ## Rate limits
 
 `Modules\Core\Security\RateLimiter` (CodeIgniter's Throttler, token bucket in the cache) with
