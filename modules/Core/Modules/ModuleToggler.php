@@ -8,6 +8,7 @@ use CodeIgniter\I18n\Time;
 use Modules\Core\Config\ModuleManifest;
 use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Models\ModuleModel;
+use Modules\Core\Permissions\ShieldMatrix;
 
 /**
  * Enables and disables modules (`modules:enable`, `modules:disable`, later the Modules screen).
@@ -64,6 +65,7 @@ final class ModuleToggler
 
         $this->setEnabled($known[$name]['id'], false);
         $this->caches->invalidate();
+        (new ShieldMatrix())->write(); // its permissions leave Shield's matrix
         log_message('notice', 'Module {module} disabled.', ['module' => $name]); // activity log: session 12
 
         return true;
@@ -105,6 +107,7 @@ final class ModuleToggler
         }
 
         $this->caches->invalidate();
+        (new ShieldMatrix())->write(); // their grants come back
         log_message('notice', 'Modules enabled: {modules}.', ['modules' => implode(', ', $order)]); // activity log: session 12
 
         return $order;

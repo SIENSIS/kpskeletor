@@ -14,6 +14,7 @@ use Modules\Core\Models\ModuleModel;
 use Modules\Core\Permissions\CatalogueBuilder;
 use Modules\Core\Permissions\DefaultGrants;
 use Modules\Core\Permissions\PermissionCatalogue;
+use Modules\Core\Permissions\ShieldMatrix;
 use Modules\Core\Registry\ApiRouteChecker;
 use Modules\Core\Registry\DeclarationRegistry;
 use Modules\Core\Theme\ThemeValidator;
@@ -162,6 +163,9 @@ final class ModuleSynchronizer
         if ($report->hasChanges()) {
             $this->caches->invalidate();
         }
+
+        // 9. Shield's permissions and group matrix, computed from the catalogue and the grants.
+        (new ShieldMatrix($this->permissions))->write();
 
         // Demo data (optional): after the caches, so the registry is current.
         if ($demo !== null) {
