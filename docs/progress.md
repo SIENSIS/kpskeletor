@@ -16,9 +16,11 @@ pull request open), *merged* (in `main`).
 | 06 | Two-factor authentication and re-authentication | merged | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
 | 07 | Central RBAC | merged | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
-| 09 | kpcrudy integration | in progress | `claude/determined-pasteur-d6pdme` | — | — |
+| 09 | kpcrudy integration | done | `claude/determined-pasteur-d6pdme` | "Session 09: kpcrudy integration" | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
 
 ## Decisions
+
+- **09:** `app.maskKey` in `Config\App`, read by both library configs through `MaskKey`, web requests refused in production without it (`spark` not blocked); CRUD page header from the title, `flashKeys` → toasts (new `info` key), `kpcrudy:confirm` → theme modal; `CrudFactory::routes()` adds `backend` + `can:<resource>.list` + name, `CrudAuditor` in `permissions:check` runs every CRUD action with inspection on; `make:module --crud` runs `kpcrudy:make` in a child process and rewrites it; the sample CRUD is a test-only module (D-09-01 … D-09-05).
 
 - **08:** menu entry keys `<Module>.<resource>`/route name, zones `sidebar`+`settings` in the sidebar and `user` in the user menu, orphans at the root, breadcrumbs from the menu when the controller adds none, cache per groups + individual permissions; `securityheaders` as a required after filter plus `SecureExceptionHandler` for error pages, COOP added, HSTS production-only ≥ 1 year, `forceGlobalSecureRequests` in production; `RateLimiter` with `Core.rateLimit*` settings and the `ratelimit` filter closing the `backend` chain (Auth keeps `LoginThrottle`); `OutboundClient` with pinned addresses, port 443, allow-list from config/.env/manifests/`Core.outboundHosts`, `GuardedEmail` for SMTP; `safe_redirect()` accepts paths and the site's own hosts (D-08-01 … D-08-05).
 
@@ -69,6 +71,8 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **09:** no kpcrudy responsive list options yet (library request); `permissions:check` inspects CRUDs without a user (operations added only for some users are caught at run time); `make:module --crud` needs the configured database and a new table; generated CRUD labels are English in the three languages; fixed the environment's Composer install by seeding `phpstan/phpstan`'s zip again (known issue 04).
+
 - **08:** the sidebar is empty until a module declares sidebar entries (Dashboard 16, News 17); `CurlTransport` is covered only through a fake transport (no network in tests); the `forceGlobalSecureRequests`/HSTS production values are checked by unit tests of the config logic, not by a production request.
 
 - **07:** `CrudPermissions` not yet selected in `Config\Kpcrudy`/`Config\Kpapy` (sessions 09/10).
@@ -83,6 +87,8 @@ pull request open), *merged* (in `main`).
 - The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
+
+- Session 10+: see `deploy-status/09-kpcrudy/README.md` and `docs/cruds.md`: complete `app/Config/Kpapy.php` (resolver, deny by default, upload path; it already reads `app.maskKey`); module CRUDs only with `CrudFactory::routes()` + `$this->crud()` + `$this->renderCrud()`, extras declared in the manifest, `unset*()` what the resource excludes, tests copied from `tests/feature/Crud/SampleCrudTest.php`. Session 12: `afterWrite()` for the activity log. Session 18: the installer writes `app.maskKey`. Session 23: the file picker field.
 
 - Session 09+: see `deploy-status/08-menus-security/README.md`, `docs/menus.md`, `docs/security.md` and `docs/outbound-requests.md`: CRUD resources get a `$menu` entry (route named after the resource, `can:<resource>.list`); redirects from request values with `safe_redirect()`; limits with `ratelimit:<limit>` or `RateLimiter`; external calls only with `OutboundClient` from tasks/commands. Session 10: `apiToken`/`apiIp` limits, `auth/token` with Auth's `LoginThrottle`. Session 12: replace the `log_message()` of `OutboundClient`, `RateLimit` and `GuardedEmail` with activity entries. Session 14: Settings › Security for `Core.rateLimit*` and `Core.outboundHosts`. Session 21: customisations refer to the menu keys of `MenuDefinitions`.
 
