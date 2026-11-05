@@ -21,12 +21,12 @@ final class PermissionsCommandsTest extends RbacTestCase
         $result = (new PermissionAudit())->run();
 
         $this->assertSame([], $result['errors']);
-        $this->assertSame(12, $result['permissions']);
+        $this->assertSame(18, $result['permissions']);
         $this->assertGreaterThan(0, $result['routes']);
         $this->assertContains('news-posts.edit is stored but no manifest generates it: `php spark modules:sync --prune` removes it.', $result['warnings']);
 
         command('permissions:check');
-        $this->assertStringContainsString('Permissions OK: 12 permission(s)', $this->getStreamFilterBuffer());
+        $this->assertStringContainsString('Permissions OK: 18 permission(s)', $this->getStreamFilterBuffer());
     }
 
     public function testCheckReportsAStaleMatrixUnknownGrantsAndIncompleteSets(): void

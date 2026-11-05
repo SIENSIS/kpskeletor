@@ -34,7 +34,7 @@ final class CrudAuditorTest extends AuthTestCase
         SampleModule::routes($routes);
 
         $auditor = new CrudAuditor();
-        $this->assertCount(2, $auditor->crudRoutes($routes), 'One entry per CRUD, not per kpcrudy route.');
+        $this->assertCount(3, $auditor->crudRoutes($routes), 'One entry per CRUD (the two samples and the Api module\'s token list), not per kpcrudy route.');
         $this->assertSame([], $auditor->audit($routes));
         $this->assertFalse(CrudFactory::inspecting(), 'Inspection is switched off afterwards.');
     }

@@ -47,7 +47,7 @@ final class AuthConfigTest extends CIUnitTestCase
         $filters = new Filters();
 
         $this->assertSame(['except' => ['api/*']], $filters->globals['before']['csrf'] ?? null);
-        $this->assertContains('authsession', $filters->globals['before']);
+        $this->assertSame(['except' => ['api/*']], $filters->globals['before']['authsession'] ?? null, 'Everywhere except the token-only API.');
         $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['backend']);
         $this->assertSame(
             [\CodeIgniter\Shield\Filters\SessionAuth::class, \Modules\Auth\Filters\ForcePasswordReset::class, \Modules\Auth\Filters\ForceTwoFactor::class, \Modules\Core\Filters\RateLimit::class],
