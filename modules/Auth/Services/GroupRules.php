@@ -6,13 +6,18 @@ namespace Modules\Auth\Services;
 
 use CodeIgniter\Shield\Entities\User;
 use Modules\Auth\Exceptions\GroupRuleException;
+use Modules\Core\Permissions\Authorization;
+use Modules\Core\Permissions\EscalationGuard;
 
 /**
- * The rules of the reserved groups (docs/specification.md, "Groups"):
+ * Changes a user's groups under the escalation rules of the Core (`EscalationGuard`,
+ * docs/specification.md, "RBAC" and "Groups"):
  *
- * - `superadmin` bypasses RBAC (`isSuperadmin()`, used by the `can` filter);
+ * - `superadmin` bypasses RBAC (`Authorization`);
  * - the four groups `superadmin`, `admin`, `editor` and `user` cannot be renamed or deleted;
- * - only a superadmin can assign or remove `superadmin`, and the last superadmin cannot lose it;
+ * - only a superadmin can assign or remove `superadmin` or change a superadmin's groups, and
+ *   the last superadmin cannot lose it;
+ * - a user can only add someone to a group whose permissions they hold;
  * - nobody changes their own groups.
  *
  * Every change regenerates the session ids of the affected user (SessionTracker).
@@ -21,43 +26,35 @@ final class GroupRules
 {
     public const SUPERADMIN = 'superadmin';
 
-    public const RESERVED = ['superadmin', 'admin', 'editor', 'user'];
+    public const RESERVED = EscalationGuard::RESERVED_GROUPS;
+
+    public function __construct(private readonly EscalationGuard $guard = new EscalationGuard())
+    {
+    }
 
     public static function isSuperadmin(?User $user): bool
     {
-        return $user !== null && $user->inGroup(self::SUPERADMIN);
+        return Authorization::isSuperadmin($user);
     }
 
     public function isReserved(string $group): bool
     {
-        return in_array($group, self::RESERVED, true);
+        return $this->guard->isReservedGroup($group);
     }
 
     public function canRenameOrDelete(string $group): bool
     {
-        return ! $this->isReserved($group);
+        return $this->guard->canRenameOrDelete($group);
     }
 
     public function canAssign(User $actor, User $target, string $group): bool
     {
-        if (! array_key_exists($group, (array) setting('AuthGroups.groups')) || (int) $actor->id === (int) $target->id) {
-            return false;
-        }
-
-        return $group !== self::SUPERADMIN || self::isSuperadmin($actor);
+        return $this->guard->canAddToGroup($actor, $target, $group);
     }
 
     public function canRemove(User $actor, User $target, string $group): bool
     {
-        if ((int) $actor->id === (int) $target->id) {
-            return false;
-        }
-
-        if ($group !== self::SUPERADMIN) {
-            return true;
-        }
-
-        return self::isSuperadmin($actor) && $this->superadminCount() > 1;
+        return $this->guard->canRemoveFromGroup($actor, $target, $group);
     }
 
     /**
@@ -88,7 +85,7 @@ final class GroupRules
 
     public function superadminCount(): int
     {
-        return db_connect()->table(config('Auth')->tables['groups_users'])->where('group', self::SUPERADMIN)->countAllResults();
+        return $this->guard->superadminCount();
     }
 
     private function changed(User $target, string $change, string $group, User $actor): void
