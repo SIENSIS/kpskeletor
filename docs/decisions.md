@@ -94,6 +94,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-04-08 | 04 | PWA settings, icons and worker | Accepted (proposal) |
 | D-04-09 | 04 | CSRF token for scripts without sessions for every visitor | Accepted (proposal) |
 | D-04-10 | 04 | Project views with inline code from CodeIgniter | Accepted (proposal) |
+| D-05-01 | 05 | Own login, magic-link and reset controllers | Accepted (proposal) |
+| D-05-02 | 05 | Session tracking and remote logout | Accepted (proposal) |
+| D-05-03 | 05 | Groups and grants before RBAC | Accepted (proposal) |
+| D-05-04 | 05 | Names, units and defaults of the Auth settings | Accepted (proposal) |
+| D-05-05 | 05 | App tokens vs personal tokens | Accepted (proposal) |
+| D-05-06 | 05 | CSRF and back-office filters before the security session | Accepted (proposal) |
+| D-05-07 | 05 | Where a login lands and profile preferences | Accepted (proposal) |
+| D-05-08 | 05 | New-device notices | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -974,3 +982,83 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-04):** applied by session 04 as proposed.
 - **Applied in:** session 04 (`app/Views/`, `modules/Core/Frontend/CspViewScanner.php`)
+
+## D-05-01 — Own login, magic-link and reset controllers
+
+- **Where:** deploy/05, spec "Authentication (Shield)"
+- **Problem:** Shield's `LoginController`/`MagicLinkController` reveal whether an email exists ("Unable to find a user"), store magic-link tokens in clear and have no password-reset screen (Shield uses the magic link for that).
+- **Proposal:** the Auth module has its own controllers on Shield's authenticator API: generic messages, a dummy hash for unknown emails, captcha, per-IP/per-account limits; magic-link and reset tokens are Shield identities (`magic-link`, `reset-password`) whose secret is the SHA-256 of the token, single use; a reset sets a new password on a form (not a login).
+- **Alternatives:** A) Shield's controllers with overridden views (keep the enumeration and clear tokens).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-02 — Session tracking and remote logout
+
+- **Where:** spec "Session handling", plan risk "session store that can be enumerated"
+- **Problem:** "My sessions", remote logout and the absolute lifetime need to enumerate sessions; the file session handler cannot, and Shield's remember-me re-creates a remotely ended session.
+- **Proposal:** table `user_sessions` (one row per login, the PHP session holds a random token, only its hash is stored, with the remember-me selector); the global `authsession` filter checks it on every request: ended row → logout; past `Auth.absoluteLifetime` → the PHP session ends without touching remember-me, which may re-create it (new row `remembered`); remote logout also deletes that session's remember-me token; remember-me tokens older than `Auth.rememberLifetime` (from their creation; Shield extends them on use) are deleted before Shield reads them. Logging out keeps Shield's behaviour (all the user's remember-me tokens are deleted).
+- **Alternatives:** A) Database session handler and deleting session rows (ties the app to one handler).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-03 — Groups and grants before RBAC
+
+- **Where:** spec "Groups", deploy/05 and 07
+- **Problem:** `can:` uses Shield's matrix, which session 07 computes; until then nobody could open the profile.
+- **Proposal:** `Config\AuthGroups` lists the four groups and, as an interim bootstrap, the `auth-profile.*`/`auth-sessions.*` permissions for every group (the same as the manifest's `defaultGrants`); session 07 replaces them with the computed `setting('AuthGroups.…')`. Superadmins bypass `can:` (`Can` filter and `BackendController::can()`); `GroupRules` holds the reserved-group rules (only a superadmin assigns or removes `superadmin`, never the last one, nobody changes their own groups, the four groups cannot be renamed or deleted) and flags the user's sessions for id regeneration.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-04 — Names, units and defaults of the Auth settings
+
+- **Where:** spec "Session handling", "Rate limits", Settings › Security (session 14)
+- **Problem:** The specification names only `Auth.minimumPasswordLength`.
+- **Proposal:** Auth module settings (defaults in `Config\Auth`, equal to the manifest, a test checks it): `minimumPasswordLength` (8), `absoluteLifetime` (minutes, 720), `idleTimeout` (minutes, 0 = off), `rememberLifetime` (days, 14, 0 = off), `captcha` (off), `newDeviceNotice` (on), `loginAttemptsPerIp` (10), `loginAttemptsPerAccount` (5), `loginLockMinutes` (15), `emailLinksPerIp` (10/hour), `emailLinksPerAccount` (3/hour, extra requests silent). `AuthPolicy` raises weak values to a floor (8 characters, 5 minutes). Counters in the cache.
+- **Alternatives:** A) Seconds everywhere (harder to edit).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-05 — App tokens vs personal tokens
+
+- **Where:** spec "changing the password … revokes the tokens obtained by app logins; personal API tokens are listed"
+- **Problem:** Shield access tokens have no origin; `extra` holds their scopes.
+- **Proposal:** a personal token (created in the back office, later session) has `auth_identities.secret2 = 'personal'`; every other access token counts as an app-login token and is revoked by a password change or reset. Event `passwordChanged` (user, sessions ended).
+- **Alternatives:** A) A naming convention (fragile).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-06 — CSRF and back-office filters before the security session
+
+- **Where:** deploy/05, deploy/07 (`backend` chain), spec "Security baseline"
+- **Problem:** Login forms need CSRF, which was not enabled; `backend/*` needs login and forced reset before session 07 builds its chain.
+- **Proposal:** global `csrf` (except `api/*`) and `authsession`; `session` (Shield) and `forcereset` (Auth: only `backend/profile/password` is reachable while a reset is forced) on `backend`/`backend/*` in `Config\Filters::$filters`. Logout is a POST (GET `logout` shows a confirmation).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-07 — Where a login lands and profile preferences
+
+- **Where:** deploy/05
+- **Problem:** There is no dashboard yet; the profile stores language and colour mode but the theme reads the `kp_theme` cookie (D-04-06) and `supportedLocales` was `['en']`.
+- **Proposal:** login redirect `backend/profile` until session 16; the profile's colour mode is copied into `kp_theme` on login and on save; the profile's language is applied to back-office requests by `authsession`; `App::$supportedLocales = ['en', 'ca', 'es']` (default locale left to session 31).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-05-08 — New-device notices
+
+- **Where:** spec "an email notice when the account signs in from a new device"
+- **Problem:** Every first login of a new account would send a notice.
+- **Proposal:** random 32-byte cookie `kp_device` (1 year, HttpOnly, Lax), SHA-256 per user in `known_devices`; no notice for the first device of an account; setting `Auth.newDeviceNotice`.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 05 as proposed.
+- **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)

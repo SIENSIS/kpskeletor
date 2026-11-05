@@ -104,6 +104,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - Every action is authorised on the server (resolver + record rules); masked ids are not access
   control; the UI only hides what the server also enforces.
 - Sensitive actions require re-authentication (`reauth` filter).
+- Authentication and sessions follow `docs/auth.md` (generic messages, rate limits, session
+  tracking); after changing a user's groups or permissions call
+  `SessionTracker::privilegesChanged()`; security emails go through `SecurityMailer`.
 - No raw SQL with interpolated values; no `getPost()` wholesale into inserts; escape all output;
   HTMLPurifier for rich text; redirects only to internal paths (`safe_redirect()`).
 - Uploads through the Storage service only (allow-lists, random names, no SVG/HTML by default).
