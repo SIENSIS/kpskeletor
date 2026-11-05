@@ -14,8 +14,11 @@ pull request open), *merged* (in `main`).
 | 04 | Front-end assets, JavaScript, CSP, dark mode, responsive and PWA | merged | `claude/funny-goldberg-9n764h` | [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) | [`deploy-status/04-frontend/`](../deploy-status/04-frontend/README.md) |
 | 05 | Authentication (Shield) and session hardening | merged | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
 | 06 | Two-factor authentication and re-authentication | merged | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
+| 07 | Central RBAC | done | `claude/tender-wright-gmq4ck` | "Session 07: Central RBAC" | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
 
 ## Decisions
+
+- **07:** `backend` filter alias (Shield session → forced reset → forced 2FA) applied by pattern to `backend/*`; `can:a,b` any / `can:all,a,b` all; names outside the enabled catalogue refused to everybody (superadmins too) and to `can:` routes in `RoutesSecurityTest`; `GrantManager` + `EscalationGuard` with extra rules (wildcards, group membership, superadmin targets, own group's grants) and the `privilegesChanged` event; `CrudPermissions` final with `forUser()`, wired into kpcrudy/kpapy by sessions 09/10 (D-07-01 … D-07-05).
 
 - **06:** per-user 2FA through `UserTwoFactorAction` (Shield `login` action, conditional) with email codes hashed and sent by `SecurityMailer` instead of Shield's `Email2FA` class; tables `user_two_factor` (encrypted TOTP secret, last step) and `user_recovery_codes` (SHA-256); otphp + php-qrcode (SVG `data:` image); remember-me issued only after the 2FA step (`SessionAuthenticator`); settings `Auth.twoFactorPolicy` and `Auth.reauthMinutes`; `auth/reauth`, POSTs not replayed, JSON 401, `requireReauth()` via the `reauth` alias (D-06-01 … D-06-06). D-06-04 (a password login counts as re-authentication) decided by the owner as proposed (option A) and applied.
 
@@ -41,6 +44,8 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **07:** grant changes go to the application log until session 12; `permissions:check` does not compare CRUD controllers yet (none exist; session 09); fixed test-order fragility for the new RBAC tests (temporary-module migrations left by earlier Core tests) with `CleanDatabaseTrait`.
+
 - **06:** the 2FA admin reset is a service + `twoFactorReset` event, without screen (session 15), notification (session 11) or activity entry (session 12); fixed a session 05 gap: Auth feature tests left a logged-in session that broke `BaseModelTest` depending on order (`AuthTestCase::tearDown()`).
 
 - **05:** security events go to the application log until session 12; no avatar until the file picker (session 23); Shield's logout deletes all the user's remember-me tokens; fixed two Core tests that assumed Core was the only module.
@@ -58,6 +63,7 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **07:** `CrudPermissions` not yet selected in `Config\Kpcrudy`/`Config\Kpapy` (sessions 09/10).
 - **06:** email 2FA needs `email.*` in `.env` to be usable outside tests; no settings screen for the 2FA policy and the re-auth window until session 14; the authenticator-app method needs `encryption.key`.
 - **05:** guests still see the default locale `en` (session 31); Auth feature tests migrate all namespaces per test (suite ~1 min).
 - **04:** CodeIgniter's development error page keeps inert `onclick` toggles under the CSP (only `csp:check` exception); the PWA can only be enabled through the settings service until session 14; `deploy/setup.sh` stops when Composer cannot fetch `phpstan/phpstan` (seed `~/.cache/composer/files/phpstan/phpstan/<sha1(dist URL)>.zip` from a git checkout, then `composer install --prefer-source`).
@@ -70,6 +76,7 @@ pull request open), *merged* (in `main`).
 
 ## Notes for the next session
 
+- Session 08+: see `deploy-status/07-rbac/README.md` and `docs/rbac.md`: check permissions only with `Authorization::for($user)` / `can()` / `CrudPermissions`; change grants only with `GrantManager`; append new back-office filters (throttling, activity, maintenance) to the `backend` alias in `app/Config/Filters.php`; session 09 sets `CrudPermissions` + `denyByDefault` and extends `PermissionAudit` for CRUD routes; `php spark permissions:check` must pass.
 - Session 07+: see `deploy-status/06-auth-2fa/README.md`: protect sensitive routes with `['can:…', 'reauth']` or `$this->requireReauth()`; add `force2fa` to the `backend` chain (after `forcereset`); session 10 reads `TwoFactor::method()`/`verifyTotp()`; session 11 notifies on `twoFactorReset`; session 15 adds the reset row operation and the policy column.
 - Session 06+: see `deploy-status/05-auth/README.md` (2FA hooks in the login/magic-link controllers, reauth for remember-me sessions, interim matrix to replace in 07, `GroupRules`, `SessionTracker::privilegesChanged()`, `PasswordChanger::PERSONAL_TOKEN`) and `docs/auth.md`.
 - Session 05+: JS in `modules/<Name>/Assets/js/`, imported as `core/…`/`<module>/…`, URLs with `asset()`; no inline code (`php spark csp:check`); `data-confirm`, `form_layout` `dirtyGuard`, `core/http.js`. Session 08: sidebar links use `<span class="nav-text">`; Settings › Security origins can reuse `ContentSecurity::apply()`. Session 09: `kpcrudy:confirm` → `core/ui/confirm.js`. Session 14: Settings UI for `Core.pwa*` and the new theme options. Session 15: store the colour mode in the profile (`ThemeMode` preference reader). See `deploy-status/04-frontend/README.md` and `docs/frontend.md`.
