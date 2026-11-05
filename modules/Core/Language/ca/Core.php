@@ -169,9 +169,11 @@ return [
         'name' => 'KP Skeletor',
     ],
     'user' => [
-        'profile'  => 'El meu perfil',
-        'sessions' => 'Les meves sessions',
-        'logout'   => 'Tanca la sessió',
+        'logout' => 'Tanca la sessió',
+    ],
+    'menu' => [
+        'settings' => 'Configuració',
+        'toggle' => 'Mostra o amaga les entrades de {0}',
     ],
     'ui' => [
         'backOffice'      => 'Back office',
@@ -202,6 +204,10 @@ return [
         'serverError' => [
             'title'   => 'Alguna cosa ha anat malament',
             'message' => 'S\'ha produït un error inesperat. S\'ha registrat; torna-ho a provar més tard.',
+        ],
+        'tooManyRequests' => [
+            'title' => 'Massa peticions',
+            'message' => 'Has fet massa peticions en poc temps. Espera un moment i torna-ho a provar.',
         ],
     ],
     'theme' => [
@@ -338,6 +344,15 @@ return [
         'pwaStart'        => 'Pàgina que obre l\'aplicació instal·lada',
         'pwaStartPublic'  => 'Pàgina d\'inici pública',
         'pwaStartBackend' => 'Back office',
+        'rateLimitBackend' => 'Peticions al back office per usuari i minut',
+        'rateLimitApiToken' => 'Peticions a l\'API per token i minut',
+        'rateLimitApiIp' => 'Peticions a l\'API pública per adreça IP i minut',
+        'rateLimitFeeds' => 'Peticions als feeds de calendari per token i hora',
+        'rateLimitUploads' => 'Pujades de fitxers per usuari i hora',
+        'rateLimitForms' => 'Enviaments de formularis públics per adreça IP i hora',
+        'rateLimitWidgets' => 'Actualitzacions de ginys del tauler per usuari i minut',
+        'outboundHosts' => 'Altres servidors externs permesos',
+        'outboundHostsHelp' => 'Noms de servidor als quals el lloc pot connectar per HTTPS o fer servir com a servidor SMTP (p. ex. api.example.com o *.example.com), a més dels de la configuració i els mòduls.',
     ],
     'csp' => [
         'scriptWithBody' => 'un element <script src> ha d\'estar buit',

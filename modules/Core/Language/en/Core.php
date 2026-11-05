@@ -169,9 +169,11 @@ return [
         'name' => 'KP Skeletor',
     ],
     'user' => [
-        'profile'  => 'My profile',
-        'sessions' => 'My sessions',
-        'logout'   => 'Log out',
+        'logout' => 'Log out',
+    ],
+    'menu' => [
+        'settings' => 'Settings',
+        'toggle' => 'Show or hide the entries of {0}',
     ],
     'ui' => [
         'backOffice'      => 'Back office',
@@ -202,6 +204,10 @@ return [
         'serverError' => [
             'title'   => 'Something went wrong',
             'message' => 'An unexpected error happened. It has been logged; please try again later.',
+        ],
+        'tooManyRequests' => [
+            'title' => 'Too many requests',
+            'message' => 'You have made too many requests in a short time. Please wait a moment and try again.',
         ],
     ],
     'theme' => [
@@ -338,6 +344,15 @@ return [
         'pwaStart'        => 'Page the installed app opens',
         'pwaStartPublic'  => 'Public home page',
         'pwaStartBackend' => 'Back office',
+        'rateLimitBackend' => 'Back-office requests per user and minute',
+        'rateLimitApiToken' => 'API requests per token and minute',
+        'rateLimitApiIp' => 'Public API requests per IP address and minute',
+        'rateLimitFeeds' => 'Calendar feed requests per token and hour',
+        'rateLimitUploads' => 'Uploads per user and hour',
+        'rateLimitForms' => 'Public form submissions per IP address and hour',
+        'rateLimitWidgets' => 'Dashboard widget refreshes per user and minute',
+        'outboundHosts' => 'Extra allowed outbound hosts',
+        'outboundHostsHelp' => 'Host names the site may call over HTTPS or use as SMTP server (e.g. api.example.com or *.example.com), besides those of the configuration and the modules.',
     ],
     'csp' => [
         'scriptWithBody' => 'a <script src> element must be empty',

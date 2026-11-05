@@ -161,6 +161,9 @@ class App extends BaseConfig
      * made via a secure connection (HTTPS). If the incoming request is not
      * secure, the user will be redirected to a secure version of the page
      * and the HTTP Strict Transport Security (HSTS) header will be set.
+     *
+     * The skeleton sets it to true in production (the default environment) in the constructor;
+     * `.env` (`app.forceGlobalSecureRequests`) can still change it.
      */
     public bool $forceGlobalSecureRequests = false;
 
@@ -207,4 +210,12 @@ class App extends BaseConfig
      * `contentsecuritypolicy.reportOnly = true` instead of disabling it.
      */
     public bool $CSPEnabled = true;
+
+    public function __construct()
+    {
+        // HTTPS for every request in production (docs/specification.md, "Security baseline").
+        $this->forceGlobalSecureRequests = ENVIRONMENT === 'production';
+
+        parent::__construct();
+    }
 }

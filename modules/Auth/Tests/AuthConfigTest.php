@@ -50,7 +50,7 @@ final class AuthConfigTest extends CIUnitTestCase
         $this->assertContains('authsession', $filters->globals['before']);
         $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['backend']);
         $this->assertSame(
-            [\CodeIgniter\Shield\Filters\SessionAuth::class, \Modules\Auth\Filters\ForcePasswordReset::class, \Modules\Auth\Filters\ForceTwoFactor::class],
+            [\CodeIgniter\Shield\Filters\SessionAuth::class, \Modules\Auth\Filters\ForcePasswordReset::class, \Modules\Auth\Filters\ForceTwoFactor::class, \Modules\Core\Filters\RateLimit::class],
             $filters->aliases['backend'],
         );
     }

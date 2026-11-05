@@ -169,9 +169,11 @@ return [
         'name' => 'KP Skeletor',
     ],
     'user' => [
-        'profile'  => 'Mi perfil',
-        'sessions' => 'Mis sesiones',
-        'logout'   => 'Cerrar sesión',
+        'logout' => 'Cerrar sesión',
+    ],
+    'menu' => [
+        'settings' => 'Configuración',
+        'toggle' => 'Muestra u oculta las entradas de {0}',
     ],
     'ui' => [
         'backOffice'      => 'Back office',
@@ -202,6 +204,10 @@ return [
         'serverError' => [
             'title'   => 'Algo ha ido mal',
             'message' => 'Se ha producido un error inesperado. Se ha registrado; vuelve a intentarlo más tarde.',
+        ],
+        'tooManyRequests' => [
+            'title' => 'Demasiadas peticiones',
+            'message' => 'Has hecho demasiadas peticiones en poco tiempo. Espera un momento y vuelve a intentarlo.',
         ],
     ],
     'theme' => [
@@ -338,6 +344,15 @@ return [
         'pwaStart'        => 'Página que abre la aplicación instalada',
         'pwaStartPublic'  => 'Página de inicio pública',
         'pwaStartBackend' => 'Back office',
+        'rateLimitBackend' => 'Peticiones al back office por usuario y minuto',
+        'rateLimitApiToken' => 'Peticiones a la API por token y minuto',
+        'rateLimitApiIp' => 'Peticiones a la API pública por dirección IP y minuto',
+        'rateLimitFeeds' => 'Peticiones a los feeds de calendario por token y hora',
+        'rateLimitUploads' => 'Subidas de archivos por usuario y hora',
+        'rateLimitForms' => 'Envíos de formularios públicos por dirección IP y hora',
+        'rateLimitWidgets' => 'Actualizaciones de widgets del panel por usuario y minuto',
+        'outboundHosts' => 'Otros servidores externos permitidos',
+        'outboundHostsHelp' => 'Nombres de servidor a los que el sitio puede conectar por HTTPS o usar como servidor SMTP (p. ej. api.example.com o *.example.com), además de los de la configuración y los módulos.',
     ],
     'csp' => [
         'scriptWithBody' => 'un elemento <script src> debe estar vacío',

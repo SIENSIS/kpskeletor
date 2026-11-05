@@ -8,12 +8,12 @@ use CodeIgniter\HTTP\IncomingRequest;
 use Throwable;
 
 /**
- * Renders the 403/404/500 pages through the active theme (standard views `errors/<code>`), with a
+ * Renders the 403/404/429/500 pages through the active theme (standard views `errors/<code>`), with a
  * plain fallback when the theme itself cannot render (a broken theme never hides the error).
  */
 final class ErrorPage
 {
-    public const CODES = [403, 404, 500];
+    public const CODES = [403, 404, 429, 500];
 
     /**
      * @param string|null $message text safe to show (never an exception message in production)
@@ -49,6 +49,7 @@ final class ErrorPage
         return match ($code) {
             403     => 'forbidden',
             404     => 'notFound',
+            429     => 'tooManyRequests',
             default => 'serverError',
         };
     }
