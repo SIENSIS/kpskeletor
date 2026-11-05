@@ -9,7 +9,9 @@ use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Modules\Auth\Database\Migrations\CreateKnownDevices;
 use Modules\Auth\Database\Migrations\CreateUserProfiles;
+use Modules\Auth\Database\Migrations\CreateUserRecoveryCodes;
 use Modules\Auth\Database\Migrations\CreateUserSessions;
+use Modules\Auth\Database\Migrations\CreateUserTwoFactor;
 
 /**
  * The Auth migrations run up, down and up again. Only the Auth migrations are reversed: the
@@ -26,7 +28,7 @@ final class AuthMigrationsTest extends CIUnitTestCase
     protected $refresh     = true;
     protected $namespace   = null;
 
-    private const TABLES = ['user_profiles', 'user_sessions', 'known_devices'];
+    private const TABLES = ['user_profiles', 'user_sessions', 'known_devices', 'user_two_factor', 'user_recovery_codes'];
 
     /**
      * @return list<Migration>
@@ -35,7 +37,7 @@ final class AuthMigrationsTest extends CIUnitTestCase
     {
         return array_map(
             static fn (string $class): Migration => new $class(\Config\Database::forge('tests')),
-            [CreateUserProfiles::class, CreateUserSessions::class, CreateKnownDevices::class],
+            [CreateUserProfiles::class, CreateUserSessions::class, CreateKnownDevices::class, CreateUserTwoFactor::class, CreateUserRecoveryCodes::class],
         );
     }
 
