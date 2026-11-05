@@ -10,9 +10,12 @@ use CodeIgniter\Shield\Config\AuthGroups as ShieldAuthGroups;
  * The four groups of the skeleton (docs/specification.md, "Groups").
  *
  * `superadmin` bypasses RBAC, cannot be renamed or deleted and only a superadmin can assign it
- * (`Modules\Auth\Services\GroupRules`). The permissions and the matrix below are an interim
- * bootstrap until the RBAC session (07) computes them from the permission catalogue and
- * `group_permissions` and stores them with `setting('AuthGroups.…')` (decision D-05-03).
+ * (`Modules\Core\Permissions\EscalationGuard`). The groups become data in session 15.
+ *
+ * `$permissions` and `$matrix` are empty on purpose (default deny): Shield reads the real ones
+ * with `setting('AuthGroups.…')`, written by `Modules\Core\Permissions\ShieldMatrix` from the
+ * permission catalogue and `group_permissions` after every `modules:sync`, module toggle and
+ * grant change (decision D-00-19). Never add permissions here.
  */
 class AuthGroups extends ShieldAuthGroups
 {
@@ -43,22 +46,10 @@ class AuthGroups extends ShieldAuthGroups
     /**
      * @var array<string, string>
      */
-    public array $permissions = [
-        'auth-profile.view'    => 'Auth: view own profile',
-        'auth-profile.edit'    => 'Auth: edit own profile and password',
-        'auth-sessions.view'   => 'Auth: view own sessions and tokens',
-        'auth-sessions.revoke' => 'Auth: log out own sessions and revoke own tokens',
-    ];
+    public array $permissions = [];
 
     /**
-     * Personal screens are granted to every group (decision D-00-17).
-     *
      * @var array<string, list<string>>
      */
-    public array $matrix = [
-        'superadmin' => ['auth-profile.*', 'auth-sessions.*'],
-        'admin'      => ['auth-profile.*', 'auth-sessions.*'],
-        'editor'     => ['auth-profile.*', 'auth-sessions.*'],
-        'user'       => ['auth-profile.*', 'auth-sessions.*'],
-    ];
+    public array $matrix = [];
 }

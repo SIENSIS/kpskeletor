@@ -8,6 +8,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Modules\Core\Permissions\Authorization;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -32,13 +33,12 @@ abstract class BackendController extends BaseController
     }
 
     /**
-     * Whether the current user has a permission (default deny for guests; superadmins bypass).
+     * Whether the current user holds one of the permissions (central `Authorization`: default
+     * deny for guests, superadmins bypass).
      */
-    protected function can(string $permission): bool
+    protected function can(string ...$permissions): bool
     {
-        $user = auth()->user();
-
-        return $user !== null && ($user->inGroup('superadmin') || $user->can($permission));
+        return Authorization::current()->can(...$permissions);
     }
 
     /**

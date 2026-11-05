@@ -8,15 +8,17 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Modules\Core\Permissions\Authorization;
 use Modules\Core\Theme\ErrorPage;
 
 /**
- * `can:<permission>[,<permission>…]`: lets the request through only when the logged-in user has
- * one of the permissions. Default deny: guests and requests without arguments get 403.
- * Superadmins bypass the check (docs/specification.md, "Groups").
+ * `can:<permission>[,<permission>…]`: lets the request through only when the logged-in user holds
+ * **one** of the permissions; `can:all,<permission>,<permission>…` requires **all** of them
+ * (decision D-07-02). Decided by the central `Authorization` (superadmin bypass, unknown or
+ * disabled permissions refused). Default deny: guests and filters without a permission get 403.
  *
- * The central permission resolver and the activity log are added by the RBAC session; guests
- * of `backend/*` are sent to the login by Shield's `session` filter before this one runs.
+ * Every route under `backend/` has one (`RoutesSecurityTest`); guests of `backend/*` are sent
+ * to the login by the `backend` chain before this filter runs.
  */
 final class Can implements FilterInterface
 {
@@ -27,17 +29,15 @@ final class Can implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        $user = auth()->user();
+        $arguments   = array_values(array_filter(array_map('trim', $arguments ?? []), static fn (string $a): bool => $a !== ''));
+        $all         = ($arguments[0] ?? null) === 'all';
+        $permissions = $all ? array_slice($arguments, 1) : $arguments;
 
-        if ($user !== null && $arguments !== null && $arguments !== []) {
-            if ($user->inGroup('superadmin')) {
+        if ($permissions !== []) {
+            $authorization = Authorization::current();
+
+            if ($all ? $authorization->canAll(...$permissions) : $authorization->can(...$permissions)) {
                 return null;
-            }
-
-            foreach ($arguments as $permission) {
-                if ($user->can($permission)) {
-                    return null;
-                }
             }
         }
 

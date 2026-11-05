@@ -11,7 +11,8 @@ use Modules\Core\Cache\CoreCache;
 
 /**
  * The stored permission catalogue (`permissions` table) and the group grants
- * (`group_permissions`). Written only by `modules:sync`; read by RBAC (session 07).
+ * (`group_permissions`, the source of truth of the group matrix). The catalogue is written only
+ * by `modules:sync`; grants by `modules:sync` (default grants) and `GrantManager`.
  */
 final class PermissionCatalogue
 {
@@ -136,6 +137,33 @@ final class PermissionCatalogue
             ->where('group', $group)->orderBy('permission')->get()->getResultArray();
 
         return array_map(static fn (array $row): string => (string) $row['permission'], $rows);
+    }
+
+    /**
+     * Every stored grant by group.
+     *
+     * @return array<string, list<string>>
+     */
+    public function allGrants(): array
+    {
+        $grants = [];
+
+        foreach ($this->db()->table('group_permissions')->select('group, permission')->orderBy('group')->orderBy('permission')->get()->getResultArray() as $row) {
+            $grants[(string) $row['group']][] = (string) $row['permission'];
+        }
+
+        return $grants;
+    }
+
+    /**
+     * Replaces the grants of a group (callers wrap it in a transaction).
+     *
+     * @param list<string> $permissions
+     */
+    public function replaceGrants(string $group, array $permissions): void
+    {
+        $this->db()->table('group_permissions')->where('group', $group)->delete();
+        $this->grant([$group => $permissions]);
     }
 
     /**

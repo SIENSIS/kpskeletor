@@ -15,12 +15,14 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
 ## Main pieces
 
 - `Filters/AuthSession.php` (global `authsession`), `Filters/ForcePasswordReset.php` (`forcereset`),
-  `Filters/ForceTwoFactor.php` (`force2fa`), `Filters/RequireReauth.php` (`reauth`).
+  `Filters/ForceTwoFactor.php` (`force2fa`), `Filters/RequireReauth.php` (`reauth`). The first
+  two back-office checks run inside the `backend` chain (`app/Config/Filters.php`).
 - `Authentication/UserTwoFactorAction.php` (Shield's `login` action, routes `auth/a/*`),
   `Authentication/SessionAuthenticator.php` (remember-me only after the 2FA step).
 - `Services/`: `AuthPolicy` (settings → `config('Auth')`), `LoginThrottle`, `Captcha`,
   `LinkTokens`, `SecurityMailer`, `SessionTracker`, `DeviceRecognizer`, `PasswordChanger`,
-  `GroupRules`, `LoginListener` (Shield `login`/`logout` events in `Config/Events.php`),
+  `GroupRules` (delegates to the Core's `EscalationGuard`), `LoginListener` (Shield
+  `login`/`logout` events and the Core's `privilegesChanged` in `Config/Events.php`),
   `TwoFactor` (method, encrypted TOTP secret, reset), `Totp` (otphp + QR SVG), `RecoveryCodes`,
   `EmailCodes`, `Reauth`.
 - Tables: `user_profiles`, `user_sessions`, `known_devices`, `user_two_factor`,
@@ -35,7 +37,6 @@ as re-authentication, decided by the owner).
 
 ## Open tasks
 
-- Session 07: replace the interim matrix of `Config\AuthGroups`; `backend` filter chain.
 - Session 10: kpapy 2FA providers reading `TwoFactor::method()` and the TOTP secret.
 - Session 11: notify the user of an admin 2FA reset (`twoFactorReset` event).
 - Session 12: activity log entries instead of `log_message()` (2FA changes, re-authentication).
@@ -48,4 +49,5 @@ as re-authentication, decided by the owner).
 
 `vendor/bin/phpunit modules/Auth` (feature tests on SQLite, base class `Tests/AuthTestCase.php`:
 requests carry the session, cookies and a CSRF token; sent emails are captured;
+`syncPermissions()` installs the catalogue, default grants and Shield's matrix;
 `Tests/TwoFactorTestCase.php` adds an encryption key, a fixed clock and TOTP helpers).

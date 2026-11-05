@@ -635,7 +635,8 @@ granularity instead of collapsing it into read/create/update/delete.
   shared by kpcrudy and kpapy (see "JSON API" for how it implements both interfaces), with
   `$denyByDefault = true`:
   * it maps `(resource, operation)` to `Authorization::for($user)->can("{$resource}.{$operation}")`
-    (`search`/`filters`/`bulk` → `.list`); superadmins bypass it. The user comes from kpapy's
+    (`search`/`filters`/`bulk` → `.list`); superadmins bypass it, but a name outside the
+    catalogue of the enabled modules is refused to everybody (D-07-03). The user comes from kpapy's
     `Context` (API) or the session (web); iCal feeds, notifications by permission, scheduled
     tasks and the CLI pass the user explicitly, never relying on a session;
   * kpcrudy and kpapy call it for every operation, button, action, bulk action and custom
@@ -662,7 +663,8 @@ granularity instead of collapsing it into read/create/update/delete.
   ```php
   $routes->group('backend/news', ['filter' => ['backend', 'can:news-stats.view']], ...);
   ```
-  * Provide a `can` filter (accepts several permissions, any/all).
+  * Provide a `can` filter (accepts several permissions, any/all): `can:a.x,b.y` passes with any
+    of them, `can:all,a.x,b.y` needs all of them (D-07-02).
   * The `backend` filter chain covers: authentication, forced reset, forced 2FA setup,
     disabled-module check, maintenance mode, activity log, idle lock and throttling.
   * **Default deny:** a back-office route without a `can:` filter fails a CI test (a
