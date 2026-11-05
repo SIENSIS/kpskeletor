@@ -132,7 +132,7 @@ final class FrontendAssetsTest extends CIUnitTestCase
         $style = strpos($html, 'rel="stylesheet"');
         $this->assertNotFalse($mode);
         $this->assertLessThan($style, $mode, 'the mode script runs before the stylesheets');
-        $this->assertMatchesRegularExpression('/<script type="importmap" nonce="[^"]+">\{"imports":\{"core\/app\.js":/', $html);
+        $this->assertMatchesRegularExpression('/<script type="importmap" nonce="[^"]+">\{"imports":\{[^}]*"core\/app\.js":/', $html);
         $this->assertMatchesRegularExpression('/<script type="module" src="[^"]+\/assets\/core\/js\/app\.js\?v=[0-9a-f]{12}" nonce="[^"]+"><\/script>/', $html);
         $this->assertMatchesRegularExpression('/<script type="application\/json" id="kp-config">\{"baseUrl":/', $html);
         $this->assertLessThan(strpos($html, 'type="module"'), strpos($html, 'type="importmap"'), 'the import map comes before any module');

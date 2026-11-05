@@ -12,8 +12,11 @@ pull request open), *merged* (in `main`).
 | 02 | Core kernel: catalogue, settings registry, enable/disable and demo data | merged | `claude/clever-lovelace-i36pbh` | [SIENSIS/kpskeletor#5](https://github.com/SIENSIS/kpskeletor/pull/5) | [`deploy-status/02-core-registry/`](../deploy-status/02-core-registry/README.md) |
 | 03 | Themes and standard views | merged | `claude/tender-ride-z9y4vv` | [SIENSIS/kpskeletor#6](https://github.com/SIENSIS/kpskeletor/pull/6) | [`deploy-status/03-themes/`](../deploy-status/03-themes/README.md) |
 | 04 | Front-end assets, JavaScript, CSP, dark mode, responsive and PWA | merged | `claude/funny-goldberg-9n764h` | [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) | [`deploy-status/04-frontend/`](../deploy-status/04-frontend/README.md) |
+| 05 | Authentication (Shield) and session hardening | done | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
 
 ## Decisions
+
+- **05:** own login/magic-link/reset controllers with hashed single-use tokens; `user_sessions` tracking checked by the global `authsession` filter (absolute lifetime, remember-me capped from its creation, remote logout deletes the session's remember-me token, idle lock); interim `AuthGroups` matrix and superadmin bypass of `can:`; `Auth.*` settings (minutes/days, defaults in `Config\Auth`); personal tokens marked `secret2 = 'personal'`; global CSRF; `session` + `forcereset` on `backend/*`; login lands on the profile; new-device notice skips the first device (D-05-01 … D-05-08).
 
 - **04:** front-end classes in `modules/Core/Frontend/` (`ThemeAssetPublisher` folded into `AssetPublisher`); development republishes stale assets per request; manifest keys `<owner>::<path>` with reserved `core`/`theme`/`vendor`, bare import specifiers only; CSP details (`*-attr 'none'`, `img-src data:`, no report endpoint); module `$csp` applied by the `cspmodules` filter; colour mode in the `kp_theme` cookie until the profile exists; sidebar offcanvas < 768 px, icon-only 768–1199 px, `kp_sidebar` cookie; PWA settings `Core.pwa`/`Core.pwaStart`, icons in `writable/pwa/` (adds `settings.core`); CSRF meta only with an existing session; CodeIgniter's welcome page replaced by a themed home (D-04-01 … D-04-10).
 
@@ -35,6 +38,8 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **05:** security events go to the application log until session 12; no avatar until the file picker (session 23); Shield's logout deletes all the user's remember-me tokens; fixed two Core tests that assumed Core was the only module.
+
 - **04:** the logged-in user's colour mode is stored in the cookie until the Users module stores it in the profile (D-04-06); the axe/WCAG contrast test is left to the quality session; fixed the session 03 gap: `public/assets/core/` and the asset manifest are git-ignored.
 
 - **03:** site name from the language line `Core.app.name` until session 14 (D-03-07); `Themes\` removed from `composer.json` autoload (themes register their namespace on demand, D-03-01); fixed the session 02 gap where `--demo=A,B` was ignored (D-03-09); `.gitignore` `vendor/` anchored so `public/assets/vendor/` is committed.
@@ -48,6 +53,7 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **05:** guests still see the default locale `en` (session 31); Auth feature tests migrate all namespaces per test (suite ~1 min).
 - **04:** CodeIgniter's development error page keeps inert `onclick` toggles under the CSP (only `csp:check` exception); the PWA can only be enabled through the settings service until session 14; `deploy/setup.sh` stops when Composer cannot fetch `phpstan/phpstan` (seed `~/.cache/composer/files/phpstan/phpstan/<sha1(dist URL)>.zip` from a git checkout, then `composer install --prefer-source`).
 - **03:** `CanFilterTest::testGuestIsForbidden` fails when run alone (needs the settings table migrated by an earlier test); passes in the full suite.
 - **02:** `CI_ENVIRONMENT` in `.env` wins over a shell variable of the same name (CodeIgniter reads `$_ENV` first).
@@ -58,6 +64,7 @@ pull request open), *merged* (in `main`).
 
 ## Notes for the next session
 
+- Session 06+: see `deploy-status/05-auth/README.md` (2FA hooks in the login/magic-link controllers, reauth for remember-me sessions, interim matrix to replace in 07, `GroupRules`, `SessionTracker::privilegesChanged()`, `PasswordChanger::PERSONAL_TOKEN`) and `docs/auth.md`.
 - Session 05+: JS in `modules/<Name>/Assets/js/`, imported as `core/…`/`<module>/…`, URLs with `asset()`; no inline code (`php spark csp:check`); `data-confirm`, `form_layout` `dirtyGuard`, `core/http.js`. Session 08: sidebar links use `<span class="nav-text">`; Settings › Security origins can reuse `ContentSecurity::apply()`. Session 09: `kpcrudy:confirm` → `core/ui/confirm.js`. Session 14: Settings UI for `Core.pwa*` and the new theme options. Session 15: store the colour mode in the profile (`ThemeMode` preference reader). See `deploy-status/04-frontend/README.md` and `docs/frontend.md`.
 - Session 04: fold `ThemeAssetPublisher` into `assets:publish`; nonces on `partials/scripts.php`; allow the one nonce'd `<style>` of `partials/head.php`; dark values of theme options, theme switch, remember the sidebar and the cookie notice. Session 08: fill the backend `sidebar` region and the menu locations. Session 09: `setLayout(theme_layout('backend'), 'content')`. Session 14: Settings UI for `Theme.*` and theme options (`docs/themes.md`). See `deploy-status/03-themes/README.md`.
 - Session 03+: read registries through `DeclarationRegistry` (disabled modules already hidden), cache with `CoreCache` scopes and invalidate only through `CacheInvalidator`. Session 04: add `assets:publish` to `modules:sync` (step 7) and `ModuleToggler::enable()`. Session 07: grants are in `group_permissions` (applied once per module); write Shield's `AuthGroups` from them. Session 12: replace the `log_message()` calls in `ModuleToggler` and `DemoDataManager` with activity log entries. Session 14: forms from `SettingsRegistry::forModule()`, values cast with `SettingCaster`.

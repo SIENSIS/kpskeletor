@@ -42,8 +42,12 @@ class Session extends BaseConfig
      *
      * The number of SECONDS you want the session to last.
      * Setting to 0 (zero) means expire when the browser is closed.
+     *
+     * Keep it at least as long as the absolute session lifetime (`Auth.absoluteLifetime`,
+     * 12 hours by default): the Auth module ends sessions itself (absolute lifetime, idle lock,
+     * remote logout), this value only bounds the server-side storage.
      */
-    public int $expiration = 7200;
+    public int $expiration = 43200;
 
     /**
      * --------------------------------------------------------------------------
@@ -92,7 +96,7 @@ class Session extends BaseConfig
      * when auto-regenerating the session ID. When set to FALSE, the data
      * will be later deleted by the garbage collector.
      */
-    public bool $regenerateDestroy = false;
+    public bool $regenerateDestroy = true;
 
     /**
      * --------------------------------------------------------------------------

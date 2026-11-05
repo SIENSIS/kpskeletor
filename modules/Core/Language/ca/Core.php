@@ -153,6 +153,11 @@ return [
     'app' => [
         'name' => 'KP Skeletor',
     ],
+    'user' => [
+        'profile'  => 'El meu perfil',
+        'sessions' => 'Les meves sessions',
+        'logout'   => 'Tanca la sessió',
+    ],
     'ui' => [
         'backOffice'      => 'Back office',
         'breadcrumbs'     => 'Fil d\'Ariadna',

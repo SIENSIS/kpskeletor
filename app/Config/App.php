@@ -120,9 +120,12 @@ class App extends BaseConfig
      *
      * IncomingRequest::setLocale() also uses this list.
      *
+     * The three languages of the skeleton (the profile's language uses them); the default
+     * locale and negotiation are set by the internationalisation session (31).
+     *
      * @var list<string>
      */
-    public array $supportedLocales = ['en'];
+    public array $supportedLocales = ['en', 'ca', 'es'];
 
     /**
      * --------------------------------------------------------------------------
