@@ -113,6 +113,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-07-03 | 07 | Unknown and disabled permissions are refused to everybody | Accepted (proposal) |
 | D-07-04 | 07 | Grant changes and extra escalation rules before the matrix screen | Accepted (proposal) |
 | D-07-05 | 07 | Resolver wiring, the development check and diagnostics | Accepted (proposal) |
+| D-08-01 | 08 | Menu keys, zones, rendering and breadcrumbs | Accepted (proposal) |
+| D-08-02 | 08 | Security headers on every response | Accepted (proposal) |
+| D-08-03 | 08 | Rate-limit service and its settings | Accepted (proposal) |
+| D-08-04 | 08 | OutboundClient details and the allow-list sources | Accepted (proposal) |
+| D-08-05 | 08 | What `safe_redirect()` accepts | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1183,3 +1188,54 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-05):** applied by session 07 as proposed.
 - **Applied in:** session 07 (`modules/Core/Permissions/CrudPermissions.php`, `PermissionAudit.php`)
+
+## D-08-01 — Menu keys, zones, rendering and breadcrumbs
+
+- **Where:** spec "Menus", "Modules › Menus" (stable keys), deploy/08
+- **Problem:** The specification names keys, zones and parents but not how `parent` refers to another entry, which zones the theme prints, what happens to entries whose parent or route is missing, nor how breadcrumbs from the tree combine with the ones controllers add.
+- **Proposal:** entry key `<Module>.<resource>` or the route name (`<key>@<zone>` for the same resource in a second zone); `parent` = a resource of the same module or any key; `modules:sync` stores normalised entries in `module_declarations` (kind `menu`). Zones: `sidebar` and `settings` (under a heading) in the sidebar, `user` in the user menu (Auth declares profile and sessions there); other zones are kept for later themes/sessions. Entries without an existing route are hidden; an entry whose parent is missing goes to the root; cycles are dropped. Cache key: groups + individual permissions; `GrantManager` invalidates `menus`. Breadcrumbs come from the menu only when the controller adds none.
+- **Alternatives:** A) Mix menu and controller breadcrumbs (duplicates). B) Hide orphans (a disabled parent module would hide another module's entries).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 08 as proposed.
+- **Applied in:** session 08 (`modules/Core/Menus/`, `themes/default/Views/partials/`, `docs/menus.md`)
+
+## D-08-02 — Security headers on every response
+
+- **Where:** spec "Security baseline" (headers), D-00-28
+- **Problem:** Global "after" filters do not run for unknown routes and exception pages; the specification does not say whether a controller may change a header.
+- **Proposal:** `securityheaders` is a **required** after filter (runs for every route, existing or not) and `Config\Exceptions::handler()` wraps CodeIgniter's handler to add the same headers to error responses. `Cross-Origin-Opener-Policy: same-origin` added; HSTS `null` = production only, max-age never below one year; a header already set by a controller is kept; CodeIgniter's `secureheaders` alias removed. `forceGlobalSecureRequests` true in production (constructor), like `Cookie::$secure`.
+- **Alternatives:** A) Global after filter only (404/500 pages without headers).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 08 as proposed.
+- **Applied in:** session 08 (`app/Config/SecurityHeaders.php`, `modules/Core/Filters/SecurityHeaders.php`, `modules/Core/Http/SecureExceptionHandler.php`, `docs/security.md`)
+
+## D-08-03 — Rate-limit service and its settings
+
+- **Where:** spec "Security baseline › Rate limits" ("values in settings"), "RBAC" (throttling in the `backend` chain), D-05-04
+- **Problem:** The settings are not named and Auth already limits logins, links, 2FA and re-authentication with its own settings.
+- **Proposal:** `RateLimiter` (Throttler) with named limits and Core settings `rateLimitBackend` (300/min per user), `rateLimitApiToken` (120/min), `rateLimitApiIp` (60/min), `rateLimitFeeds` (60/h per token), `rateLimitUploads` (100/h per user), `rateLimitForms` (10/h per IP), `rateLimitWidgets` (120/min per user); `ratelimit:<limit>` filter (per user, or IP for guests) whose class closes the `backend` chain; 429 + `Retry-After` (themed `errors/429` or JSON). Auth keeps `LoginThrottle` and its `Auth.*` settings for the authentication forms; API login (`auth/token`) reuses them in session 10.
+- **Alternatives:** A) Move Auth's counters to the Core service now (rewrites tested Auth code without need).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 08 as proposed.
+- **Applied in:** session 08 (`modules/Core/Security/RateLimiter.php`, `modules/Core/Filters/RateLimit.php`, `modules/Core/Config/Module.php`)
+
+## D-08-04 — OutboundClient details and the allow-list sources
+
+- **Where:** spec "Outbound requests", D-00-29, plan session 08 (DNS rebinding)
+- **Problem:** The format of allow-list entries, the allowed ports, proxies, the setting name and how the mail service is hooked are not specified.
+- **Proposal:** entries are host names or `*.example.com` (subdomains only); sources `Config\Outbound::$allowedHosts` + `.env` `outbound.hosts` + enabled modules' `$outboundHosts` (`module_declarations` kind `outbound`) + setting `Core.outboundHosts` (JSON list); port 443 only (configurable); every resolved address must be public, connection pinned with `CURLOPT_RESOLVE`; redirects followed by hand and re-checked; direct connections unless `outbound.proxy` is set; logging to the application log until session 12 (no query strings). Mail: `app/Config/Services::email()` returns `GuardedEmail`, which refuses SMTP hosts outside the list.
+- **Alternatives:** A) CodeIgniter's CURLRequest (no address pinning, follows redirects itself).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 08 as proposed.
+- **Applied in:** session 08 (`app/Config/Outbound.php`, `modules/Core/Http/`, `modules/Core/Mail/GuardedEmail.php`, `docs/outbound-requests.md`)
+
+## D-08-05 — What `safe_redirect()` accepts
+
+- **Where:** spec "Data handling" ("redirects only to internal paths")
+- **Problem:** Absolute URLs of the site itself are common in `return` values.
+- **Proposal:** `safe_redirect($url, $fallback)` follows paths and http(s) URLs whose host is `app.baseURL`'s or in `app.allowedHostnames`; refuses `//`, backslashes, other schemes, user information and control characters; an external fallback falls back to `/`.
+- **Alternatives:** A) Paths only (breaks absolute self links).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 08 as proposed.
+- **Applied in:** session 08 (`modules/Core/Security/SafeRedirect.php`, `modules/Core/Helpers/redirect_helper.php`)
+

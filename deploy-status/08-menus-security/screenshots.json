@@ -1,0 +1,21 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/08-menus-security/screenshots",
+  "deviceScaleFactor": 2,
+  "login": {
+    "url": "/login", "user": "admin@example.com", "password": "Demo-kpskeletor-2026",
+    "userField": "input[name=email]", "passwordField": "input[name=password]",
+    "submit": "button[type=submit]", "waitFor": "/backend"
+  },
+  "shots": [
+    { "url": "/backend/demo/stats", "name": "01-menu-admin", "width": 1366, "height": 768 },
+    { "url": "/backend/demo/categories", "name": "02-menu-editor", "width": 1366, "height": 768,
+      "login": { "user": "editor@example.com", "password": "Demo-kpskeletor-2026" } },
+    { "url": "/backend/profile", "name": "03-menu-user", "width": 1366, "height": 768,
+      "login": { "user": "usuari@example.com", "password": "Demo-kpskeletor-2026" } },
+    { "url": "/backend/profile/sessions", "name": "04-user-menu-open", "width": 1366, "height": 768, "click": [".topbar .dropdown-toggle"], "wait": 400 },
+    { "url": "/backend/demo/options", "name": "05-settings-zone-dark", "width": 1366, "height": 768, "dark": true },
+    { "url": "/backend/demo/stats", "name": "06-menu-phone", "width": 390, "height": 844, "click": [".topbar [data-bs-toggle=offcanvas]"], "wait": 500 },
+    { "url": "/backend/demo/stats", "name": "07-menu-tablet-icons", "width": 900, "height": 700 }
+  ]
+}

@@ -22,6 +22,10 @@ return [
     'suggestPasswordTooSimilar' => 'Do not use parts of your username in your password.',
     'errorPasswordEmpty'        => 'A Password is required.',
     'errorPasswordTooLongBytes' => 'Password cannot exceed {param} bytes in length.',
+    'menu'                      => [
+        'profile'  => 'My profile',
+        'sessions' => 'My sessions',
+    ],
     'res'                       => [
         'profile'  => 'My profile',
         'sessions' => 'My sessions',

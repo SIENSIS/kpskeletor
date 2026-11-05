@@ -62,6 +62,11 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.
   Module routes point at controllers (a disabled module answers 404 through its controller namespace).
+- **Menus:** back-office entries only in the manifest `$menu` (resource or route + permission,
+  `zone` `sidebar`/`settings`/`user`, `parent`, `order`); the menu is generated, filtered by
+  permission and cached per group set (`docs/menus.md`). Security headers, rate limits
+  (`ratelimit:<limit>`, `RateLimiter`), `safe_redirect()` and `OutboundClient`: `docs/security.md`,
+  `docs/outbound-requests.md`.
 - **Views and themes:** render through the active theme (`BackendController::render()` /
   `theme_view()`, `$this->extend($layout)`), compose the standard views and components
   (`theme_component('page_header'|'card'|'form_layout'…)`, `ui_badge()`, `ui_date()`…) and never

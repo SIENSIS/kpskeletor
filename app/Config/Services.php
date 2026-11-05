@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use Modules\Core\Mail\GuardedEmail;
 
 /**
  * Services Configuration file.
@@ -21,6 +22,27 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
+    /**
+     * The mail service with the SMTP host checked against the outbound allow-list
+     * (Modules\Core\Mail\GuardedEmail, decision D-00-29).
+     *
+     * @param array<string, mixed>|Email|null $config
+     */
+    public static function email($config = null, bool $getShared = true): GuardedEmail
+    {
+        if ($getShared) {
+            $email = static::getSharedInstance('email', $config);
+
+            if ($email instanceof GuardedEmail) {
+                return $email;
+            }
+        }
+
+        $config ??= config(Email::class);
+
+        return new GuardedEmail($config);
+    }
+
     /*
      * public static function example($getShared = true)
      * {

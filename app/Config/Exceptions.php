@@ -7,6 +7,7 @@ namespace Config;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Debug\ExceptionHandler;
 use CodeIgniter\Debug\ExceptionHandlerInterface;
+use Modules\Core\Http\SecureExceptionHandler;
 use Psr\Log\LogLevel;
 use Throwable;
 
@@ -103,6 +104,7 @@ class Exceptions extends BaseConfig
      */
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
-        return new ExceptionHandler($this);
+        // Error responses carry the security headers too (Modules\Core\Filters\SecurityHeaders).
+        return new SecureExceptionHandler(new ExceptionHandler($this));
     }
 }

@@ -13,10 +13,11 @@ use CodeIgniter\Filters\Honeypot;
 use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
-use CodeIgniter\Filters\SecureHeaders;
 use CodeIgniter\Shield\Filters\SessionAuth;
 use Modules\Auth\Filters\ForcePasswordReset;
 use Modules\Auth\Filters\ForceTwoFactor;
+use Modules\Core\Filters\RateLimit;
+use Modules\Core\Filters\SecurityHeaders;
 
 class Filters extends BaseFilters
 {
@@ -34,7 +35,8 @@ class Filters extends BaseFilters
         'toolbar'       => DebugToolbar::class,
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
-        'secureheaders' => SecureHeaders::class,
+        // CodeIgniter's `secureheaders` is replaced by the Core's `securityheaders` (D-00-28).
+        'securityheaders' => SecurityHeaders::class,
         'cors'          => Cors::class,
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
@@ -44,12 +46,14 @@ class Filters extends BaseFilters
         // login (Shield), a forced password change, the 2FA set-up a group policy requires.
         // Global filters already cover the rest of the chain for every request: the disabled-
         // module check (`moduleenabled`) and the session hardening with the idle lock
-        // (`authsession`). Maintenance mode, the activity hook and throttling join this list in
-        // the sessions that build them. Each route adds its own `can:` filter.
+        // (`authsession`). Then the request rate limit per user (`RateLimit`, limit `backend`).
+        // Maintenance mode and the activity hook join this list in the sessions that build them.
+        // Each route adds its own `can:` filter.
         'backend' => [
             SessionAuth::class,
             ForcePasswordReset::class,
             ForceTwoFactor::class,
+            RateLimit::class,
         ],
     ];
 
@@ -72,9 +76,10 @@ class Filters extends BaseFilters
             'pagecache',  // Web Page Caching
         ],
         'after' => [
-            'pagecache',   // Web Page Caching
-            'performance', // Performance Metrics
-            'toolbar',     // Debug Toolbar
+            'pagecache',       // Web Page Caching
+            'performance',     // Performance Metrics
+            'toolbar',         // Debug Toolbar
+            'securityheaders', // HSTS, Referrer-Policy, nosniff, frame options… (Config\SecurityHeaders)
         ],
     ];
 
@@ -98,7 +103,7 @@ class Filters extends BaseFilters
         ],
         'after' => [
             // 'honeypot',
-            // 'secureheaders',
+            // Never 'secureheaders' (replaced by the required `securityheaders`, D-00-28).
         ],
     ];
 

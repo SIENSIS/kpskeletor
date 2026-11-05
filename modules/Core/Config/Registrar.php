@@ -7,6 +7,7 @@ namespace Modules\Core\Config;
 use Modules\Core\Filters\Can;
 use Modules\Core\Filters\ContentSecurity;
 use Modules\Core\Filters\ModuleEnabled;
+use Modules\Core\Filters\RateLimit;
 
 /**
  * Merges the Core's settings into the application's config classes (CodeIgniter registrar).
@@ -23,6 +24,7 @@ final class Registrar
                 'can'           => Can::class,
                 'cspmodules'    => ContentSecurity::class,
                 'moduleenabled' => ModuleEnabled::class,
+                'ratelimit'     => RateLimit::class,
             ],
         ];
     }

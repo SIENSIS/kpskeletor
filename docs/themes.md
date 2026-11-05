@@ -15,7 +15,7 @@ themes/corporate/
 ├── Theme.php                       manifest
 ├── Views/
 │   ├── layouts/                    backend, public, auth, blank, print (a child inherits them)
-│   ├── partials/                   head, scripts, brand, flash, user_menu, page_top…
+│   ├── partials/                   head, scripts, brand, flash, user_menu, sidebar_menu, page_top…
 │   ├── components/                 overrides of the Core components (badge, page_header…)
 │   └── overrides/<Module>/…        overrides of module views
 ├── Assets/css, Assets/js, Assets/img   published to public/themes/<slug>/
@@ -103,7 +103,8 @@ Core standard views (`modules/Core/Views/`), every one overridable by a theme:
 | `components/empty_state` | `icon`, `title`, `message`, `action` |
 | `components/tabs` | `id`, `tabs` (`[['id', 'label', 'content', 'icon', 'active']]`) |
 | `components/card` | `title`, `icon`, `body`, `footer`, `actions` |
-| `errors/403`, `errors/404`, `errors/500` | `message` (escaped), `homeUrl`; rendered in the `blank` layout |
+| `errors/403`, `errors/404`, `errors/429`, `errors/500` | `message` (escaped), `homeUrl`; rendered in the `blank` layout |
+| `partials/sidebar_menu`, `partials/sidebar_menu_items`, `partials/user_menu` | the generated back-office menu (`backend_menu($zone)`, list of `MenuEntry`; see `docs/menus.md`) |
 
 Small components (`ui_helper`): `ui_badge($text, $variant, $icon)`, `ui_status($status, $label)`,
 `ui_avatar($name, $imageUrl, $size)`, `ui_date($date, 'date'|'datetime'|'long'|'relative')`,

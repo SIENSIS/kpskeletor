@@ -91,10 +91,11 @@ manifest (`extra`) and run `modules:sync`.
 ## Routes: default deny
 
 - The `backend` filter chain runs on `backend` and `backend/*` (`app/Config/Filters.php`): login
-  (Shield `session`), forced password change, forced 2FA set-up. The global filters cover the
+  (Shield `session`), forced password change, forced 2FA set-up, the per-user request limit
+  (`RateLimit`, limit `backend`, `docs/security.md`). The global filters cover the
   disabled-module check (`moduleenabled`) and the session hardening with the idle lock
-  (`authsession`); throttling, maintenance mode and the activity hook join the chain in the
-  sessions that build them (08, 28, 12).
+  (`authsession`); maintenance mode and the activity hook join the chain in the sessions that
+  build them (28, 12).
 - Every `backend/` route also has its own `can:` filter; sensitive ones add `reauth`.
 - Every `api/v1/` route has `kpapy`, `kpapy:optional` or `kpapy:hmac`; `kpapy:login` only on the
   `auth/token*` login routes; `kpapy:public` only for GET.
