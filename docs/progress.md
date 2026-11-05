@@ -16,7 +16,7 @@ pull request open), *merged* (in `main`).
 | 06 | Two-factor authentication and re-authentication | merged | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
 | 07 | Central RBAC | merged | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
-| 09 | kpcrudy integration | done | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
+| 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
 
 ## Decisions
 
