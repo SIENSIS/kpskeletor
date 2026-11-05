@@ -14,7 +14,7 @@ pull request open), *merged* (in `main`).
 | 04 | Front-end assets, JavaScript, CSP, dark mode, responsive and PWA | merged | `claude/funny-goldberg-9n764h` | [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) | [`deploy-status/04-frontend/`](../deploy-status/04-frontend/README.md) |
 | 05 | Authentication (Shield) and session hardening | merged | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
 | 06 | Two-factor authentication and re-authentication | merged | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
-| 07 | Central RBAC | done | `claude/tender-wright-gmq4ck` | "Session 07: Central RBAC" | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
+| 07 | Central RBAC | done | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
 
 ## Decisions
 

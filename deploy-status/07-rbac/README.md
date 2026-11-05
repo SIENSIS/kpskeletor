@@ -1,6 +1,6 @@
 # Session 07 — Central RBAC
 
-Branch: `claude/tender-wright-gmq4ck` (assigned by the environment) · Pull request: "Session 07: Central RBAC" (linked in `docs/progress.md`) · Date: 2026-11-05
+Branch: `claude/tender-wright-gmq4ck` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) "Session 07: Central RBAC" · Date: 2026-11-05
 
 ## What was built
 
