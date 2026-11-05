@@ -6,10 +6,12 @@ namespace Modules\Auth\Config;
 
 use Modules\Auth\Filters\AuthSession;
 use Modules\Auth\Filters\ForcePasswordReset;
+use Modules\Auth\Filters\ForceTwoFactor;
+use Modules\Auth\Filters\RequireReauth;
 
 /**
  * Filter aliases of the Auth module (CodeIgniter registrar). `authsession` runs globally and
- * `session` + `forcereset` cover `backend/*` (app/Config/Filters.php).
+ * `session`, `forcereset` and `force2fa` cover `backend/*`; `reauth` protects sensitive routes (app/Config/Filters.php).
  */
 final class Registrar
 {
@@ -22,6 +24,8 @@ final class Registrar
             'aliases' => [
                 'authsession' => AuthSession::class,
                 'forcereset'  => ForcePasswordReset::class,
+                'force2fa'    => ForceTwoFactor::class,
+                'reauth'      => RequireReauth::class,
             ],
         ];
     }

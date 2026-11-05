@@ -112,8 +112,10 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [
-        // Back office: login required (Shield) and a forced password change first (Auth).
+        // Back office: login required (Shield), a forced password change first, then the 2FA
+        // set-up a group policy requires (Auth).
         'session'    => ['before' => ['backend', 'backend/*']],
         'forcereset' => ['before' => ['backend', 'backend/*']],
+        'force2fa'   => ['before' => ['backend', 'backend/*']],
     ];
 }

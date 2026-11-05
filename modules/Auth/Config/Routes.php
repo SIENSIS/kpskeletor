@@ -7,9 +7,11 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * Routes of the Auth module (discovered by CodeIgniter; never queries the database).
  *
- * Public: login, logout, magic link, password reset, captcha image and the idle lock screen.
+ * Public: login, logout, magic link, password reset, captcha image, the idle lock screen, the
+ * 2FA step of a pending login and the re-authentication screen (both check the session).
  * Back office (every route has its `can:` filter; `session` and `forcereset` cover `backend/*`
- * in app/Config/Filters.php): the profile (`auth-profile`) and "my sessions" (`auth-sessions`).
+ * in app/Config/Filters.php): the profile and its 2FA screens (`auth-profile`; changes also need
+ * `reauth`) and "my sessions" (`auth-sessions`).
  *
  * @var RouteCollection $routes
  */
@@ -31,6 +33,18 @@ $routes->group('', ['namespace' => 'Modules\Auth\Controllers'], static function 
     $routes->get('auth/captcha', 'CaptchaController::image', ['as' => 'auth-captcha']);
     $routes->get('auth/lock', 'LockController::show', ['as' => 'auth-lock']);
     $routes->post('auth/lock', 'LockController::unlock');
+
+    // 2FA step of a pending login (Shield's action route names; the controller answers 404
+    // unless a login is pending with UserTwoFactorAction).
+    $routes->get('auth/a/show', 'TwoFactorController::show', ['as' => 'auth-action-show']);
+    $routes->post('auth/a/handle', 'TwoFactorController::handle', ['as' => 'auth-action-handle']);
+    $routes->post('auth/a/verify', 'TwoFactorController::verify', ['as' => 'auth-action-verify']);
+    $routes->post('auth/a/cancel', 'TwoFactorController::cancel', ['as' => 'auth-action-cancel']);
+
+    // Re-authentication ("sudo mode"); the controller requires a logged-in user.
+    $routes->get('auth/reauth', 'ReauthController::show', ['as' => 'auth-reauth']);
+    $routes->post('auth/reauth', 'ReauthController::confirm');
+    $routes->post('auth/reauth/send-code', 'ReauthController::sendCode');
 });
 
 $routes->group('backend/profile', ['namespace' => 'Modules\Auth\Controllers'], static function (RouteCollection $routes): void {
@@ -38,6 +52,13 @@ $routes->group('backend/profile', ['namespace' => 'Modules\Auth\Controllers'], s
     $routes->post('/', 'ProfileController::update', ['filter' => 'can:auth-profile.edit']);
     $routes->get('password', 'ProfileController::password', ['as' => 'auth-profile-password', 'filter' => 'can:auth-profile.view']);
     $routes->post('password', 'ProfileController::changePassword', ['filter' => 'can:auth-profile.edit']);
+
+    $routes->get('two-factor', 'TwoFactorSettingsController::index', ['as' => 'auth-two-factor', 'filter' => 'can:auth-profile.view']);
+    $routes->post('two-factor/email', 'TwoFactorSettingsController::enableEmail', ['filter' => ['can:auth-profile.edit', 'reauth']]);
+    $routes->get('two-factor/app', 'TwoFactorSettingsController::app', ['filter' => ['can:auth-profile.edit', 'reauth']]);
+    $routes->post('two-factor/app', 'TwoFactorSettingsController::confirmApp', ['filter' => ['can:auth-profile.edit', 'reauth']]);
+    $routes->post('two-factor/disable', 'TwoFactorSettingsController::disable', ['filter' => ['can:auth-profile.edit', 'reauth']]);
+    $routes->post('two-factor/recovery-codes', 'TwoFactorSettingsController::regenerateCodes', ['filter' => ['can:auth-profile.edit', 'reauth']]);
 
     $routes->get('sessions', 'SessionsController::index', ['as' => 'auth-sessions', 'filter' => 'can:auth-sessions.view']);
     $routes->post('sessions/revoke-others', 'SessionsController::revokeOthers', ['filter' => 'can:auth-sessions.revoke']);

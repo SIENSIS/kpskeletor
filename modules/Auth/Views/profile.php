@@ -97,6 +97,7 @@ $mode = $value('theme_mode', $profile['theme_mode'] ?? 'auto');
         </p>
         <div class="d-grid gap-2">
             <a class="btn btn-outline-primary" href="<?= esc(site_url('backend/profile/password')) ?>"><i class="bi bi-key me-1" aria-hidden="true"></i><?= esc(lang('Auth.profile.changePassword')) ?></a>
+            <a class="btn btn-outline-primary" href="<?= esc(site_url('backend/profile/two-factor')) ?>"><i class="bi bi-shield-check me-1" aria-hidden="true"></i><?= esc(lang('Auth.twoFactor.title')) ?></a>
             <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend/profile/sessions')) ?>"><i class="bi bi-laptop me-1" aria-hidden="true"></i><?= esc(lang('Auth.sessions.title')) ?></a>
         </div>
         <?php $side = (string) ob_get_clean() ?>
