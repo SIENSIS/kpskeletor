@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Modules\Core\Crud;
 
 use CodeIgniter\Controller;
+use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\Router\RouteCollection;
 use Kpcrudy\Crud;
 use Modules\Core\Permissions\CrudPermissions;
 use Modules\Core\Permissions\PermissionCatalogue;
 use Modules\Core\Permissions\RouteSecurityAuditor;
+use Config\Services;
 
 /**
  * Compares every kpcrudy CRUD of the routes with the permission catalogue
@@ -127,12 +129,15 @@ final class CrudAuditor
             return [null, "the handler {$handler} does not exist."];
         }
 
-        $error = null;
+        $error    = null;
+        $previous = service('request');
+        $request  = $previous instanceof IncomingRequest ? $previous : Services::incomingrequest(null, false);
+        Services::injectMock('request', $request); // kpcrudy needs a web request (spark has a CLI one)
         CrudFactory::inspect();
 
         try {
             $controller = new $class();
-            $controller->initController(service('request'), service('response'), service('logger'));
+            $controller->initController($request, service('response'), service('logger'));
             $controller->{$method}();
         } catch (CrudInspection) {
             // renderCrud() reached: the CRUD is recorded.
@@ -140,6 +145,7 @@ final class CrudAuditor
             $error = $e->getMessage();
         } finally {
             $cruds = CrudFactory::inspected();
+            Services::injectMock('request', $previous);
         }
 
         if ($cruds === []) {
