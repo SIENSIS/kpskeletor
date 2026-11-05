@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Tests;
 
+use CodeIgniter\Database\Migration;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
+use Modules\Auth\Database\Migrations\CreateKnownDevices;
+use Modules\Auth\Database\Migrations\CreateUserProfiles;
+use Modules\Auth\Database\Migrations\CreateUserSessions;
 
 /**
- * The Auth migrations run up, down and up again.
+ * The Auth migrations run up, down and up again. Only the Auth migrations are reversed: the
+ * tables reference Shield's `users`, which must stay (MariaDB enforces the foreign keys).
  *
  * @internal
  */
@@ -23,27 +28,41 @@ final class AuthMigrationsTest extends CIUnitTestCase
 
     private const TABLES = ['user_profiles', 'user_sessions', 'known_devices'];
 
+    /**
+     * @return list<Migration>
+     */
+    private function migrations(): array
+    {
+        return array_map(
+            static fn (string $class): Migration => new $class(\Config\Database::forge('tests')),
+            [CreateUserProfiles::class, CreateUserSessions::class, CreateKnownDevices::class],
+        );
+    }
+
+    private function assertTables(bool $exist): void
+    {
+        $this->db->resetDataCache();
+
+        foreach (self::TABLES as $table) {
+            $this->assertSame($exist, $this->db->tableExists($table), $table);
+        }
+    }
+
     public function testUpDownUp(): void
     {
-        $runner = service('migrations');
-        $runner->setNamespace('Modules\Auth');
+        $this->assertTables(true);
 
-        foreach (self::TABLES as $table) {
-            $this->assertTrue($this->db->tableExists($table), $table);
+        foreach (array_reverse($this->migrations()) as $migration) {
+            $migration->down();
         }
 
-        $runner->regress(0, 'tests');
-        $this->db->resetDataCache();
+        $this->assertTables(false);
+        $this->assertTrue($this->db->tableExists('users'), "Shield's users table is untouched.");
 
-        foreach (self::TABLES as $table) {
-            $this->assertFalse($this->db->tableExists($table), $table);
+        foreach ($this->migrations() as $migration) {
+            $migration->up();
         }
 
-        $runner->latest('tests');
-        $this->db->resetDataCache();
-
-        foreach (self::TABLES as $table) {
-            $this->assertTrue($this->db->tableExists($table), $table);
-        }
+        $this->assertTables(true);
     }
 }
