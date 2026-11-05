@@ -14,9 +14,12 @@ pull request open), *merged* (in `main`).
 | 04 | Front-end assets, JavaScript, CSP, dark mode, responsive and PWA | merged | `claude/funny-goldberg-9n764h` | [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) | [`deploy-status/04-frontend/`](../deploy-status/04-frontend/README.md) |
 | 05 | Authentication (Shield) and session hardening | merged | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
 | 06 | Two-factor authentication and re-authentication | merged | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
-| 07 | Central RBAC | done | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
+| 07 | Central RBAC | merged | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
+| 08 | Back-office menus and the security baseline | done | `claude/pensive-volta-9ttaws` | (see the pull request "Session 08: Back-office menus and the security baseline") | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 
 ## Decisions
+
+- **08:** menu entry keys `<Module>.<resource>`/route name, zones `sidebar`+`settings` in the sidebar and `user` in the user menu, orphans at the root, breadcrumbs from the menu when the controller adds none, cache per groups + individual permissions; `securityheaders` as a required after filter plus `SecureExceptionHandler` for error pages, COOP added, HSTS production-only ≥ 1 year, `forceGlobalSecureRequests` in production; `RateLimiter` with `Core.rateLimit*` settings and the `ratelimit` filter closing the `backend` chain (Auth keeps `LoginThrottle`); `OutboundClient` with pinned addresses, port 443, allow-list from config/.env/manifests/`Core.outboundHosts`, `GuardedEmail` for SMTP; `safe_redirect()` accepts paths and the site's own hosts (D-08-01 … D-08-05).
 
 - **07:** `backend` filter alias (Shield session → forced reset → forced 2FA) applied by pattern to `backend/*`; `can:a,b` any / `can:all,a,b` all; names outside the enabled catalogue refused to everybody (superadmins too) and to `can:` routes in `RoutesSecurityTest`; `GrantManager` + `EscalationGuard` with extra rules (wildcards, group membership, superadmin targets, own group's grants) and the `privilegesChanged` event; `CrudPermissions` final with `forUser()`, wired into kpcrudy/kpapy by sessions 09/10 (D-07-01 … D-07-05).
 
@@ -44,6 +47,8 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **08:** outbound requests and rate-limit refusals are written to the application log until the activity log (session 12); `app.allowedHostnames` is left to the installer (session 18); the Settings › Security form for the new settings is session 14. Fixed nothing from earlier sessions except the expected `backend` chain in `AuthConfigTest`.
+
 - **07:** grant changes go to the application log until session 12; `permissions:check` does not compare CRUD controllers yet (none exist; session 09); fixed test-order fragility for the new RBAC tests (temporary-module migrations left by earlier Core tests) with `CleanDatabaseTrait`.
 
 - **06:** the 2FA admin reset is a service + `twoFactorReset` event, without screen (session 15), notification (session 11) or activity entry (session 12); fixed a session 05 gap: Auth feature tests left a logged-in session that broke `BaseModelTest` depending on order (`AuthTestCase::tearDown()`).
@@ -63,6 +68,8 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **08:** the sidebar is empty until a module declares sidebar entries (Dashboard 16, News 17); `CurlTransport` is covered only through a fake transport (no network in tests); the `forceGlobalSecureRequests`/HSTS production values are checked by unit tests of the config logic, not by a production request.
+
 - **07:** `CrudPermissions` not yet selected in `Config\Kpcrudy`/`Config\Kpapy` (sessions 09/10).
 - **06:** email 2FA needs `email.*` in `.env` to be usable outside tests; no settings screen for the 2FA policy and the re-auth window until session 14; the authenticator-app method needs `encryption.key`.
 - **05:** guests still see the default locale `en` (session 31); Auth feature tests migrate all namespaces per test (suite ~1 min).
@@ -75,6 +82,8 @@ pull request open), *merged* (in `main`).
 - The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
+
+- Session 09+: see `deploy-status/08-menus-security/README.md`, `docs/menus.md`, `docs/security.md` and `docs/outbound-requests.md`: CRUD resources get a `$menu` entry (route named after the resource, `can:<resource>.list`); redirects from request values with `safe_redirect()`; limits with `ratelimit:<limit>` or `RateLimiter`; external calls only with `OutboundClient` from tasks/commands. Session 10: `apiToken`/`apiIp` limits, `auth/token` with Auth's `LoginThrottle`. Session 12: replace the `log_message()` of `OutboundClient`, `RateLimit` and `GuardedEmail` with activity entries. Session 14: Settings › Security for `Core.rateLimit*` and `Core.outboundHosts`. Session 21: customisations refer to the menu keys of `MenuDefinitions`.
 
 - Session 08+: see `deploy-status/07-rbac/README.md` and `docs/rbac.md`: check permissions only with `Authorization::for($user)` / `can()` / `CrudPermissions`; change grants only with `GrantManager`; append new back-office filters (throttling, activity, maintenance) to the `backend` alias in `app/Config/Filters.php`; session 09 sets `CrudPermissions` + `denyByDefault` and extends `PermissionAudit` for CRUD routes; `php spark permissions:check` must pass.
 - Session 07+: see `deploy-status/06-auth-2fa/README.md`: protect sensitive routes with `['can:…', 'reauth']` or `$this->requireReauth()`; add `force2fa` to the `backend` chain (after `forcereset`); session 10 reads `TwoFactor::method()`/`verifyTotp()`; session 11 notifies on `twoFactorReset`; session 15 adds the reset row operation and the policy column.
