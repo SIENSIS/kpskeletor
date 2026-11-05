@@ -17,7 +17,7 @@ pull request open), *merged* (in `main`).
 | 07 | Central RBAC | merged | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 | 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
-| 10 | kpapy integration and API authentication | done | `claude/tender-galileo-i38wrh` | (pending) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
+| 10 | kpapy integration and API authentication | done | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
 
 ## Decisions
 

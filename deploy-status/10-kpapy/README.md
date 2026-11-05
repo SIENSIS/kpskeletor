@@ -1,6 +1,6 @@
 # Session 10 — kpapy integration and API authentication
 
-Branch: `claude/tender-galileo-i38wrh` (assigned by the environment) · Pull request: see `docs/progress.md` · Date: 2026-11-05
+Branch: `claude/tender-galileo-i38wrh` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) "Session 10: kpapy integration and API authentication" · Date: 2026-11-05
 
 ## What was built
 
