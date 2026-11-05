@@ -14,6 +14,9 @@ use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
+use CodeIgniter\Shield\Filters\SessionAuth;
+use Modules\Auth\Filters\ForcePasswordReset;
+use Modules\Auth\Filters\ForceTwoFactor;
 
 class Filters extends BaseFilters
 {
@@ -36,6 +39,18 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+
+        // The back-office chain (docs/specification.md, "RBAC"; decision D-07-01), in order:
+        // login (Shield), a forced password change, the 2FA set-up a group policy requires.
+        // Global filters already cover the rest of the chain for every request: the disabled-
+        // module check (`moduleenabled`) and the session hardening with the idle lock
+        // (`authsession`). Maintenance mode, the activity hook and throttling join this list in
+        // the sessions that build them. Each route adds its own `can:` filter.
+        'backend' => [
+            SessionAuth::class,
+            ForcePasswordReset::class,
+            ForceTwoFactor::class,
+        ],
     ];
 
     /**
@@ -112,10 +127,7 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [
-        // Back office: login required (Shield), a forced password change first, then the 2FA
-        // set-up a group policy requires (Auth).
-        'session'    => ['before' => ['backend', 'backend/*']],
-        'forcereset' => ['before' => ['backend', 'backend/*']],
-        'force2fa'   => ['before' => ['backend', 'backend/*']],
+        // Every back-office request runs the `backend` chain (RoutesSecurityTest checks it).
+        'backend' => ['before' => ['backend', 'backend/*']],
     ];
 }

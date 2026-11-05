@@ -92,7 +92,7 @@ class Autoload extends AutoloadConfig
      *
      * @var list<string>
      */
-    public $helpers = ['auth', 'setting', 'theme', 'ui', 'asset'];
+    public $helpers = ['auth', 'setting', 'theme', 'ui', 'asset', 'can'];
 
     /**
      * Merges the per-module namespaces (`Modules\News` => `modules/News`) from the generated
