@@ -108,6 +108,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-06-04 | 06 | A password login counts as re-authentication | Applied (decided) |
 | D-06-05 | 06 | 2FA group policy and re-authentication settings | Accepted (proposal) |
 | D-06-06 | 06 | Re-authentication screen, URLs and non-GET requests | Accepted (proposal) |
+| D-07-01 | 07 | The `backend` filter chain | Accepted (proposal) |
+| D-07-02 | 07 | Syntax of `can:` with several permissions | Accepted (proposal) |
+| D-07-03 | 07 | Unknown and disabled permissions are refused to everybody | Accepted (proposal) |
+| D-07-04 | 07 | Grant changes and extra escalation rules before the matrix screen | Accepted (proposal) |
+| D-07-05 | 07 | Resolver wiring, the development check and diagnostics | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1129,3 +1134,52 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Decision (2026-11-05):** applied by session 06 as proposed.
 - **Applied in:** session 06 (`modules/Auth/`, `modules/Core/Controllers/BackendController.php`)
 
+## D-07-01 — The `backend` filter chain
+
+- **Where:** spec "RBAC" (`backend` chain: authentication, forced reset, forced 2FA, disabled-module check, maintenance, activity log, idle lock, throttling), example `['filter' => ['backend', 'can:…']]`
+- **Problem:** Half of the chain exists (Shield `session`, `forcereset`, `force2fa`), part runs globally already (`moduleenabled`, `authsession` with the idle lock) and the rest does not exist yet (throttling 08, activity 12, maintenance 28). A chain that each route must name can be forgotten.
+- **Proposal:** `backend` is a filter alias in `app/Config/Filters.php` listing the classes in order (`SessionAuth`, `ForcePasswordReset`, `ForceTwoFactor`) and is applied by pattern to `backend` and `backend/*` (`$filters`), replacing the three separate entries; routes only add `can:` (and `reauth`). The global filters keep covering the disabled-module check and the idle lock; later sessions append their classes to the alias. `RoutesSecurityTest` checks the pattern.
+- **Alternatives:** A) Each route group names `backend` (as in the specification's example; easy to forget). B) A Core filter class that runs a configurable list of aliases (more indirection for the same result).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 07 as proposed (not a public convention change nor a security weakening).
+- **Applied in:** session 07 (`app/Config/Filters.php`, `docs/rbac.md`)
+
+## D-07-02 — Syntax of `can:` with several permissions
+
+- **Where:** spec "RBAC" ("a `can` filter (accepts several permissions, any/all)")
+- **Problem:** CodeIgniter filter arguments are a comma-separated list; the specification does not say how "all" is written.
+- **Proposal:** `can:a.x,b.y` passes with **any** of them; `can:all,a.x,b.y` requires **all** of them (`all` has no dot, so it cannot be a permission). `can:` or `can:all` alone deny. Helpers `can()` (any) and `can_all()`.
+- **Alternatives:** A) A second alias `canall:`. B) Several `can:` filters on the route (CodeIgniter runs each one: "all" by repetition, verbose).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 07 as proposed (fills a gap; no existing name changes).
+- **Applied in:** session 07 (`modules/Core/Filters/Can.php`, `modules/Core/Helpers/can_helper.php`, `docs/specification.md`)
+
+## D-07-03 — Unknown and disabled permissions are refused to everybody
+
+- **Where:** spec "RBAC" (superadmins bypass the resolver; disabled modules hidden), "Module lifecycle"
+- **Problem:** A superadmin bypass that answers yes to any string hides typos (`can:news-post.list` would work for the developer testing as superadmin and fail for everybody else), and grants of a disabled module would still match through Shield.
+- **Proposal:** `Authorization` refuses names that are not in the catalogue of the **enabled** modules to everybody, superadmins included; superadmins hold every other permission. Shield's `AuthGroups.permissions`/`matrix` only contain the enabled catalogue and the grants (atomic or wildcard) that give some of it; grants are kept and come back when the module is enabled. `RoutesSecurityTest` and `permissions:check` also fail when a `can:` names a permission outside the catalogue.
+- **Alternatives:** A) Superadmins pass any name (the literal reading; typos go unnoticed).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 07 as proposed (stricter than the specification, not weaker).
+- **Applied in:** session 07 (`modules/Core/Permissions/Authorization.php`, `ShieldMatrix.php`, `RouteSecurityAuditor.php`, `docs/specification.md`)
+
+## D-07-04 — Grant changes and extra escalation rules before the matrix screen
+
+- **Where:** spec "RBAC" (implied permissions on save, atomic saves, escalation rules), session 15 (matrix screen)
+- **Problem:** The rules must exist and be tested in this session, but the screens come in session 15. The specification lists four escalation rules; group membership and wildcards leave gaps (an admin could add a user to a group holding more than the admin; a wildcard could hide permissions the granter lacks).
+- **Proposal:** `GrantManager` is the only way to change grants: names validated (atomic catalogue names, or Shield wildcards matching some of them; users get atomic names only), implied permissions added, group saves in one transaction, Shield's matrix rewritten, event `privilegesChanged` (user id) for every affected user, which Auth turns into `SessionTracker::privilegesChanged()`. `EscalationGuard` (Core) holds the rules and `Auth\GroupRules` delegates to it. Besides the four rules: a wildcard needs every permission it matches; adding someone to a group needs every permission of the group; only superadmins touch a superadmin's groups or permissions and the `superadmin` group's grants; nobody but a superadmin changes the grants of a group they belong to. Changes go to the application log until session 12.
+- **Alternatives:** A) Only the four rules of the specification (leaves the gaps above).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 07 as proposed (stricter, not weaker).
+- **Applied in:** session 07 (`modules/Core/Permissions/GrantManager.php`, `EscalationGuard.php`, `modules/Auth/Services/GroupRules.php`, `modules/Auth/Config/Events.php`)
+
+## D-07-05 — Resolver wiring, the development check and diagnostics
+
+- **Where:** spec "RBAC" (`CrudPermissions`, "in development it fails loudly", `permissions:check` "for every CRUD route")
+- **Problem:** `Config\Kpcrudy` and `Config\Kpapy` are created by sessions 09 and 10; no CRUD exists yet, so `permissions:check` cannot instantiate CRUDs; kpcrudy/kpapy instantiate the resolver with `new $class()`.
+- **Proposal:** `CrudPermissions` is final, has a no-argument constructor and `forUser($user)` for explicit users; sessions 09/10 set it as `$permissionResolver` with `$denyByDefault = true`. The catalogue comparison runs in every environment but production (so tests catch it), once per resource and process. `permissions:check` covers manifests, catalogue, grants, matrix and routes now; session 09 adds the CRUD comparison through `CrudPermissions::undeclared()` when `CrudFactory` exists. `permissions:check` diagnostics are English developer output (like exception messages); its summary lines are translated.
+- **Alternatives:** A) Create the kpcrudy/kpapy config files now (out of scope of this session).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 07 as proposed.
+- **Applied in:** session 07 (`modules/Core/Permissions/CrudPermissions.php`, `PermissionAudit.php`)

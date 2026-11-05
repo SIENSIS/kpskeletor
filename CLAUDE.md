@@ -29,6 +29,7 @@ records the owner's decisions; they override the specification when they disagre
 ```bash
 composer install
 php spark modules:sync            # migrations, seeds, permissions, settings, assets
+php spark permissions:check       # manifests, catalogue, grants, Shield matrix, route filters
 php spark assets:publish --watch  # while editing modules/*/Assets (--check: CI)
 php spark csp:check               # no inline scripts, handlers or styles in views
 vendor/bin/phpunit                # tests (SQLite)
@@ -53,7 +54,10 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   with the resource `'name'` (e.g. `backup.*`); duplicates are rejected and `Security`/`Update` are
   reserved module names. Every `backend/` route has a `can:` filter, personal screens included
   (their own resources, granted to every group by `defaultGrants`); every `api/v1/` route has the
-  `kpapy` filter or is declared public. Default deny.
+  `kpapy` filter or is declared public. Default deny. `can:a,b` = any, `can:all,a,b` = all; the
+  `backend` chain covers `backend/*` by itself. Check permissions only through
+  `Authorization::for($user)` / `can()` / `CrudPermissions`, change grants only through
+  `GrantManager` (`docs/rbac.md`); `php spark permissions:check` must pass.
 - **Database:** one migration per table, Forge / Query Builder only, `down()` always implemented,
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.

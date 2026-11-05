@@ -57,9 +57,11 @@ mode"), the profile and "my sessions" on top of Shield.
   and clears a forced reset. Event `passwordChanged`.
 - **New device:** a random `kp_device` cookie (hash per user in `known_devices`); a login from an
   unknown device emails a notice with a link to "my sessions" (not for the first device).
-- **Groups:** `superadmin`, `admin`, `editor`, `user` (`Config\AuthGroups`). Superadmins bypass
-  `can:`; only a superadmin assigns or removes `superadmin`, the last one keeps it, nobody changes
-  their own groups and the four groups cannot be renamed or deleted (`GroupRules`).
+- **Groups:** `superadmin`, `admin`, `editor`, `user` (`Config\AuthGroups`; their permissions
+  come from `group_permissions`, see `docs/rbac.md`). Superadmins bypass `can:`; only a superadmin
+  assigns or removes `superadmin` or changes a superadmin's groups, the last one keeps it, nobody
+  changes their own groups, nobody adds a user to a group holding permissions they lack, and the
+  four groups cannot be renamed or deleted (`GroupRules` → Core `EscalationGuard`).
 
 ## Two-factor authentication
 
