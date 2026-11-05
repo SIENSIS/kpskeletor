@@ -11,7 +11,8 @@ use Modules\Core\Config\ModuleManifest;
 /**
  * Checks that every `$api` entry of a manifest matches a route of the module's
  * `Config/Routes.php`: `api/v1/<path>` handled by `<handler>` (decision D-00-08). Run by
- * `modules:sync` before anything is written; `permissions:check` (session 07) checks more.
+ * `modules:sync` before anything is written and by `permissions:check` (with `RouteSecurityAuditor`,
+ * which also requires kpapy's filter on every `api/v1/` route).
  */
 final class ApiRouteChecker
 {
@@ -21,10 +22,11 @@ final class ApiRouteChecker
 
     /**
      * @param array<string, ModuleManifest> $manifests
+     * @param RouteCollection|null          $collection Loaded routes (default: a fresh collection)
      *
      * @return list<string> Errors (translated)
      */
-    public function check(array $manifests): array
+    public function check(array $manifests, ?RouteCollection $collection = null): array
     {
         $entries = [];
 
@@ -40,7 +42,7 @@ final class ApiRouteChecker
             return [];
         }
 
-        $handlers = $this->routes();
+        $handlers = $this->routes($collection);
         $errors   = [];
 
         foreach ($entries as [$module, $key, $path, $handler]) {
@@ -57,10 +59,12 @@ final class ApiRouteChecker
     /**
      * @return array<string, list<string>> route => handlers (normalised)
      */
-    private function routes(): array
+    private function routes(?RouteCollection $collection): array
     {
-        $collection = new RouteCollection(service('locator'), new ModulesConfig(), config('Routing'));
-        $collection->loadRoutes();
+        if ($collection === null) {
+            $collection = new RouteCollection(service('locator'), new ModulesConfig(), config('Routing'));
+            $collection->loadRoutes();
+        }
 
         $routes = [];
 
