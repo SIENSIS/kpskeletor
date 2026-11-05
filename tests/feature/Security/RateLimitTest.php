@@ -85,9 +85,10 @@ final class RateLimitTest extends AuthTestCase
         $filter = new RateLimit();
 
         $request = service('request')->setHeader('Accept', 'application/json');
-        $this->assertNull($filter->before($request, ['forms']));
-
+        $first    = $filter->before($request, ['forms']);
         $response = $filter->before($request, ['forms']);
+
+        $this->assertNull($first);
         $this->assertNotNull($response);
         $this->assertSame(429, $response->getStatusCode());
         $this->assertSame(['error' => lang('Core.errors.tooManyRequests.message')], json_decode((string) $response->getBody(), true));
