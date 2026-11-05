@@ -11,6 +11,15 @@ environment; never weaken a default to make something work. `php spark security:
 - Cookies are `Secure` in production, `HttpOnly` and `SameSite=Lax` (`Config\Cookie`).
 - Set `app.allowedHostnames` to every host name the site answers on (the installer, session 18).
 
+## Mask key (`app.maskKey`)
+
+kpcrudy and kpapy mask ids in URLs and sign URLs with one shared key, `app.maskKey` in `.env`
+(64 random hex characters: `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`; the installer
+writes it). `Modules\Core\Security\MaskKey` refuses web requests in production when it is
+empty, and in every environment when it is shorter than 32 characters (`spark` still runs, so
+the key can be generated). Masked ids hide sequential ids; they are never access control.
+Changing the key breaks every masked or signed link already sent (D-09-01).
+
 ## Security headers
 
 The Core `securityheaders` filter (`Modules\Core\Filters\SecurityHeaders`) is a **required

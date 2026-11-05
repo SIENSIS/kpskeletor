@@ -118,6 +118,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-08-03 | 08 | Rate-limit service and its settings | Accepted (proposal) |
 | D-08-04 | 08 | OutboundClient details and the allow-list sources | Accepted (proposal) |
 | D-08-05 | 08 | What `safe_redirect()` accepts | Accepted (proposal) |
+| D-09-01 | 09 | Where `app.maskKey` lives and when the application refuses to start | Accepted (proposal) |
+| D-09-02 | 09 | CRUD page header, messages as toasts and the confirmation modal | Accepted (proposal) |
+| D-09-03 | 09 | `CrudFactory` details and how `permissions:check` inspects CRUDs | Accepted (proposal) |
+| D-09-04 | 09 | `make:module --crud`: running `kpcrudy:make` and what is rewritten | Accepted (proposal) |
+| D-09-05 | 09 | The sample CRUD lives in the tests, not in a module | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1239,3 +1244,52 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Decision (2026-11-05):** applied by session 08 as proposed.
 - **Applied in:** session 08 (`modules/Core/Security/SafeRedirect.php`, `modules/Core/Helpers/redirect_helper.php`)
 
+## D-09-01 — Where `app.maskKey` lives and when the application refuses to start
+
+- **Where:** spec "JSON API" (the same `app.maskKey`), deploy/09 ("refuse to boot in production when it is empty")
+- **Problem:** The key must be read by two library configs; "refuse to boot" also stops `spark`, which the installer (session 18) needs to generate the key. kpcrudy/kpapy reject keys under 32 characters only when they first use them.
+- **Proposal:** `Config\App::$maskKey` (`.env` `app.maskKey`), read through `Modules\Core\Security\MaskKey` by `Config\Kpcrudy` and `Config\Kpapy` (a minimal kpapy config that session 10 completes). A Core `pre_system` listener refuses **web** requests in production when the key is empty, and in every environment when it is shorter than 32 characters; `spark` is not blocked. The `env` template documents it empty; `phpunit.xml.dist` sets a test-only value; local `.env` files get a generated one (`php -r "echo bin2hex(random_bytes(32));"`).
+- **Alternatives:** A) Refuse in `spark` too (the installer could not run). B) Throw only when a CRUD is first used (a misconfigured production would serve pages until then).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 09 as proposed.
+- **Applied in:** session 09 (`app/Config/App.php`, `app/Config/Kpcrudy.php`, `app/Config/Kpapy.php`, `modules/Core/Security/MaskKey.php`, `modules/Core/Config/Events.php`, `phpunit.xml.dist`)
+
+## D-09-02 — CRUD page header, messages as toasts and the confirmation modal
+
+- **Where:** spec "CRUDs with kpcrudy" (`showTitle = false`, "`flashKeys` mapped to the layout's toasts", "`kpcrudy:confirm` to use the theme's confirmation modal")
+- **Problem:** In section mode kpcrudy only passes `$title` to the layout, which printed a page header only from `$pageHeader`; the layout showed session messages as alerts, not toasts; kpcrudy has an `info` type the layout did not know.
+- **Proposal:** `partials/page_top` builds the page header from `$title` + `$breadcrumbs` when no `$pageHeader` is given (`renderCrud()` passes the breadcrumbs); `flashKeys` = success→`success`, danger→`error`, warning→`warning`, info→`info` (new key, also accepted by `BackendController::flash()`); `partials/flash` prints the alerts inside a `core/ui/flash` component that turns them into toasts (alerts stay without JavaScript); `core/ui/confirm.js` cancels `kpcrudy:confirm` and asks with the theme's modal. The library's `crud_container` card is not used: the CRUD markup is already a card.
+- **Alternatives:** A) Render CRUDs in fragment mode inside a Core view (loses `page()` layouts of custom operations).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 09 as proposed.
+- **Applied in:** session 09 (`themes/default/Views/partials/{page_top,flash}.php`, `modules/Core/Assets/js/ui/{flash,confirm}.js`, `modules/Core/Controllers/BackendController.php`)
+
+## D-09-03 — `CrudFactory` details and how `permissions:check` inspects CRUDs
+
+- **Where:** spec "CRUDs with kpcrudy" (`CrudFactory::make()/routes()`), D-07-05 (CRUD comparison in `permissions:check`)
+- **Problem:** CRUDs are configured inside controller actions, so a command cannot read their operations without running them; routes of `backend/*` already get the `backend` chain by pattern.
+- **Proposal:** `CrudFactory::routes()` always adds `backend` (CodeIgniter runs an alias once per request, so routes outside `backend/` are covered too), `can:<resource>.list`, extra filters appended, `as` = resource; resource names are validated. `CrudAuditor` (run by `permissions:check`) finds every kpcrudy route, requires the factory's route name and `can:`, runs the action with `CrudFactory::inspect()` and a GET web request and no user; `renderCrud()` stops before rendering; it reports CRUDs not made with the factory, a resource different from the route's, and operations not in the catalogue (`CrudPermissions::undeclared()`). Operations a CRUD adds only for some users are not seen there; `CrudPermissions` still fails loudly at run time outside production.
+- **Alternatives:** A) A static `crud()` method per controller describing the CRUD (duplicates the configuration).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 09 as proposed.
+- **Applied in:** session 09 (`modules/Core/Crud/`, `modules/Core/Permissions/PermissionAudit.php`)
+
+## D-09-04 — `make:module --crud`: running `kpcrudy:make` and what is rewritten
+
+- **Where:** D-00-09, spec "Common module base"
+- **Problem:** `kpcrudy:make` reads its options with `CLI::getOption()`, so `command()` cannot pass them; it needs the table in the database; it writes a non-strict, non-final controller without return types and `image`/`upload` field types (forbidden, D-00-23).
+- **Proposal:** `make:module <Name> --crud=<table>` generates the module with a migration for that table, a `crud` resource `<key>` (table without the `<module>_` prefix and underscores; `except` `import`), its admin grant, menu entry (under `main`) and language keys; runs `php spark migrate -n Modules\<Name>` and `php spark kpcrudy:make <table> --namespace … --extends BackendController --controller <Key> --route backend/<module>/<key> --as <module>-<key> --filter backend` as child processes; then rewrites the route to `CrudFactory::routes()`, `new Crud()` → `$this->crud()`, `render()` → `renderCrud()`, adds strict types, `final` and the return type, and replaces upload field types with a comment pointing to the file picker.
+- **Alternatives:** A) Call kpcrudy's `CrudGenerator` class directly (not documented as public API).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 09 as proposed.
+- **Applied in:** session 09 (`modules/Core/Commands/MakeModule.php`, `modules/Core/Modules/{CrudScaffold,ModuleGenerator}.php`, `modules/Core/Modules/Templates/`)
+
+## D-09-05 — The sample CRUD lives in the tests, not in a module
+
+- **Where:** deploy/09 ("A sample CRUD in a test module")
+- **Problem:** A real `modules/<Sample>` would be discovered, synced and shown in every installation.
+- **Proposal:** a test-only "Sample" module in `tests/_support/Crud/` (manifest, controller, routes and table installed by the test); the permissions come from its manifest through `CatalogueBuilder`, like a real module's. Screenshots use a module generated with `make:module Library --crud=library_books` that is not committed.
+- **Alternatives:** A) A disabled demo module shipped with the skeleton.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 09 as proposed.
+- **Applied in:** session 09 (`tests/_support/Crud/`, `tests/feature/Crud/`)
