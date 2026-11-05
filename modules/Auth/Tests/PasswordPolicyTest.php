@@ -61,13 +61,11 @@ final class PasswordPolicyTest extends AuthTestCase
         $this->assertTrue(service('passwords')->verify(self::$password, (string) model(\CodeIgniter\Shield\Models\UserModel::class)->findById($user->id)?->password_hash));
 
         setting('Auth.minimumPasswordLength', 8);
-        $r = $this->send('POST', 'backend/profile/password', [
+        $this->send('POST', 'backend/profile/password', [
             'current_password' => self::$password,
             'password'         => 'Qz7-unique-pass',
             'password_confirm' => 'Qz7-unique-pass',
-        ]);
-        fwrite(STDERR, print_r([$_SESSION['errors'] ?? null, $_SESSION['error'] ?? null, config('Auth')->minimumPasswordLength], true));
-        $r->assertRedirectTo(site_url('backend/profile'));
+        ])->assertRedirectTo(site_url('backend/profile'));
     }
 
     public function testRememberLifetimeSettingDrivesShieldsRememberConfig(): void
