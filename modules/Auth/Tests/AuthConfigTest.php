@@ -48,9 +48,11 @@ final class AuthConfigTest extends CIUnitTestCase
 
         $this->assertSame(['except' => ['api/*']], $filters->globals['before']['csrf'] ?? null);
         $this->assertContains('authsession', $filters->globals['before']);
-        $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['session']);
-        $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['forcereset']);
-        $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['force2fa']);
+        $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['backend']);
+        $this->assertSame(
+            [\CodeIgniter\Shield\Filters\SessionAuth::class, \Modules\Auth\Filters\ForcePasswordReset::class, \Modules\Auth\Filters\ForceTwoFactor::class],
+            $filters->aliases['backend'],
+        );
     }
 
     public function testTheLoginActionIsTheUserTwoFactorAction(): void

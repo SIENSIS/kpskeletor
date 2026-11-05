@@ -13,9 +13,11 @@ use CodeIgniter\Test\FeatureTestTrait;
 use CodeIgniter\Test\TestResponse;
 use Config\Services;
 use Modules\Auth\Services\SessionTracker;
+use Modules\Core\Tests\RbacFixtureTrait;
 
 /**
  * Base of the Auth feature tests: every namespace migrated (Shield, Settings, Core, Auth),
+ * the permission catalogue, default grants and Shield's matrix as `modules:sync` leaves them,
  * users in groups, requests that carry the session, the cookies and a valid CSRF token, and the
  * emails sent (MockEmail archives).
  */
@@ -23,6 +25,7 @@ abstract class AuthTestCase extends CIUnitTestCase
 {
     use DatabaseTestTrait;
     use FeatureTestTrait;
+    use RbacFixtureTrait;
 
     protected $migrate     = true;
     protected $migrateOnce = false;
@@ -52,6 +55,7 @@ abstract class AuthTestCase extends CIUnitTestCase
         });
         service('superglobals')->setCookieArray([]);
         service('superglobals')->setServer('REMOTE_ADDR', '192.0.2.10');
+        $this->syncPermissions();
     }
 
     /**

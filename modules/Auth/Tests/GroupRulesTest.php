@@ -91,11 +91,12 @@ final class GroupRulesTest extends AuthTestCase
         $this->createUser('ana@example.com');
 
         $this->login('ana@example.com');
-        $this->assertNotNull((new Can())->before(service('request'), ['news-posts.delete']), 'A user without the permission is refused.');
+        $this->assertNotNull((new Can())->before(service('request'), ['modules.upload']), 'A user without the permission is refused.');
         $this->assertNull((new Can())->before(service('request'), ['auth-profile.view']), 'Personal screens are granted to every group.');
 
         $this->send('POST', 'logout');
         $this->login('super@example.com');
-        $this->assertNull((new Can())->before(service('request'), ['news-posts.delete']));
+        $this->assertNull((new Can())->before(service('request'), ['modules.upload']));
+        $this->assertNotNull((new Can())->before(service('request'), ['news-posts.delete']), 'Not in the catalogue: refused even to a superadmin.');
     }
 }
