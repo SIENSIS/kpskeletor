@@ -15,6 +15,6 @@ final class {{Name}}DemoSeeder extends DemoSeeder
 {
     public function load(DemoData $demo): void
     {
-        $demo->insert('{{name}}_items', ['name' => 'Element de demostració']);
+        $demo->insert('{{table}}', ['name' => 'Element de demostració']);
     }
 }

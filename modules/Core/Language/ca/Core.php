@@ -94,6 +94,12 @@ return [
         'reserved'    => '"{0}" és un nom de mòdul reservat.',
         'next'        => 'Següent pas: php spark modules:sync',
         'nameMissing' => 'Nom del mòdul',
+        'invalidTable' => 'Nom de taula no vàlid "{0}": feu servir minúscules, xifres i _ (p. ex. news_posts).',
+        'migrating' => 'Es crea la taula {0} (php spark migrate -n {1})…',
+        'crudGenerating' => 'S’escriu el CRUD amb php spark kpcrudy:make {0}…',
+        'crudFailed' => 'No s’ha pogut generar el CRUD: {0}. El mòdul s’ha creat; corregiu el problema i executeu l’ordre indicada a dalt.',
+        'crudCreated' => 'S’ha creat el CRUD {0}: {1} (ruta backend/{2}).',
+        'crudNext' => 'Següent pas: php spark modules:sync i adapteu el CRUD a {0} (camps, relacions, hideFields(), where()) i les seves proves.',
     ],
     'cancelled' => 'Cancel·lat: no s\'ha canviat res.',
     'res' => [
