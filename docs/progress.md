@@ -17,8 +17,11 @@ pull request open), *merged* (in `main`).
 | 07 | Central RBAC | merged | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 | 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
+| 10 | kpapy integration and API authentication | done | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
 
 ## Decisions
+
+- **10:** the API core is a core module `Api` (settings `Api.*`, permissions `api.*` incl. `api.list/show/delete` for every user's tokens); app login methods `totp` then `email` (users with email 2FA and without 2FA alike, deny link without login); limits and CORS from settings, Auth's `LoginThrottle` on the API login, password reset and personal-token refresh refused; no session on `api/*`, `Accept-Language` negotiation, `me` contents; personal tokens with scopes from the user's permissions, fixed expiries, `api_token_ips`, admin list as a kpcrudy CRUD (D-10-01 … D-10-05).
 
 - **09:** `app.maskKey` in `Config\App`, read by both library configs through `MaskKey`, web requests refused in production without it (`spark` not blocked); CRUD page header from the title, `flashKeys` → toasts (new `info` key), `kpcrudy:confirm` → theme modal; `CrudFactory::routes()` adds `backend` + `can:<resource>.list` + name, `CrudAuditor` in `permissions:check` runs every CRUD action with inspection on; `make:module --crud` runs `kpcrudy:make` in a child process and rewrites it; the sample CRUD is a test-only module (D-09-01 … D-09-05).
 
@@ -50,6 +53,8 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **10:** logins and token changes go to the application log until session 12; `me` is not in the OpenAPI document (library request); fixed an earlier gap: the global `authsession` filter opened a session on API requests (now `except api/*`); five Core/Auth tests that counted only Core+Auth permissions updated.
+
 - **08:** outbound requests and rate-limit refusals are written to the application log until the activity log (session 12); `app.allowedHostnames` is left to the installer (session 18); the Settings › Security form for the new settings is session 14. Fixed nothing from earlier sessions except the expected `backend` chain in `AuthConfigTest`.
 
 - **07:** grant changes go to the application log until session 12; `permissions:check` does not compare CRUD controllers yet (none exist; session 09); fixed test-order fragility for the new RBAC tests (temporary-module migrations left by earlier Core tests) with `CleanDatabaseTrait`.
@@ -71,6 +76,8 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **10:** any token can list/revoke its user's tokens through `me/tokens` (kpapy, library request); long scope list for administrators in "My API tokens"; the development debug toolbar starts a session on API calls (not production); fixed the environment's Composer install by seeding `phpstan/phpstan`'s zip again (known issue 04).
+
 - **09:** no kpcrudy responsive list options yet (library request); `permissions:check` inspects CRUDs without a user (operations added only for some users are caught at run time); `make:module --crud` needs the configured database and a new table; generated CRUD labels are English in the three languages; fixed the environment's Composer install by seeding `phpstan/phpstan`'s zip again (known issue 04).
 
 - **08:** the sidebar is empty until a module declares sidebar entries (Dashboard 16, News 17); `CurlTransport` is covered only through a fake transport (no network in tests); the `forceGlobalSecureRequests`/HSTS production values are checked by unit tests of the config logic, not by a production request.
@@ -87,6 +94,8 @@ pull request open), *merged* (in `main`).
 - The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
+
+- Session 11+: see `deploy-status/10-kpapy/README.md` and `docs/api.md`: module API resources with `Resource::routes(..., ['filter' => 'kpapy'])` under `api/v1/<path>`, `setResource()` = the CRUD's resource, an `$api` manifest entry, tests from `modules/Api/Tests/ApiResourceTest.php`. Session 12: activity entries for the `kpapy.auth.*` events and token changes. Session 14: Settings › Security for `Api.publicSpec`, `Api.corsOrigins`, `Api.appTokenDays`. Session 23: `avatar_url` in `me`. Session 26: Core endpoints and API catalogue checks.
 
 - Session 10+: see `deploy-status/09-kpcrudy/README.md` and `docs/cruds.md`: complete `app/Config/Kpapy.php` (resolver, deny by default, upload path; it already reads `app.maskKey`); module CRUDs only with `CrudFactory::routes()` + `$this->crud()` + `$this->renderCrud()`, extras declared in the manifest, `unset*()` what the resource excludes, tests copied from `tests/feature/Crud/SampleCrudTest.php`. Session 12: `afterWrite()` for the activity log. Session 18: the installer writes `app.maskKey`. Session 23: the file picker field.
 

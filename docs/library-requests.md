@@ -25,3 +25,13 @@ Found in session 09 (kpcrudy integration):
 | kpcrudy | A way to describe a CRUD's operations without running the controller action | `permissions:check` compares every CRUD with the catalogue | `CrudAuditor` runs the action with `CrudFactory::inspect()` and stops at `renderCrud()` | Open |
 | kpcrudy | `Crud` accepting the CLI request (it requires `IncomingRequest`) | Building a CRUD from `spark` (`permissions:check`) | `CrudAuditor` injects a GET `IncomingRequest` while inspecting | Open |
 | kpcrudy | Upload fields: `uploadPath` set to `writable/kpcrudy-unused-uploads` (session 09) | See the first row above | `make:module --crud` replaces guessed `image`/`upload` field types with a comment | Open |
+
+Found in session 10 (kpapy integration):
+
+| Library | Missing feature | Why it is needed | Workaround | Status |
+|---|---|---|---|---|
+| kpapy | `AuthRoutes::register()` with another login controller class | The skeleton extends `LoginController` (Auth's throttling, password-reset rule, refresh only for app tokens) | The Api module registers the same paths itself pointing to `Modules\Api\Controllers\LoginController` | Open |
+| kpapy | Scope check on `me/tokens` (`TokenController`) | Any token, even one limited to `x.list`, can list and revoke its user's other tokens | Accepted for now (it can only remove access, never add it); documented in `docs/api.md` | Open |
+| kpapy | Describing custom endpoints (a plain controller such as `me`) in the OpenAPI document | `GET api/v1/me` is missing from the documentation page | Documented in `docs/api.md` | Open |
+| kpapy | Marking tokens on creation (`TokenService::create()` options, e.g. `secret2`) and recording the last IP address of a token | Personal tokens must survive a password change; the profile shows the last IP | The Api module updates `secret2` after creating the token; `TokenAuthenticator` writes `api_token_ips` | Open |
+

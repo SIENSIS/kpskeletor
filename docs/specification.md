@@ -465,7 +465,7 @@ A hand-written screen in Core (`modules.*` permissions) to manage modules withou
     restores everything as it was;
   * dependencies are respected: a module cannot be disabled while enabled modules depend on it
     (the screen names them), and enabling a module offers to enable its disabled dependencies
-    too; core modules (`Core`, `Auth`, `Users`, `Settings`) cannot be disabled;
+    too; core modules (`Core`, `Auth`, `Api`, `Users`, `Settings`) cannot be disabled;
   * enabling a module with pending migrations runs them (database only, no code is written) and
     publishes its assets, like `modules:sync` for that module; errors leave it disabled and are
     shown with the log;

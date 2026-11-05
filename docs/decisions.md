@@ -123,6 +123,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-09-03 | 09 | `CrudFactory` details and how `permissions:check` inspects CRUDs | Accepted (proposal) |
 | D-09-04 | 09 | `make:module --crud`: running `kpcrudy:make` and what is rewritten | Accepted (proposal) |
 | D-09-05 | 09 | The sample CRUD lives in the tests, not in a module | Accepted (proposal) |
+| D-10-01 | 10 | The API core in a core module `Api` | Accepted (proposal) |
+| D-10-02 | 10 | Second factor of the app login: authenticator app, else an emailed code | Accepted (proposal) |
+| D-10-03 | 10 | API limits, CORS and login rules | Accepted (proposal) |
+| D-10-04 | 10 | No session on the API, its language and `api/v1/me` | Accepted (proposal) |
+| D-10-05 | 10 | Personal tokens: scopes, expiry, last IP and the administrators' list | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1293,3 +1298,53 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-05):** applied by session 09 as proposed.
 - **Applied in:** session 09 (`tests/_support/Crud/`, `tests/feature/Crud/`)
+
+## D-10-01 — The API core in a core module `Api`
+
+- **Where:** spec "JSON API (kpapy)" (`api.docs`, `api.tokens`, `Api.publicSpec`), `docs/plan.md` session 10 (files in `modules/Core/Api/`), CLAUDE.md ("never hard-code a module in the Core")
+- **Problem:** The plan put the API login providers in the Core, but they read the Auth module's 2FA data (the Core must not depend on a module); settings named `Api.*` need a module named `Api` (setting names are `<Module>.<key>`); the administrators' token list needs permissions the specification does not name.
+- **Proposal:** a module `Api` (requires Core and Auth) added to the core modules that cannot be disabled (`ModuleToggler::CORE_MODULES`). One resource named `api` (D-00-18): kpcrudy CRUD of every user's tokens (`api.list`, `api.show`, `api.delete`) plus `api.docs` and `api.tokens`; settings `Api.publicSpec`, `Api.corsOrigins`, `Api.appTokenDays`; default grants admin `api.*`, editor `api.tokens`. Names in the specification are unchanged. Modules' API resources stay in their own modules; Core resources (notifications, session 26) in the Core.
+- **Alternatives:** A) Everything in the Core with settings `Core.api*` (renames `Api.publicSpec`; Core depends on Auth). B) The admin list as a hand-written screen with `api.manage`.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 10 as proposed.
+- **Applied in:** `modules/Api/`, `modules/Core/Modules/ModuleToggler.php`, `docs/specification.md` (core modules), `docs/api.md`
+
+## D-10-02 — Second factor of the app login: authenticator app, else an emailed code
+
+- **Where:** spec "JSON API" › "Login for apps", `docs/plan.md` (`twoFactorMethods = ['totp', 'email', 'emailcode']`)
+- **Problem:** Users with email 2FA and users without 2FA both receive a code by email; two methods would differ only in the email's wording, and the app would have to handle both.
+- **Proposal:** `twoFactorMethods = ['totp', 'email']`. `totp` (`Modules\Api\TwoFactor\TotpProvider`): users whose method is the authenticator app; codes checked by Auth's `TwoFactor::verifyTotp()` (a step is never reused, shared with the web), or a recovery code. `email` (`EmailCodeProvider`): everybody else; the email names device, IP and time and links to `auth/api-login/<challenge>` (no login: the 192-bit challenge id is the proof and it can only stop the sign-in; the POST needs CSRF). Users with 2FA may also answer with a recovery code. Codes valid 10 minutes, 5 wrong codes close the challenge. kpapy's `web` method is not used.
+- **Alternatives:** A) A third method `emailcode` for users without 2FA. B) Refuse users without 2FA (`403 two-factor-required`).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 10 as proposed.
+- **Applied in:** `app/Config/Kpapy.php`, `modules/Api/TwoFactor/`, `modules/Api/Controllers/LoginDenyController.php`
+
+## D-10-03 — API limits, CORS and login rules
+
+- **Where:** spec "JSON API" › "Cross-cutting", "Security baseline" › rate limits
+- **Problem:** kpapy reads its limits and origins from its config class; the skeleton keeps them in settings.
+- **Proposal:** `Config\Kpapy`'s constructor reads `Core.rateLimitApiToken` (per token), `Core.rateLimitApiIp` (per IP, routes without a token), `Api.appTokenDays` and `Api.corsOrigins` (full `http(s)://host` origins only; `*` is dropped). The app login keeps kpapy's `rateLimitLogin` (10 per minute per IP and per account) and also counts wrong passwords in Auth's `LoginThrottle` (shared with the web form; `429` while blocked). Users who must change their password get `403 password-reset-required`; personal tokens cannot be refreshed (`403 personal-token`).
+- **Alternatives:** A) An extended `ApiFilter` using the Core's `RateLimiter` (the library's alias would have to be overridden).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 10 as proposed.
+- **Applied in:** `app/Config/Kpapy.php`, `modules/Api/Controllers/LoginController.php`
+
+## D-10-04 — No session on the API, its language and `api/v1/me`
+
+- **Where:** spec "Security baseline" › API ("the API never reads the session cookie"), "JSON API" (problem+json translated, `me`)
+- **Problem:** The global `authsession` filter opened a session (and set its cookie) on API requests; locale negotiation is off in the application, so API errors were always in the default language; `me` is not a table resource.
+- **Proposal:** `authsession` excludes `api/*`; a filter `apilocale` (Api module, on `api/*`) negotiates `Accept-Language` among ca/es/en; `GET api/v1/me` is a controller using kpapy's `Responder` (any valid token, no secrets): masked id (context `users`, the same as a future users CRUD), name, email, locale, time zone, colour mode, groups, 2FA method and the token's name, scopes and expiry; avatar URL `null` until session 23. (In development the debug toolbar still starts a session; production never.)
+- **Alternatives:** A) `me` as a kpapy `Resource` on `users` limited with `where()` (it would answer a list).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 10 as proposed.
+- **Applied in:** `app/Config/Filters.php`, `modules/Api/Filters/ApiLocale.php`, `modules/Api/Controllers/Me.php`
+
+## D-10-05 — Personal tokens: scopes, expiry, last IP and the administrators' list
+
+- **Where:** spec "JSON API" › "Personal tokens" (name, scopes, expiry, last use and IP)
+- **Problem:** The specification does not say which scopes or expiries are offered; Shield does not store the address of the last use.
+- **Proposal:** scopes `*` or permissions the user holds when creating the token (escalation refused on the server); expiry 7, 30, 90 or 365 days (default 90, never unlimited); creation behind `reauth`, the secret shown once; tokens marked personal (`secret2`, D-05). A table `api_token_ips` (Api module) keeps the last address of each token, written by `Modules\Api\Auth\TokenAuthenticator` only when it changes. Administrators list and revoke every token in a kpcrudy CRUD over `auth_identities` (type `access_token`; no secrets shown).
+- **Alternatives:** A) Free-text scopes. B) Store the IP in `auth_identities.extra` (Shield keeps the scopes there).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 10 as proposed.
+- **Applied in:** `modules/Api/Services/PersonalTokens.php`, `modules/Api/Controllers/{PersonalTokens,Tokens}.php`, `modules/Api/Database/Migrations/`

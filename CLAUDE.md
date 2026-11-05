@@ -11,7 +11,9 @@ records the owner's decisions; they override the specification when they disagre
 - **`siensis/kpcrudy` ^1.0**: every back-office CRUD screen (`Kpcrudy\Crud`), always through the
   Core: `CrudFactory::routes()` + `$this->crud('<resource>')` + `$this->renderCrud()`, never
   `new Crud()` (`docs/cruds.md`; `permissions:check` enforces it).
-- **`siensis/kpapy` ^1.0**: every JSON API endpoint (`Kpapy\Resource`).
+- **`siensis/kpapy` ^1.0**: every JSON API endpoint (`Kpapy\Resource`), routed under `api/v1/<path>`
+  with the `kpapy` filter, `setResource()` = the CRUD's resource name, declared in the manifest
+  `$api` (`docs/api.md`; the API core is the `Api` module).
 - Install from Packagist only: `composer require siensis/kpcrudy:^1.0 siensis/kpapy:^1.0`. Never
   `dev-main`, a `repositories` entry or a local path. If Composer fails, stop and report it.
 - **Read their docs in `vendor/` before using them**, not from memory:

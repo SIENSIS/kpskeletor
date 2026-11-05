@@ -123,7 +123,7 @@ final class ModuleToggleTest extends CIUnitTestCase
             }
         }
 
-        $this->assertSame(['Core', 'Auth', 'Users', 'Settings'], ModuleToggler::CORE_MODULES);
+        $this->assertSame(['Core', 'Auth', 'Api', 'Users', 'Settings'], ModuleToggler::CORE_MODULES);
     }
 
     public function testDependantsBlockDisablingAndDependenciesAreOffered(): void

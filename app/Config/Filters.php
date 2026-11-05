@@ -97,7 +97,7 @@ class Filters extends BaseFilters
             'moduleenabled', // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
             'cspmodules',    // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
             'csrf' => ['except' => ['api/*']], // Every POST except the token-only API (CodeIgniter's CSRF, session based)
-            'authsession',   // Session hardening: lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
+            'authsession' => ['except' => ['api/*']], // Session hardening (never on the token-only API): lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
             // 'honeypot',
             // 'invalidchars',
         ],
@@ -134,5 +134,7 @@ class Filters extends BaseFilters
     public array $filters = [
         // Every back-office request runs the `backend` chain (RoutesSecurityTest checks it).
         'backend' => ['before' => ['backend', 'backend/*']],
+        // API responses in the client's language (Accept-Language; Modules\Api\Filters\ApiLocale).
+        'apilocale' => ['before' => ['api/*']],
     ];
 }
