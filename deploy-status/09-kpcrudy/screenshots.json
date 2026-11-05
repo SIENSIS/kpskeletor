@@ -1,0 +1,20 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/09-kpcrudy/screenshots",
+  "deviceScaleFactor": 2,
+  "login": {
+    "url": "/login", "user": "admin@example.com", "password": "Demo-kpskeletor-2026",
+    "userField": "input[name=email]", "passwordField": "input[name=password]",
+    "submit": "button[type=submit]", "waitFor": "/backend"
+  },
+  "shots": [
+    { "url": "/backend/library/books", "name": "01-crud-admin", "width": 1366, "height": 768 },
+    { "url": "/backend/library/books", "name": "02-crud-read-only", "width": 1366, "height": 768,
+      "login": { "user": "editor@example.com", "password": "Demo-kpskeletor-2026" } },
+    { "url": "/backend/library/books/add", "name": "03-crud-add-form", "width": 1366, "height": 768 },
+    { "url": "/backend/library/books", "name": "04-confirm-modal", "width": 1366, "height": 768, "click": ["[data-kp-confirm]"], "wait": 600 },
+    { "url": "/backend/library/books", "name": "05-toast-after-delete", "width": 1366, "height": 768, "click": ["[data-kp-confirm]", ".modal.show .btn-danger"], "wait": 1500 },
+    { "url": "/backend/library/books", "name": "06-crud-dark", "width": 1366, "height": 768, "dark": true },
+    { "url": "/backend/library/books", "name": "07-crud-phone", "width": 390, "height": 844 }
+  ]
+}

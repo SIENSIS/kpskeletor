@@ -7,10 +7,10 @@ namespace Modules\{{Name}}\Database\Migrations;
 use CodeIgniter\Database\Migration;
 
 /**
- * Example table of the {{Name}} module (one migration per table; down() reverses up()).
- * Rename or delete it before the module's first release.
+ * Table `{{table}}` of the {{Name}} module (one migration per table; down() reverses up()).
+ * An example: adapt its columns before the module's first release.
  */
-final class Create{{Name}}Items extends Migration
+final class {{migrationClass}} extends Migration
 {
     public function up(): void
     {
@@ -24,11 +24,11 @@ final class Create{{Name}}Items extends Migration
             'deleted_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addPrimaryKey('id');
-        $this->forge->createTable('{{name}}_items');
+        $this->forge->createTable('{{table}}');
     }
 
     public function down(): void
     {
-        $this->forge->dropTable('{{name}}_items', true);
+        $this->forge->dropTable('{{table}}', true);
     }
 }

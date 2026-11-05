@@ -94,6 +94,12 @@ return [
         'reserved'    => '"{0}" es un nombre de módulo reservado.',
         'next'        => 'Siguiente paso: php spark modules:sync',
         'nameMissing' => 'Nombre del módulo',
+        'invalidTable' => 'Nombre de tabla no válido "{0}": use minúsculas, cifras y _ (p. ej. news_posts).',
+        'migrating' => 'Se crea la tabla {0} (php spark migrate -n {1})…',
+        'crudGenerating' => 'Se escribe el CRUD con php spark kpcrudy:make {0}…',
+        'crudFailed' => 'No se ha podido generar el CRUD: {0}. El módulo se ha creado; corrija el problema y ejecute la orden indicada arriba.',
+        'crudCreated' => 'Se ha creado el CRUD {0}: {1} (ruta backend/{2}).',
+        'crudNext' => 'Siguiente paso: php spark modules:sync y adapte el CRUD en {0} (campos, relaciones, hideFields(), where()) y sus pruebas.',
     ],
     'cancelled' => 'Cancelado: no se ha cambiado nada.',
     'res' => [

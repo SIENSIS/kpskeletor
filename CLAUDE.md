@@ -8,7 +8,9 @@ records the owner's decisions; they override the specification when they disagre
 
 ## Required libraries (never replace them)
 
-- **`siensis/kpcrudy` ^1.0**: every back-office CRUD screen (`Kpcrudy\Crud`).
+- **`siensis/kpcrudy` ^1.0**: every back-office CRUD screen (`Kpcrudy\Crud`), always through the
+  Core: `CrudFactory::routes()` + `$this->crud('<resource>')` + `$this->renderCrud()`, never
+  `new Crud()` (`docs/cruds.md`; `permissions:check` enforces it).
 - **`siensis/kpapy` ^1.0**: every JSON API endpoint (`Kpapy\Resource`).
 - Install from Packagist only: `composer require siensis/kpcrudy:^1.0 siensis/kpapy:^1.0`. Never
   `dev-main`, a `repositories` entry or a local path. If Composer fails, stop and report it.
@@ -95,7 +97,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   - manifest complete: resources, menus, default grants, settings, `$requires`, `$backup`,
     `$csp`, `$outboundHosts`, `$api`;
   - one migration per table with `down()`; demo data only in `<Name>DemoSeeder`;
-  - CRUDs with kpcrudy, API resources with kpapy; every operation declared in the manifest;
+  - CRUDs with kpcrudy (`CrudFactory`), API resources with kpapy; every operation declared in
+    the manifest;
   - `can:` on every back-office route, the `kpapy` filter on every API route;
   - texts in `ca`, `es` and `en` (same keys); no hard-coded strings;
   - assets in `Assets/`, ES modules, no inline JavaScript or styles;

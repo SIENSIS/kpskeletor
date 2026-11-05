@@ -211,6 +211,19 @@ class App extends BaseConfig
      */
     public bool $CSPEnabled = true;
 
+    /**
+     * --------------------------------------------------------------------------
+     * Mask key (kpcrudy and kpapy)
+     * --------------------------------------------------------------------------
+     *
+     * The one key both libraries use to mask ids in URLs and to sign URLs
+     * (`app.maskKey` in `.env`, at least 32 characters: 64 random hex characters,
+     * `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`). Read by `Config\Kpcrudy`
+     * and `Config\Kpapy`; production refuses to boot without it
+     * (`Modules\Core\Security\MaskKey`). Changing it breaks every masked or signed link.
+     */
+    public string $maskKey = '';
+
     public function __construct()
     {
         // HTTPS for every request in production (docs/specification.md, "Security baseline").

@@ -11,6 +11,10 @@ use Modules\Core\Config\Version;
  * Generates an empty module from the templates in `Modules/Templates` (`make:module <Name>`):
  * manifest, routes, language files (ca, es, en), controller, view, asset folders, a migration,
  * the initial-data seeder, a widget stub, a scheduled-task stub and a test.
+ *
+ * With a CRUD table (`make:module <Name> --crud=<table>`) the migration creates that table and
+ * the manifest, menu and language files declare its `crud` resource (`CrudScaffold`); the
+ * controller and route are then written by `kpcrudy:make` and rewritten to the Core's factory.
  */
 final class ModuleGenerator
 {
@@ -23,7 +27,7 @@ final class ModuleGenerator
         'Language.ca.php.tpl' => 'Language/ca/{{Name}}.php',
         'Language.es.php.tpl' => 'Language/es/{{Name}}.php',
         'Language.en.php.tpl' => 'Language/en/{{Name}}.php',
-        'Migration.php.tpl'   => 'Database/Migrations/{{date}}-000001_Create{{Name}}Items.php',
+        'Migration.php.tpl'   => 'Database/Migrations/{{date}}-000001_{{migrationClass}}.php',
         'Seeder.php.tpl'      => 'Database/Seeds/{{Name}}Seeder.php',
         'DemoSeeder.php.tpl'  => 'Database/Seeds/{{Name}}DemoSeeder.php',
         'Widget.php.tpl'      => 'Widgets/{{Name}}Widget.php',
@@ -68,9 +72,9 @@ final class ModuleGenerator
      *
      * @throws \InvalidArgumentException when the name is invalid or the module exists
      */
-    public function generate(string $name): string
+    public function generate(string $name, ?string $crudTable = null): string
     {
-        $error = $this->nameError($name);
+        $error = $this->nameError($name) ?? ($crudTable !== null ? CrudScaffold::tableError($crudTable) : null);
 
         if ($error !== null) {
             throw new \InvalidArgumentException($error);
@@ -78,11 +82,16 @@ final class ModuleGenerator
 
         [$major, $minor] = explode('.', Version::CORE);
 
+        $lower   = strtolower($name);
+        $table   = $crudTable ?? $lower . '_items';
         $replace = [
             '{{Name}}'           => $name,
-            '{{name}}'           => strtolower($name),
+            '{{name}}'           => $lower,
             '{{date}}'           => Time::now()->format('Y-m-d'),
             '{{coreConstraint}}' => '^' . $major . '.' . $minor,
+            '{{table}}'          => $table,
+            '{{migrationClass}}' => 'Create' . ($crudTable === null ? $name . 'Items' : str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))),
+            ...CrudScaffold::templateValues($name, $crudTable),
         ];
 
         $path = $this->root . '/' . $name;

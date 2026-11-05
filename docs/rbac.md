@@ -102,6 +102,11 @@ manifest (`extra`) and run `modules:sync`.
 - `tests/feature/Security/RoutesSecurityTest.php` walks every route with `RouteSecurityAuditor`
   and fails on any breach (also on a `can:` naming a permission outside the catalogue);
   `php spark permissions:check` reports the same.
+- kpcrudy CRUDs (`docs/cruds.md`): `CrudFactory::routes()` adds `backend` and
+  `can:<resource>.list`; each operation is then `<resource>.<operation>` through `CrudPermissions`
+  (`Config\Kpcrudy`, deny by default). `permissions:check` also runs every CRUD action with
+  `CrudAuditor` and fails when a CRUD is not made with the factory or asks about an operation its
+  manifest does not declare.
 
 ## Escalation rules (`EscalationGuard`)
 

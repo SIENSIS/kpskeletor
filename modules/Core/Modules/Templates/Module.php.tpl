@@ -18,15 +18,15 @@ final class Module extends \Modules\Core\Config\ModuleManifest
     public array $requires  = ['Core' => '{{coreConstraint}}'];
 
     public array $resources = [
-        'main' => ['label' => '{{Name}}.res.main', 'type' => 'page'],
+        'main' => ['label' => '{{Name}}.res.main', 'type' => 'page'],{{crudResource}}
     ];
 
     public array $defaultGrants = [
-        'admin' => ['{{name}}-main.*'],
+        'admin' => ['{{name}}-main.*'{{crudGrant}}],
     ];
 
     public array $menu = [
-        ['resource' => 'main', 'label' => '{{Name}}.menu.main', 'icon' => 'bi bi-box', 'order' => 100],
+        ['resource' => 'main', 'label' => '{{Name}}.menu.main', 'icon' => 'bi bi-box', 'order' => 100],{{crudMenu}}
     ];
 
     public array $widgets = [{{Name}}Widget::class];

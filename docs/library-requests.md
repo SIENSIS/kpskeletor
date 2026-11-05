@@ -16,3 +16,12 @@ Gaps found while reviewing kpcrudy 1.0.0 and kpapy 1.0.0 for `docs/plan.md`:
 | kpcrudy | Responsive list options: priority columns hidden on phones, card view on phones, row actions in a "⋯" menu, collapsible filters panel | Specification "Responsive design" (kpcrudy lists) | Theme CSS on the `bootstrap5` markup and a Core JS component; no template copies | Open |
 | kpcrudy | Searchable (AJAX) relation fields for large tables | Events audience "users field (searchable, AJAX)"; a dropdown of every user does not scale | `callbackField()` with a Core `data-component` that queries a permission-checked JSON endpoint | Open |
 | kpcrudy | Tree display for self-referencing tables (indentation/order by parent) | Pages "list with tree indentation" | `callbackColumn()` prefixing the depth and a `defaultOrder()` on a materialised path column | Open |
+
+Found in session 09 (kpcrudy integration):
+
+| Library | Missing feature | Why it is needed | Workaround | Status |
+|---|---|---|---|---|
+| kpcrudy | `kpcrudy:make` options passed in `$params` (it reads `CLI::getOption()` only) | `make:module --crud` runs it from another command; `command()` passes options in `$params` | `make:module` runs `php spark kpcrudy:make …` as a child process | Open |
+| kpcrudy | A way to describe a CRUD's operations without running the controller action | `permissions:check` compares every CRUD with the catalogue | `CrudAuditor` runs the action with `CrudFactory::inspect()` and stops at `renderCrud()` | Open |
+| kpcrudy | `Crud` accepting the CLI request (it requires `IncomingRequest`) | Building a CRUD from `spark` (`permissions:check`) | `CrudAuditor` injects a GET `IncomingRequest` while inspecting | Open |
+| kpcrudy | Upload fields: `uploadPath` set to `writable/kpcrudy-unused-uploads` (session 09) | See the first row above | `make:module --crud` replaces guessed `image`/`upload` field types with a comment | Open |

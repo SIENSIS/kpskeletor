@@ -47,6 +47,8 @@
             database.tests.database, database.tests.username, database.tests.password
             and database.tests.port before running PHPUnit.
         -->
+        <!-- Shared mask key of kpcrudy and kpapy for the tests only (never a real value). -->
+        <env name="app.maskKey" value="0000000000000000000000000000000000000000000000000000000000test09"/>
         <env name="database.tests.DBDriver" value="SQLite3"/>
         <env name="database.tests.database" value=":memory:"/>
         <env name="database.tests.DBPrefix" value="db_"/>
