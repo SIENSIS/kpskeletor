@@ -11,5 +11,6 @@ declare(strict_types=1);
  */
 
 return [
+    'Modules\Auth' => __DIR__ . '/../../modules/Auth',
     'Modules\Core' => __DIR__ . '/../../modules/Core',
 ];

@@ -76,8 +76,9 @@ class Filters extends BaseFilters
         'before' => [
             'moduleenabled', // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
             'cspmodules',    // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
+            'csrf' => ['except' => ['api/*']], // Every POST except the token-only API (CodeIgniter's CSRF, session based)
+            'authsession',   // Session hardening: lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
             // 'honeypot',
-            // 'csrf',
             // 'invalidchars',
         ],
         'after' => [
@@ -110,5 +111,9 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+        // Back office: login required (Shield) and a forced password change first (Auth).
+        'session'    => ['before' => ['backend', 'backend/*']],
+        'forcereset' => ['before' => ['backend', 'backend/*']],
+    ];
 }

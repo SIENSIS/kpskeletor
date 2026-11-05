@@ -55,6 +55,9 @@ class Cookie extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Cookie will only be set if a secure HTTPS connection exists.
+     *
+     * The skeleton sets it to true in production (the default environment) in the constructor;
+     * `.env` (`cookie.secure`) can still change it, e.g. behind a TLS-terminating proxy.
      */
     public bool $secure = false;
 
@@ -106,4 +109,12 @@ class Cookie extends BaseConfig
      * @see https://tools.ietf.org/html/rfc2616#section-2.2
      */
     public bool $raw = false;
+
+    public function __construct()
+    {
+        // HTTPS-only cookies in production (docs/specification.md, "Session handling").
+        $this->secure = ENVIRONMENT === 'production';
+
+        parent::__construct();
+    }
 }

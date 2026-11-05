@@ -27,6 +27,7 @@ parameters:
         additionalServices:
             - Modules\Core\Config\Services
             - CodeIgniter\Settings\Config\Services
+            - CodeIgniter\Shield\Config\Services
         additionalModelNamespaces:
             - CodeIgniter\Shield\Models\
         schemaCacheDirectory: build/phpstan-schema
