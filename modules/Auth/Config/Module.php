@@ -36,6 +36,12 @@ final class Module extends ModuleManifest
         ],
     ];
 
+    /** The user menu (zone `user`): profile and "my sessions". */
+    public array $menu = [
+        ['resource' => 'profile', 'label' => 'Auth.menu.profile', 'icon' => 'bi bi-person-circle', 'order' => 10, 'zone' => 'user'],
+        ['resource' => 'sessions', 'label' => 'Auth.menu.sessions', 'icon' => 'bi bi-laptop', 'order' => 20, 'zone' => 'user'],
+    ];
+
     public array $defaultGrants = [
         'superadmin' => ['auth-profile.*', 'auth-sessions.*'],
         'admin'      => ['auth-profile.*', 'auth-sessions.*'],

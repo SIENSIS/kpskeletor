@@ -22,6 +22,10 @@ return [
     'suggestPasswordTooSimilar' => 'No facis servir parts del nom d\'usuari a la contrasenya.',
     'errorPasswordEmpty'        => 'Cal una contrasenya.',
     'errorPasswordTooLongBytes' => 'La contrasenya no pot superar els {param} bytes.',
+    'menu'                      => [
+        'profile'  => 'El meu perfil',
+        'sessions' => 'Les meves sessions',
+    ],
     'res'                       => [
         'profile'  => 'El meu perfil',
         'sessions' => 'Les meves sessions',

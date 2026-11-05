@@ -9,11 +9,13 @@ use CodeIgniter\I18n\Time;
 use Config\Database;
 use Modules\Core\Cache\CoreCache;
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Menus\MenuDefinitions;
 
 /**
  * The declarations of the manifests that later services use at runtime: settings, dashboard
  * widgets, scheduled tasks, notification types, menu link types, calendars, calendar providers,
- * API resources and Content-Security-Policy sources (`module_declarations` table).
+ * API resources, Content-Security-Policy sources, back-office menu entries and outbound hosts
+ * (`module_declarations` table).
  *
  * `modules:sync` stores them (step 6) so that regular requests never load the manifests. Readers
  * see only the declarations of enabled modules, except settings (their defaults stay readable).
@@ -21,13 +23,13 @@ use Modules\Core\Config\ModuleManifest;
  */
 final class DeclarationRegistry
 {
-    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'api', 'csp'];
+    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'api', 'csp', 'menu', 'outbound'];
 
     /** Kinds declared as maps: their keys are qualified with the module ("News.perPage"). */
-    public const MAP_KINDS = ['setting', 'calendar', 'api', 'csp'];
+    public const MAP_KINDS = ['setting', 'calendar', 'api', 'csp', 'outbound'];
 
     /** Cache scope of each kind. */
-    private const SCOPES = ['setting' => 'settings', 'widget' => 'widgets'];
+    private const SCOPES = ['setting' => 'settings', 'widget' => 'widgets', 'menu' => 'menus'];
 
     /**
      * @param BaseConnection<object|resource, object|resource>|null $db Default: the default connection
@@ -76,6 +78,16 @@ final class DeclarationRegistry
                     $class = ltrim($class, '\\');
                     $declarations["{$module}|{$kind}|{$class}"] = ['module' => $module, 'kind' => $kind, 'key' => $class, 'definition' => []];
                 }
+            }
+
+            // Menu entries: keyed by their stable key ("<Module>.<resource>" or the route name).
+            foreach (MenuDefinitions::of($manifest) as $key => $definition) {
+                $declarations["{$module}|menu|{$key}"] = ['module' => $module, 'kind' => 'menu', 'key' => $key, 'definition' => $definition];
+            }
+
+            foreach ($manifest->outboundHosts as $host) {
+                $host = strtolower($host);
+                $declarations["{$module}|outbound|{$host}"] = ['module' => $module, 'kind' => 'outbound', 'key' => $host, 'definition' => []];
             }
         }
 
@@ -198,6 +210,20 @@ final class DeclarationRegistry
     public function calendarProviders(): array
     {
         return array_keys($this->all('calendarProvider'));
+    }
+
+    /** @return array<string, array{module: string, definition: array<array-key, mixed>}> Back-office menu entries of enabled modules (key => definition) */
+    public function menuEntries(): array
+    {
+        return $this->all('menu');
+    }
+
+    /** @return list<string> Outbound host names declared by enabled modules ("<Module>.<host>" keys) */
+    public function outboundHosts(): array
+    {
+        $hosts = array_map(static fn (string $key): string => substr($key, strpos($key, '.') + 1), array_keys($this->all('outbound')));
+
+        return array_values(array_unique($hosts));
     }
 
     /** @return array<string, array{module: string, definition: array<array-key, mixed>}> Calendars of enabled modules */

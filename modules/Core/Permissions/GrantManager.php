@@ -7,6 +7,7 @@ namespace Modules\Core\Permissions;
 use CodeIgniter\Events\Events;
 use CodeIgniter\Shield\Entities\User;
 use Config\Database;
+use Modules\Core\Modules\CacheInvalidator;
 use Throwable;
 
 /**
@@ -66,6 +67,7 @@ final class GrantManager
         }
 
         $this->matrix()->write();
+        (new CacheInvalidator())->invalidate(['menus']); // menus are cached per group set
 
         foreach ($this->members($group) as $userId) {
             Events::trigger('privilegesChanged', $userId);
@@ -130,6 +132,7 @@ final class GrantManager
     public function rebuild(): void
     {
         $this->matrix()->write();
+        (new CacheInvalidator())->invalidate(['menus']);
     }
 
     /**

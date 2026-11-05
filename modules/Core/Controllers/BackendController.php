@@ -67,7 +67,8 @@ abstract class BackendController extends BaseController
     }
 
     /**
-     * Adds a breadcrumb; the layout prints them (the first one is usually the module).
+     * Adds a breadcrumb; the layout prints them (the first one is usually the module). Without
+     * any, the breadcrumbs come from the generated menu (the trail to the active entry).
      */
     protected function breadcrumb(string $label, ?string $url = null): static
     {
@@ -81,7 +82,15 @@ abstract class BackendController extends BaseController
      */
     protected function breadcrumbs(): array
     {
-        return [['label' => lang('Core.ui.backOffice'), 'url' => base_url('backend')], ...$this->breadcrumbs];
+        $crumbs = $this->breadcrumbs;
+
+        if ($crumbs === []) {
+            foreach (backend_menu_trail() as $entry) {
+                $crumbs[] = ['label' => $entry->text(), 'url' => $entry->url()];
+            }
+        }
+
+        return [['label' => lang('Core.ui.backOffice'), 'url' => base_url('backend')], ...$crumbs];
     }
 
     /**

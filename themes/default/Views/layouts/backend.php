@@ -3,7 +3,8 @@
  * Back-office layout: sidebar (offcanvas on phones, icon-only bar on tablets, full on desktops,
  * collapsible and remembered), top bar with the theme switch and the user menu, page header or
  * breadcrumbs, session messages, the `content` section and a footer.
- * Regions: sidebar (menus), topbar, footer. kpcrudy uses it with the section `content`.
+ * The sidebar prints the generated menu (partials/sidebar_menu), then the `sidebar` region.
+ * Regions: sidebar, topbar, footer. kpcrudy uses it with the section `content`.
  *
  * @var string|null $title
  */
@@ -23,6 +24,7 @@ $font = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
             <button type="button" class="btn-close btn-close-white d-md-none" data-bs-dismiss="offcanvas" data-bs-target="#backend-sidebar" aria-label="<?= esc(lang('Core.ui.close')) ?>"></button>
         </div>
         <nav class="sidebar-nav flex-grow-1 overflow-y-auto px-2 py-3" aria-label="<?= esc(lang('Core.ui.mainMenu')) ?>">
+            <?= theme_partial('sidebar_menu') ?>
             <?= theme_region('backend', 'sidebar') ?>
         </nav>
     </aside>
