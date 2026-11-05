@@ -1,6 +1,6 @@
 # Session 08 — Back-office menus and the security baseline
 
-Branch: `claude/pensive-volta-9ttaws` (assigned by the environment) · Pull request: PR_LINK "Session 08: Back-office menus and the security baseline" · Date: 2026-11-05
+Branch: `claude/pensive-volta-9ttaws` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) "Session 08: Back-office menus and the security baseline" · Date: 2026-11-05
 
 ## What was built
 
@@ -110,8 +110,8 @@ php spark serve                    # http://localhost:8080/login
   was not committed: resources posts/categories/stats/options, `editor` granted only posts and
   categories `list`).
 - Headers: `curl -sI http://localhost:8080/login`, also on a 404 (`/nope`).
-- Rate limit: save `setting('Core.rateLimitBackend', 2)` (e.g. `php spark shell`… or a test) and
-  reload a back-office page three times → 429.
+- Rate limit: there is no settings screen yet (session 14); `tests/feature/Security/RateLimitTest.php`
+  saves `setting('Core.rateLimitBackend', 2)` and gets 429 on the third back-office request.
 
 ## Tests and checks
 

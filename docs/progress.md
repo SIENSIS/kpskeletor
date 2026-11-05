@@ -15,7 +15,7 @@ pull request open), *merged* (in `main`).
 | 05 | Authentication (Shield) and session hardening | merged | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
 | 06 | Two-factor authentication and re-authentication | merged | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
 | 07 | Central RBAC | merged | `claude/tender-wright-gmq4ck` | [SIENSIS/kpskeletor#11](https://github.com/SIENSIS/kpskeletor/pull/11) | [`deploy-status/07-rbac/`](../deploy-status/07-rbac/README.md) |
-| 08 | Back-office menus and the security baseline | done | `claude/pensive-volta-9ttaws` | (see the pull request "Session 08: Back-office menus and the security baseline") | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
+| 08 | Back-office menus and the security baseline | done | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 
 ## Decisions
 
