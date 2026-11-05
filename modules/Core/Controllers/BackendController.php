@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Controllers;
 
 use App\Controllers\BaseController;
+use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -38,6 +39,31 @@ abstract class BackendController extends BaseController
         $user = auth()->user();
 
         return $user !== null && ($user->inGroup('superadmin') || $user->can($permission));
+    }
+
+    /**
+     * Re-authentication ("sudo mode") inside an action: null when the user confirmed their
+     * identity recently, otherwise the response to return (the confirmation screen, or 401 for
+     * JSON). Same rules as the `reauth` route filter, which is preferred on routes.
+     *
+     * ```php
+     * if (($response = $this->requireReauth()) !== null) {
+     *     return $response;
+     * }
+     * ```
+     */
+    protected function requireReauth(): ?ResponseInterface
+    {
+        $class = config('Filters')->aliases['reauth'] ?? null;
+
+        if (! is_string($class) || ! is_subclass_of($class, FilterInterface::class)) {
+            // Default deny: without the filter (registered by the Auth module) nothing passes.
+            return service('response')->setStatusCode(403);
+        }
+
+        $result = (new $class())->before($this->request);
+
+        return $result instanceof ResponseInterface ? $result : null;
     }
 
     /**

@@ -16,7 +16,7 @@ use Modules\Core\Config\ModuleManifest;
 final class Module extends ModuleManifest
 {
     public string $name    = 'Auth';
-    public string $version = '0.1.0';
+    public string $version = '0.2.0';
     public string $icon    = 'bi bi-shield-lock';
     public array $requires = ['Core' => '^0.1'];
 
@@ -112,6 +112,21 @@ final class Module extends ModuleManifest
             'default' => 3,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
             'label'   => 'Auth.settings.emailLinksPerAccount',
+        ],
+        'reauthMinutes' => [
+            'type'    => 'int',
+            'default' => 15,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[240]',
+            'label'   => 'Auth.settings.reauthMinutes',
+            'help'    => 'Auth.settings.reauthMinutesHelp',
+        ],
+        // Group name => 'required' | 'optional' (missing groups are optional). Moves to the
+        // `groups` table with the Groups screen (session 15).
+        'twoFactorPolicy' => [
+            'type'    => 'json',
+            'default' => [],
+            'label'   => 'Auth.settings.twoFactorPolicy',
+            'help'    => 'Auth.settings.twoFactorPolicyHelp',
         ],
     ];
 

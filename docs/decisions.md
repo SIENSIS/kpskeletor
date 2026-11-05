@@ -102,6 +102,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-05-06 | 05 | CSRF and back-office filters before the security session | Accepted (proposal) |
 | D-05-07 | 05 | Where a login lands and profile preferences | Accepted (proposal) |
 | D-05-08 | 05 | New-device notices | Accepted (proposal) |
+| D-06-01 | 06 | Email codes through the Core action | Accepted (proposal) |
+| D-06-02 | 06 | 2FA storage, TOTP and recovery codes | Accepted (proposal) |
+| D-06-03 | 06 | Remember-me and the 2FA step | Accepted (proposal) |
+| D-06-04 | 06 | A password login counts as re-authentication | Applied (decided) |
+| D-06-05 | 06 | 2FA group policy and re-authentication settings | Accepted (proposal) |
+| D-06-06 | 06 | Re-authentication screen, URLs and non-GET requests | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1062,3 +1068,64 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-05):** applied by session 05 as proposed.
 - **Applied in:** session 05 (`modules/Auth/`, `app/Config/`)
+
+## D-06-01 — Email codes through the Core action
+
+- **Where:** spec "Authentication" ("Email (Shield's `Email2FA` logic)"), decision D-00-13
+- **Problem:** Shield's `Email2FA` class asks the user to type their email again, stores the code in clear, sends it with `emailer()` directly (not through `SecurityMailer`) and has no expiry; it also uses its own identity type, which a per-user dispatcher cannot share.
+- **Proposal:** `UserTwoFactorAction` (Shield's `login` action, `ConditionalActionInterface`: applies only to users with 2FA) keeps Shield's logic (a 6-digit code in a pending code identity, `checkAction()` to complete the login) but sends the code at once through `SecurityMailer`, stores only its SHA-256 hash (`secret2`), expires it after 10 minutes, offers "send a new code" within the email limits and counts wrong codes as failed logins. The identity secret is a random nonce that `checkAction()` compares once a code (email, TOTP or recovery) has been verified. Its routes keep Shield's names (`auth-action-show|handle|verify`) at `auth/a/*`, rendered in the theme's auth layout, plus `auth/a/cancel`.
+- **Alternatives:** use `Email2FA` unchanged for the email method (code in clear, no `SecurityMailer`).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 06 as proposed.
+- **Applied in:** session 06 (`modules/Auth/Authentication/`, `app/Config/Auth.php`)
+
+## D-06-02 — 2FA storage, TOTP and recovery codes
+
+- **Where:** spec "Authentication" (TOTP secret encrypted, recovery codes hashed, ±1 step, no reuse)
+- **Problem:** Shield has no place for a user's method, the TOTP secret or recovery codes.
+- **Proposal:** two Auth tables: `user_two_factor` (user, method `email`/`totp`, TOTP secret encrypted with CI4 Encryption and base64-encoded, last accepted time step) and `user_recovery_codes` (SHA-256 of 10 codes of 10 characters from a 31-letter alphabet, ≈50 bits each, `used_at`). TOTP with `spomky-labs/otphp` (6 digits, 30 s, SHA-1: what every app reads), 160-bit secrets, steps −1…+1 accepted and only a step later than the last accepted one (conditional update, so two simultaneous requests cannot both pass). QR with `chillerlan/php-qrcode` as an SVG `data:` image (allowed by `img-src data:`; always on white). The app method is unavailable while `encryption.key` is empty (never stored in clear). Enabling a method creates new recovery codes (shown once); turning 2FA off or an admin reset deletes them.
+- **Alternatives:** store the method in `user_profiles` (released migration: needs a new column migration anyway); bcrypt for recovery codes (slower per check, no gain at 50 random bits).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 06 as proposed.
+- **Applied in:** session 06 (`modules/Auth/`, `composer.json`)
+
+## D-06-03 — Remember-me and the 2FA step
+
+- **Where:** spec "Session handling" (remember-me) and "Two-factor authentication"
+- **Problem:** Shield issues the remember-me token inside `attempt()`, before the login action completes: a cookie obtained with the password alone would log in once the pending 2FA identity disappears (for example after an admin reset). On the other hand a valid remember-me token re-creates a session without asking for a code (Shield's behaviour: the device is trusted).
+- **Proposal:** `Config\Auth::$authenticators['session']` is `Modules\Auth\Authentication\SessionAuthenticator` (a subclass of Shield's `Session`): for a user with 2FA the login form does not ask Shield to remember them and the token is issued only after a correct code. Remember-me logins keep skipping the code (device trust, limited by `Auth.rememberLifetime`), and sensitive actions still require re-authentication with password and code.
+- **Alternatives:** disable remember-me for users with 2FA; ask the code on every remember-me login.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 06 as proposed.
+- **Applied in:** session 06 (`modules/Auth/`, `app/Config/Auth.php`)
+
+## D-06-04 — A password login counts as re-authentication (decide)
+
+- **Where:** spec "Re-authentication" (the confirmation lasts 15 minutes; a session re-created by remember-me still requires it)
+- **Problem:** Right after typing the password (and the 2FA code) at the login, a sensitive action (for example the forced 2FA set-up of a required group) would ask for them again.
+- **Proposal:** a password login, with its 2FA step, opens the re-authentication window for `Auth.reauthMinutes`; a magic-link login, a remember-me session and an unlocked idle lock do not. Changing it is one line in `LoginListener::login()`.
+- **Alternatives:** A) no login counts: every sensitive action asks again, also just after logging in (stricter, one more prompt). B) magic links count too (weaker: the email account alone would give sudo mode).
+- **Status:** Applied (decided)
+- **Decision (2026-11-05):** «A) Sí, compta (recomanada)». A password login, with its 2FA step, opens the re-authentication window for `Auth.reauthMinutes`; magic-link logins, sessions re-created by remember-me and unlocking the idle lock do not.
+- **Applied in:** `modules/Auth/Services/LoginListener.php` (built by session 06; tests `ReauthTest::testPasswordLoginOpensTheWindowForFifteenMinutes`, `TwoFactorLoginTest::testEmailCodeLogin`, `TwoFactorLoginTest::testMagicLinkLoginAlsoAsksForTheCode`, `ReauthTest::testSessionRecreatedByRememberMeStillRequiresIt`), `docs/specification.md`
+
+## D-06-05 — 2FA group policy and re-authentication settings
+
+- **Where:** spec "Policy per group (setting)", "Groups" (a `groups` table with the 2FA policy, session 15), "Re-authentication" (15 minutes, setting)
+- **Problem:** The `groups` table arrives in session 15, but the policy is needed now.
+- **Proposal:** settings `Auth.twoFactorPolicy` (json: group name → `required`|`optional`, missing groups optional; default `{}`) and `Auth.reauthMinutes` (int, 1–240, default 15), defaults in `Config\Auth` like the other Auth settings; session 15 moves the policy to the `groups` table (or makes the column write this setting). The `force2fa` filter on `backend/*` (after `forcereset`) sends a user of a required group without 2FA to `backend/profile/two-factor` (only the 2FA and password screens stay reachable; JSON gets 403); such a user can change the method but not turn 2FA off.
+- **Alternatives:** wait for session 15 (acceptance criterion 5 needs the policy now).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 06 as proposed.
+- **Applied in:** session 06 (`modules/Auth/`, `app/Config/Auth.php`, `app/Config/Filters.php`)
+
+## D-06-06 — Re-authentication screen, URLs and non-GET requests
+
+- **Where:** spec "Re-authentication" (`reauth` filter, `$this->requireReauth()`)
+- **Problem:** Where the confirmation is asked and what happens to the request that triggered it.
+- **Proposal:** `auth/reauth` (auth layout, checks the session itself) asks for the password and, with 2FA, the method's code (TOTP, or an emailed code requested with a button) or a recovery code; failures count as failed logins and past the limit end the session. The window is stored in the PHP session (so a re-created session starts without it) and forgotten at login/logout. The filter sends a GET to the screen and back afterwards; a POST/PUT/DELETE is never replayed (the user confirms and repeats it; they return to the Referer when it is a page of this site); JSON gets 401 with the URL. `BackendController::requireReauth()` runs the filter registered under the alias `reauth` (no module name in the Core) and denies when it is missing. The profile's 2FA changes (`backend/profile/two-factor/*`) are the first routes using it; impersonation (session 15) will refuse it.
+- **Alternatives:** a modal with an AJAX confirmation (needs JS for a security path); replaying the POST (stores request bodies in the session).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-05):** applied by session 06 as proposed.
+- **Applied in:** session 06 (`modules/Auth/`, `modules/Core/Controllers/BackendController.php`)
+

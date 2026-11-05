@@ -1,8 +1,8 @@
 # Authentication and sessions
 
 The **Auth** module (`modules/Auth/`, a core module that cannot be disabled) adds login, magic
-links, password reset, hardened sessions, the profile and "my sessions" on top of Shield.
-Two-factor authentication and re-authentication arrive in session 06.
+links, password reset, hardened sessions, two-factor authentication, re-authentication ("sudo
+mode"), the profile and "my sessions" on top of Shield.
 
 ## Screens and routes
 
@@ -17,9 +17,13 @@ Two-factor authentication and re-authentication arrive in session 06.
 | `backend/profile` (`auth-profile.view`/`.edit`) | Name, email (needs the current password), language, time zone, colour mode, birth date |
 | `backend/profile/password` (`auth-profile.view`/`.edit`) | Password change; the only back-office page while a reset is forced |
 | `backend/profile/sessions` (`auth-sessions.view`/`.revoke`) | Open sessions with remote logout, API tokens with revocation |
+| `GET auth/a/show`, `POST auth/a/verify`, `auth/a/handle`, `auth/a/cancel` | 2FA step of a pending login (code, recovery code, new email code, cancel); 404 without a pending login |
+| `GET/POST auth/reauth`, `POST auth/reauth/send-code` | Re-authentication: password and, with 2FA, a code |
+| `backend/profile/two-factor` (`auth-profile.view`) | Method (none / email / app), recovery codes left |
+| `POST backend/profile/two-factor/email`, `GET/POST …/app`, `POST …/disable`, `POST …/recovery-codes` (`auth-profile.edit` + `reauth`) | Enable email codes, enrol an authenticator app (QR + key + code), turn off, new recovery codes |
 
 `auth-profile` and `auth-sessions` are granted to every group. `backend/*` also runs Shield's
-`session` filter (login required) and `forcereset`.
+`session` filter (login required), `forcereset` and `force2fa`.
 
 ## Rules
 
@@ -57,11 +61,49 @@ Two-factor authentication and re-authentication arrive in session 06.
   `can:`; only a superadmin assigns or removes `superadmin`, the last one keeps it, nobody changes
   their own groups and the four groups cannot be renamed or deleted (`GroupRules`).
 
+## Two-factor authentication
+
+- **Methods**, chosen by each user in the profile: none, **email** (a 6-digit code sent at every
+  login) or **authenticator app** (TOTP, RFC 6238: 6 digits, 30 s, SHA-1; Google/Microsoft
+  Authenticator, Aegis, 1Password…). Table `user_two_factor` (one row per user with 2FA).
+- **Login step:** Shield's single `login` action is `Modules\Auth\Authentication\UserTwoFactorAction`,
+  which applies only to users with 2FA (password and magic-link logins). Email codes are hashed,
+  valid 10 minutes, single use, sent inline by `SecurityMailer`; "send a new code" follows the
+  email limits. Wrong codes count as failed logins; past the limit the pending login ends.
+- **App enrolment:** a 160-bit secret kept in the session, its QR code (local SVG, `data:` image on
+  white) and the key in text; it is saved, encrypted with CI4 Encryption, only after a valid code.
+  Needs `encryption.key` in `.env` (the method is unavailable without it).
+- **Codes:** the current 30-second step ±1 is accepted, and never a step already used (the last
+  accepted step is stored).
+- **Recovery codes:** 10 codes `XXXXX-XXXXX` (case and dash ignored), SHA-256 in
+  `user_recovery_codes`, single use, shown once, regenerable; created when a method is enabled,
+  deleted when 2FA is turned off.
+- **Remember-me:** for a user with 2FA the token is issued only after the code
+  (`SessionAuthenticator`); a remember-me login does not ask the code again (trusted device)
+  but sensitive actions do.
+- **Group policy** (`Auth.twoFactorPolicy`, e.g. `{"admin": "required"}`; missing groups are
+  optional): a user of a required group without 2FA is sent to the set-up screen by `force2fa`
+  and cannot turn it off.
+- **Admin reset:** `(new TwoFactor())->reset($user, $adminId)` turns it off, deletes the recovery
+  codes and a pending code, logs it and fires `twoFactorReset` (notification: session 11; screen:
+  session 15). Enabling/disabling fires `twoFactorChanged`.
+
+## Re-authentication ("sudo mode")
+
+- Sensitive actions ask again for the password and, with 2FA, a code (or a recovery code);
+  the confirmation lasts `Auth.reauthMinutes` (15) for the PHP session.
+- A password login (with its 2FA step) opens the window; a magic link, a session re-created by
+  remember-me and the idle lock do not (decision D-06-04).
+- Wrong answers count as failed logins; past the limit the session ends.
+- A GET is sent to `auth/reauth` and back afterwards; a POST is never replayed: the user confirms
+  and repeats the action. JSON requests get 401 `{"error": …, "reauth": url}`.
+
 ## Settings (Settings › Security, session 14)
 
 `Auth.minimumPasswordLength`, `absoluteLifetime`, `idleTimeout`, `rememberLifetime`, `captcha`,
 `newDeviceNotice`, `loginAttemptsPerIp`, `loginAttemptsPerAccount`, `loginLockMinutes`,
-`emailLinksPerIp`, `emailLinksPerAccount`. Defaults live in `app/Config/Auth.php`.
+`emailLinksPerIp`, `emailLinksPerAccount`, `reauthMinutes` (15, 1–240), `twoFactorPolicy` (json,
+group → `required`|`optional`). Defaults live in `app/Config/Auth.php`.
 
 Keep `Config\Session::$expiration` at least as long as the absolute lifetime.
 
@@ -73,3 +115,13 @@ Keep `Config\Session::$expiration` at least as long as the absolute lifetime.
   `(new \Modules\Auth\Services\SessionTracker())->privilegesChanged($userId)`, or use
   `GroupRules::assign()`/`remove()`.
 - Send security emails with `Modules\Auth\Services\SecurityMailer`, never the queued channel.
+- Protect sensitive actions with re-authentication: `'filter' => ['can:<permission>', 'reauth']`
+  on the route (preferred), or inside a `BackendController` action:
+
+  ```php
+  if (($response = $this->requireReauth()) !== null) {
+      return $response;
+  }
+  ```
+- `(new \Modules\Auth\Services\TwoFactor())->method($userId)` gives a user's 2FA method
+  (`email`, `totp` or null).

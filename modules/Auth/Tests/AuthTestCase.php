@@ -54,6 +54,18 @@ abstract class AuthTestCase extends CIUnitTestCase
         service('superglobals')->setServer('REMOTE_ADDR', '192.0.2.10');
     }
 
+    /**
+     * Leaves no logged-in user behind for the next test class (the session and Shield's shared
+     * authenticator outlive the test otherwise).
+     */
+    protected function tearDown(): void
+    {
+        $_SESSION = [];
+        Services::resetSingle('auth');
+        service('superglobals')->setCookieArray([]);
+        parent::tearDown();
+    }
+
     protected function createUser(string $email = 'ana@example.com', string $group = 'user', ?string $password = null): User
     {
         $users = model(UserModel::class);

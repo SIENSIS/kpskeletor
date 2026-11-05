@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Auth\Services;
 
 use CodeIgniter\Shield\Entities\User;
+use Modules\Auth\Controllers\TwoFactorSettingsController;
 use Modules\Auth\Filters\AuthSession;
 use Modules\Auth\Models\UserProfileModel;
 use Modules\Core\Frontend\ThemeMode;
@@ -23,6 +24,17 @@ final class LoginListener
 
         (new DeviceRecognizer())->loggedIn($user);
 
+        $reauth = new Reauth();
+        $reauth->forget();
+
+        if (session(Reauth::PASSWORD_LOGIN_KEY) === true) {
+            // Password (and 2FA code) typed just now: sensitive actions need no second prompt.
+            $reauth->confirm($user);
+        }
+
+        session()->remove(Reauth::PASSWORD_LOGIN_KEY);
+        session()->remove(TwoFactorSettingsController::PENDING_SECRET);
+
         $mode = model(UserProfileModel::class)->forUser((int) $user->id)['theme_mode'] ?? null;
 
         if (is_string($mode) && in_array($mode, ThemeMode::MODES, true)) {
@@ -34,6 +46,9 @@ final class LoginListener
 
     public function logout(): void
     {
+        (new Reauth())->forget();
+        session()->remove([TwoFactorSettingsController::PENDING_SECRET, TwoFactorSettingsController::NEW_CODES]);
+
         (new SessionTracker())->endCurrent(SessionTracker::END_LOGOUT);
     }
 

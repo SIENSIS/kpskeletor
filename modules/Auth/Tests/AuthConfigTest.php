@@ -50,5 +50,13 @@ final class AuthConfigTest extends CIUnitTestCase
         $this->assertContains('authsession', $filters->globals['before']);
         $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['session']);
         $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['forcereset']);
+        $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['force2fa']);
+    }
+
+    public function testTheLoginActionIsTheUserTwoFactorAction(): void
+    {
+        $this->assertSame(\Modules\Auth\Authentication\UserTwoFactorAction::class, config('Auth')->actions['login']);
+        $this->assertSame(15, config('Auth')->reauthMinutes);
+        $this->assertSame([], config('Auth')->twoFactorPolicy);
     }
 }

@@ -21,12 +21,14 @@
         "ext-openssl": "*",
         "ext-sodium": "*",
         "ext-zip": "*",
+        "chillerlan/php-qrcode": "^5.0",
         "codeigniter4/framework": "^4.7",
         "codeigniter4/settings": "^2.4",
         "codeigniter4/shield": "^1.4",
         "codeigniter4/translations": "^4.7",
         "siensis/kpapy": "^1.0",
-        "siensis/kpcrudy": "^1.0"
+        "siensis/kpcrudy": "^1.0",
+        "spomky-labs/otphp": "^11.3"
     },
     "require-dev": {
         "codeigniter/phpstan-codeigniter": "^2.2",

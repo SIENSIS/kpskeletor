@@ -7,6 +7,9 @@ namespace Modules\Auth\Controllers;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Authentication\Authenticators\Session;
+use Modules\Auth\Authentication\SessionAuthenticator;
+use Modules\Auth\Services\Reauth;
+use Modules\Auth\Services\TwoFactor;
 
 /**
  * Password login and logout.
@@ -71,9 +74,22 @@ final class LoginController extends AuthController
         }
 
         $remember = (bool) $this->request->getPost('remember') && (bool) config('Auth')->sessionConfig['allowRemembering'];
-        $result   = $authenticator->remember($remember)->attempt(['email' => $email, 'password' => $password]);
+
+        // With 2FA, remember-me is issued only after the code (SessionAuthenticator).
+        $twoFactor = $remember && $user !== null && (new TwoFactor())->enabled((int) $user->id);
+        session()->remove(SessionAuthenticator::REMEMBER_AFTER_2FA);
+
+        if ($twoFactor) {
+            $remember = false;
+            session()->set(SessionAuthenticator::REMEMBER_AFTER_2FA, true);
+        }
+
+        // A password login (with its 2FA step) counts as a fresh re-authentication (LoginListener).
+        session()->set(Reauth::PASSWORD_LOGIN_KEY, true);
+        $result = $authenticator->remember($remember)->attempt(['email' => $email, 'password' => $password]);
 
         if (! $result->isOK()) {
+            session()->remove([Reauth::PASSWORD_LOGIN_KEY, SessionAuthenticator::REMEMBER_AFTER_2FA]);
             $this->throttle()->loginFailed($this->ip(), $email);
 
             // Only someone who knows the password learns that the account is banned.
