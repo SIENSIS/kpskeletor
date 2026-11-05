@@ -99,6 +99,21 @@ return [
     'res' => [
         'modules' => 'Modules',
     ],
+    'rbac' => [
+        'unknownGroup' => 'The group "{0}" does not exist.',
+        'unknownPermission' => 'The permission "{0}" does not exist.',
+        'cannotGrant' => 'You cannot change these permissions of the group "{0}": you can only grant permissions you hold, and not to a group you belong to.',
+        'cannotChangeUser' => 'You cannot change the permissions of this user.',
+        'notInstalled' => 'The permission tables do not exist yet: run "php spark modules:sync".',
+        'listEmpty' => 'No permissions found.',
+        'permission' => 'Permission',
+        'description' => 'Description',
+        'groups' => 'Groups',
+        'warning' => 'Warning:',
+        'error' => 'Error:',
+        'checkFailed' => 'Permission check failed: {0} error(s).',
+        'checkOk' => 'Permissions OK: {0} permission(s) in the catalogue, {1} route(s) checked.',
+    ],
     'perm' => [
         'list'      => 'List',
         'show'      => 'Show',

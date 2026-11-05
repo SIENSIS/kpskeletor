@@ -99,6 +99,21 @@ return [
     'res' => [
         'modules' => 'Mòduls',
     ],
+    'rbac' => [
+        'unknownGroup' => 'El grup «{0}» no existeix.',
+        'unknownPermission' => 'El permís «{0}» no existeix.',
+        'cannotGrant' => 'No pots canviar aquests permisos del grup «{0}»: només pots concedir permisos que tens, i no a un grup on ets.',
+        'cannotChangeUser' => 'No pots canviar els permisos d\'aquest usuari.',
+        'notInstalled' => 'Les taules de permisos encara no existeixen: executa «php spark modules:sync».',
+        'listEmpty' => 'No s\'ha trobat cap permís.',
+        'permission' => 'Permís',
+        'description' => 'Descripció',
+        'groups' => 'Grups',
+        'warning' => 'Avís:',
+        'error' => 'Error:',
+        'checkFailed' => 'La comprovació de permisos ha fallat: {0} error(s).',
+        'checkOk' => 'Permisos correctes: {0} permís(os) al catàleg, {1} ruta(es) comprovades.',
+    ],
     'perm' => [
         'list'      => 'Llistar',
         'show'      => 'Veure',
