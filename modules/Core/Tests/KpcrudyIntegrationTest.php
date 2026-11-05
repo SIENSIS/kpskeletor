@@ -131,6 +131,7 @@ final class KpcrudyIntegrationTest extends CIUnitTestCase
     public function testPageTopBuildsAHeaderFromTheCrudTitle(): void
     {
         $html = view(theme_resolve('partials/page_top'), [
+            'pageHeader'  => null, // view data outlives view() calls
             'title'       => 'Posts <x>',
             'breadcrumbs' => [['label' => 'Back office', 'url' => '/backend'], ['label' => 'News', 'url' => null]],
         ]);
@@ -139,7 +140,7 @@ final class KpcrudyIntegrationTest extends CIUnitTestCase
         $this->assertStringContainsString('Posts &lt;x&gt;', $html);
         $this->assertStringContainsString('aria-current="page"', $html);
 
-        $crumbs = view(theme_resolve('partials/page_top'), ['title' => null, 'breadcrumbs' => [['label' => 'News', 'url' => null]]]);
+        $crumbs = view(theme_resolve('partials/page_top'), ['pageHeader' => null, 'title' => null, 'breadcrumbs' => [['label' => 'News', 'url' => null]]]);
         $this->assertStringNotContainsString('page-header', $crumbs, 'No title: breadcrumbs only.');
     }
 

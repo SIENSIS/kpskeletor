@@ -85,7 +85,7 @@ final class CrudScaffoldTest extends CIUnitTestCase
 
         $controller = CrudScaffold::rewriteController($source, 'library-books');
 
-        $this->assertStringContainsString("declare(strict_types=1);", $controller);
+        $this->assertStringContainsString('declare(strict_types=1);', $controller);
         $this->assertStringContainsString("\$crud = \$this->crud('library-books');", $controller);
         $this->assertStringContainsString('return $this->renderCrud($crud);', $controller);
         $this->assertStringContainsString('final class Books extends BackendController', $controller);

@@ -7,11 +7,11 @@ namespace Modules\Core\Crud;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\Router\RouteCollection;
+use Config\Services;
 use Kpcrudy\Crud;
 use Modules\Core\Permissions\CrudPermissions;
 use Modules\Core\Permissions\PermissionCatalogue;
 use Modules\Core\Permissions\RouteSecurityAuditor;
-use Config\Services;
 
 /**
  * Compares every kpcrudy CRUD of the routes with the permission catalogue
