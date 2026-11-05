@@ -6,6 +6,7 @@ namespace Modules\Core\Permissions;
 
 use CodeIgniter\Router\RouteCollection;
 use Config\Services;
+use Modules\Core\Crud\CrudAuditor;
 use Modules\Core\Modules\ModuleDiscovery;
 
 /**
@@ -14,7 +15,8 @@ use Modules\Core\Modules\ModuleDiscovery;
  *
  * - errors: invalid manifests or duplicate permission names; generated permissions missing from
  *   the stored catalogue (run `modules:sync`); Shield's matrix out of date; route problems
- *   (`RouteSecurityAuditor`, with the generated catalogue).
+ *   (`RouteSecurityAuditor`, with the generated catalogue); kpcrudy CRUDs not made with
+ *   `CrudFactory` or asking about undeclared operations (`CrudAuditor`).
  * - warnings: stored permissions no manifest generates (`modules:sync --prune`); grants naming
  *   unknown permissions; atomic grants without the permissions they imply.
  *
@@ -87,6 +89,10 @@ final class PermissionAudit
 
         $routes = $this->routes ?? Services::routes(false)->loadRoutes(); // a fresh collection: the shared one keeps request state
         $errors = [...$errors, ...(new RouteSecurityAuditor())->audit($routes, $names)];
+
+        if (db_connect()->tableExists('permissions')) {
+            $errors = [...$errors, ...(new CrudAuditor($this->catalogue))->audit($routes)];
+        }
 
         return [
             'errors'      => $errors,
