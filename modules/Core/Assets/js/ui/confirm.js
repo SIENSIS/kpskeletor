@@ -84,3 +84,25 @@ export function bindConfirmations(root = document) {
         }
     });
 }
+
+/**
+ * kpcrudy's confirmations (delete, bulk actions, operations with `confirm`) use the theme's
+ * modal: kpcrudy dispatches the cancelable `kpcrudy:confirm` event before window.confirm(); this
+ * cancels it, asks with confirm() and calls detail.proceed() when accepted.
+ */
+export function bindKpcrudyConfirmations(target = document) {
+    target.addEventListener('kpcrudy:confirm', (event) => {
+        const detail = event.detail || {};
+
+        if (typeof detail.proceed !== 'function') {
+            return;
+        }
+
+        event.preventDefault();
+        confirm(String(detail.message || ''), { variant: 'danger' }).then((accepted) => {
+            if (accepted) {
+                detail.proceed();
+            }
+        });
+    });
+}

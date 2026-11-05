@@ -8,6 +8,9 @@ use App\Controllers\BaseController;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Kpcrudy\Crud;
+use Modules\Core\Crud\CrudFactory;
+use Modules\Core\Crud\CrudInspection;
 use Modules\Core\Permissions\Authorization;
 use Psr\Log\LoggerInterface;
 
@@ -16,9 +19,9 @@ use Psr\Log\LoggerInterface;
  *
  * Renders through the back-office theme (`Theme.backend`): views extend
  * `theme_layout('backend')` and module views can be overridden by the theme
- * (`Views/overrides/<Module>/…`). The CRUD helpers (`crud()` / `renderCrud()`) are added with
- * kpcrudy and toasts with the front-end session. Every back-office route still declares its own
- * `can:` filter; `can()` here is for checks inside an action.
+ * (`Views/overrides/<Module>/…`). kpcrudy CRUDs: `crud()` / `renderCrud()` (docs/cruds.md).
+ * Every back-office route still declares its own `can:` filter; `can()` here is for checks
+ * inside an action.
  */
 abstract class BackendController extends BaseController
 {
@@ -39,6 +42,31 @@ abstract class BackendController extends BaseController
     protected function can(string ...$permissions): bool
     {
         return Authorization::current()->can(...$permissions);
+    }
+
+    /**
+     * A kpcrudy CRUD for a resource of the catalogue (`CrudFactory::make()`): permissions through
+     * `CrudPermissions`, masked ids, the theme's back-office layout.
+     */
+    protected function crud(string $resource): Crud
+    {
+        return CrudFactory::make($resource);
+    }
+
+    /**
+     * Renders a CRUD inside the back-office layout (page header with the CRUD's title and the
+     * breadcrumbs; messages as toasts). Returns kpcrudy's response as is for redirects and
+     * downloads, so the action must return it.
+     */
+    protected function renderCrud(Crud $crud): ResponseInterface|string
+    {
+        if (CrudFactory::inspecting()) {
+            throw new CrudInspection($crud);
+        }
+
+        $crud->setLayoutData(['breadcrumbs' => $this->breadcrumbs()]);
+
+        return $crud->render();
     }
 
     /**
@@ -127,11 +155,12 @@ abstract class BackendController extends BaseController
     }
 
     /**
-     * A message shown once on the next page (`message`, `success`, `warning` or `error`).
+     * A message shown once on the next page as a toast (`message`, `success`, `info`, `warning`
+     * or `error`).
      */
     protected function flash(string $message, string $type = 'message'): static
     {
-        session()->setFlashdata(in_array($type, ['message', 'success', 'warning', 'error'], true) ? $type : 'message', $message);
+        session()->setFlashdata(in_array($type, ['message', 'success', 'info', 'warning', 'error'], true) ? $type : 'message', $message);
 
         return $this;
     }

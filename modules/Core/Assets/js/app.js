@@ -5,7 +5,7 @@
 import { mountAll, observe } from 'core/components.js';
 import { initDirtyGuards } from 'core/forms/dirty-guard.js';
 import { initPwa } from 'core/pwa.js';
-import { bindConfirmations } from 'core/ui/confirm.js';
+import { bindConfirmations, bindKpcrudyConfirmations } from 'core/ui/confirm.js';
 import { initCookieNotice } from 'core/ui/cookie-notice.js';
 import { initSidebar } from 'core/ui/sidebar.js';
 import { initTabsMemory } from 'core/ui/tabs-memory.js';
@@ -18,6 +18,7 @@ const steps = [
     () => initCookieNotice(document),
     () => initDirtyGuards(document),
     () => bindConfirmations(document),
+    () => bindKpcrudyConfirmations(document),
     () => mountAll(document),
     () => observe(document.body),
     () => initPwa(),
