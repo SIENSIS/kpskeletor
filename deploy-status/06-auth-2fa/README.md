@@ -1,6 +1,6 @@
 # Session 06 — Two-factor authentication and re-authentication
 
-Branch: `claude/ecstatic-davinci-goi31r` (assigned by the environment) · Pull request: "Session 06: Two-factor authentication and re-authentication" (link in `docs/progress.md`) · Date: 2026-11-05
+Branch: `claude/ecstatic-davinci-goi31r` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) "Session 06: Two-factor authentication and re-authentication" · Date: 2026-11-05
 
 ## What was built
 

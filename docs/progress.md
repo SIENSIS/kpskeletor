@@ -13,7 +13,7 @@ pull request open), *merged* (in `main`).
 | 03 | Themes and standard views | merged | `claude/tender-ride-z9y4vv` | [SIENSIS/kpskeletor#6](https://github.com/SIENSIS/kpskeletor/pull/6) | [`deploy-status/03-themes/`](../deploy-status/03-themes/README.md) |
 | 04 | Front-end assets, JavaScript, CSP, dark mode, responsive and PWA | merged | `claude/funny-goldberg-9n764h` | [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) | [`deploy-status/04-frontend/`](../deploy-status/04-frontend/README.md) |
 | 05 | Authentication (Shield) and session hardening | merged | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
-| 06 | Two-factor authentication and re-authentication | done | `claude/ecstatic-davinci-goi31r` | — | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
+| 06 | Two-factor authentication and re-authentication | done | `claude/ecstatic-davinci-goi31r` | [SIENSIS/kpskeletor#10](https://github.com/SIENSIS/kpskeletor/pull/10) | [`deploy-status/06-auth-2fa/`](../deploy-status/06-auth-2fa/README.md) |
 
 ## Decisions
 
