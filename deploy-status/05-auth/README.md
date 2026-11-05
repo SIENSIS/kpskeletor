@@ -1,6 +1,6 @@
 # Session 05 — Authentication (Shield) and session hardening
 
-Branch: `claude/confident-turing-bbgi7g` (assigned by the environment) · Pull request: "Session 05: Authentication (Shield) and session hardening" · Date: 2026-11-05
+Branch: `claude/confident-turing-bbgi7g` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) "Session 05: Authentication (Shield) and session hardening" · Date: 2026-11-05
 
 ## What was built
 

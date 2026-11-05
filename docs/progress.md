@@ -12,7 +12,7 @@ pull request open), *merged* (in `main`).
 | 02 | Core kernel: catalogue, settings registry, enable/disable and demo data | merged | `claude/clever-lovelace-i36pbh` | [SIENSIS/kpskeletor#5](https://github.com/SIENSIS/kpskeletor/pull/5) | [`deploy-status/02-core-registry/`](../deploy-status/02-core-registry/README.md) |
 | 03 | Themes and standard views | merged | `claude/tender-ride-z9y4vv` | [SIENSIS/kpskeletor#6](https://github.com/SIENSIS/kpskeletor/pull/6) | [`deploy-status/03-themes/`](../deploy-status/03-themes/README.md) |
 | 04 | Front-end assets, JavaScript, CSP, dark mode, responsive and PWA | merged | `claude/funny-goldberg-9n764h` | [SIENSIS/kpskeletor#7](https://github.com/SIENSIS/kpskeletor/pull/7) | [`deploy-status/04-frontend/`](../deploy-status/04-frontend/README.md) |
-| 05 | Authentication (Shield) and session hardening | done | `claude/confident-turing-bbgi7g` | "Session 05: Authentication (Shield) and session hardening" | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
+| 05 | Authentication (Shield) and session hardening | done | `claude/confident-turing-bbgi7g` | [SIENSIS/kpskeletor#8](https://github.com/SIENSIS/kpskeletor/pull/8) | [`deploy-status/05-auth/`](../deploy-status/05-auth/README.md) |
 
 ## Decisions
 
