@@ -47,7 +47,7 @@ final class Tokens extends BackendController
             ->defaultOrder('last_used_at', 'desc')
             ->unsetAdd()->unsetEdit()->unsetExport()
             ->afterDelete(static function (string $id, array $row): void {
-                log_message('notice', 'API token {token} of user {user} revoked by user {by}.', ['token' => $id, 'user' => $row['user_id'] ?? 0, 'by' => auth()->id() ?? 0]);
+                security_log('Api', 'token_revoked', ['resource' => 'api', 'record_id' => $id, 'summary' => (string) ($row['name'] ?? ''), 'changes' => ['owner' => (int) ($row['user_id'] ?? 0)]]);
             });
 
         return $this->renderCrud($crud);

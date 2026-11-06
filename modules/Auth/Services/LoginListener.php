@@ -41,11 +41,15 @@ final class LoginListener
             self::rememberThemeMode($mode);
         }
 
-        log_message('info', 'User {id} logged in.', ['id' => $user->id]);
+        activity_log('Auth', 'login', ['user_id' => $user->id, 'resource' => 'auth-profile', 'summary' => (string) $user->email]);
     }
 
-    public function logout(): void
+    public function logout(?User $user = null): void
     {
+        if ($user !== null) {
+            activity_log('Auth', 'logout', ['user_id' => $user->id, 'resource' => 'auth-profile']);
+        }
+
         (new Reauth())->forget();
         session()->remove([TwoFactorSettingsController::PENDING_SECRET, TwoFactorSettingsController::NEW_CODES]);
 

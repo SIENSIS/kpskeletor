@@ -14,6 +14,7 @@ use Modules\Auth\Services\LoginListener;
 use Modules\Auth\Services\LoginThrottle;
 use Modules\Auth\Services\PasswordChanger;
 use Modules\Auth\Services\SessionTracker;
+use Modules\Core\Activity\ActivityLogger;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Frontend\ThemeMode;
 
@@ -77,18 +78,27 @@ final class ProfileController extends BackendController
             }
         }
 
-        model(UserProfileModel::class)->saveFor((int) $user->id, [
+        $profile = [
             'name'       => $data['name'] === '' ? null : $data['name'],
             'locale'     => $data['locale'],
             'timezone'   => $data['timezone'],
             'theme_mode' => $data['theme_mode'],
             'birth_date' => $data['birth_date'] === '' ? null : $data['birth_date'],
-        ]);
+        ];
+        $old = model(UserProfileModel::class)->forUser((int) $user->id);
+        model(UserProfileModel::class)->saveFor((int) $user->id, $profile);
+
+        [$before, $after] = ActivityLogger::diff($old, $profile);
+
+        if ($after !== []) {
+            activity_log('Auth', 'profile_updated', ['resource' => 'auth-profile', 'record_id' => $user->id, 'before' => $before, 'after' => $after]);
+        }
 
         if ($emailChanged) {
+            $previous    = (string) $user->email;
             $user->email = $data['email'];
             model(UserModel::class)->save($user);
-            log_message('notice', 'User {id} changed the account email.', ['id' => $user->id]);
+            security_log('Auth', 'email_changed', ['resource' => 'auth-profile', 'record_id' => $user->id, 'before' => ['email' => $previous], 'after' => ['email' => $data['email']]]);
         }
 
         LoginListener::rememberThemeMode($data['theme_mode']);

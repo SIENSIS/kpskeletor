@@ -69,7 +69,7 @@ final class SessionsController extends BackendController
             return $this->back('error', lang('Auth.sessions.notFound'));
         }
 
-        log_message('notice', 'User {id} logged out session {session} remotely.', ['id' => $user->id, 'session' => $id]);
+        security_log('Auth', 'session_revoked', ['resource' => 'auth-sessions', 'record_id' => $id]);
 
         return $this->back('success', lang('Auth.sessions.revoked'));
     }
@@ -79,7 +79,7 @@ final class SessionsController extends BackendController
         $user  = $this->user();
         $ended = (new SessionTracker())->endOthers((int) $user->id, SessionTracker::END_REVOKED);
 
-        log_message('notice', 'User {id} logged out {count} other session(s).', ['id' => $user->id, 'count' => $ended]);
+        security_log('Auth', 'sessions_revoked', ['resource' => 'auth-sessions', 'summary' => (string) $ended]);
 
         return $this->back('success', lang('Auth.sessions.revokedOthers', [$ended]));
     }
@@ -94,7 +94,7 @@ final class SessionsController extends BackendController
         }
 
         $user->revokeAccessTokenBySecret((string) $token->secret);
-        log_message('notice', 'User {id} revoked API token {token}.', ['id' => $user->id, 'token' => $id]);
+        security_log('Auth', 'token_revoked', ['resource' => 'auth-sessions', 'record_id' => $id, 'summary' => (string) $token->name]);
 
         return $this->back('success', lang('Auth.sessions.tokenRevoked'));
     }

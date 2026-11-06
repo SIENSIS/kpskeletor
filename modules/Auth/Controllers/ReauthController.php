@@ -73,7 +73,7 @@ final class ReauthController extends AuthController
 
         if (! $valid) {
             $this->throttle()->loginFailed($this->ip(), $email);
-            log_message('notice', 'Failed re-authentication of user {id}.', ['id' => $user->id]);
+            security_log('Auth', 'reauth_failed', ['resource' => 'auth-profile']);
 
             if ($this->throttle()->loginBlockedFor($this->ip(), $email) > 0) {
                 return $this->endSession(lang('Auth.reauth.tooMany'));
@@ -86,7 +86,7 @@ final class ReauthController extends AuthController
 
         $reauth = new Reauth($this->policy());
         $reauth->confirm($user);
-        log_message('info', 'User {id} re-authenticated.', ['id' => $user->id]);
+        security_log('Auth', 'reauth', ['resource' => 'auth-profile']);
 
         $return = $reauth->takeReturn();
 

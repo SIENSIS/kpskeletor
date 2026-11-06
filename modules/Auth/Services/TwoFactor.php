@@ -167,7 +167,7 @@ final class TwoFactor
         (new RecoveryCodes())->delete((int) $user->id);
         (new EmailCodes())->forget($user);
 
-        log_message('notice', 'Two-factor authentication of user {id} reset by user {by}.', ['id' => $user->id, 'by' => $byUserId ?? 0]);
+        security_log('Auth', '2fa_reset', ['user_id' => $byUserId, 'resource' => 'users', 'record_id' => $user->id, 'summary' => (string) $user->username]);
         Events::trigger('twoFactorReset', $user, $byUserId);
     }
 
@@ -219,7 +219,7 @@ final class TwoFactor
     {
         $codes = $newCodes ? (new RecoveryCodes())->generate((int) $user->id) : [];
 
-        log_message('notice', 'User {id} {what} two-factor authentication ({method}).', ['id' => $user->id, 'what' => $what, 'method' => $method ?? 'none']);
+        security_log('Auth', '2fa_' . $what, ['user_id' => $user->id, 'resource' => 'auth-profile', 'summary' => $method ?? '']);
         Events::trigger('twoFactorChanged', $user, $method);
 
         return $codes;

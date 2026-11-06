@@ -198,7 +198,7 @@ final class AuthSession implements FilterInterface
         }
 
         $tracker->start($user, true);
-        log_message('info', 'User {id} signed in again with remember-me.', ['id' => $user->id]);
+        activity_log('Auth', 'login_remembered', ['user_id' => $user->id, 'resource' => 'auth-profile']);
 
         return true;
     }

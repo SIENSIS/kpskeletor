@@ -10,6 +10,7 @@ use CodeIgniter\Shield\Authentication\Authenticators\Session;
 use Modules\Auth\Authentication\SessionAuthenticator;
 use Modules\Auth\Services\Reauth;
 use Modules\Auth\Services\TwoFactor;
+use Modules\Core\Activity\ActivityLogger;
 
 /**
  * Password login and logout.
@@ -138,6 +139,9 @@ final class LoginController extends AuthController
      */
     private function failed(array $data, string $message): ResponseInterface
     {
+        // The typed email is stored as data (never interpolated), and only if it is an email.
+        security_log('Auth', 'login_failed', ['user_id' => null, 'resource' => 'auth-profile', 'summary' => ActivityLogger::typedEmail($data['email'] ?? null)]);
+
         return $this->response->setStatusCode(200)->setBody($this->render(self::VIEW, $data + ['error' => $message]));
     }
 }

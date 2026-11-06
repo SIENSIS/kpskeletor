@@ -131,7 +131,7 @@ final class TwoFactorSettingsController extends BackendController
         }
 
         $codes = (new RecoveryCodes())->generate((int) $user->id);
-        log_message('notice', 'User {id} regenerated the recovery codes.', ['id' => $user->id]);
+        security_log('Auth', 'recovery_codes_regenerated', ['resource' => 'auth-profile']);
 
         return $this->done(lang('Auth.twoFactor.codesRegenerated'), $codes);
     }

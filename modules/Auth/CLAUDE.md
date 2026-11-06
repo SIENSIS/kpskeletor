@@ -34,6 +34,12 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
 - Demo users (`php spark modules:demo Auth`): superadmin@, admin@, editor@, usuari@example.com,
   password `Demo-kpskeletor-2026`.
 
+## Activity log
+
+Logins/logouts, failed logins (typed email only if valid), throttling, 2FA, recovery codes,
+re-authentication, password/email/profile changes, sessions and groups are written with
+`activity_log()` / `security_log()` (labels in `Language/*/Auth.php` › `activity`; D-12-01).
+
 ## Decisions
 
 D-05-01 … D-05-08 and D-06-01 … D-06-06 in `docs/decisions.md` (D-06-04: a password login counts
@@ -42,7 +48,6 @@ as re-authentication, decided by the owner).
 ## Open tasks
 
 - Session 10: kpapy 2FA providers reading `TwoFactor::method()` and the TOTP secret.
-- Session 12: activity log entries instead of `log_message()` (2FA changes, re-authentication).
 - Session 14: Settings › Security form for the `Auth.*` settings.
 - Session 15: 2FA reset row operation, policy in the `groups` table, refuse `reauth` while
   impersonating.

@@ -30,7 +30,7 @@ Events::on('login', static function (User $user): void {
 });
 
 Events::on('logout', static function (?User $user = null): void {
-    (new LoginListener())->logout();
+    (new LoginListener())->logout($user);
 });
 
 Events::on('privilegesChanged', static function (int $userId): void {

@@ -45,10 +45,11 @@ final class PasswordChanger
         $sessions = $this->tracker->endOthers((int) $user->id, SessionTracker::END_PASSWORD);
         $tokens   = $this->revokeAppTokens($user);
 
-        log_message('notice', 'Password of user {id} changed: {sessions} other session(s) ended, {tokens} app token(s) revoked.', [
-            'id'       => $user->id,
-            'sessions' => $sessions,
-            'tokens'   => $tokens,
+        security_log('Auth', 'password_changed', [
+            'user_id'   => auth()->id() ?? $user->id,
+            'resource'  => 'auth-profile',
+            'record_id' => $user->id,
+            'changes'   => ['sessions_ended' => $sessions, 'app_tokens_revoked' => $tokens],
         ]);
 
         Events::trigger('passwordChanged', $user, $sessions);

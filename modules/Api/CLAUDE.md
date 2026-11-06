@@ -27,13 +27,18 @@ profile, every user's tokens for administrators, the documentation page with "Tr
   (`apilocale` on `api/*`), `Services/PersonalTokens.php`.
 - Table `api_token_ips`. kpapy's own table `kpapy_login_challenges` is migrated by `modules:sync`.
 
+## Activity log
+
+`Config/Events.php` writes kpapy's `kpapy.auth.*` events; token creation/revocation and a token
+used from a new IP (`TokenAuthenticator`) are security entries (labels in `Language/*/Api.php` ›
+`activity`; D-12-01).
+
 ## Decisions
 
 D-10-01 … D-10-05 in `docs/decisions.md`.
 
 ## Open tasks
 
-- Session 12: activity log entries for logins, refusals and token changes (now `log_message()`).
 - Session 14: Settings › Security form for `Api.*`.
 - Session 23: `avatar_url` in `me`.
 - Session 26: Core endpoints (news, events, notifications, public ones) and the API catalogue

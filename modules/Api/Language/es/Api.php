@@ -83,4 +83,13 @@ return [
         'invalidDays'   => 'Elige uno de los periodos de caducidad ofrecidos.',
         'invalidScopes' => 'Elige «todo» o al menos uno de tus permisos.',
     ],
+    // Labels of the activity log actions (Activity module).
+    'activity' => [
+        'api_login_challenge' => 'Entrada desde una app: código pedido',
+        'api_login_failed' => 'Entrada desde una app fallida',
+        'api_login_denied' => 'Entrada desde una app rechazada por el usuario',
+        'token_created' => 'Token de API creado',
+        'token_revoked' => 'Token de API revocado',
+        'token_new_ip' => 'Token de API usado desde una dirección nueva',
+    ],
 ];
