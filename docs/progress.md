@@ -18,10 +18,12 @@ pull request open), *merged* (in `main`).
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 | 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
 | 10 | kpapy integration and API authentication | merged | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
-| 11 | Notifications and scheduler | done | `claude/charming-edison-f3elks` | [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
+| 11 | Notifications and scheduler | merged | `claude/charming-edison-f3elks` | [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
+| 12 | Activity log and Activity module | done | `claude/trusting-curie-sqluwo` | "Session 12: Activity log and Activity module" | [`deploy-status/12-activity/`](../deploy-status/12-activity/README.md) |
 
 ## Decisions
 
+- **12:** the Core writes the append-only `activity_log` (`ActivityLogger`, `activity_log()`/`security_log()`, `SecretMasker`, `SafeLogger` for the file log); each module logs its own events; CRUD writes, POST custom operations, bulk actions and exports logged by `AuditedCrud` (made by `CrudFactory`); action codes with labels `<Module>.activity.<code>`; failed logins keep only a valid typed email; IP/user agent only with `activity-log.network`; retention `Core.activityRetentionDays` (D-12-04 open) with the daily `PurgeActivityLog`; Activity module with `activity-log` and `activity-mine` (D-12-01 … D-12-05).
 - **11:** notification types are classes (`NotificationType`, key = class, data stored and rendered when read); email channel queued in `mail_queue` and sent by the Core scheduled task `SendQueuedEmails` (5 attempts), rendered in the recipient's language (`RecipientLocale`, Auth's profile locale); banned users skipped, `notifyPermission()` per user with `Authorization::for()`, mandatory types; resource `core-notifications` (every group) with the bell, list, open/read-all and preferences at `backend/profile/notifications`; scheduler with `next_run_at` + atomic claims, DB locks, 50 runs per task, failures notified to `schedule.list` holders, resource `schedule` (`list`, `show`, `run`; admin `schedule.*`); poor man's cron behind `Core.poorMansCron` (D-11-01 … D-11-06).
 - **10:** the API core is a core module `Api` (settings `Api.*`, permissions `api.*` incl. `api.list/show/delete` for every user's tokens); app login methods `totp` then `email` (users with email 2FA and without 2FA alike, deny link without login); limits and CORS from settings, Auth's `LoginThrottle` on the API login, password reset and personal-token refresh refused; no session on `api/*`, `Accept-Language` negotiation, `me` contents; personal tokens with scopes from the user's permissions, fixed expiries, `api_token_ips`, admin list as a kpcrudy CRUD (D-10-01 … D-10-05).
 
@@ -55,6 +57,7 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **12:** listeners of Auth/Api events live in those modules, not in the Core (D-12-01); kpcrudy's single `afterWrite` replaced by the `AuditedCrud` subclass (D-12-02); a CRUD token revocation writes a `delete` and a `token_revoked` entry; denials inside a CRUD are kpcrudy's "not found" (only `can:` denials are `forbidden` entries); six counting tests updated; error-level `log_message()` calls kept.
 - **11:** no separate `Lock` class (locks in `ScheduledTasks`); the bell shows absolute localised dates (no Catalan `Time::humanize()` strings); eight tests that count Core permissions/grants/tasks/migrations/filters updated; Auth listens to `twoFactorReset` (session 06 gap closed).
 - **10:** logins and token changes go to the application log until session 12; `me` is not in the OpenAPI document (library request); fixed an earlier gap: the global `authsession` filter opened a session on API requests (now `except api/*`); five Core/Auth tests that counted only Core+Auth permissions updated.
 
@@ -79,6 +82,7 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **12:** settings changes (14), refused uploads (13) and packages (29) not logged yet; module/action filter options read with `DISTINCT` per page; phone width scrolls the table (known issue 09); `security:check` does not exist until session 30; Composer needed `phpstan/phpstan`'s zip seeded again (known issue 04).
 - **11:** existing installations do not receive the Core's new default grants (`core-notifications.*`, `schedule.*`; grants applied once per module): recreate development databases; queued emails fail and retry in development without `email.*`; with `php spark serve`/mod_php the poor man's cron makes one request wait; the preferences list every type to every user; `ui_date(…, 'relative')` falls back to English in Catalan. Composer needed `phpstan/phpstan`'s zip seeded again (known issue 04).
 - **10:** any token can list/revoke its user's tokens through `me/tokens` (kpapy, library request); long scope list for administrators in "My API tokens"; the development debug toolbar starts a session on API calls (not production); fixed the environment's Composer install by seeding `phpstan/phpstan`'s zip again (known issue 04).
 
@@ -98,6 +102,8 @@ pull request open), *merged* (in `main`).
 - The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
+
+- Session 13+: see `deploy-status/12-activity/README.md` and `docs/activity.md`: log actions with `activity_log()` and refusals with `security_log()` (labels `<Module>.activity.<code>` in ca/es/en), never `log_message()` for audit; CRUDs log by themselves (`AuditedCrud`). Session 13: `upload_refused`; session 14: settings changes and `Core.activityRetentionDays` in the UI; session 15: impersonation, bans, forced resets; session 16: a security widget from `activity_log`; session 29: refused packages. D-12-04 is open.
 
 - Session 12+: see `deploy-status/11-notifications-scheduler/README.md`, `docs/scheduler.md` and `docs/notifications.md`: modules declare `$tasks` (`TaskInterface`) and `$notifications` (`NotificationType`) and send with `notify()`/`notifyGroup()`/`notifyPermission()`; session 12 logs "run now", task failures and preference changes in the activity log and purges it with a scheduled task; session 14 adds `Core.poorMansCron` to the settings UI; session 15 the 2FA reset row operation (notification already wired); session 16 a failing-tasks widget from `scheduled_tasks.last_status`; session 26 `api/v1/notifications` on top of `Inbox`.
 

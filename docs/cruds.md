@@ -81,6 +81,15 @@ catalogue (`search`, `filters` and `bulk` are part of `list`); superadmins pass,
 - Refused operations redirect to the list with an error toast; the UI hides what the server
   refuses. Masked ids are not access control.
 
+## Activity log
+
+`CrudFactory::make()` returns an `AuditedCrud` (a Core subclass of `Kpcrudy\Crud`): every write
+(insert, update with the changed fields, delete, restore, bulk actions, imports), every POST
+custom operation and custom bulk action, and every CSV export is written to the activity log with
+the CRUD's resource and module, after the CRUD's own hooks. Do not log them again in
+`afterWrite()`; `->skipActivity('key')` leaves out an operation that only changes the user's own
+view. See `docs/activity.md` (D-12-02).
+
 ## Configuration (`app/Config/Kpcrudy.php`)
 
 | Option | Value | Why |

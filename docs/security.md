@@ -84,6 +84,13 @@ re-authentication keep their own counters (`Auth.loginAttempts*`, `Auth.emailLin
 - Subjects are hashed before they reach the cache. A module's own limit:
   `attemptCustom('news-votes', $subject, 5, MINUTE)`.
 
+## Activity and security log
+
+Security events (failed logins and codes, throttling, 403s, re-authentication, token changes, a
+token used from a new IP, refused outbound requests…) are `security` entries of the append-only
+activity log; secrets are masked by key and the file log escapes line breaks (`SafeLogger`).
+Log a new security rule's refusals with `security_log()`. See `docs/activity.md`.
+
 ## Redirects
 
 Redirect targets that come from the request (`return`, `next`…) go through `safe_redirect()`:
