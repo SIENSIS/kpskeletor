@@ -16,6 +16,9 @@ final class Module extends ModuleManifest
     /**
      * The Modules screen (session 29) and the module commands: modules.list, modules.toggle,
      * modules.sync, modules.upload, modules.uninstall and modules.demo.
+     * The user's notifications (list page, bell, preferences: `core-notifications.*`, granted to
+     * every group) and the scheduled tasks screen (`schedule.list`, `schedule.show`,
+     * `schedule.run` for "run now").
      */
     public array $resources = [
         'modules' => [
@@ -31,6 +34,35 @@ final class Module extends ModuleManifest
                 'demo'      => 'Core.perm.demo',
             ],
         ],
+        'notifications' => [
+            'label'  => 'Core.res.notifications',
+            'type'   => 'crud',
+            'except' => ['add', 'edit', 'export', 'import', 'trash', 'restore', 'purge'],
+        ],
+        'schedule' => [
+            'label'  => 'Core.res.schedule',
+            'type'   => 'crud',
+            'name'   => 'schedule',
+            'except' => ['add', 'edit', 'delete', 'export', 'import', 'trash', 'restore', 'purge'],
+            'extra'  => [
+                'run' => 'Core.perm.run',
+            ],
+        ],
+    ];
+
+    public array $menu = [
+        ['resource' => 'notifications', 'label' => 'Core.menu.notifications', 'icon' => 'bi bi-bell', 'order' => 15, 'zone' => 'user'],
+        ['resource' => 'schedule', 'label' => 'Core.menu.schedule', 'icon' => 'bi bi-clock-history', 'order' => 85, 'zone' => 'settings'],
+    ];
+
+    /** @var list<string> */
+    public array $tasks = [
+        \Modules\Core\Tasks\SendQueuedEmails::class,
+    ];
+
+    /** @var list<string> */
+    public array $notifications = [
+        \Modules\Core\Notifications\Types\ScheduledTaskFailed::class,
     ];
 
     /**
@@ -96,6 +128,14 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitWidgets',
         ],
+        // Runs the due scheduled tasks from back-office requests (at most once a minute) on hosts
+        // without cron (Modules\Core\Filters\PoorMansCron).
+        'poorMansCron' => [
+            'type'    => 'bool',
+            'default' => false,
+            'label'   => 'Core.settings.poorMansCron',
+            'help'    => 'Core.settings.poorMansCronHelp',
+        ],
         // Extra outbound hosts (Settings › Security), added to Config\Outbound and the manifests.
         'outboundHosts' => [
             'type'    => 'json',
@@ -105,8 +145,14 @@ final class Module extends ModuleManifest
         ],
     ];
 
-    /** upload, uninstall and demo stay with the superadmin (who bypasses the checks). */
+    /**
+     * upload, uninstall and demo stay with the superadmin (who bypasses the checks). Personal
+     * screens (notifications) go to every group (D-00-17).
+     */
     public array $defaultGrants = [
-        'admin' => ['modules.list', 'modules.toggle', 'modules.sync'],
+        'superadmin' => ['core-notifications.*'],
+        'admin'      => ['modules.list', 'modules.toggle', 'modules.sync', 'core-notifications.*', 'schedule.*'],
+        'editor'     => ['core-notifications.*'],
+        'user'       => ['core-notifications.*'],
     ];
 }

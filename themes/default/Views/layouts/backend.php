@@ -1,8 +1,8 @@
 <?php
 /**
  * Back-office layout: sidebar (offcanvas on phones, icon-only bar on tablets, full on desktops,
- * collapsible and remembered), top bar with the theme switch and the user menu, page header or
- * breadcrumbs, session messages, the `content` section and a footer.
+ * collapsible and remembered), top bar with the notifications bell, the theme switch and the
+ * user menu, page header or breadcrumbs, session messages, the `content` section and a footer.
  * The sidebar prints the generated menu (partials/sidebar_menu), then the `sidebar` region.
  * Regions: sidebar, topbar, footer. kpcrudy uses it with the section `content`.
  *
@@ -40,6 +40,7 @@ $font = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
                 <?= theme_region('backend', 'topbar') ?>
             </div>
             <div class="d-flex align-items-center gap-1 ms-auto">
+                <?= theme_partial('notifications_bell') ?>
                 <?= theme_partial('theme_switch') ?>
                 <?= theme_partial('user_menu') ?>
             </div>
