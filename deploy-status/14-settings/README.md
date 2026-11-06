@@ -122,9 +122,11 @@ Playwright against `php spark serve`, demo data, device scale factor 2.
 ## Known issues and notes for the next session
 
 - D-14-01 and D-14-02 were decided by the owner as proposed (Decisions 14, same branch).
-- `Api\Tests\ApiResourceTest::testTheLoginIsLimitedPerIp` failed once (500) in the first full
-  run of this session before any change and passed alone and in later full runs: flaky, not
-  investigated further.
+- `Api\Tests\ApiResourceTest::testTheLoginIsLimitedPerIp` failed at random with a 500 (also in
+  CI on `main` after session 13). Cause: kpapy hashed a dummy password made of `random_bytes(16)`
+  for unknown emails, and bcrypt throws a `ValueError` on a null byte (about 6 % of processes).
+  Fixed in kpapy 1.0.1 (hex-encoded dummy password) and installed here (`composer.lock`);
+  recorded in `docs/library-requests.md`.
 - Composer needed `phpstan/phpstan`'s zip seeded again (known issue 04).
 - Session 15: move `Auth.twoFactorPolicy` to the `groups` table (and out of Settings ›
   Security); `SessionTracker::privilegesChanged()` is not needed by settings changes.
