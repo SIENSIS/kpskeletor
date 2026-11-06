@@ -70,7 +70,7 @@ final class ModulesSyncTest extends CIUnitTestCase
         $first = $this->synchronizer()->sync();
 
         $this->assertTrue($first->namespacesChanged);
-        $this->assertSame(11, $first->migrations['Modules\Core']);
+        $this->assertSame(12, $first->migrations['Modules\Core']);
         $this->assertSame(1, $first->migrations['Modules\\' . $this->module]);
         $this->assertArrayHasKey('Core', $first->installed);
         $this->assertArrayHasKey($this->module, $first->installed);

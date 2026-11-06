@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Config;
 
 use CodeIgniter\Config\BaseService;
+use Modules\Core\Activity\ActivityLogger;
 use Modules\Core\Frontend\AssetManifest;
 use Modules\Core\Notifications\Notifier;
 use Modules\Core\Theme\ThemeManager;
@@ -49,5 +50,17 @@ class Services extends BaseService
         }
 
         return new Notifier();
+    }
+
+    /**
+     * The activity and security log: `activity_log()`, `security_log()` (docs/activity.md).
+     */
+    public static function activity(bool $getShared = true): ActivityLogger
+    {
+        if ($getShared) {
+            return static::getSharedInstance('activity');
+        }
+
+        return new ActivityLogger();
     }
 }

@@ -89,7 +89,7 @@ final class RegistrySyncTest extends CIUnitTestCase
 
         $registry = new DeclarationRegistry();
         $this->assertSame(["Modules\\{$name}\\Widgets\\{$name}Widget"], $registry->widgets());
-        $this->assertSame(['Modules\\Core\\Tasks\\SendQueuedEmails', "Modules\\{$name}\\Tasks\\{$name}Task"], $registry->tasks());
+        $this->assertSame(['Modules\\Core\\Tasks\\SendQueuedEmails', 'Modules\\Core\\Tasks\\PurgeActivityLog', "Modules\\{$name}\\Tasks\\{$name}Task"], $registry->tasks());
         $this->assertSame('#dc3545', $registry->calendars()["{$name}.notices"]['definition']['color']);
         $this->assertTrue($report->declarationsChanged);
 

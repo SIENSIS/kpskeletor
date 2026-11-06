@@ -58,6 +58,7 @@ final class Module extends ModuleManifest
     /** @var list<string> */
     public array $tasks = [
         \Modules\Core\Tasks\SendQueuedEmails::class,
+        \Modules\Core\Tasks\PurgeActivityLog::class,
     ];
 
     /** @var list<string> */
@@ -137,6 +138,14 @@ final class Module extends ModuleManifest
             'help'    => 'Core.settings.poorMansCronHelp',
         ],
         // Extra outbound hosts (Settings › Security), added to Config\Outbound and the manifests.
+        // Days the activity log keeps its entries (PurgeActivityLog, daily).
+        'activityRetentionDays' => [
+            'type'    => 'int',
+            'default' => 365,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[3650]',
+            'label'   => 'Core.settings.activityRetentionDays',
+            'help'    => 'Core.settings.activityRetentionDaysHelp',
+        ],
         'outboundHosts' => [
             'type'    => 'json',
             'default' => [],
