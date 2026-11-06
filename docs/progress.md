@@ -18,10 +18,11 @@ pull request open), *merged* (in `main`).
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 | 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
 | 10 | kpapy integration and API authentication | merged | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
-| 11 | Notifications and scheduler | in progress | `claude/charming-edison-f3elks` | — | — |
+| 11 | Notifications and scheduler | done | `claude/charming-edison-f3elks` | — | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
 
 ## Decisions
 
+- **11:** notification types are classes (`NotificationType`, key = class, data stored and rendered when read); email channel queued in `mail_queue` and sent by the Core scheduled task `SendQueuedEmails` (5 attempts), rendered in the recipient's language (`RecipientLocale`, Auth's profile locale); banned users skipped, `notifyPermission()` per user with `Authorization::for()`, mandatory types; resource `core-notifications` (every group) with the bell, list, open/read-all and preferences at `backend/profile/notifications`; scheduler with `next_run_at` + atomic claims, DB locks, 50 runs per task, failures notified to `schedule.list` holders, resource `schedule` (`list`, `show`, `run`; admin `schedule.*`); poor man's cron behind `Core.poorMansCron` (D-11-01 … D-11-06).
 - **10:** the API core is a core module `Api` (settings `Api.*`, permissions `api.*` incl. `api.list/show/delete` for every user's tokens); app login methods `totp` then `email` (users with email 2FA and without 2FA alike, deny link without login); limits and CORS from settings, Auth's `LoginThrottle` on the API login, password reset and personal-token refresh refused; no session on `api/*`, `Accept-Language` negotiation, `me` contents; personal tokens with scopes from the user's permissions, fixed expiries, `api_token_ips`, admin list as a kpcrudy CRUD (D-10-01 … D-10-05).
 
 - **09:** `app.maskKey` in `Config\App`, read by both library configs through `MaskKey`, web requests refused in production without it (`spark` not blocked); CRUD page header from the title, `flashKeys` → toasts (new `info` key), `kpcrudy:confirm` → theme modal; `CrudFactory::routes()` adds `backend` + `can:<resource>.list` + name, `CrudAuditor` in `permissions:check` runs every CRUD action with inspection on; `make:module --crud` runs `kpcrudy:make` in a child process and rewrites it; the sample CRUD is a test-only module (D-09-01 … D-09-05).
@@ -54,6 +55,7 @@ pull request open), *merged* (in `main`).
 
 ## Deviations from the specification
 
+- **11:** no separate `Lock` class (locks in `ScheduledTasks`); the bell shows absolute localised dates (no Catalan `Time::humanize()` strings); eight tests that count Core permissions/grants/tasks/migrations/filters updated; Auth listens to `twoFactorReset` (session 06 gap closed).
 - **10:** logins and token changes go to the application log until session 12; `me` is not in the OpenAPI document (library request); fixed an earlier gap: the global `authsession` filter opened a session on API requests (now `except api/*`); five Core/Auth tests that counted only Core+Auth permissions updated.
 
 - **08:** outbound requests and rate-limit refusals are written to the application log until the activity log (session 12); `app.allowedHostnames` is left to the installer (session 18); the Settings › Security form for the new settings is session 14. Fixed nothing from earlier sessions except the expected `backend` chain in `AuthConfigTest`.
@@ -77,6 +79,7 @@ pull request open), *merged* (in `main`).
 
 ## Known issues
 
+- **11:** existing installations do not receive the Core's new default grants (`core-notifications.*`, `schedule.*`; grants applied once per module): recreate development databases; queued emails fail and retry in development without `email.*`; with `php spark serve`/mod_php the poor man's cron makes one request wait; the preferences list every type to every user; `ui_date(…, 'relative')` falls back to English in Catalan. Composer needed `phpstan/phpstan`'s zip seeded again (known issue 04).
 - **10:** any token can list/revoke its user's tokens through `me/tokens` (kpapy, library request); long scope list for administrators in "My API tokens"; the development debug toolbar starts a session on API calls (not production); fixed the environment's Composer install by seeding `phpstan/phpstan`'s zip again (known issue 04).
 
 - **09:** no kpcrudy responsive list options yet (library request); `permissions:check` inspects CRUDs without a user (operations added only for some users are caught at run time); `make:module --crud` needs the configured database and a new table; generated CRUD labels are English in the three languages; fixed the environment's Composer install by seeding `phpstan/phpstan`'s zip again (known issue 04).
@@ -95,6 +98,8 @@ pull request open), *merged* (in `main`).
 - The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
+
+- Session 12+: see `deploy-status/11-notifications-scheduler/README.md`, `docs/scheduler.md` and `docs/notifications.md`: modules declare `$tasks` (`TaskInterface`) and `$notifications` (`NotificationType`) and send with `notify()`/`notifyGroup()`/`notifyPermission()`; session 12 logs "run now", task failures and preference changes in the activity log and purges it with a scheduled task; session 14 adds `Core.poorMansCron` to the settings UI; session 15 the 2FA reset row operation (notification already wired); session 16 a failing-tasks widget from `scheduled_tasks.last_status`; session 26 `api/v1/notifications` on top of `Inbox`.
 
 - Session 11+: see `deploy-status/10-kpapy/README.md` and `docs/api.md`: module API resources with `Resource::routes(..., ['filter' => 'kpapy'])` under `api/v1/<path>`, `setResource()` = the CRUD's resource, an `$api` manifest entry, tests from `modules/Api/Tests/ApiResourceTest.php`. Session 12: activity entries for the `kpapy.auth.*` events and token changes. Session 14: Settings › Security for `Api.publicSpec`, `Api.corsOrigins`, `Api.appTokenDays`. Session 23: `avatar_url` in `me`. Session 26: Core endpoints and API catalogue checks.
 
