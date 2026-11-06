@@ -31,4 +31,17 @@ final class SecurityDefaultsTest extends CIUnitTestCase
         $this->assertStringContainsString("!/public/uploads/index.html\n", $gitignore);
         $this->assertFileExists(ROOTPATH . 'public/uploads/index.html');
     }
+
+    public function testNothingRunsInThePublicUploadFolder(): void
+    {
+        $gitignore = (string) file_get_contents(ROOTPATH . '.gitignore');
+        $htaccess  = (string) file_get_contents(ROOTPATH . 'public/uploads/.htaccess');
+
+        $this->assertStringContainsString("!/public/uploads/.htaccess\n", $gitignore);
+        $this->assertStringContainsString('php_flag engine off', $htaccess);
+        $this->assertStringContainsString('-ExecCGI', $htaccess);
+        $this->assertStringContainsString('X-Content-Type-Options "nosniff"', $htaccess);
+        $this->assertStringContainsString('sandbox', $htaccess);
+        $this->assertMatchesRegularExpression('/FilesMatch "[^"]*php[^"]*html\?[^"]*">\s*Require all denied/', $htaccess);
+    }
 }
