@@ -1,0 +1,24 @@
+# Public disk of the Storage service (docs/web-server.md). Uploaded files are data, never code:
+# nothing here is executed, listed or sniffed, and active types are downloaded, not rendered.
+Options -Indexes -ExecCGI -Includes
+RemoveHandler .php .phtml .phar .php3 .php4 .php5 .php7 .php8 .pht .cgi .pl .py .sh .shtml
+RemoveType .php .phtml .phar .php3 .php4 .php5 .php7 .php8 .pht
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<FilesMatch "\.(?i:php\d?|phtml|phar|pht|cgi|pl|py|sh|shtml|html?|xhtml|js|mjs)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; frame-ancestors 'self'; sandbox"
+    <FilesMatch "\.(?i:svg|svgz)$">
+        Header always set Content-Disposition "attachment"
+    </FilesMatch>
+</IfModule>

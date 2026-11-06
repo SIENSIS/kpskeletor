@@ -371,6 +371,12 @@ return [
         'outboundHostsHelp' => 'Host names the site may call over HTTPS or use as SMTP server (e.g. api.example.com or *.example.com), besides those of the configuration and the modules.',
         'activityRetentionDays' => 'Days the activity log is kept',
         'activityRetentionDaysHelp' => 'Older entries are deleted every night (scheduled task).',
+        'uploadTypes' => 'Allowed file types',
+        'uploadTypesHelp' => 'Extensions separated by commas (e.g. jpg, png, pdf). Each upload field can only narrow this list. Code, HTML and executables are always refused.',
+        'uploadMaxSize' => 'Maximum upload size (MB)',
+        'uploadMaxSizeHelp' => 'Each upload field can only lower it. PHP\'s upload_max_filesize and post_max_size must allow it too.',
+        'uploadAllowSvg' => 'Allow SVG images',
+        'uploadAllowSvgHelp' => 'SVG files can carry scripts: when allowed, they are sanitised and only accepted by fields that list svg.',
         'poorMansCron' => 'Run scheduled tasks without cron',
         'poorMansCronHelp' => 'For hosts without cron: back-office visits run the due scheduled tasks at most once a minute, after the page is sent. A cron entry is more reliable.',
     ],
@@ -484,5 +490,20 @@ return [
         'outbound_refused' => 'Outbound request refused',
         'preferences_saved' => 'Notification preferences saved',
         'purge' => 'Old entries deleted',
+        'upload_refused' => 'Upload refused',
+    ],
+    // Upload rules of the Storage service.
+    'storage' => [
+        'refused' => [
+            'invalid' => 'The file could not be uploaded. Try again.',
+            'empty' => 'The file is empty.',
+            'too_large' => 'The file is too large (maximum {0} MB).',
+            'type' => 'Files of type "{0}" are not allowed here. Allowed: {1}.',
+            'forbidden' => 'Files of type "{0}" are never accepted.',
+            'mime' => 'The contents of the file do not match its type ({0}).',
+            'image' => 'The image could not be read or is too large.',
+            'svg' => 'SVG images are not allowed or the file is not a valid SVG.',
+            'content' => 'The file contains code or HTML and was refused.',
+        ],
     ],
 ];

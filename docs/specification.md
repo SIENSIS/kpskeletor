@@ -930,14 +930,18 @@ granularity instead of collapsing it into read/create/update/delete.
 ### Storage
 
 * A `Storage` service (Flysystem) with two disks: `public` (`public/uploads`) and `private`
-  (`writable/storage`, served through a controller that checks permissions). Modules never use
+  (`writable/storage`, served only by `files/private/{key}`, a random 128-bit key, through a
+  controller that checks permissions: until the folder permissions of "Files" only the uploader
+  and superadmins; anything not allowed is a 404). Modules never use
   paths directly, so another adapter (S3, SFTP) can be added later.
 * Uploads: extension allow-list **and** MIME check, size limit, random file names (the original
-  name is kept in the database), and no execution in upload folders.
-  * **SVG and HTML are refused by default** (they can carry scripts); a setting allows SVG only
-    through a sanitiser.
+  name is kept in the database), and no execution in upload folders. The global rules are Core
+  settings, `Core.uploadTypes` (comma-separated extensions) and `Core.uploadMaxSize` (MB, default
+  10); each field can only narrow them.
+  * **SVG and HTML are refused by default** (they can carry scripts); the setting
+    `Core.uploadAllowSvg` (off by default) allows SVG only through a sanitiser.
   * **Images are re-encoded by default** (avatars and public images), which strips metadata and
-    payloads hidden in the file; a setting can turn it off per field.
+    payloads hidden in the file; a field option can turn it off for that field.
   * **Private files that are not images or PDF** are served with
     `Content-Disposition: attachment`; every file is served with its stored MIME type and
     `X-Content-Type-Options: nosniff`.
@@ -1197,7 +1201,8 @@ customise, links, reset), as atomic operations.
 * Metadata in a `files` table (disk, path, original name, mime, size, dimensions, checksum,
   uploaded_by, visibility public/private, alt text, tags); the folder tree is virtual (paths).
 * Search and filters by type, date and tag; list and grid views.
-* Rules: extension and MIME allow-lists from settings, size limits, quotas, image thumbnails
+* Rules: extension and MIME allow-lists from the Core settings (`Core.uploadTypes`,
+  `Core.uploadMaxSize`, `Core.uploadAllowSvg`), size limits, quotas, image thumbnails
   generated on upload, path traversal impossible (all paths normalised and resolved inside the
   disk root).
 

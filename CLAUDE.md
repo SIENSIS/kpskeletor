@@ -131,7 +131,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   `SessionTracker::privilegesChanged()`; security emails go through `SecurityMailer`.
 - No raw SQL with interpolated values; no `getPost()` wholesale into inserts; escape all output;
   HTMLPurifier for rich text; redirects only to internal paths (`safe_redirect()`).
-- Uploads through the Storage service only (allow-lists, random names, no SVG/HTML by default).
+- Uploads through the Storage service only (`service('storage')->store()`, `UploadRules`;
+  allow-lists, random names, no SVG/HTML by default; `docs/storage.md`, `docs/web-server.md`).
 - No outbound HTTP on regular requests; external calls only through `OutboundClient`
   (HTTPS + allow-list).
 - Secrets only in `.env`; never commit real values, keys, passwords or tokens.

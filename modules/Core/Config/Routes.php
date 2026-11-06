@@ -22,6 +22,10 @@ $routes->get('manifest.webmanifest', '\Modules\Core\Controllers\Pwa::manifest');
 $routes->get('sw.js', '\Modules\Core\Controllers\Pwa::serviceWorker');
 $routes->get('pwa/icon-(:num).png', '\Modules\Core\Controllers\Pwa::icon/$1');
 
+// Private files of the Storage service: served only after Config\Storage::$accessRule allows it
+// (otherwise 404), with the stored MIME type, nosniff and `attachment` unless image or PDF.
+$routes->get('files/private/(:segment)', '\Modules\Core\Controllers\PrivateFiles::show/$1');
+
 // Notifications of the logged-in user (resource core-notifications, granted to every group).
 // The bell's endpoints come before the CRUD's catch-all route.
 $routes->group('backend', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {

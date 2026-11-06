@@ -371,6 +371,12 @@ return [
         'outboundHostsHelp' => 'Noms de servidor als quals el lloc pot connectar per HTTPS o fer servir com a servidor SMTP (p. ex. api.example.com o *.example.com), a més dels de la configuració i els mòduls.',
         'activityRetentionDays' => 'Dies que es conserva el registre d\'activitat',
         'activityRetentionDaysHelp' => 'Les entrades més antigues s\'esborren cada nit (tasca programada).',
+        'uploadTypes' => 'Tipus de fitxer permesos',
+        'uploadTypesHelp' => 'Extensions separades per comes (p. ex. jpg, png, pdf). Cada camp de pujada només pot restringir aquesta llista. El codi, l\'HTML i els executables sempre es rebutgen.',
+        'uploadMaxSize' => 'Mida màxima de pujada (MB)',
+        'uploadMaxSizeHelp' => 'Cada camp de pujada només la pot reduir. upload_max_filesize i post_max_size de PHP també l\'han de permetre.',
+        'uploadAllowSvg' => 'Permetre imatges SVG',
+        'uploadAllowSvgHelp' => 'Els fitxers SVG poden contenir scripts: si es permeten, es netegen i només els accepten els camps que inclouen svg.',
         'poorMansCron' => 'Executar les tasques programades sense cron',
         'poorMansCronHelp' => 'Per a servidors sense cron: les visites al backoffice executen les tasques programades pendents com a màxim un cop per minut, després d\'enviar la pàgina. Una entrada de cron és més fiable.',
     ],
@@ -484,5 +490,20 @@ return [
         'outbound_refused' => 'Petició externa refusada',
         'preferences_saved' => 'Preferències de notificacions desades',
         'purge' => 'Entrades antigues esborrades',
+        'upload_refused' => 'Pujada rebutjada',
+    ],
+    // Upload rules of the Storage service.
+    'storage' => [
+        'refused' => [
+            'invalid' => 'No s\'ha pogut pujar el fitxer. Torna-ho a provar.',
+            'empty' => 'El fitxer és buit.',
+            'too_large' => 'El fitxer és massa gran (màxim {0} MB).',
+            'type' => 'Aquí no es permeten fitxers de tipus «{0}». Permesos: {1}.',
+            'forbidden' => 'Els fitxers de tipus «{0}» no s\'accepten mai.',
+            'mime' => 'El contingut del fitxer no correspon al seu tipus ({0}).',
+            'image' => 'No s\'ha pogut llegir la imatge o és massa gran.',
+            'svg' => 'Les imatges SVG no estan permeses o el fitxer no és un SVG vàlid.',
+            'content' => 'El fitxer conté codi o HTML i s\'ha rebutjat.',
+        ],
     ],
 ];

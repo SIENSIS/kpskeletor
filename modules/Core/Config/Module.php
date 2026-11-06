@@ -137,6 +137,28 @@ final class Module extends ModuleManifest
             'label'   => 'Core.settings.poorMansCron',
             'help'    => 'Core.settings.poorMansCronHelp',
         ],
+        // Upload rules of the Storage service (docs/storage.md): the global allow-list of
+        // extensions and size limit (fields can only narrow them) and SVG through the sanitiser.
+        'uploadTypes' => [
+            'type'    => 'string',
+            'default' => 'jpg,jpeg,png,gif,webp,pdf,txt,csv,odt,ods,odp,doc,docx,xls,xlsx,ppt,pptx',
+            'rules'   => 'required|max_length[500]',
+            'label'   => 'Core.settings.uploadTypes',
+            'help'    => 'Core.settings.uploadTypesHelp',
+        ],
+        'uploadMaxSize' => [
+            'type'    => 'int',
+            'default' => 10,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[2048]',
+            'label'   => 'Core.settings.uploadMaxSize',
+            'help'    => 'Core.settings.uploadMaxSizeHelp',
+        ],
+        'uploadAllowSvg' => [
+            'type'    => 'bool',
+            'default' => false,
+            'label'   => 'Core.settings.uploadAllowSvg',
+            'help'    => 'Core.settings.uploadAllowSvgHelp',
+        ],
         // Extra outbound hosts (Settings › Security), added to Config\Outbound and the manifests.
         // Days the activity log keeps its entries (PurgeActivityLog, daily).
         'activityRetentionDays' => [

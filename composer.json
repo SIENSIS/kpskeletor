@@ -26,6 +26,8 @@
         "codeigniter4/settings": "^2.4",
         "codeigniter4/shield": "^1.4",
         "codeigniter4/translations": "^4.7",
+        "league/flysystem": "^3.29",
+        "league/flysystem-local": "^3.29",
         "siensis/kpapy": "^1.0",
         "siensis/kpcrudy": "^1.0",
         "spomky-labs/otphp": "^11.3"
