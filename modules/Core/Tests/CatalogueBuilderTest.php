@@ -75,7 +75,11 @@ final class CatalogueBuilderTest extends CIUnitTestCase
         $catalogue = (new CatalogueBuilder())->build(['Core' => new CoreModule()]);
 
         $this->assertSame(
-            ['modules.list', 'modules.toggle', 'modules.sync', 'modules.upload', 'modules.uninstall', 'modules.demo', 'settings.core'],
+            [
+                'modules.list', 'modules.toggle', 'modules.sync', 'modules.upload', 'modules.uninstall', 'modules.demo',
+                'core-notifications.list', 'core-notifications.show', 'core-notifications.delete',
+                'schedule.list', 'schedule.show', 'schedule.run', 'settings.core',
+            ],
             array_keys($catalogue),
         );
         $this->assertSame('modules', $catalogue['modules.demo']['resource']);
