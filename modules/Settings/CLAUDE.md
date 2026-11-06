@@ -33,7 +33,7 @@ Full description: `docs/settings.md`.
 
 ## Decisions
 
-D-14-01 (security group and `list` type) and D-14-02 (new settings names) are **Open (decide)**;
+D-14-01 (security group and `list` type) and D-14-02 (new settings names) decided by the owner as proposed;
 D-14-03 … D-14-06 accepted (`docs/decisions.md`).
 
 ## Open tasks

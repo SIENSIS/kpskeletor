@@ -144,6 +144,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-13-03 | 13 | `stored_files` in the Core | Accepted (proposal) |
 | D-13-04 | 13 | Headers of served private files | Accepted (proposal) |
 | D-13-05 | 13 | Upload checks in detail | Accepted (proposal) |
+| D-14-01 | 14 | Which settings belong to Settings › Security, and the `list` type | Applied (decided) |
+| D-14-02 | 14 | Names of the new site-wide and CSP settings | Applied (decided) |
+| D-14-03 | 14 | Settings permissions, routes and actions | Accepted (proposal) |
+| D-14-04 | 14 | What "weakening the baseline" means | Accepted (proposal) |
+| D-14-05 | 14 | Test email and clear caches | Accepted (proposal) |
+| D-14-06 | 14 | Site-wide settings built now | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1526,7 +1532,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The Settings UI must know which declared settings need `settings.security` + re-authentication instead of `settings.<module>`, without the Settings module hard-coding other modules; and several security settings are lists (outbound hosts, CORS origins, CSP origins) that a JSON textarea makes error-prone. Both are manifest conventions.
 - **Proposal:** A setting whose `group` is `security` or `security.<sub>` is shown only in Settings › Security (one card per module, a heading per `<sub>`); every other setting is on its module's tab. A new setting type `list` (list of strings, edited one per line, cast by `SettingCaster`). `Core.outboundHosts` and `Api.corsOrigins` change from `json` to `list` (same stored array). Validation rules that refuse weakening values are ordinary rule names (`csp_sources`, `outbound_hosts`, `min_config[…]`…) registered by a module's registrar in `Config\Validation::$ruleSets`.
 - **Alternatives:** A) A new boolean manifest key `'security' => true` (group keeps only meaning a heading). B) A fixed list of setting names in the Settings module (hard-codes other modules). C) No `list` type: JSON textareas.
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-06):** «Grup «security» (recomanada)». A setting whose `group` is `security` or `security.<sub>` is shown only in Settings › Security; other settings stay on their module's tab. The new setting type `list` (one entry per line) is kept, and `Core.outboundHosts` and `Api.corsOrigins` use it. Nothing to change in the code: session 14 built it this way.
+- **Applied in:** `docs/specification.md` ("Module manifest", "Configuration and settings"), `CLAUDE.md` ("Settings"), `docs/settings.md`; code of session 14 (`modules/Core/Settings/SettingCaster.php`, `modules/Core/Modules/ManifestValidator.php`, `modules/Settings/Services/SettingsEditor.php`; tests `SettingsFormTest`, `SettingsScreensTest`)
 
 ## D-14-02 — Names of the new site-wide and CSP settings (decide)
 
@@ -1534,7 +1542,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The specification does not name them; settings names are a public convention.
 - **Proposal:** `Core.siteName` (string, empty = the language line `Core.app.name`, read with `site_name()`), `Core.timezone` (string, default `UTC`, the display time zone of `ui_date()`; dates stay stored in UTC), and one `list` setting per directive: `Core.cspScriptSrc`, `Core.cspStyleSrc` (no wildcards), `Core.cspImgSrc`, `Core.cspFontSrc`, `Core.cspConnectSrc`, `Core.cspFrameSrc`, `Core.cspMediaSrc`, merged by the `cspmodules` filter.
 - **Alternatives:** A) One JSON setting `Core.cspOrigins` (directive => list; needs a custom form). B) `Core.appName` / `Core.siteTimezone`. C) Change `Config\App::$appTimezone` instead (stored dates would shift).
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-06):** «Noms proposats (recomanada)». The settings are named `Core.siteName` (empty = the language line `Core.app.name`), `Core.timezone` (the display time zone; dates stay stored in UTC) and one `list` setting per CSP directive: `Core.cspScriptSrc`, `Core.cspStyleSrc` (no wildcards), `Core.cspImgSrc`, `Core.cspFontSrc`, `Core.cspConnectSrc`, `Core.cspFrameSrc`, `Core.cspMediaSrc`. Nothing to change in the code: session 14 built it this way.
+- **Applied in:** `docs/specification.md` ("Configuration and settings", "Security baseline" › "Configuring headers and CSP"), `docs/settings.md`; code of session 14 (`modules/Core/Config/Module.php`, `modules/Core/Filters/ContentSecurity.php`, `modules/Core/Helpers/ui_helper.php`; tests `SettingsScreensTest::testACspOriginAddedInTheUiAppearsInTheHeader`, `testAModuleTabIsSavedCastAndLogged`)
 
 ## D-14-03 — Settings permissions, routes and actions
 

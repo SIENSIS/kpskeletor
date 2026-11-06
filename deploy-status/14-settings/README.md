@@ -57,9 +57,9 @@ Branch: `claude/happy-darwin-p8xstn` · Pull request: [SIENSIS/kpskeletor#18](ht
 
 ## Decisions and deviations
 
-- **D-14-01 (decide, Open):** settings with `group` `security`/`security.<sub>` go to Settings ›
+- **D-14-01 (decided as proposed):** settings with `group` `security`/`security.<sub>` go to Settings ›
   Security; new setting type `list` (`Core.outboundHosts`, `Api.corsOrigins` changed from `json`).
-- **D-14-02 (decide, Open):** names `Core.siteName`, `Core.timezone`, `Core.cspScriptSrc`,
+- **D-14-02 (decided as proposed):** names `Core.siteName`, `Core.timezone`, `Core.cspScriptSrc`,
   `cspStyleSrc`, `cspImgSrc`, `cspFontSrc`, `cspConnectSrc`, `cspFrameSrc`, `cspMediaSrc`.
 - D-14-03 (accepted): permissions/routes/actions (read-only tabs, theme = `settings.core`,
   publish assets = `settings.security` + re-auth, admin `settings.*`).
@@ -70,8 +70,7 @@ Branch: `claude/happy-darwin-p8xstn` · Pull request: [SIENSIS/kpskeletor#18](ht
 - Deviation: `docs/menus.md`'s example `settings.news` route replaced (module tabs share one
   parameterised route).
 
-Both open decisions were built so they can still change (renaming a setting or the group
-convention touches only the manifests and `SettingsEditor::isSecurity()`).
+Both decisions were confirmed by the owner as built (`executa deploy/decide.md`, 2026-11-06).
 
 ## How to try it
 
@@ -122,7 +121,7 @@ Playwright against `php spark serve`, demo data, device scale factor 2.
 
 ## Known issues and notes for the next session
 
-- **Open decisions D-14-01 and D-14-02** (decide): run `deploy/decide.md` before session 15.
+- D-14-01 and D-14-02 were decided by the owner as proposed (Decisions 14, same branch).
 - `Api\Tests\ApiResourceTest::testTheLoginIsLimitedPerIp` failed once (500) in the first full
   run of this session before any change and passed alone and in later full runs: flaky, not
   investigated further.
