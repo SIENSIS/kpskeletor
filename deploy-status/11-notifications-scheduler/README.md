@@ -1,6 +1,6 @@
 # Session 11 — Notifications and scheduler
 
-Branch: `claude/charming-edison-f3elks` · Pull request: see `docs/progress.md` · Date: 2026-11-06
+Branch: `claude/charming-edison-f3elks` · Pull request: [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) · Date: 2026-11-06
 
 ## What was built
 

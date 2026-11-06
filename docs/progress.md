@@ -18,7 +18,7 @@ pull request open), *merged* (in `main`).
 | 08 | Back-office menus and the security baseline | merged | `claude/pensive-volta-9ttaws` | [SIENSIS/kpskeletor#12](https://github.com/SIENSIS/kpskeletor/pull/12) | [`deploy-status/08-menus-security/`](../deploy-status/08-menus-security/README.md) |
 | 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
 | 10 | kpapy integration and API authentication | merged | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
-| 11 | Notifications and scheduler | done | `claude/charming-edison-f3elks` | — | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
+| 11 | Notifications and scheduler | done | `claude/charming-edison-f3elks` | [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
 
 ## Decisions
 
