@@ -139,6 +139,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-12-03 | 12 | Entry format, action codes and labels, security events | Accepted (proposal) |
 | D-12-04 | 12 | Retention setting `Core.activityRetentionDays` | Applied |
 | D-12-05 | 12 | Personal data and network fields in the log | Accepted (proposal) |
+| D-13-01 | 13 | Private file URL and who may read a private file | Open |
+| D-13-02 | 13 | Upload settings `Core.uploadTypes`, `Core.uploadMaxSize`, `Core.uploadAllowSvg` | Open |
+| D-13-03 | 13 | `stored_files` in the Core | Accepted (proposal) |
+| D-13-04 | 13 | Headers of served private files | Accepted (proposal) |
+| D-13-05 | 13 | Upload checks in detail | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1470,3 +1475,43 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Decision (2026-11-06):** applied by session 12 as proposed.
 - **Applied in:** `modules/Core/Activity/ActivityLogger.php` (`typedEmail()`), `modules/Activity/Controllers/Activity.php`
 
+
+## D-13-01 — Private file URL and who may read a private file (decide)
+
+- **Where:** spec "Storage" (private disk "served through a controller that checks permissions"), "Files" (folder ACL and `FileAccessPolicy`, session 22); `docs/plan.md` session 13 (route `files/private/(:segment)`, "temporary permission rule")
+- **Problem:** The URL of a private file and the rule used before the folder permissions exist are not specified; URLs are a public convention and the rule is security.
+- **Proposal:** `GET files/private/{key}`, where `key` is a random 128-bit identifier (32 hex characters, `stored_files.file_key`, unrelated to the file name); `?download=1` forces a download. Anything not allowed, unknown, on the public disk or missing on disk is a **404** (the existence of a file is not revealed, also to guests). The rule is a class (`Config\Storage::$accessRule`, interface `FileAccessRule`): until session 22 `OwnerAccess` = the user who uploaded the file and superadmins; the Files module replaces it with the folder permissions and its `FileAccessPolicy` registry. A misconfigured rule denies everything.
+- **Alternatives:** A) Masked numeric ids (`app.maskKey`): rotating the mask key would break every stored link. B) Login required and 403 for others (reveals that the file exists). C) Administrators read every private file now (before `files.all` exists).
+- **Status:** Open
+
+## D-13-02 — Upload settings `Core.uploadTypes`, `Core.uploadMaxSize`, `Core.uploadAllowSvg` (decide)
+
+- **Where:** spec "Storage" ("a setting allows SVG only through a sanitiser", "a setting can turn [re-encoding] off per field"), "Files" ("extension and MIME allow-lists from settings, size limits")
+- **Problem:** The settings have no names; settings names are a public convention.
+- **Proposal:** Core settings (the Storage service is the Core's and is used without the Files module): `Core.uploadTypes` (string, comma-separated extensions, default `jpg,jpeg,png,gif,webp,pdf,txt,csv,odt,ods,odp,doc,docx,xls,xlsx,ppt,pptx`), `Core.uploadMaxSize` (int, MB, default 10, 1–2048) and `Core.uploadAllowSvg` (bool, default off). A field (`UploadRules`) can only narrow them: an extension must be in both lists and the smaller size wins. Re-encoding is a field option (`UploadRules::$reencode`, default on), not a global setting. Extensions in `Config\Storage::$forbiddenExtensions` (code, HTML, executables, server configuration) are refused whatever the settings say. Shown in Settings › Security by session 14.
+- **Alternatives:** A) `Files.*` settings in the Files module (uploads of other modules would have no rules while it is disabled). B) Separate lists per disk or for images.
+- **Status:** Open
+
+## D-13-03 — `stored_files` in the Core
+
+- **Where:** spec "Storage" ("the original name is kept in the database"), "Files" (`files` table with file-manager metadata, session 22); `docs/plan.md` session 13 ("`stored_files` minimal unless the Files `files` table is created here")
+- **Problem:** The Storage service needs a record per file (original name, MIME type, owner, URL key) before the Files module exists, and must keep working without it.
+- **Proposal:** The Core table `stored_files` (`file_key`, `disk`, `path`, `original_name`, `extension`, `mime`, `size`, `checksum` SHA-256, `width`, `height`, `uploaded_by`, `created_at`) written only by `Storage::store()`/`storeContents()` and removed by `Storage::delete()`. Session 22's `files` table adds the file-manager metadata (visibility, alt, tags, trash) with a reference to `stored_files.id` instead of repeating these columns.
+- **Alternatives:** A) Create the Files `files` table now in the Core (file-manager columns in the Core). B) No table until session 22 (no original names, no private URLs).
+- **Status:** Accepted (proposal)
+
+## D-13-04 — Headers of served private files
+
+- **Where:** spec "Storage" (stored MIME type, `nosniff`, `attachment` for private files that are not images or PDF)
+- **Problem:** "Images" includes SVG, which can run scripts when opened; the spec does not say how private files are cached or framed.
+- **Proposal:** `Content-Type` = the stored type (the canonical type of the allowed extension, never the client's), `X-Content-Type-Options: nosniff`, `Content-Disposition: inline` only for raster images (JPEG, PNG, GIF, WebP) and PDF, `attachment` for everything else (SVG included) and with `?download=1`; `Content-Security-Policy: default-src 'none'; img-src 'self'; style-src 'self'; frame-ancestors 'self'; sandbox` (PDF without `sandbox`: browsers' PDF viewers do not work sandboxed), `X-Frame-Options: SAMEORIGIN` (previews in the file manager), `Cross-Origin-Resource-Policy: same-origin`, `Cache-Control: private, no-transform, no-store, must-revalidate`. The global security headers are added as usual. The public upload folder gets the same `nosniff`/sandbox headers and SVG as attachment from the web server (`public/uploads/.htaccess`, `docs/web-server.md`).
+- **Alternatives:** A) SVG inline with the sandbox CSP. B) Private caching with `ETag` (CodeIgniter's `DownloadResponse` cannot answer 304).
+- **Status:** Accepted (proposal)
+
+## D-13-05 — Upload checks in detail
+
+- **Where:** spec "Storage" (allow-list and MIME check, SVG through a sanitiser, image re-encoding, no execution), "Security baseline" (uploads)
+- **Problem:** The spec lists the rules but not how they are checked, nor which sanitiser to use (adding a dependency needs the owner's approval; only Flysystem is pre-approved here).
+- **Proposal:** The MIME type is detected from the contents with `finfo` and must belong to the extension (`Config\Mimes` + `Config\Storage::$extraMimes`); HTML/XML/SVG/PHP contents under another extension and `<?php` in the first 64 KB are refused; images must decode with `getimagesize`, match their extension and stay under 40 megapixels, then are re-encoded with GD (EXIF orientation applied first; animated GIFs keep their first frame); SVG is cleaned by the Core's own allow-list `SvgSanitizer` (DOM, no DOCTYPE/entities, no scripts, handlers, styles, `foreignObject`, links or external references). Paths are normalised by `PathNormalizer` (no `..`, `.`, absolute, backslashes, control characters or hidden segments) before Flysystem's own check; stored names are random (`<32 hex>.<ext>`). Public disk: folders `0755`, files `0644` (the web server reads them); private disk: `0750`/`0640`. Refused uploads are logged as `security` entries `Core`/`upload_refused` with the reason, disk and folder.
+- **Alternatives:** A) `enshrined/svg-sanitize` (a new dependency). B) Trust the browser's MIME type (forgeable).
+- **Status:** Accepted (proposal)

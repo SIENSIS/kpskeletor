@@ -87,9 +87,17 @@ re-authentication keep their own counters (`Auth.loginAttempts*`, `Auth.emailLin
 ## Activity and security log
 
 Security events (failed logins and codes, throttling, 403s, re-authentication, token changes, a
-token used from a new IP, refused outbound requests…) are `security` entries of the append-only
+token used from a new IP, refused outbound requests, refused uploads…) are `security` entries of the append-only
 activity log; secrets are masked by key and the file log escapes line breaks (`SafeLogger`).
 Log a new security rule's refusals with `security_log()`. See `docs/activity.md`.
+
+## Uploads and private files
+
+Files are written only through the Storage service: allow-listed extensions and MIME types
+detected from the contents, size limits, random names, SVG and HTML refused by default, images
+re-encoded, private files served only through `files/private/{key}` with `nosniff`, a sandboxing
+CSP and `attachment` unless image or PDF. Nothing is executed in `public/uploads` and `writable/`
+is never served. See `docs/storage.md` and `docs/web-server.md` (Apache and Nginx snippets).
 
 ## Redirects
 
