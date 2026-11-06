@@ -66,6 +66,10 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.
   Module routes point at controllers (a disabled module answers 404 through its controller namespace).
+- **Notifications and scheduled tasks:** types in `Notifications/` (extend `NotificationType`,
+  send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email inline), scheduled
+  tasks in `Tasks/` (`TaskInterface`), both declared in the manifest; one cron line runs
+  `php spark schedule:run` (`docs/notifications.md`, `docs/scheduler.md`).
 - **Menus:** back-office entries only in the manifest `$menu` (resource or route + permission,
   `zone` `sidebar`/`settings`/`user`, `parent`, `order`); the menu is generated, filtered by
   permission and cached per group set (`docs/menus.md`). Security headers, rate limits
