@@ -1,6 +1,6 @@
 # Session 12 — Activity log and Activity module
 
-Branch: `claude/trusting-curie-sqluwo` · Pull request: "Session 12: Activity log and Activity module" · Date: 2026-11-06
+Branch: `claude/trusting-curie-sqluwo` · Pull request: [SIENSIS/kpskeletor#16](https://github.com/SIENSIS/kpskeletor/pull/16) · Date: 2026-11-06
 
 ## What was built
 

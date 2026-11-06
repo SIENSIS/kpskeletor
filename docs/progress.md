@@ -19,7 +19,7 @@ pull request open), *merged* (in `main`).
 | 09 | kpcrudy integration | merged | `claude/determined-pasteur-d6pdme` | [SIENSIS/kpskeletor#13](https://github.com/SIENSIS/kpskeletor/pull/13) | [`deploy-status/09-kpcrudy/`](../deploy-status/09-kpcrudy/README.md) |
 | 10 | kpapy integration and API authentication | merged | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
 | 11 | Notifications and scheduler | merged | `claude/charming-edison-f3elks` | [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
-| 12 | Activity log and Activity module | done | `claude/trusting-curie-sqluwo` | "Session 12: Activity log and Activity module" | [`deploy-status/12-activity/`](../deploy-status/12-activity/README.md) |
+| 12 | Activity log and Activity module | done | `claude/trusting-curie-sqluwo` | [SIENSIS/kpskeletor#16](https://github.com/SIENSIS/kpskeletor/pull/16) | [`deploy-status/12-activity/`](../deploy-status/12-activity/README.md) |
 
 ## Decisions
 
