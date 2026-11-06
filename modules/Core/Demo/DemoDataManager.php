@@ -128,7 +128,7 @@ final class DemoDataManager
             $db->transException(false);
         }
 
-        log_message('notice', 'Demo data loaded for module {module}.', ['module' => $module]);
+        activity_log('Core', 'demo_loaded', ['resource' => 'modules', 'summary' => $module]);
 
         return true;
     }
@@ -156,7 +156,7 @@ final class DemoDataManager
             $db->table('demo_records')->where('id', $record['id'])->delete();
         }
 
-        log_message('notice', 'Demo data removed for module {module}.', ['module' => $module]);
+        activity_log('Core', 'demo_removed', ['resource' => 'modules', 'summary' => $module]);
 
         return $removal;
     }

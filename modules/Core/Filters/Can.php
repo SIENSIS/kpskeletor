@@ -14,7 +14,7 @@ use Modules\Core\Theme\ErrorPage;
 /**
  * `can:<permission>[,<permission>…]`: lets the request through only when the logged-in user holds
  * **one** of the permissions; `can:all,<permission>,<permission>…` requires **all** of them
- * (decision D-07-02). Decided by the central `Authorization` (superadmin bypass, unknown or
+ * (decision D-07-02). Every denial is a `forbidden` security entry of the activity log. Decided by the central `Authorization` (superadmin bypass, unknown or
  * disabled permissions refused). Default deny: guests and filters without a permission get 403.
  *
  * Every route under `backend/` has one (`RoutesSecurityTest`); guests of `backend/*` are sent
@@ -41,6 +41,12 @@ final class Can implements FilterInterface
             }
         }
 
+        security_log('Core', 'forbidden', [
+            'resource' => self::resourceOf($permissions),
+            'summary'  => $request instanceof IncomingRequest ? $request->getMethod() . ' /' . ltrim($request->getPath(), '/') : '',
+            'changes'  => ['permissions' => $permissions, 'all' => $all],
+        ]);
+
         $response = service('response')->setStatusCode(403);
 
         if ($request instanceof IncomingRequest && str_contains($request->getHeaderLine('Accept'), 'application/json')) {
@@ -48,6 +54,16 @@ final class Can implements FilterInterface
         }
 
         return $response->setContentType('text/html')->setBody(ErrorPage::render(403, lang('Core.forbidden')));
+    }
+
+    /**
+     * The resource of the first permission (`news-posts.edit` → `news-posts`).
+     *
+     * @param list<string> $permissions
+     */
+    private static function resourceOf(array $permissions): string
+    {
+        return $permissions === [] ? '' : explode('.', $permissions[0], 2)[0];
     }
 
     /**

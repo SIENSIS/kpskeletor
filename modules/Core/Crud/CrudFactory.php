@@ -21,7 +21,8 @@ use Kpcrudy\Crud;
  * return $this->renderCrud($crud);
  * ```
  *
- * `make()` gives a `Crud` with `setResource($resource)` and the active theme's back-office layout;
+ * `make()` gives a `Crud` (an `AuditedCrud`: every write goes to the activity log) with
+ * `setResource($resource)` and the active theme's back-office layout;
  * nothing else is mapped by hand: `Config\Kpcrudy` selects `CrudPermissions` and
  * `denyByDefault`, so every operation is `<resource>.<operation>` in the catalogue.
  *
@@ -41,12 +42,12 @@ final class CrudFactory
      *
      * @throws \InvalidArgumentException for an invalid resource name
      */
-    public static function make(string $resource, ?KpcrudyConfig $config = null): Crud
+    public static function make(string $resource, ?KpcrudyConfig $config = null): AuditedCrud
     {
         self::assertResource($resource);
 
         $config ??= config(KpcrudyConfig::class);
-        $crud = new Crud($config);
+        $crud = new AuditedCrud($config);
         $crud->setResource($resource);
 
         if (function_exists('theme_layout')) {

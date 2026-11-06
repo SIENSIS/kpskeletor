@@ -44,6 +44,7 @@ class GuardedEmail extends Email
     {
         if (! $this->transportAllowed()) {
             log_message('error', 'Email not sent: the SMTP host {host} is not in the outbound allow-list (Config\Outbound).', ['host' => (string) $this->SMTPHost]);
+            security_log('Core', 'outbound_refused', ['resource' => 'outbound', 'summary' => 'SMTP ' . $this->SMTPHost]);
 
             return false;
         }
