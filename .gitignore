@@ -130,6 +130,7 @@ _modules/*
 # assets:publish output (copies of modules/*/Assets and themes/*/Assets) and the PWA icons
 /public/uploads/*
 !/public/uploads/index.html
+!/public/uploads/.htaccess
 /test-results/
 /playwright-report/
 /public/assets/core/
