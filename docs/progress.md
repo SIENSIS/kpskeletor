@@ -21,7 +21,7 @@ pull request open), *merged* (in `main`).
 | 11 | Notifications and scheduler | merged | `claude/charming-edison-f3elks` | [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
 | 12 | Activity log and Activity module | merged | `claude/trusting-curie-sqluwo` | [SIENSIS/kpskeletor#16](https://github.com/SIENSIS/kpskeletor/pull/16) | [`deploy-status/12-activity/`](../deploy-status/12-activity/README.md) |
 | 13 | Storage service and upload rules | merged | `claude/gifted-newton-p029ve` | [SIENSIS/kpskeletor#17](https://github.com/SIENSIS/kpskeletor/pull/17) | [`deploy-status/13-storage/`](../deploy-status/13-storage/README.md) |
-| 14 | Settings module and Settings › Security | done | `claude/happy-darwin-p8xstn` | [SIENSIS/kpskeletor#18](https://github.com/SIENSIS/kpskeletor/pull/18) | [`deploy-status/14-settings/`](../deploy-status/14-settings/README.md) |
+| 14 | Settings module and Settings › Security | merged | `claude/happy-darwin-p8xstn` | [SIENSIS/kpskeletor#18](https://github.com/SIENSIS/kpskeletor/pull/18) | [`deploy-status/14-settings/`](../deploy-status/14-settings/README.md) |
 
 ## Decisions
 
