@@ -1,6 +1,6 @@
 # Session 14 — Settings module and Settings › Security
 
-Branch: `claude/happy-darwin-p8xstn` · Pull request: "Session 14: Settings module and Settings › Security" · Date: 2026-11-06
+Branch: `claude/happy-darwin-p8xstn` · Pull request: [SIENSIS/kpskeletor#18](https://github.com/SIENSIS/kpskeletor/pull/18) · Date: 2026-11-06
 
 ## What was built
 
