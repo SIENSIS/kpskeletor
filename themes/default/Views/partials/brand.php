@@ -5,7 +5,7 @@
  * @var string|null $brandUrl
  * @var string|null $brandClass
  */
-$siteName = lang('Core.app.name');
+$siteName = site_name();
 $toUrl    = static fn (string $logo): string => $logo === '' ? '' : (preg_match('#^https?://#i', $logo) === 1 ? $logo : base_url(ltrim($logo, '/')));
 $logoUrl  = $toUrl((string) theme_option('logo'));
 $darkUrl  = $toUrl((string) theme_option('logoDark'));

@@ -49,7 +49,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
             <?php if ((string) theme_option('footerText') !== ''): ?>
                 <?= esc((string) theme_option('footerText')) ?>
             <?php else: ?>
-                &copy; <?= date('Y') ?> <?= esc(lang('Core.app.name')) ?>
+                &copy; <?= date('Y') ?> <?= esc(site_name()) ?>
             <?php endif ?>
         </div>
     </div>

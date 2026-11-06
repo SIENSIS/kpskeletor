@@ -58,7 +58,7 @@ final class Pwa
      */
     public function manifest(): array
     {
-        $name  = lang('Core.app.name');
+        $name  = site_name();
         $start = $this->startArea() === 'backend' ? base_url('backend') : base_url('/');
         $icons = [];
 

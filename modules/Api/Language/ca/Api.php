@@ -92,4 +92,7 @@ return [
         'token_revoked' => 'Testimoni d\'API revocat',
         'token_new_ip' => 'Testimoni d\'API usat des d\'una adreça nova',
     ],
+    'settingGroups' => [
+        'api' => 'API',
+    ],
 ];

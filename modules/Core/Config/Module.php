@@ -67,16 +67,36 @@ final class Module extends ModuleManifest
     ];
 
     /**
+     * Edited in the Settings module (docs/settings.md): the "Core" tab (`settings.core`) and,
+     * for the `security.*` groups, Settings › Security (`settings.security` + re-authentication).
      * Minimal PWA (web app manifest, icons, a service worker that caches nothing): off by default.
-     * Rate limits (requests per minute or hour, Modules\Core\Security\RateLimiter::LIMITS) and
-     * the extra outbound hosts are edited in Settings › Security (session 14).
+     * Rate limits are requests per minute or hour (Modules\Core\Security\RateLimiter::LIMITS).
      */
     public array $settings = [
+        // Site-wide: the name shown in titles, emails and the authenticator app (empty: the
+        // language line Core.app.name) and the time zone dates are shown in (stored in UTC).
+        'siteName' => [
+            'type'    => 'string',
+            'default' => '',
+            'rules'   => 'permit_empty|max_length[100]',
+            'label'   => 'Core.settings.siteName',
+            'help'    => 'Core.settings.siteNameHelp',
+            'group'   => 'general',
+        ],
+        'timezone' => [
+            'type'    => 'string',
+            'default' => 'UTC',
+            'rules'   => 'required|timezone',
+            'label'   => 'Core.settings.timezone',
+            'help'    => 'Core.settings.timezoneHelp',
+            'group'   => 'general',
+        ],
         'pwa' => [
             'type'    => 'bool',
             'default' => false,
             'label'   => 'Core.settings.pwa',
             'help'    => 'Core.settings.pwaHelp',
+            'group'   => 'pwa',
         ],
         'pwaStart' => [
             'type'    => 'select',
@@ -86,48 +106,56 @@ final class Module extends ModuleManifest
                 'public'  => 'Core.settings.pwaStartPublic',
                 'backend' => 'Core.settings.pwaStartBackend',
             ],
+            'group'   => 'pwa',
         ],
         'rateLimitBackend' => [
             'type'    => 'int',
             'default' => 300,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitBackend',
+            'group'   => 'security.rateLimits',
         ],
         'rateLimitApiToken' => [
             'type'    => 'int',
             'default' => 120,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitApiToken',
+            'group'   => 'security.rateLimits',
         ],
         'rateLimitApiIp' => [
             'type'    => 'int',
             'default' => 60,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitApiIp',
+            'group'   => 'security.rateLimits',
         ],
         'rateLimitFeeds' => [
             'type'    => 'int',
             'default' => 60,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitFeeds',
+            'group'   => 'security.rateLimits',
         ],
         'rateLimitUploads' => [
             'type'    => 'int',
             'default' => 100,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitUploads',
+            'group'   => 'security.rateLimits',
         ],
         'rateLimitForms' => [
             'type'    => 'int',
             'default' => 10,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[1000]',
             'label'   => 'Core.settings.rateLimitForms',
+            'group'   => 'security.rateLimits',
         ],
         'rateLimitWidgets' => [
             'type'    => 'int',
             'default' => 120,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[10000]',
             'label'   => 'Core.settings.rateLimitWidgets',
+            'group'   => 'security.rateLimits',
         ],
         // Runs the due scheduled tasks from back-office requests (at most once a minute) on hosts
         // without cron (Modules\Core\Filters\PoorMansCron).
@@ -136,15 +164,17 @@ final class Module extends ModuleManifest
             'default' => false,
             'label'   => 'Core.settings.poorMansCron',
             'help'    => 'Core.settings.poorMansCronHelp',
+            'group'   => 'scheduler',
         ],
         // Upload rules of the Storage service (docs/storage.md): the global allow-list of
         // extensions and size limit (fields can only narrow them) and SVG through the sanitiser.
         'uploadTypes' => [
             'type'    => 'string',
             'default' => 'jpg,jpeg,png,gif,webp,pdf,txt,csv,odt,ods,odp,doc,docx,xls,xlsx,ppt,pptx',
-            'rules'   => 'required|max_length[500]',
+            'rules'   => 'required|max_length[500]|upload_types',
             'label'   => 'Core.settings.uploadTypes',
             'help'    => 'Core.settings.uploadTypesHelp',
+            'group'   => 'security.uploads',
         ],
         'uploadMaxSize' => [
             'type'    => 'int',
@@ -152,14 +182,15 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[2048]',
             'label'   => 'Core.settings.uploadMaxSize',
             'help'    => 'Core.settings.uploadMaxSizeHelp',
+            'group'   => 'security.uploads',
         ],
         'uploadAllowSvg' => [
             'type'    => 'bool',
             'default' => false,
             'label'   => 'Core.settings.uploadAllowSvg',
             'help'    => 'Core.settings.uploadAllowSvgHelp',
+            'group'   => 'security.uploads',
         ],
-        // Extra outbound hosts (Settings › Security), added to Config\Outbound and the manifests.
         // Days the activity log keeps its entries (PurgeActivityLog, daily).
         'activityRetentionDays' => [
             'type'    => 'int',
@@ -167,12 +198,75 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[3650]',
             'label'   => 'Core.settings.activityRetentionDays',
             'help'    => 'Core.settings.activityRetentionDaysHelp',
+            'group'   => 'security.activity',
         ],
+        // Extra outbound hosts, added to Config\Outbound and the manifests' $outboundHosts.
         'outboundHosts' => [
-            'type'    => 'json',
+            'type'    => 'list',
             'default' => [],
+            'rules'   => 'outbound_hosts',
             'label'   => 'Core.settings.outboundHosts',
             'help'    => 'Core.settings.outboundHostsHelp',
+            'group'   => 'security.outbound',
+        ],
+        // Extra Content-Security-Policy origins per directive, added to Config\ContentSecurityPolicy
+        // and the manifests' $csp by the `cspmodules` filter (never keywords or wildcards for
+        // scripts and styles: Modules\Core\Settings\SecurityRules).
+        'cspScriptSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_script_sources',
+            'label'   => 'Core.settings.cspScriptSrc',
+            'help'    => 'Core.settings.cspStrictHelp',
+            'group'   => 'security.csp',
+        ],
+        'cspStyleSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_script_sources',
+            'label'   => 'Core.settings.cspStyleSrc',
+            'help'    => 'Core.settings.cspStrictHelp',
+            'group'   => 'security.csp',
+        ],
+        'cspImgSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_sources',
+            'label'   => 'Core.settings.cspImgSrc',
+            'help'    => 'Core.settings.cspHelp',
+            'group'   => 'security.csp',
+        ],
+        'cspFontSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_sources',
+            'label'   => 'Core.settings.cspFontSrc',
+            'help'    => 'Core.settings.cspHelp',
+            'group'   => 'security.csp',
+        ],
+        'cspConnectSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_sources',
+            'label'   => 'Core.settings.cspConnectSrc',
+            'help'    => 'Core.settings.cspHelp',
+            'group'   => 'security.csp',
+        ],
+        'cspFrameSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_sources',
+            'label'   => 'Core.settings.cspFrameSrc',
+            'help'    => 'Core.settings.cspHelp',
+            'group'   => 'security.csp',
+        ],
+        'cspMediaSrc' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'csp_sources',
+            'label'   => 'Core.settings.cspMediaSrc',
+            'help'    => 'Core.settings.cspHelp',
+            'group'   => 'security.csp',
         ],
     ];
 

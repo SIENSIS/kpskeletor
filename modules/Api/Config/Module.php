@@ -59,13 +59,16 @@ final class Module extends ModuleManifest
             'default' => false,
             'label'   => 'Api.settings.publicSpec',
             'help'    => 'Api.settings.publicSpecHelp',
+            'group'   => 'security.api',
         ],
         // Origins allowed to call the API from a browser (CORS); empty = none.
         'corsOrigins' => [
-            'type'    => 'json',
+            'type'    => 'list',
             'default' => [],
+            'rules'   => 'cors_origins',
             'label'   => 'Api.settings.corsOrigins',
             'help'    => 'Api.settings.corsOriginsHelp',
+            'group'   => 'security.api',
         ],
         // Days a token obtained by an app login lasts (it can be refreshed before).
         'appTokenDays' => [
@@ -73,6 +76,7 @@ final class Module extends ModuleManifest
             'default' => 30,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[365]',
             'label'   => 'Api.settings.appTokenDays',
+            'group'   => 'security.api',
         ],
     ];
 

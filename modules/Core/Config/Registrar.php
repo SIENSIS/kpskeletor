@@ -9,6 +9,7 @@ use Modules\Core\Filters\ContentSecurity;
 use Modules\Core\Filters\ModuleEnabled;
 use Modules\Core\Filters\PoorMansCron;
 use Modules\Core\Filters\RateLimit;
+use Modules\Core\Settings\SecurityRules;
 
 /**
  * Merges the Core's settings into the application's config classes (CodeIgniter registrar).
@@ -29,5 +30,15 @@ final class Registrar
                 'ratelimit'     => RateLimit::class,
             ],
         ];
+    }
+
+    /**
+     * Rules that refuse values weakening the security baseline (Settings › Security).
+     *
+     * @return array<string, mixed>
+     */
+    public static function Validation(): array
+    {
+        return ['ruleSets' => [SecurityRules::class]];
     }
 }

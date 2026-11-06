@@ -117,7 +117,7 @@ class Kpapy extends \Kpapy\Config\Kpapy
                 $this->corsOrigins = array_values(array_filter($origins, static fn ($o): bool => is_string($o) && preg_match('#^https?://[^/\s*]+$#', $o) === 1));
             }
 
-            $name = lang('Core.app.name');
+            $name = function_exists('site_name') ? site_name() : lang('Core.app.name');
 
             if ($name !== 'Core.app.name' && trim($name) !== '') {
                 $this->openApiTitle = trim($name) . ' API';

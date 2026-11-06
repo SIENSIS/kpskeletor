@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Core\Filters;
 
+use Closure;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\ContentSecurityPolicy;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Core\Modules\ManifestValidator;
 use Modules\Core\Registry\DeclarationRegistry;
+use Modules\Core\Settings\SecurityRules;
 use Throwable;
 
 /**
@@ -19,6 +21,11 @@ use Throwable;
  * Config\ContentSecurityPolicy. Sources added to `script-src`/`style-src` also go to
  * `script-src-elem`/`style-src-elem`, which the browser checks first. `'none'` is never added
  * (it could only weaken nothing and breaks the other sources).
+ *
+ * It also adds the extra origins an administrator stored in Settings › Security
+ * (`Core.cspScriptSrc`, `Core.cspImgSrc`…, see SETTINGS), checked again here with
+ * SecurityRules::isAllowedCspSource() (no keywords or schemes; no wildcards for scripts and
+ * styles) so a value written another way cannot weaken the policy.
  */
 final class ContentSecurity implements FilterInterface
 {
@@ -40,6 +47,17 @@ final class ContentSecurity implements FilterInterface
         'frame-ancestors' => ['addFrameAncestor'],
     ];
 
+    /** Directive => setting with the extra origins of Settings › Security. */
+    public const SETTINGS = [
+        'script-src'  => 'Core.cspScriptSrc',
+        'style-src'   => 'Core.cspStyleSrc',
+        'img-src'     => 'Core.cspImgSrc',
+        'font-src'    => 'Core.cspFontSrc',
+        'connect-src' => 'Core.cspConnectSrc',
+        'frame-src'   => 'Core.cspFrameSrc',
+        'media-src'   => 'Core.cspMediaSrc',
+    ];
+
     /**
      * @param list<string>|null $arguments
      */
@@ -52,8 +70,41 @@ final class ContentSecurity implements FilterInterface
         }
 
         self::apply(service('csp'), $sources);
+        self::apply(service('csp'), self::settingSources());
 
         return null;
+    }
+
+    /**
+     * The origins stored in Settings › Security, only those SecurityRules accepts.
+     *
+     * @param (Closure(string): mixed)|null $read reads a setting (tests); defaults to setting()
+     *
+     * @return array<string, list<string>> directive => origins
+     */
+    public static function settingSources(?Closure $read = null): array
+    {
+        $read ??= static function (string $name): mixed {
+            try {
+                return setting($name);
+            } catch (Throwable) {
+                return null;
+            }
+        };
+
+        $sources = [];
+
+        foreach (self::SETTINGS as $directive => $name) {
+            $strict = in_array($directive, ['script-src', 'style-src'], true);
+
+            foreach (SecurityRules::lines($read($name)) as $origin) {
+                if (SecurityRules::isAllowedCspSource($origin, $strict)) {
+                    $sources[$directive][] = $origin;
+                }
+            }
+        }
+
+        return $sources;
     }
 
     /**

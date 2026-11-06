@@ -92,4 +92,7 @@ return [
         'token_revoked' => 'API token revoked',
         'token_new_ip' => 'API token used from a new address',
     ],
+    'settingGroups' => [
+        'api' => 'API',
+    ],
 ];

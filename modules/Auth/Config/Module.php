@@ -58,9 +58,10 @@ final class Module extends ModuleManifest
         'minimumPasswordLength' => [
             'type'    => 'int',
             'default' => 8,
-            'rules'   => 'required|integer|greater_than_equal_to[8]|less_than_equal_to[128]',
+            'rules'   => 'required|integer|greater_than_equal_to[8]|less_than_equal_to[128]|min_config[Auth.minimumPasswordLength]',
             'label'   => 'Auth.settings.minimumPasswordLength',
             'help'    => 'Auth.settings.minimumPasswordLengthHelp',
+            'group'   => 'security.passwords',
         ],
         'absoluteLifetime' => [
             'type'    => 'int',
@@ -68,6 +69,7 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[5]|less_than_equal_to[10080]',
             'label'   => 'Auth.settings.absoluteLifetime',
             'help'    => 'Auth.settings.absoluteLifetimeHelp',
+            'group'   => 'security.sessions',
         ],
         'idleTimeout' => [
             'type'    => 'int',
@@ -75,6 +77,7 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1440]',
             'label'   => 'Auth.settings.idleTimeout',
             'help'    => 'Auth.settings.idleTimeoutHelp',
+            'group'   => 'security.sessions',
         ],
         'rememberLifetime' => [
             'type'    => 'int',
@@ -82,47 +85,55 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[365]',
             'label'   => 'Auth.settings.rememberLifetime',
             'help'    => 'Auth.settings.rememberLifetimeHelp',
+            'group'   => 'security.sessions',
         ],
         'captcha' => [
             'type'    => 'bool',
             'default' => false,
             'label'   => 'Auth.settings.captcha',
             'help'    => 'Auth.settings.captchaHelp',
+            'group'   => 'security.login',
         ],
         'newDeviceNotice' => [
             'type'    => 'bool',
             'default' => true,
             'label'   => 'Auth.settings.newDeviceNotice',
+            'group'   => 'security.sessions',
         ],
         'loginAttemptsPerIp' => [
             'type'    => 'int',
             'default' => 10,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[1000]',
             'label'   => 'Auth.settings.loginAttemptsPerIp',
+            'group'   => 'security.login',
         ],
         'loginAttemptsPerAccount' => [
             'type'    => 'int',
             'default' => 5,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
             'label'   => 'Auth.settings.loginAttemptsPerAccount',
+            'group'   => 'security.login',
         ],
         'loginLockMinutes' => [
             'type'    => 'int',
             'default' => 15,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[1440]',
             'label'   => 'Auth.settings.loginLockMinutes',
+            'group'   => 'security.login',
         ],
         'emailLinksPerIp' => [
             'type'    => 'int',
             'default' => 10,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[1000]',
             'label'   => 'Auth.settings.emailLinksPerIp',
+            'group'   => 'security.login',
         ],
         'emailLinksPerAccount' => [
             'type'    => 'int',
             'default' => 3,
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
             'label'   => 'Auth.settings.emailLinksPerAccount',
+            'group'   => 'security.login',
         ],
         'reauthMinutes' => [
             'type'    => 'int',
@@ -130,14 +141,17 @@ final class Module extends ModuleManifest
             'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[240]',
             'label'   => 'Auth.settings.reauthMinutes',
             'help'    => 'Auth.settings.reauthMinutesHelp',
+            'group'   => 'security.sessions',
         ],
         // Group name => 'required' | 'optional' (missing groups are optional). Moves to the
         // `groups` table with the Groups screen (session 15).
         'twoFactorPolicy' => [
             'type'    => 'json',
             'default' => [],
+            'rules'   => 'permit_empty|valid_json|two_factor_policy',
             'label'   => 'Auth.settings.twoFactorPolicy',
             'help'    => 'Auth.settings.twoFactorPolicyHelp',
+            'group'   => 'security.twoFactor',
         ],
     ];
 
