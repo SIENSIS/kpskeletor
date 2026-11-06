@@ -53,10 +53,10 @@ Branch: `claude/gifted-newton-p029ve` · Pull request: [SIENSIS/kpskeletor#17](h
 
 ## Decisions and deviations
 
-- **D-13-01 (decide, Open):** private file URL `files/private/{key}` (random key, 404 for anything
+- **D-13-01 (decided as proposed, 2026-11-06):** private file URL `files/private/{key}` (random key, 404 for anything
   not allowed) and the interim rule "uploader + superadmins", replaceable by session 22 through
   `Config\Storage::$accessRule`.
-- **D-13-02 (decide, Open):** settings names `Core.uploadTypes`, `Core.uploadMaxSize`,
+- **D-13-02 (decided as proposed, 2026-11-06):** settings names `Core.uploadTypes`, `Core.uploadMaxSize`,
   `Core.uploadAllowSvg`; re-encoding is a field option, not a global setting.
 - **D-13-03 (accepted):** `stored_files` in the Core; the Files `files` table (22) references it.
 - **D-13-04 (accepted):** served headers — SVG always as attachment, CSP sandbox (not for PDF),

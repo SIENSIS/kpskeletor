@@ -45,7 +45,8 @@ Generated settings UI with per-module permissions and the security tab.
 - Site-wide settings and **Settings › Security** (`settings.security` + re-auth): minimum password
   length (`Auth.minimumPasswordLength`, applied to Shield's `config('Auth')`), session lifetimes
   (absolute lifetime and the remember-me lifetime), re-auth window, rate limits, extra CSP origins per directive, outbound
-  allow-list, upload rules, `Api.publicSpec`; values that weaken the baseline refused.
+  allow-list, upload rules (`Core.uploadTypes`, `Core.uploadMaxSize`, `Core.uploadAllowSvg`),
+  `Api.publicSpec`; values that weaken the baseline refused.
 - Actions: test email, clear caches, publish assets.
 - Tests: permissions per tab, refused weak values, CSP origin added appears in the header, a
   changed minimum password length is enforced, the remember-me lifetime caps re-created sessions.

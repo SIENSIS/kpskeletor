@@ -44,6 +44,9 @@ A file manager over the storage service with inherited folder permissions.
   restore, download, preview, public URL; metadata table; search and filters; list/grid views.
 - Folder ACL with inheritance, subjects and rights, predefined spaces (personal, modules, shared),
   personal space `users/{user_id}/` per group setting, quotas, `FileAccessPolicy` registration.
+- Private files keep the URL `files/private/{key}` (404 when not allowed): replace the Core's
+  interim rule (`Config\Storage::$accessRule` = `OwnerAccess`) with the folder ACL; `files`
+  references `stored_files`.
 - Tests: ACL inheritance, traversal, quotas.
 
 ## Out of scope

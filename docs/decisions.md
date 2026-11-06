@@ -139,8 +139,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-12-03 | 12 | Entry format, action codes and labels, security events | Accepted (proposal) |
 | D-12-04 | 12 | Retention setting `Core.activityRetentionDays` | Applied |
 | D-12-05 | 12 | Personal data and network fields in the log | Accepted (proposal) |
-| D-13-01 | 13 | Private file URL and who may read a private file | Open |
-| D-13-02 | 13 | Upload settings `Core.uploadTypes`, `Core.uploadMaxSize`, `Core.uploadAllowSvg` | Open |
+| D-13-01 | 13 | Private file URL and who may read a private file | Applied (decided) |
+| D-13-02 | 13 | Upload settings `Core.uploadTypes`, `Core.uploadMaxSize`, `Core.uploadAllowSvg` | Applied (decided) |
 | D-13-03 | 13 | `stored_files` in the Core | Accepted (proposal) |
 | D-13-04 | 13 | Headers of served private files | Accepted (proposal) |
 | D-13-05 | 13 | Upload checks in detail | Accepted (proposal) |
@@ -1482,7 +1482,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The URL of a private file and the rule used before the folder permissions exist are not specified; URLs are a public convention and the rule is security.
 - **Proposal:** `GET files/private/{key}`, where `key` is a random 128-bit identifier (32 hex characters, `stored_files.file_key`, unrelated to the file name); `?download=1` forces a download. Anything not allowed, unknown, on the public disk or missing on disk is a **404** (the existence of a file is not revealed, also to guests). The rule is a class (`Config\Storage::$accessRule`, interface `FileAccessRule`): until session 22 `OwnerAccess` = the user who uploaded the file and superadmins; the Files module replaces it with the folder permissions and its `FileAccessPolicy` registry. A misconfigured rule denies everything.
 - **Alternatives:** A) Masked numeric ids (`app.maskKey`): rotating the mask key would break every stored link. B) Login required and 403 for others (reveals that the file exists). C) Administrators read every private file now (before `files.all` exists).
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-06):** «Clau aleatòria + 404 (recomanada)». Private files are served at `files/private/{key}` with a random 128-bit key; only the uploader and superadmins may read them until session 22 replaces the rule with folder permissions; everybody else, guests included, gets a 404. Nothing to change: session 13 built it this way.
+- **Applied in:** `app/Config/Storage.php`, `modules/Core/Storage/{Storage,OwnerAccess,FileAccessRule}.php`, `modules/Core/Controllers/PrivateFiles.php`, `modules/Core/Config/Routes.php`, `docs/storage.md`, `docs/specification.md` ("Storage"), `deploy/22-files-manager.md` (tests `PrivateFilesTest`)
 
 ## D-13-02 — Upload settings `Core.uploadTypes`, `Core.uploadMaxSize`, `Core.uploadAllowSvg` (decide)
 
@@ -1490,7 +1492,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The settings have no names; settings names are a public convention.
 - **Proposal:** Core settings (the Storage service is the Core's and is used without the Files module): `Core.uploadTypes` (string, comma-separated extensions, default `jpg,jpeg,png,gif,webp,pdf,txt,csv,odt,ods,odp,doc,docx,xls,xlsx,ppt,pptx`), `Core.uploadMaxSize` (int, MB, default 10, 1–2048) and `Core.uploadAllowSvg` (bool, default off). A field (`UploadRules`) can only narrow them: an extension must be in both lists and the smaller size wins. Re-encoding is a field option (`UploadRules::$reencode`, default on), not a global setting. Extensions in `Config\Storage::$forbiddenExtensions` (code, HTML, executables, server configuration) are refused whatever the settings say. Shown in Settings › Security by session 14.
 - **Alternatives:** A) `Files.*` settings in the Files module (uploads of other modules would have no rules while it is disabled). B) Separate lists per disk or for images.
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-06):** «Paràmetres del Core (recomanada)». The global upload rules are Core settings `Core.uploadTypes`, `Core.uploadMaxSize` (MB, default 10) and `Core.uploadAllowSvg` (off), which every field can only narrow; re-encoding is a per-field option. Nothing to change in the code: session 13 built it this way.
+- **Applied in:** `modules/Core/Config/Module.php`, `modules/Core/Storage/{UploadValidator,UploadRules}.php`, `modules/Core/Language/*/Core.php`, `docs/storage.md`, `docs/specification.md` ("Storage", "Files"), `deploy/14-settings.md` (tests `StorageTest::testTheDefaultRulesComeFromTheSettings`, `UploadRulesTest`)
 
 ## D-13-03 — `stored_files` in the Core
 
