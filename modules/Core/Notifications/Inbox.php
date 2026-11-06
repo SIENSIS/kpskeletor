@@ -36,7 +36,7 @@ final class Inbox
      */
     public function latest(int $limit = self::LATEST): array
     {
-        return $this->db()->table('notifications')->where('user_id', $this->userId)->orderBy('id', 'desc')->limit($limit)->get()->getResultArray();
+        return $this->db()->table('notifications')->where('user_id', $this->userId)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->limit($limit)->get()->getResultArray();
     }
 
     /**
@@ -100,7 +100,7 @@ final class Inbox
                 'body'  => mb_strimwidth($message->body, 0, 160, '…'),
                 'icon'  => Notifier::iconOf($row),
                 'url'   => site_url('backend/notifications/open/' . (int) $row['id']),
-                'date'  => $row['created_at'] !== null ? Time::parse((string) $row['created_at'])->humanize() : '',
+                'date'  => $row['created_at'] !== null ? (string) Time::parse((string) $row['created_at'])->toLocalizedString('d MMM y, HH:mm') : '',
                 'read'  => $row['read_at'] !== null,
             ];
         }

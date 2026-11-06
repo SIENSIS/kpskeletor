@@ -24,6 +24,7 @@ final class NotificationPreferences extends BackendController
         }
 
         ksort($groups);
+        $this->breadcrumb(lang('Core.notifications.title'), site_url('backend/notifications'))->breadcrumb(lang('Core.notifications.preferences'));
 
         return $this->render('Modules\Core\Views\notifications\preferences', [
             'title'    => lang('Core.notifications.preferences'),

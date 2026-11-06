@@ -397,6 +397,7 @@ return [
         'markAllRead' => 'Marcar todo como leído',
         'markedAllRead' => '{0, plural, =0{No había ninguna notificación por leer.} one{Se ha marcado una notificación como leída.} other{Se han marcado # notificaciones como leídas.}}',
         'preferences' => 'Preferencias de notificaciones',
+        'preferencesShort' => 'Preferencias',
         'preferencesIntro' => 'Elija cómo quiere recibir cada tipo de notificación. Las notificaciones obligatorias no se pueden desactivar.',
         'preferencesSaved' => 'Se han guardado las preferencias de notificaciones.',
         'type' => 'Tipo de notificación',

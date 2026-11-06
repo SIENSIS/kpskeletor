@@ -96,6 +96,11 @@ export function mount(element, options) {
 
     element.addEventListener('show.bs.dropdown', () => load(true));
 
+    // Opened before this module was loaded.
+    if (element.querySelector('.dropdown-menu.show') !== null) {
+        load(true);
+    }
+
     if (form !== null && options.readAll) {
         form.addEventListener('submit', async (event) => {
             event.preventDefault();

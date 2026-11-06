@@ -16,7 +16,7 @@ $config = json_encode([
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <div class="dropdown notification-bell" data-component="core/ui/bell" data-options="<?= esc((string) $config, 'attr') ?>">
-    <button class="btn btn-link text-body position-relative px-2" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="<?= esc($label) ?>" title="<?= esc(lang('Core.notifications.title')) ?>" data-bell-button>
+    <button class="btn btn-link text-body position-relative px-2" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bs-display="static" aria-expanded="false" aria-label="<?= esc($label) ?>" title="<?= esc(lang('Core.notifications.title')) ?>" data-bell-button>
         <i class="bi bi-bell" aria-hidden="true"></i>
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger bell-count" data-bell-count<?= $unread === 0 ? ' hidden' : '' ?>><?= $unread > 99 ? '99+' : esc((string) $unread) ?></span>
     </button>
@@ -33,7 +33,7 @@ $config = json_encode([
         </div>
         <div class="d-flex border-top">
             <a class="dropdown-item text-center small py-2" href="<?= esc(site_url('backend/notifications')) ?>"><?= esc(lang('Core.notifications.seeAll')) ?></a>
-            <a class="dropdown-item text-center small py-2 border-start" href="<?= esc(site_url('backend/profile/notifications')) ?>"><?= esc(lang('Core.notifications.preferences')) ?></a>
+            <a class="dropdown-item text-center small py-2 border-start" href="<?= esc(site_url('backend/profile/notifications')) ?>"><?= esc(lang('Core.notifications.preferencesShort')) ?></a>
         </div>
     </div>
 </div>

@@ -397,6 +397,7 @@ return [
         'markAllRead' => 'Mark all as read',
         'markedAllRead' => '{0, plural, =0{No notification was unread.} one{One notification marked as read.} other{# notifications marked as read.}}',
         'preferences' => 'Notification preferences',
+        'preferencesShort' => 'Preferences',
         'preferencesIntro' => 'Choose how you want to receive each kind of notification. Mandatory notifications cannot be turned off.',
         'preferencesSaved' => 'Your notification preferences have been saved.',
         'type' => 'Kind of notification',

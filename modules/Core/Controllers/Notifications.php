@@ -39,7 +39,7 @@ final class Notifications extends BackendController
             ->callbackColumn('read_at', static fn ($value): string => $value === null || $value === ''
                 ? ui_badge(lang('Core.notifications.unread'), 'primary')
                 : ui_date((string) $value, 'datetime'))
-            ->defaultOrder('id', 'desc')
+            ->defaultOrder('created_at', 'desc')
             ->unsetAdd()->unsetEdit()->unsetExport()->unsetSearch()
             ->addOperation('read', static function (?string $id) use ($userId): string {
                 (new Inbox($userId))->markRead((int) $id);

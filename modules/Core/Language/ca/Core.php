@@ -397,6 +397,7 @@ return [
         'markAllRead' => 'Marca-ho tot com a llegit',
         'markedAllRead' => '{0, plural, =0{No hi havia cap notificació per llegir.} one{S\'ha marcat una notificació com a llegida.} other{S\'han marcat # notificacions com a llegides.}}',
         'preferences' => 'Preferències de notificacions',
+        'preferencesShort' => 'Preferències',
         'preferencesIntro' => 'Trieu com voleu rebre cada tipus de notificació. Les notificacions obligatòries no es poden desactivar.',
         'preferencesSaved' => 'S\'han desat les preferències de notificacions.',
         'type' => 'Tipus de notificació',
