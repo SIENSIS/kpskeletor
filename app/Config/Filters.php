@@ -16,6 +16,7 @@ use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Shield\Filters\SessionAuth;
 use Modules\Auth\Filters\ForcePasswordReset;
 use Modules\Auth\Filters\ForceTwoFactor;
+use Modules\Core\Filters\PoorMansCron;
 use Modules\Core\Filters\RateLimit;
 use Modules\Core\Filters\SecurityHeaders;
 
@@ -46,7 +47,9 @@ class Filters extends BaseFilters
         // login (Shield), a forced password change, the 2FA set-up a group policy requires.
         // Global filters already cover the rest of the chain for every request: the disabled-
         // module check (`moduleenabled`) and the session hardening with the idle lock
-        // (`authsession`). Then the request rate limit per user (`RateLimit`, limit `backend`).
+        // (`authsession`). Then the request rate limit per user (`RateLimit`, limit `backend`)
+        // and the scheduler fallback for hosts without cron (`PoorMansCron`, after filter, off
+        // unless the setting Core.poorMansCron is on).
         // Maintenance mode and the activity hook join this list in the sessions that build them.
         // Each route adds its own `can:` filter.
         'backend' => [
@@ -54,6 +57,7 @@ class Filters extends BaseFilters
             ForcePasswordReset::class,
             ForceTwoFactor::class,
             RateLimit::class,
+            PoorMansCron::class,
         ],
     ];
 
