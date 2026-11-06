@@ -371,6 +371,12 @@ return [
         'outboundHostsHelp' => 'Nombres de servidor a los que el sitio puede conectar por HTTPS o usar como servidor SMTP (p. ej. api.example.com o *.example.com), además de los de la configuración y los módulos.',
         'activityRetentionDays' => 'Días que se conserva el registro de actividad',
         'activityRetentionDaysHelp' => 'Las entradas más antiguas se borran cada noche (tarea programada).',
+        'uploadTypes' => 'Tipos de archivo permitidos',
+        'uploadTypesHelp' => 'Extensiones separadas por comas (p. ej. jpg, png, pdf). Cada campo de subida solo puede restringir esta lista. El código, el HTML y los ejecutables siempre se rechazan.',
+        'uploadMaxSize' => 'Tamaño máximo de subida (MB)',
+        'uploadMaxSizeHelp' => 'Cada campo de subida solo puede reducirlo. upload_max_filesize y post_max_size de PHP también deben permitirlo.',
+        'uploadAllowSvg' => 'Permitir imágenes SVG',
+        'uploadAllowSvgHelp' => 'Los archivos SVG pueden contener scripts: si se permiten, se limpian y solo los aceptan los campos que incluyen svg.',
         'poorMansCron' => 'Ejecutar las tareas programadas sin cron',
         'poorMansCronHelp' => 'Para servidores sin cron: las visitas al backoffice ejecutan las tareas programadas pendientes como máximo una vez por minuto, después de enviar la página. Una entrada de cron es más fiable.',
     ],
@@ -484,5 +490,20 @@ return [
         'outbound_refused' => 'Petición externa rechazada',
         'preferences_saved' => 'Preferencias de notificaciones guardadas',
         'purge' => 'Entradas antiguas borradas',
+        'upload_refused' => 'Subida rechazada',
+    ],
+    // Upload rules of the Storage service.
+    'storage' => [
+        'refused' => [
+            'invalid' => 'No se ha podido subir el archivo. Vuelve a intentarlo.',
+            'empty' => 'El archivo está vacío.',
+            'too_large' => 'El archivo es demasiado grande (máximo {0} MB).',
+            'type' => 'Aquí no se permiten archivos de tipo «{0}». Permitidos: {1}.',
+            'forbidden' => 'Los archivos de tipo «{0}» no se aceptan nunca.',
+            'mime' => 'El contenido del archivo no corresponde a su tipo ({0}).',
+            'image' => 'No se ha podido leer la imagen o es demasiado grande.',
+            'svg' => 'Las imágenes SVG no están permitidas o el archivo no es un SVG válido.',
+            'content' => 'El archivo contiene código o HTML y se ha rechazado.',
+        ],
     ],
 ];

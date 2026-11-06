@@ -8,6 +8,7 @@ use CodeIgniter\Config\BaseService;
 use Modules\Core\Activity\ActivityLogger;
 use Modules\Core\Frontend\AssetManifest;
 use Modules\Core\Notifications\Notifier;
+use Modules\Core\Storage\Storage;
 use Modules\Core\Theme\ThemeManager;
 
 /**
@@ -62,5 +63,17 @@ class Services extends BaseService
         }
 
         return new ActivityLogger();
+    }
+
+    /**
+     * File storage: the `public` and `private` disks and the upload rules (docs/storage.md).
+     */
+    public static function storage(bool $getShared = true): Storage
+    {
+        if ($getShared) {
+            return static::getSharedInstance('storage');
+        }
+
+        return new Storage(config(\Config\Storage::class));
     }
 }
