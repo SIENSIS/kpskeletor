@@ -66,8 +66,8 @@ Branch: `claude/trusting-curie-sqluwo` · Pull request: [SIENSIS/kpskeletor#16](
   `afterWrite()` hook (kpcrudy keeps a single one).
 - **D-12-03** (accepted): action codes + language labels, summary as data, which events are
   `security`.
-- **D-12-04** (**open, decide**): the retention setting's name `Core.activityRetentionDays`
-  (built as proposed; easy to rename).
+- **D-12-04** (decided by the owner as proposed with `deploy/decide.md`): the retention setting `Core.activityRetentionDays`
+  (365 days, purged daily by the Core even while the Activity module is disabled).
 - **D-12-05** (accepted): a failed login keeps the typed name only if it is an email; IP/user
   agent hidden on both screens without `activity-log.network`.
 - Deviations: CRUD token revocation writes two entries (the `delete` and the `token_revoked`
@@ -153,4 +153,4 @@ inside its card.*
   settings changes (masked by key) and `Core.activityRetentionDays` in the Settings UI.
   Session 15: impersonation start/end, bans, forced resets. Session 16: a security-events widget
   can read `activity_log`. Session 29: refused packages.
-- D-12-04 is open: run `deploy/decide.md`.
+- D-12-04 was decided as proposed (`Core.activityRetentionDays`); nothing is open.

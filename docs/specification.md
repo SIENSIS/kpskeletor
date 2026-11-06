@@ -913,7 +913,9 @@ granularity instead of collapsing it into read/create/update/delete.
   custom operations and exports through the Core's `AuditedCrud`); each module logs its own
   events; a failed login keeps the typed name only if it is an email (D-12-01 … D-12-05,
   `docs/activity.md`).
-* Retention by setting (e.g. 365 days), purged by a scheduled task.
+* Retention by the Core setting `Core.activityRetentionDays` (default 365 days, 1–3650), purged
+  daily by the Core scheduled task `PurgeActivityLog` (also while the Activity module is
+  disabled).
 
 ### Dashboard widgets
 

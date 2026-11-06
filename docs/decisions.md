@@ -137,7 +137,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-12-01 | 12 | Who writes the activity log | Accepted (proposal) |
 | D-12-02 | 12 | CRUD writes logged by a Core subclass of kpcrudy's `Crud` | Accepted (proposal) |
 | D-12-03 | 12 | Entry format, action codes and labels, security events | Accepted (proposal) |
-| D-12-04 | 12 | Retention setting `Core.activityRetentionDays` | Open |
+| D-12-04 | 12 | Retention setting `Core.activityRetentionDays` | Applied |
 | D-12-05 | 12 | Personal data and network fields in the log | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
@@ -1456,8 +1456,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The setting has no name; settings names are a public convention.
 - **Proposal:** `Core.activityRetentionDays` (int, default 365, 1–3650) in the Core's manifest (the log is the Core's, D-12-01); the Core scheduled task `PurgeActivityLog` runs daily at 03:17 and deletes older entries in chunks of 1000, then writes a `purge` entry. Shown in Settings by session 14.
 - **Alternatives:** A) `Activity.retentionDays` in the Activity module (the purge would stop while the module is disabled). B) Separate retention for `security` entries (e.g. 2 years).
-- **Status:** Open
-- **Applied in:** built as proposed (session 12); renaming it is one line in `modules/Core/Config/Module.php` plus `PurgeActivityLog`.
+- **Status:** Applied
+- **Decision (2026-11-06):** «Core.activityRetentionDays (recomanada)». A single retention setting `Core.activityRetentionDays` (int, default 365, 1–3650) owned by the Core; the Core scheduled task `PurgeActivityLog` purges older entries daily, also while the Activity module is disabled. Nothing to change: session 12 built it this way.
+- **Applied in:** `modules/Core/Config/Module.php`, `modules/Core/Tasks/PurgeActivityLog.php`, `modules/Core/Language/*/Core.php`, `docs/activity.md`, `docs/specification.md` (session 12; tests in `modules/Core/Tests/ActivityLoggerTest.php`)
 
 ## D-12-05 — Personal data and network fields in the log
 

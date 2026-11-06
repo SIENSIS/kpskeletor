@@ -25,7 +25,7 @@ and keeps being written while this module is disabled. Full description: `docs/a
 
 ## Decisions
 
-D-12-01 … D-12-05 in `docs/decisions.md` (D-12-04, the retention setting's name, is open).
+D-12-01 … D-12-05 in `docs/decisions.md` (D-12-04, the retention setting `Core.activityRetentionDays`, decided by the owner as proposed).
 
 ## Open tasks
 
