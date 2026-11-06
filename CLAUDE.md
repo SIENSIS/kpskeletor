@@ -66,6 +66,10 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.
   Module routes point at controllers (a disabled module answers 404 through its controller namespace).
+- **Activity log:** CRUD writes, custom operations and exports are logged by the Core
+  (`AuditedCrud`, through `CrudFactory`); log other actions with `activity_log()` and security
+  events with `security_log()` (`<Module>`, action code, labels in `<Module>.activity.<code>`),
+  never with `log_message()`; the log is append-only (`docs/activity.md`).
 - **Notifications and scheduled tasks:** types in `Notifications/` (extend `NotificationType`,
   send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email inline), scheduled
   tasks in `Tasks/` (`TaskInterface`), both declared in the manifest; one cron line runs

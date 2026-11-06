@@ -66,7 +66,7 @@ final class ModuleToggler
         $this->setEnabled($known[$name]['id'], false);
         $this->caches->invalidate();
         (new ShieldMatrix())->write(); // its permissions leave Shield's matrix
-        log_message('notice', 'Module {module} disabled.', ['module' => $name]); // activity log: session 12
+        activity_log('Core', 'module_disabled', ['resource' => 'modules', 'summary' => $name]);
 
         return true;
     }
@@ -108,7 +108,7 @@ final class ModuleToggler
 
         $this->caches->invalidate();
         (new ShieldMatrix())->write(); // their grants come back
-        log_message('notice', 'Modules enabled: {modules}.', ['modules' => implode(', ', $order)]); // activity log: session 12
+        activity_log('Core', 'module_enabled', ['resource' => 'modules', 'summary' => implode(', ', $order), 'changes' => ['modules' => $order]]);
 
         return $order;
     }

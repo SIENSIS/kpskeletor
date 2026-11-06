@@ -9,6 +9,7 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Kpcrudy\Crud;
+use Modules\Core\Crud\AuditedCrud;
 use Modules\Core\Crud\CrudFactory;
 use Modules\Core\Crud\CrudInspection;
 use Modules\Core\Permissions\Authorization;
@@ -48,7 +49,7 @@ abstract class BackendController extends BaseController
      * A kpcrudy CRUD for a resource of the catalogue (`CrudFactory::make()`): permissions through
      * `CrudPermissions`, masked ids, the theme's back-office layout.
      */
-    protected function crud(string $resource): Crud
+    protected function crud(string $resource): AuditedCrud
     {
         return CrudFactory::make($resource);
     }

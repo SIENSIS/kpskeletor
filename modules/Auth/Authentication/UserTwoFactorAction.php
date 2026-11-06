@@ -164,7 +164,7 @@ final class UserTwoFactorAction implements ActionInterface, ConditionalActionInt
 
         if (! $valid) {
             $throttle->loginFailed($ip, $email);
-            log_message('notice', 'Wrong two-factor code for user {id}.', ['id' => $user->id]);
+            security_log('Auth', '2fa_failed', ['user_id' => $user->id, 'resource' => 'auth-profile', 'summary' => $recovery !== '' ? 'recovery' : (string) $identity->name]);
 
             if ($throttle->loginBlockedFor($ip, $email) > 0) {
                 return $this->abandon(lang('Auth.twoFactor.tooManyAttempts'));
@@ -187,7 +187,7 @@ final class UserTwoFactorAction implements ActionInterface, ConditionalActionInt
         $redirect = redirect()->to(config('Auth')->loginRedirect())->withCookies();
 
         if ($usedCode) {
-            log_message('notice', 'User {id} logged in with a recovery code.', ['id' => $user->id]);
+            security_log('Auth', 'recovery_code_used', ['user_id' => $user->id, 'resource' => 'auth-profile']);
             $redirect->with('warning', lang('Auth.twoFactor.recoveryUsed', [(new RecoveryCodes())->remaining((int) $user->id)]));
         }
 

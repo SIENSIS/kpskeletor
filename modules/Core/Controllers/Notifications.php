@@ -62,6 +62,8 @@ final class Notifications extends BackendController
             ->addBulkAction('read', lang('Core.notifications.markRead'), static function (array $ids) use ($userId): string {
                 return lang('Core.notifications.markedAllRead', [(new Inbox($userId))->markAllRead(array_map(intval(...), $ids))]);
             }, ['permission' => 'list'])
+            // Marking as read changes only the user's own view: not written to the activity log.
+            ->skipActivity('read', 'readall')
             ->addHeaderAction(lang('Core.notifications.preferences'), 'backend/profile/notifications', ['icon' => 'bi bi-sliders']);
 
         return $this->renderCrud($crud);

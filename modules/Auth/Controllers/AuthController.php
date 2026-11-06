@@ -87,6 +87,8 @@ abstract class AuthController extends FrontendController
     {
         $minutes = max(1, (int) ceil($seconds / 60));
 
+        security_log('Auth', 'throttled', ['summary' => '/' . ltrim($this->request->getPath(), '/')]);
+
         return $this->response
             ->setStatusCode(429)
             ->setHeader('Retry-After', (string) $seconds)

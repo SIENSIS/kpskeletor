@@ -909,7 +909,13 @@ granularity instead of collapsing it into read/create/update/delete.
   them. Values are stored as data (never interpolated into log lines), so user input cannot
   forge entries; the file logs escape line breaks.
 * The `Activity` module shows it with **kpcrudy** (see "Modules").
-* Retention by setting (e.g. 365 days), purged by a scheduled task.
+* The Core writes the log (`ActivityLogger`, `activity_log()`/`security_log()`; kpcrudy writes,
+  custom operations and exports through the Core's `AuditedCrud`); each module logs its own
+  events; a failed login keeps the typed name only if it is an email (D-12-01 … D-12-05,
+  `docs/activity.md`).
+* Retention by the Core setting `Core.activityRetentionDays` (default 365 days, 1–3650), purged
+  daily by the Core scheduled task `PurgeActivityLog` (also while the Activity module is
+  disabled).
 
 ### Dashboard widgets
 

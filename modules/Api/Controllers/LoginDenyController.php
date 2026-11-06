@@ -41,7 +41,6 @@ final class LoginDenyController extends FrontendController
         $denied     = $challenge !== null && $challenges->deny($id, (int) $challenge['user_id']);
 
         if ($denied) {
-            log_message('notice', 'User {id} denied an API sign-in from {ip}.', ['id' => $challenge['user_id'], 'ip' => $challenge['ip_address']]);
             Events::trigger('kpapy.auth.denied', ['user_id' => (int) $challenge['user_id'], 'challenge' => $id]);
         }
 

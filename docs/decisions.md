@@ -134,6 +134,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-11-04 | 11 | Notification screens, URLs and the bell | Accepted (proposal) |
 | D-11-05 | 11 | How the scheduler decides, locks and records runs; the `schedule` resource | Accepted (proposal) |
 | D-11-06 | 11 | The poor man's cron | Accepted (proposal) |
+| D-12-01 | 12 | Who writes the activity log | Accepted (proposal) |
+| D-12-02 | 12 | CRUD writes logged by a Core subclass of kpcrudy's `Crud` | Accepted (proposal) |
+| D-12-03 | 12 | Entry format, action codes and labels, security events | Accepted (proposal) |
+| D-12-04 | 12 | Retention setting `Core.activityRetentionDays` | Applied |
+| D-12-05 | 12 | Personal data and network fields in the log | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1414,4 +1419,54 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-06):** applied by session 11 as proposed.
 - **Applied in:** `modules/Core/Filters/PoorMansCron.php`, `app/Config/Filters.php`, `modules/Core/Config/Module.php`
+
+## D-12-01 — Who writes the activity log
+
+- **Where:** spec "Activity log", "Modules" › "Activity"; `docs/plan.md` session 12 (listeners in `modules/Core/Config/Events.php` for Shield, kpapy, reauth, 403s and tokens)
+- **Problem:** The plan puts every listener in the Core, but the Core must never hard-code a module (`CLAUDE.md`), and the log must keep working when the Activity module is disabled.
+- **Proposal:** The Core owns the table, `ActivityLogger` (service `activity`, helpers `activity_log()` / `security_log()`), `SecretMasker`, `SafeLogger` and the retention task; each module logs its own events where they happen: Auth (Shield `login`/`logout`, failed logins, throttling, 2FA, re-authentication, profile, sessions, groups), Api (kpapy `kpapy.auth.*` in `modules/Api/Config/Events.php`, tokens, new IP), Core (403s from `can:`, rate limits, grants, modules, demo data, scheduler, outbound, preferences). The Activity module only has the two read-only screens and can be disabled.
+- **Alternatives:** A) Every listener in the Core's `Config/Events.php` (the Core would know Auth's and Api's events). B) The logger inside the Activity module (nothing logged while it is disabled).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 12 as proposed.
+- **Applied in:** `modules/Core/Activity/`, `modules/Core/Helpers/activity_helper.php`, `modules/{Auth,Api,Core}/…`, `docs/activity.md`
+
+## D-12-02 — CRUD writes logged by a Core subclass of kpcrudy's `Crud`
+
+- **Where:** spec "Activity log" ("kpcrudy `afterWrite()` hooks, custom operations"); session 09 note ("`afterWrite()` for the activity log")
+- **Problem:** kpcrudy keeps a single `afterWrite` callback: a Core hook set by `CrudFactory` would be replaced by a module's own `afterWrite()`, and vice versa. Custom operations and exports have no hook.
+- **Proposal:** `Modules\Core\Crud\AuditedCrud extends Kpcrudy\Crud` (made by `CrudFactory::make()`, so no module code changes) logs after kpcrudy's own hooks in `callHook()` (insert, update with the changed fields only, delete, restore; bulk actions and imports included), wraps POST custom operations and custom bulk actions (logged unless the callback returns `false`) and logs CSV exports. `skipActivity(…)` leaves out operations that only change the user's own view or log a richer entry themselves (notifications "read", schedule "run"). Module hooks keep working as documented.
+- **Alternatives:** A) A Core `afterWrite()` that modules must not override (easy to break). B) A library request for several `afterWrite` callbacks (blocks this session).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 12 as proposed.
+- **Applied in:** `modules/Core/Crud/{AuditedCrud,CrudFactory}.php`, `modules/Core/Controllers/BackendController.php`, `docs/cruds.md`
+
+## D-12-03 — Entry format, action codes and labels, security events
+
+- **Where:** spec "Activity log" (columns, `security` type, append-only)
+- **Problem:** The specification lists columns but not how actions are named and translated, which events are `security`, nor where the summary text comes from (UI texts only in language files).
+- **Proposal:** `action` is a code (`insert`, `login_failed`, `token_new_ip`…); its label is `<Module>.activity.<action>`, then `Activity.actions.<action>`, else the code. `summary` is data (a record's title/name/username/email, an email typed at login, a path), never a sentence; `changes` is JSON `{before, after, changes}` masked by key. `type` is `security` for failed logins/codes/re-authentications, throttling, 403s, re-authentication, password/email/2FA/recovery-code changes, grants and user permissions, token creation/revocation/new IP, denied app logins and refused outbound requests; everything else is `activity`. Errors stay in the file log (with `SafeLogger`). Settings changes, refused uploads and refused packages are logged by sessions 14, 13 and 29.
+- **Alternatives:** A) Store a translated sentence (frozen in the writer's language). B) Store language keys with parameters (breaks when a module is removed).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 12 as proposed.
+- **Applied in:** `modules/Core/Activity/ActivityLogger.php`, `modules/Activity/Controllers/Activity.php`, language files of Core, Auth, Api and Activity, `docs/activity.md`
+
+## D-12-04 — Retention setting `Core.activityRetentionDays` (decide)
+
+- **Where:** spec "Activity log" ("Retention by setting (e.g. 365 days), purged by a scheduled task")
+- **Problem:** The setting has no name; settings names are a public convention.
+- **Proposal:** `Core.activityRetentionDays` (int, default 365, 1–3650) in the Core's manifest (the log is the Core's, D-12-01); the Core scheduled task `PurgeActivityLog` runs daily at 03:17 and deletes older entries in chunks of 1000, then writes a `purge` entry. Shown in Settings by session 14.
+- **Alternatives:** A) `Activity.retentionDays` in the Activity module (the purge would stop while the module is disabled). B) Separate retention for `security` entries (e.g. 2 years).
+- **Status:** Applied
+- **Decision (2026-11-06):** «Core.activityRetentionDays (recomanada)». A single retention setting `Core.activityRetentionDays` (int, default 365, 1–3650) owned by the Core; the Core scheduled task `PurgeActivityLog` purges older entries daily, also while the Activity module is disabled. Nothing to change: session 12 built it this way.
+- **Applied in:** `modules/Core/Config/Module.php`, `modules/Core/Tasks/PurgeActivityLog.php`, `modules/Core/Language/*/Core.php`, `docs/activity.md`, `docs/specification.md` (session 12; tests in `modules/Core/Tests/ActivityLoggerTest.php`)
+
+## D-12-05 — Personal data and network fields in the log
+
+- **Where:** spec "Activity" (IP and user agent hidden without `activity-log.network`), "My activity"
+- **Problem:** A failed login stores what was typed (sometimes a password in the email field); "My activity" would show the IP addresses of the user's own entries.
+- **Proposal:** A failed login keeps the typed login name only when it is a valid email address. IP and user agent are hidden with `hideFields()` from every user without `activity-log.network`, on both screens (users see their own entries without them). Each entry stores the IP of the request that caused it (for a failed login: the attacker's).
+- **Alternatives:** A) Store the typed text as is. B) Show users their own IP addresses.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 12 as proposed.
+- **Applied in:** `modules/Core/Activity/ActivityLogger.php` (`typedEmail()`), `modules/Activity/Controllers/Activity.php`
 

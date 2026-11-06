@@ -83,4 +83,13 @@ return [
         'invalidDays'   => 'Choose one of the offered expiry periods.',
         'invalidScopes' => 'Choose “everything” or at least one of your permissions.',
     ],
+    // Labels of the activity log actions (Activity module).
+    'activity' => [
+        'api_login_challenge' => 'App sign-in: code requested',
+        'api_login_failed' => 'Failed app sign-in',
+        'api_login_denied' => 'App sign-in denied by the user',
+        'token_created' => 'API token created',
+        'token_revoked' => 'API token revoked',
+        'token_new_ip' => 'API token used from a new address',
+    ],
 ];

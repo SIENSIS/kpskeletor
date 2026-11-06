@@ -216,11 +216,14 @@ final class OutboundClient
     {
         $parts = parse_url($url);
 
-        log_message('info', 'Outbound {method} {host}{path}: {result}', [
-            'method' => $method,
-            'host'   => is_array($parts) ? ($parts['host'] ?? '?') : '?',
-            'path'   => is_array($parts) ? ($parts['path'] ?? '/') : '',
-            'result' => $result,
-        ]);
+        $host = is_array($parts) ? (string) ($parts['host'] ?? '?') : '?';
+        $path = is_array($parts) ? (string) ($parts['path'] ?? '/') : '';
+        $data = ['resource' => 'outbound', 'summary' => $method . ' ' . $host . $path, 'changes' => ['result' => $result]];
+
+        if (str_starts_with($result, 'refused')) {
+            security_log('Core', 'outbound_refused', $data);
+        } else {
+            activity_log('Core', 'outbound', $data);
+        }
     }
 }

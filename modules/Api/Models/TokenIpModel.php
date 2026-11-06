@@ -22,13 +22,13 @@ final class TokenIpModel extends Model
     /**
      * Stores the address a token was used from (only when it changed).
      */
-    public function record(int $tokenId, int $userId, string $ip): void
+    public function record(int $tokenId, int $userId, string $ip): ?string
     {
         $ip  = mb_substr($ip, 0, 45);
         $row = $this->find($tokenId);
 
         if (is_array($row) && $row['ip_address'] === $ip) {
-            return;
+            return null;
         }
 
         $data = ['user_id' => $userId, 'ip_address' => $ip, 'updated_at' => Time::now()->format('Y-m-d H:i:s')];
@@ -38,6 +38,8 @@ final class TokenIpModel extends Model
         } else {
             $this->builder()->insert($data + ['token_id' => $tokenId]);
         }
+
+        return is_array($row) ? (string) $row['ip_address'] : null;
     }
 
     /**

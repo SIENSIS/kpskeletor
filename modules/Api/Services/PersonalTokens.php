@@ -79,7 +79,7 @@ final class PersonalTokens
         model(UserIdentityModel::class)->builder()->where('id', $token['id'])->where('user_id', $user->id)
             ->update(['secret2' => PasswordChanger::PERSONAL_TOKEN]);
 
-        log_message('notice', 'User {id} created the personal API token {token}.', ['id' => $user->id, 'token' => $token['id']]);
+        security_log('Api', 'token_created', ['user_id' => $user->id, 'resource' => 'api', 'record_id' => $token['id'], 'summary' => $name, 'changes' => ['scopes' => $scopes, 'days' => $days]]);
 
         return $token;
     }
@@ -124,7 +124,7 @@ final class PersonalTokens
             return false;
         }
 
-        log_message('notice', 'User {id} revoked the API token {token}.', ['id' => $user->id, 'token' => $id]);
+        security_log('Api', 'token_revoked', ['user_id' => $user->id, 'resource' => 'api', 'record_id' => $id]);
 
         return true;
     }

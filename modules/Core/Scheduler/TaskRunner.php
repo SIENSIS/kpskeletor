@@ -111,7 +111,17 @@ final class TaskRunner
             throw new \InvalidArgumentException(lang('Core.schedule.unknownTask', [(string) $task]));
         }
 
-        return $this->execute($row, $instance, $source, $userId, $now);
+        $run = $this->execute($row, $instance, $source, $userId, $now);
+
+        activity_log('Core', 'task_run', [
+            'user_id'   => $userId,
+            'resource'  => 'schedule',
+            'record_id' => (int) $row['id'],
+            'summary'   => $run->name,
+            'changes'   => ['class' => $run->class, 'source' => $source, 'status' => $run->status],
+        ]);
+
+        return $run;
     }
 
     /**
@@ -196,6 +206,13 @@ final class TaskRunner
 
         if ($result->failed()) {
             log_message('error', 'Scheduled task {class} failed: {output}', ['class' => $row['class'], 'output' => $result->storedOutput()]);
+            activity_log('Core', 'task_failed', [
+                'user_id'   => $userId,
+                'resource'  => 'schedule',
+                'record_id' => $id,
+                'summary'   => $run->name,
+                'changes'   => ['class' => $run->class, 'source' => $source, 'output' => mb_substr($run->output, 0, 500)],
+            ]);
             $this->notifyFailure($row, $run);
         }
 

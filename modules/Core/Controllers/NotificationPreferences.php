@@ -51,6 +51,7 @@ final class NotificationPreferences extends BackendController
         }
 
         service('notifications')->savePreferences((int) auth()->id(), $choices);
+        activity_log('Core', 'preferences_saved', ['resource' => 'core-notifications', 'changes' => ['channels' => $choices]]);
 
         return redirect()->to(site_url('backend/profile/notifications'))->with('success', lang('Core.notifications.preferencesSaved'));
     }

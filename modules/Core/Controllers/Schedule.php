@@ -60,6 +60,7 @@ final class Schedule extends BackendController
             ->callbackColumn('runs', static fn ($value, array $row): string => self::runsTable((int) ($row['id'] ?? 0)))
             ->defaultOrder('module')
             ->readOnly()->unsetExport()->unsetBulk()
+            ->skipActivity('run') // TaskRunner::runNow() writes the `task_run` entry with the result
             ->addOperation('run', static function (string $id, array $row, Crud $crud) use ($runner): ResponseInterface {
                 try {
                     $run = $runner->runNow((int) $id, TaskRunner::SOURCE_MANUAL, (int) auth()->id());

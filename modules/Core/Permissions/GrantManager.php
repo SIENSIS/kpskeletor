@@ -57,6 +57,8 @@ final class GrantManager
         $db = Database::connect();
         $db->transException(true)->transStart();
 
+        $previous = $this->catalogue->grants($group);
+
         try {
             $this->catalogue->replaceGrants($group, $grants);
             $db->transComplete();
@@ -73,11 +75,19 @@ final class GrantManager
             Events::trigger('privilegesChanged', $userId);
         }
 
-        log_message('notice', 'Grants of group {group} set to [{grants}] by {actor}.', [
-            'group'  => $group,
-            'grants' => implode(', ', $grants),
-            'actor'  => $actor === null ? 'the console' : 'user ' . $actor->id,
-        ]);
+        $removed = array_values(array_diff($previous, $grants));
+        $added   = array_values(array_diff($grants, $previous));
+
+        if ($removed !== [] || $added !== []) {
+            security_log('Core', 'grants_changed', [
+                'user_id'   => $actor?->id,
+                'resource'  => 'groups',
+                'record_id' => $group,
+                'summary'   => $group,
+                'before'    => ['grants' => $removed],
+                'after'     => ['grants' => $added],
+            ]);
+        }
 
         return $grants;
     }
@@ -205,11 +215,12 @@ final class GrantManager
     {
         Events::trigger('privilegesChanged', (int) $target->id);
 
-        log_message('notice', 'Permissions [{permissions}] {change} to user {target} by {actor}.', [
-            'permissions' => implode(', ', $permissions),
-            'change'      => $change,
-            'target'      => $target->id,
-            'actor'       => $actor === null ? 'the console' : 'user ' . $actor->id,
+        security_log('Core', $change === 'granted' ? 'permissions_granted' : 'permissions_revoked', [
+            'user_id'   => $actor?->id,
+            'resource'  => 'users',
+            'record_id' => $target->id,
+            'summary'   => (string) $target->username,
+            'changes'   => ['permissions' => $permissions],
         ]);
     }
 

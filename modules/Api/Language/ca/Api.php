@@ -83,4 +83,13 @@ return [
         'invalidDays'   => 'Tria un dels períodes de caducitat oferts.',
         'invalidScopes' => 'Tria «tot» o almenys un dels teus permisos.',
     ],
+    // Labels of the activity log actions (Activity module).
+    'activity' => [
+        'api_login_challenge' => 'Entrada des d\'una app: codi demanat',
+        'api_login_failed' => 'Entrada des d\'una app fallida',
+        'api_login_denied' => 'Entrada des d\'una app rebutjada per l\'usuari',
+        'token_created' => 'Testimoni d\'API creat',
+        'token_revoked' => 'Testimoni d\'API revocat',
+        'token_new_ip' => 'Testimoni d\'API usat des d\'una adreça nova',
+    ],
 ];

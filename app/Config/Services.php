@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use Config\Logger as LoggerConfig;
+use Modules\Core\Log\SafeLogger;
 use Modules\Core\Mail\GuardedEmail;
 
 /**
@@ -22,6 +24,24 @@ use Modules\Core\Mail\GuardedEmail;
  */
 class Services extends BaseService
 {
+    /**
+     * The application (file) log with line breaks and control characters escaped in the values
+     * interpolated into messages, so user input cannot forge log lines
+     * (Modules\Core\Log\SafeLogger; docs/activity.md).
+     */
+    public static function logger(bool $getShared = true): SafeLogger
+    {
+        if ($getShared) {
+            $logger = static::getSharedInstance('logger');
+
+            if ($logger instanceof SafeLogger) {
+                return $logger;
+            }
+        }
+
+        return new SafeLogger(config(LoggerConfig::class));
+    }
+
     /**
      * The mail service with the SMTP host checked against the outbound allow-list
      * (Modules\Core\Mail\GuardedEmail, decision D-00-29).

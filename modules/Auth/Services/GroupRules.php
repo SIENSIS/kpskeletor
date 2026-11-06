@@ -92,11 +92,12 @@ final class GroupRules
     {
         (new SessionTracker())->privilegesChanged((int) $target->id);
 
-        log_message('notice', 'User {target} {change} group {group} by user {actor}.', [
-            'target' => $target->id,
-            'change' => $change,
-            'group'  => $group,
-            'actor'  => $actor->id,
+        activity_log('Auth', $change === 'added to' ? 'group_added' : 'group_removed', [
+            'user_id'   => $actor->id,
+            'resource'  => 'users',
+            'record_id' => $target->id,
+            'summary'   => $group,
+            'changes'   => ['user' => (string) $target->username, 'group' => $group],
         ]);
     }
 }

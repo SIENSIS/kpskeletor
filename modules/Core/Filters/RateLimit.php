@@ -32,7 +32,7 @@ final class RateLimit implements FilterInterface
             return null;
         }
 
-        log_message('warning', 'Rate limit {limit} reached by {subject}.', ['limit' => $limit, 'subject' => $userId !== null ? 'user ' . $userId : 'an IP address']);
+        security_log('Core', 'throttled', ['summary' => $request instanceof IncomingRequest ? '/' . ltrim($request->getPath(), '/') : '', 'changes' => ['limit' => $limit]]);
 
         return self::tooManyRequests($request, $wait);
     }
