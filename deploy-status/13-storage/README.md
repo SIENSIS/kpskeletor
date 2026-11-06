@@ -1,6 +1,6 @@
 # Session 13 — Storage service and upload rules
 
-Branch: `claude/gifted-newton-p029ve` · Pull request: PR_LINK · Date: 2026-11-06
+Branch: `claude/gifted-newton-p029ve` · Pull request: [SIENSIS/kpskeletor#17](https://github.com/SIENSIS/kpskeletor/pull/17) · Date: 2026-11-06
 
 ## What was built
 

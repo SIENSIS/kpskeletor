@@ -20,7 +20,7 @@ pull request open), *merged* (in `main`).
 | 10 | kpapy integration and API authentication | merged | `claude/tender-galileo-i38wrh` | [SIENSIS/kpskeletor#14](https://github.com/SIENSIS/kpskeletor/pull/14) | [`deploy-status/10-kpapy/`](../deploy-status/10-kpapy/README.md) |
 | 11 | Notifications and scheduler | merged | `claude/charming-edison-f3elks` | [SIENSIS/kpskeletor#15](https://github.com/SIENSIS/kpskeletor/pull/15) | [`deploy-status/11-notifications-scheduler/`](../deploy-status/11-notifications-scheduler/README.md) |
 | 12 | Activity log and Activity module | merged | `claude/trusting-curie-sqluwo` | [SIENSIS/kpskeletor#16](https://github.com/SIENSIS/kpskeletor/pull/16) | [`deploy-status/12-activity/`](../deploy-status/12-activity/README.md) |
-| 13 | Storage service and upload rules | in progress | `claude/gifted-newton-p029ve` | — | — |
+| 13 | Storage service and upload rules | done | `claude/gifted-newton-p029ve` | [SIENSIS/kpskeletor#17](https://github.com/SIENSIS/kpskeletor/pull/17) | [`deploy-status/13-storage/`](../deploy-status/13-storage/README.md) |
 
 ## Decisions
 
