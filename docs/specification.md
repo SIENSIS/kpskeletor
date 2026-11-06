@@ -302,7 +302,12 @@ final class Module extends ModuleManifest
     /** Link types the module offers to the public menu editor (e.g. "a news category") */
     public array $menuLinks = [\Modules\News\Menu\CategoryLink::class];
 
-    /** Runtime settings (codeigniter4/settings): key => definition; UI is generated */
+    /**
+     * Runtime settings (codeigniter4/settings): key => definition; UI is generated.
+     * Types: string, text, int, float, bool, select, email, url, color, json, list (one entry
+     * per line). 'group' is a heading on the module's tab; 'security' or 'security.<sub>'
+     * moves the setting to Settings › Security (settings.security + re-authentication).
+     */
     public array $settings = [
         'perPage'       => ['type' => 'int',  'default' => 20,   'rules' => 'is_natural_no_zero', 'label' => 'News.settings.perPage'],
         'noticesOnHome' => ['type' => 'bool', 'default' => true, 'label' => 'News.settings.noticesOnHome'],
@@ -850,11 +855,16 @@ granularity instead of collapsing it into read/create/update/delete.
     settings, `modules:sync` also generates **`settings.<module>`** (lower case, e.g.
     `settings.news`), required to change that module's tab. Security settings (headers, CSP,
     outbound hosts, password length, 2FA policy) need `settings.security` and a re-authentication.
-* **Site-wide settings** (Core): site name, logo, default locale, available locales, time zone,
-  maintenance mode, idle lock, captcha on/off, 2FA policy per group, mail transport, themes.
+* **Site-wide settings** (Core): site name (`Core.siteName`, empty = the default name), logo
+  (theme option), default locale, available locales, time zone (`Core.timezone`, the zone dates
+  are shown in; they are stored in UTC), maintenance mode, idle lock, captcha on/off, 2FA policy
+  per group, mail transport, themes.
 * **Settings › Security** (Core, `settings.security` + re-authentication): minimum password
   length (`Auth.minimumPasswordLength`), session lifetimes (absolute and remember-me), re-authentication window, rate limits, extra CSP origins per
-  directive, the outbound allow-list, upload rules (SVG, re-encoding) and `Api.publicSpec`.
+  directive (`Core.cspScriptSrc`, `cspStyleSrc`, `cspImgSrc`, `cspFontSrc`, `cspConnectSrc`,
+  `cspFrameSrc`, `cspMediaSrc`, `list` settings), the outbound allow-list (`Core.outboundHosts`),
+  upload rules (SVG, re-encoding) and `Api.publicSpec`. A setting belongs to this tab when its
+  manifest `group` is `security` or `security.<sub>`.
   File configuration (`Config\…` and `.env`) sets the defaults; the UI only stores overrides,
   and values that would weaken the baseline (e.g. `unsafe-inline`) are refused.
 
@@ -1498,8 +1508,9 @@ both supported:
   `Config\SecurityHeaders` (Core), overridable from `.env`. Modules add what they need in their
   manifest (e.g. the calendar's feed URLs are `'self'` already; a video module may add
   `frame-src https://www.youtube-nocookie.com`), and admins add extra allowed origins per
-  directive in **Settings › Security** (`settings.security` + re-authentication), validated as
-  origins (no wildcards for scripts). The final policy is shown read-only in the Security status
+  directive in **Settings › Security** (`settings.security` + re-authentication; settings
+  `Core.csp<Directive>`, e.g. `Core.cspImgSrc`), validated as origins (no wildcards for scripts
+  and styles). The final policy is shown read-only in the Security status
   page. `docs/security.md` explains each header, the defaults and examples (embedding a video, a
   map, an external analytics script, a CDN for fonts), and a `Content-Security-Policy-Report-Only`
   mode to test a change before enforcing it.

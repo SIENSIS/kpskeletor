@@ -8,6 +8,7 @@ use Modules\Auth\Filters\AuthSession;
 use Modules\Auth\Filters\ForcePasswordReset;
 use Modules\Auth\Filters\ForceTwoFactor;
 use Modules\Auth\Filters\RequireReauth;
+use Modules\Auth\Validation\AuthRules;
 
 /**
  * Filter aliases of the Auth module (CodeIgniter registrar). `authsession` runs globally and
@@ -28,5 +29,15 @@ final class Registrar
                 'reauth'      => RequireReauth::class,
             ],
         ];
+    }
+
+    /**
+     * Rules of the Auth settings (`two_factor_policy`).
+     *
+     * @return array<string, mixed>
+     */
+    public static function Validation(): array
+    {
+        return ['ruleSets' => [AuthRules::class]];
     }
 }

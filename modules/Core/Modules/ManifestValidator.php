@@ -26,7 +26,7 @@ final class ManifestValidator
 
     public const RESOURCE_TYPES = ['crud', 'page'];
 
-    public const SETTING_TYPES = ['string', 'text', 'int', 'float', 'bool', 'select', 'email', 'url', 'color', 'json'];
+    public const SETTING_TYPES = ['string', 'text', 'int', 'float', 'bool', 'select', 'email', 'url', 'color', 'json', 'list'];
 
     public const MENU_KEYS = ['resource', 'route', 'permission', 'label', 'icon', 'order', 'zone', 'parent'];
 

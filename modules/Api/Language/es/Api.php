@@ -92,4 +92,7 @@ return [
         'token_revoked' => 'Token de API revocado',
         'token_new_ip' => 'Token de API usado desde una dirección nueva',
     ],
+    'settingGroups' => [
+        'api' => 'API',
+    ],
 ];

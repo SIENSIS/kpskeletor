@@ -38,7 +38,7 @@ final class ShieldMatrixTest extends RbacTestCase
         }
 
         $this->assertContains('auth-profile.*', $matrix['user'], 'Personal screens are granted to every group (D-00-17).');
-        $this->assertSame(['activity-log.*', 'activity-mine.*', 'api.*', 'auth-profile.*', 'auth-sessions.*', 'core-notifications.*', 'modules.list', 'modules.sync', 'modules.toggle', 'schedule.*'], $matrix['admin']);
+        $this->assertSame(['activity-log.*', 'activity-mine.*', 'api.*', 'auth-profile.*', 'auth-sessions.*', 'core-notifications.*', 'modules.list', 'modules.sync', 'modules.toggle', 'schedule.*', 'settings.*'], $matrix['admin']);
     }
 
     public function testAGrantChangeRewritesTheMatrix(): void

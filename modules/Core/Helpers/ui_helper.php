@@ -78,7 +78,7 @@ if (! function_exists('ui_date')) {
             return theme_component('date', ['iso' => null, 'text' => '—', 'title' => null]);
         }
 
-        $time   = $date instanceof DateTimeInterface ? Time::createFromInstance($date) : Time::parse($date);
+        $time   = ($date instanceof DateTimeInterface ? Time::createFromInstance($date) : Time::parse($date))->setTimezone(site_timezone());
         $locale = service('request')->getLocale();
 
         $text = match ($format) {
@@ -232,5 +232,39 @@ if (! function_exists('ui_safe_url')) {
         }
 
         return '#';
+    }
+}
+
+if (! function_exists('site_name')) {
+    /**
+     * The site name: the `Core.siteName` setting, or the language line `Core.app.name` when it
+     * is empty (or before installation).
+     */
+    function site_name(): string
+    {
+        try {
+            $name = setting('Core.siteName');
+        } catch (Throwable) {
+            $name = null;
+        }
+
+        return is_string($name) && trim($name) !== '' ? trim($name) : lang('Core.app.name');
+    }
+}
+
+if (! function_exists('site_timezone')) {
+    /**
+     * The time zone dates are shown in (`Core.timezone`; dates are stored in the application's
+     * time zone, UTC). An unknown value falls back to UTC.
+     */
+    function site_timezone(): string
+    {
+        try {
+            $zone = setting('Core.timezone');
+        } catch (Throwable) {
+            $zone = null;
+        }
+
+        return is_string($zone) && in_array($zone, timezone_identifiers_list(), true) ? $zone : 'UTC';
     }
 }

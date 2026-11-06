@@ -75,7 +75,7 @@ final class TwoFactorSettingsController extends BackendController
             session()->set(self::PENDING_SECRET, $secret);
         }
 
-        $uri = $twoFactor->totp()->provisioningUri($secret, (string) $user->email, lang('Core.app.name'));
+        $uri = $twoFactor->totp()->provisioningUri($secret, (string) $user->email, site_name());
 
         $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))
             ->breadcrumb(lang('Auth.twoFactor.title'), site_url('backend/profile/two-factor'))

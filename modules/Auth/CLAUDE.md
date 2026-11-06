@@ -48,7 +48,7 @@ as re-authentication, decided by the owner).
 ## Open tasks
 
 - Session 10: kpapy 2FA providers reading `TwoFactor::method()` and the TOTP secret.
-- Session 14: Settings › Security form for the `Auth.*` settings.
+- Done in session 14: the `Auth.*` settings are in Settings › Security (`security.*` groups, `min_config` and `two_factor_policy` rules in `Validation/AuthRules.php`).
 - Session 15: 2FA reset row operation, policy in the `groups` table, refuse `reauth` while
   impersonating.
 - Session 23: avatar with the file picker.

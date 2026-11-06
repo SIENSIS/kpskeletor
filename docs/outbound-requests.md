@@ -30,8 +30,9 @@ The union of:
 1. `Config\Outbound::$allowedHosts` (`app/Config/Outbound.php`) and `outbound.hosts` in `.env`
    (comma separated);
 2. the `$outboundHosts` of the **enabled** modules (shown before enabling a module, session 29);
-3. the `Core.outboundHosts` setting (a JSON list), edited in **Settings › Security**
-   (`settings.security` + re-authentication, session 14).
+3. the `Core.outboundHosts` setting (a `list`, one host per line), edited in **Settings › Security**
+   (`settings.security` + re-authentication; IP addresses, local names, schemes and ports are
+   refused, docs/settings.md).
 
 An entry is a host name (`api.github.com`) or `*.example.com` (its subdomains, not
 `example.com` itself). IP literals are never needed; when listed, they must still be public.

@@ -296,4 +296,13 @@ return [
         'group_added' => 'Afegit a un grup',
         'group_removed' => 'Tret d\'un grup',
     ],
+    'settingGroups' => [
+        'passwords' => 'Contrasenyes',
+        'sessions' => 'Sessions i reautenticació',
+        'login' => 'Inici de sessió i enllaços per correu',
+        'twoFactor' => 'Autenticació en dos passos',
+    ],
+    'validation' => [
+        'twoFactorPolicy' => 'Escriviu un objecte JSON de grups existents i "required" o "optional", p. ex. {"admin": "required"}.',
+    ],
 ];

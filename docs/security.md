@@ -60,7 +60,7 @@ Rotating `app.maskKey` changes every masked id of the API too; to revoke every t
 ## Rate limits
 
 `Modules\Core\Security\RateLimiter` (CodeIgniter's Throttler, token bucket in the cache) with
-named limits whose capacities are Core settings (Settings › Security, session 14):
+named limits whose capacities are Core settings (Settings › Security, docs/settings.md):
 
 | Limit | Setting | Default | Counted per | Used by |
 |---|---|---|---|---|

@@ -296,4 +296,13 @@ return [
         'group_added' => 'Added to a group',
         'group_removed' => 'Removed from a group',
     ],
+    'settingGroups' => [
+        'passwords' => 'Passwords',
+        'sessions' => 'Sessions and re-authentication',
+        'login' => 'Login and email links',
+        'twoFactor' => 'Two-factor authentication',
+    ],
+    'validation' => [
+        'twoFactorPolicy' => 'Write a JSON object of existing groups and "required" or "optional", e.g. {"admin": "required"}.',
+    ],
 ];

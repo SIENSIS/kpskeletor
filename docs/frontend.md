@@ -120,8 +120,9 @@ Modules add sources in their manifest; `modules:sync` validates them (only `http
 public array $csp = ['frame-src' => ['https://www.youtube-nocookie.com']];
 ```
 
-Per-site extra origins from Settings › Security and the remaining security headers arrive with
-session 08 (`Config\SecurityHeaders`).
+Per-site extra origins come from Settings › Security (`Core.cspScriptSrc`, `Core.cspImgSrc`…,
+added by the same filter; docs/settings.md); the other security headers from
+`Config\SecurityHeaders` (docs/security.md).
 
 ## Light and dark mode, responsive layout
 
@@ -129,7 +130,7 @@ See `docs/themes.md` ("Light and dark mode", "Responsive layout").
 
 ## Minimal PWA
 
-Off by default; enable the setting `Core.pwa` (Settings screen in session 14; until then
+Off by default; enable the setting `Core.pwa` (Settings › General, or
 `service('settings')->set('Core.pwa', true)`). Then:
 
 - `/manifest.webmanifest`: name, start URL (setting `Core.pwaStart`: public home or back

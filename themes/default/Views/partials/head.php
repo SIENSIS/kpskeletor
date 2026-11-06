@@ -8,7 +8,7 @@
  * @var string|null                $title
  * @var array<string, mixed>|null  $meta description, canonical, robots, og (bool), image, type
  */
-$siteName  = lang('Core.app.name');
+$siteName  = site_name();
 $pageTitle = isset($title) && $title !== '' ? $title . ' · ' . $siteName : $siteName;
 $meta ??= [];
 $pwa = pwa_enabled();

@@ -16,7 +16,7 @@ $font = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
 <body class="layout-print theme-font-<?= esc($font) ?>">
 <main id="main" class="print-page container-fluid py-3">
     <header class="d-flex justify-content-between align-items-end border-bottom pb-2 mb-3">
-        <span class="fw-semibold"><?= esc(lang('Core.app.name')) ?></span>
+        <span class="fw-semibold"><?= esc(site_name()) ?></span>
         <?php if (! empty($title)): ?><h1 class="h4 mb-0"><?= esc($title) ?></h1><?php endif ?>
     </header>
     <?= $this->renderSection('content') ?>
