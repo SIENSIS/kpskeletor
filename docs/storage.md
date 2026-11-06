@@ -57,7 +57,7 @@ logged by the Core, a file-manager upload by the Files module).
 
 ## Upload rules
 
-Global rules (settings, edited in Settings › Security by session 14):
+Global rules (settings, edited in Settings › Security; forbidden extensions are refused there too):
 
 | Setting | Default | Meaning |
 |---|---|---|

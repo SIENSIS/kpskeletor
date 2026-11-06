@@ -15,7 +15,7 @@ shows it, is disabled.
 | Logins, logouts, remember-me logins, profile changes, group membership, module enable/disable, demo data, "run now", failed scheduled tasks, notification preferences, outbound requests | `activity_log()` in the code that does it | activity |
 | Failed logins, 2FA codes and re-authentications, throttling (`429`), permission denials (`403` from `can:`), re-authentication, password/email/2FA changes, recovery codes, grants and user permissions, token creation and revocation, a token used from a new IP address, app logins denied, refused outbound requests | `security_log()` | security |
 
-Refused uploads (session 13), settings changes (session 14) and refused packages (session 29) are
+Refused uploads (session 13), settings changes (session 14: `Settings`/`settings_changed`, `security_settings_changed`, `security_settings_refused`, `test_email`, `caches_cleared`, `assets_published`) and refused packages (session 29) are
 written by the sessions that build them, with `security_log()` / `activity_log()`.
 
 ## Writing entries
@@ -59,7 +59,7 @@ security_log('Storage', 'upload_refused', ['summary' => $originalName, 'changes'
 
 - No screen, route or API edits or deletes entries (`readOnly()`, no `add`/`edit`/`delete`
   permissions in the catalogue; tests post forged requests).
-- `Core.activityRetentionDays` (default 365, 1–3650; Settings in session 14): the Core scheduled
+- `Core.activityRetentionDays` (default 365, 1–3650; Settings › Security): the Core scheduled
   task `PurgeActivityLog` (daily, 03:17, without overlapping) deletes older entries in chunks of
   1000 (500 chunks per run at most) and writes a `purge` entry.
 

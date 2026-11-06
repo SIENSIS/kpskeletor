@@ -40,8 +40,8 @@ themes' assets; any error stops the sync.
 ## Which theme is active
 
 `setting('Theme.backend')` and `setting('Theme.public')` (defaults in `Modules\Core\Config\Theme`,
-overridable in `app/Config/Theme.php` or `.env`: `theme.backend = corporate`; the Settings
-screen arrives in session 14). `BackendController` switches the request to the `backend` area,
+overridable in `app/Config/Theme.php` or `.env`: `theme.backend = corporate`; or the theme tab of
+Settings, `backend/settings/theme`). `BackendController` switches the request to the `backend` area,
 everything else renders in the `public` area. A missing or broken theme falls back to
 `Theme.fallback` (`default`) and is logged, so a bad setting never takes the site down.
 
@@ -130,7 +130,7 @@ public array $options = [
 
 Saved values are stored by codeigniter4/settings as `Theme.<option>` with the context
 `theme:<slug>` (`service('settings')->set('Theme.primaryColor', '#198754', 'theme:default')`;
-the Settings screen arrives in session 14). Colour options with a `css` key become CSS custom
+edited in the theme tab of Settings, `settings.core`). Colour options with a `css` key become CSS custom
 properties (`--bs-primary` and `--bs-primary-rgb`) printed by the layouts in one `<style>` with
 the CSP nonce; only validated hex colours reach it (D-00-25).
 

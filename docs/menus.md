@@ -15,7 +15,7 @@ public array $menu = [
     // "parent" names a resource of the same module, or the key of any other entry.
     ['resource' => 'categories', 'label' => 'News.menu.categories', 'parent' => 'posts'],
     // Other entries give a route name and a permission.
-    ['route' => 'settings.news', 'permission' => 'settings.news', 'label' => 'News.menu.settings', 'zone' => 'settings'],
+    ['route' => 'news-archive', 'permission' => 'news-posts.list', 'label' => 'News.menu.archive', 'zone' => 'sidebar'],
 ];
 ```
 

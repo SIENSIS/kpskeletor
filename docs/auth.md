@@ -100,12 +100,14 @@ mode"), the profile and "my sessions" on top of Shield.
 - A GET is sent to `auth/reauth` and back afterwards; a POST is never replayed: the user confirms
   and repeats the action. JSON requests get 401 `{"error": …, "reauth": url}`.
 
-## Settings (Settings › Security, session 14)
+## Settings (Settings › Security)
 
 `Auth.minimumPasswordLength`, `absoluteLifetime`, `idleTimeout`, `rememberLifetime`, `captcha`,
 `newDeviceNotice`, `loginAttemptsPerIp`, `loginAttemptsPerAccount`, `loginLockMinutes`,
 `emailLinksPerIp`, `emailLinksPerAccount`, `reauthMinutes` (15, 1–240), `twoFactorPolicy` (json,
-group → `required`|`optional`). Defaults live in `app/Config/Auth.php`.
+group → `required`|`optional`). Defaults live in `app/Config/Auth.php`. They are edited in
+Settings › Security (`settings.security` + re-authentication, docs/settings.md); the minimum
+password length can never go below `Config\Auth::$minimumPasswordLength` (`min_config`).
 
 Keep `Config\Session::$expiration` at least as long as the absolute lifetime.
 

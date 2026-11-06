@@ -1519,3 +1519,51 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** The MIME type is detected from the contents with `finfo` and must belong to the extension (`Config\Mimes` + `Config\Storage::$extraMimes`); HTML/XML/SVG/PHP contents under another extension and `<?php` in the first 64 KB are refused; images must decode with `getimagesize`, match their extension and stay under 40 megapixels, then are re-encoded with GD (EXIF orientation applied first; animated GIFs keep their first frame); SVG is cleaned by the Core's own allow-list `SvgSanitizer` (DOM, no DOCTYPE/entities, no scripts, handlers, styles, `foreignObject`, links or external references). Paths are normalised by `PathNormalizer` (no `..`, `.`, absolute, backslashes, control characters or hidden segments) before Flysystem's own check; stored names are random (`<32 hex>.<ext>`). Public disk: folders `0755`, files `0644` (the web server reads them); private disk: `0750`/`0640`. Refused uploads are logged as `security` entries `Core`/`upload_refused` with the reason, disk and folder.
 - **Alternatives:** A) `enshrined/svg-sanitize` (a new dependency). B) Trust the browser's MIME type (forgeable).
 - **Status:** Accepted (proposal)
+
+## D-14-01 — Which settings belong to Settings › Security, and the `list` type (decide)
+
+- **Where:** specification "Configuration and settings" (Settings › Security lists the settings it shows; definitions have a `group`), "Module manifest" (`$settings`)
+- **Problem:** The Settings UI must know which declared settings need `settings.security` + re-authentication instead of `settings.<module>`, without the Settings module hard-coding other modules; and several security settings are lists (outbound hosts, CORS origins, CSP origins) that a JSON textarea makes error-prone. Both are manifest conventions.
+- **Proposal:** A setting whose `group` is `security` or `security.<sub>` is shown only in Settings › Security (one card per module, a heading per `<sub>`); every other setting is on its module's tab. A new setting type `list` (list of strings, edited one per line, cast by `SettingCaster`). `Core.outboundHosts` and `Api.corsOrigins` change from `json` to `list` (same stored array). Validation rules that refuse weakening values are ordinary rule names (`csp_sources`, `outbound_hosts`, `min_config[…]`…) registered by a module's registrar in `Config\Validation::$ruleSets`.
+- **Alternatives:** A) A new boolean manifest key `'security' => true` (group keeps only meaning a heading). B) A fixed list of setting names in the Settings module (hard-codes other modules). C) No `list` type: JSON textareas.
+- **Status:** Open
+
+## D-14-02 — Names of the new site-wide and CSP settings (decide)
+
+- **Where:** specification "Configuration and settings" (site name, time zone; "extra CSP origins per directive")
+- **Problem:** The specification does not name them; settings names are a public convention.
+- **Proposal:** `Core.siteName` (string, empty = the language line `Core.app.name`, read with `site_name()`), `Core.timezone` (string, default `UTC`, the display time zone of `ui_date()`; dates stay stored in UTC), and one `list` setting per directive: `Core.cspScriptSrc`, `Core.cspStyleSrc` (no wildcards), `Core.cspImgSrc`, `Core.cspFontSrc`, `Core.cspConnectSrc`, `Core.cspFrameSrc`, `Core.cspMediaSrc`, merged by the `cspmodules` filter.
+- **Alternatives:** A) One JSON setting `Core.cspOrigins` (directive => list; needs a custom form). B) `Core.appName` / `Core.siteTimezone`. C) Change `Config\App::$appTimezone` instead (stored dates would shift).
+- **Status:** Open
+
+## D-14-03 — Settings permissions, routes and actions
+
+- **Where:** specification "Configuration and settings" (`settings.update` opens the UI, `settings.<module>` changes a tab, `settings.security` + re-authentication), "Modules" › "Settings" (actions), D-00-33
+- **Problem:** The specification does not say what a user with `settings.update` but without `settings.<module>` sees, which permission the theme tab and the actions need, nor how `settings.update`/`settings.security` are generated.
+- **Proposal:** The Settings module has one resource `name => 'settings'` of type `crud` with every CRUD operation excluded and the extras `update` and `security` (exactly `settings.update`, `settings.security`). `settings.update` opens every tab (read-only without the tab's permission: fields disabled, POST refused by the `can:` filter's 403 and `forbidden` entry); the theme tab saves with `settings.core`. URLs `backend/settings` (first tab), `backend/settings/<module>` (lower case; 404 for a module without non-security settings), `backend/settings/theme`, `backend/settings/security` (`can:settings.security` + `reauth`, GET and POST), `backend/settings/actions`. Test email and clear caches: `settings.update`; publish assets: `settings.security` + `reauth` (it writes JavaScript into `public/`). Default grant: `admin` → `settings.*`.
+- **Alternatives:** A) Hide tabs without their permission. B) `settings.update` also for publishing assets.
+- **Status:** Accepted (proposal)
+
+## D-14-04 — What "weakening the baseline" means
+
+- **Where:** specification "Configuration and settings" ("values that would weaken the baseline (e.g. `unsafe-inline`) are refused"), "Security baseline" (CSP origins "validated as origins (no wildcards for scripts)")
+- **Problem:** Only `unsafe-inline` is named.
+- **Proposal:** Bounds in each setting's `rules` (e.g. password ≥ 8, remember-me ≤ 365 days, rate limits ≤ 10000) plus: CSP origins only `https://host[:port]`, `https://*.host` or `wss://host` (no keywords, `*`, schemes alone, `http:`, `data:` or paths; scripts/styles without wildcards); outbound hosts only host names or `*.domain` (no IPs, local names, schemes or ports); CORS origins `https://host[:port]` (`http://` only for localhost); upload types never a forbidden extension; the minimum password length never below `Config\Auth` (`min_config`); 2FA policy only for existing groups. Refusals are `security_settings_refused` security entries; the CSP filter re-checks stored origins. The UI stores only overrides (a value equal to the file configuration or manifest default is forgotten).
+- **Alternatives:** A) Refuse any value weaker than the file default (would forbid raising a rate limit).
+- **Status:** Accepted (proposal)
+
+## D-14-05 — Test email and clear caches
+
+- **Where:** specification "Modules" › "Settings" (actions), D-00-15 (email never inline except security emails)
+- **Problem:** A test email sent inline would block the request and contradict D-00-15; "clear caches" could also wipe the rate limiter's counters.
+- **Proposal:** The test email goes to the logged-in user through `mail_queue` (sent by `SendQueuedEmails` within a minute; the screen shows the queue length). "Clear caches" invalidates the Core's cache scopes and the theme registry only. Both are logged.
+- **Alternatives:** A) Send the test email inline with a short timeout. B) `cache()->clean()`.
+- **Status:** Accepted (proposal)
+
+## D-14-06 — Site-wide settings built now
+
+- **Where:** specification "Configuration and settings" (site name, logo, default/available locales, time zone, maintenance mode, idle lock, captcha, 2FA policy, mail transport, themes)
+- **Problem:** Several of them belong to later sessions or already exist elsewhere.
+- **Proposal:** Built now: site name, time zone (display), themes (theme tab), and in Settings › Security the existing idle lock, captcha and 2FA policy. Later: default/available locales (session 31), maintenance mode (session 28, used by `app:update`); the mail transport stays in `.env` (it holds secrets; "send a test email" checks it); the logo is the theme option `logo`. The user's own time zone (profile) is applied by session 31.
+- **Alternatives:** A) A maintenance-mode setting now without the filter.
+- **Status:** Accepted (proposal)

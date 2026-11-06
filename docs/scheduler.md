@@ -123,7 +123,7 @@ checked on the server) runs it immediately. Administrators hold `schedule.*`.
 ## The fallback without cron
 
 For hosts without cron, turn on the setting `Core.poorMansCron` ("Run scheduled tasks without
-cron"; in the Settings screen from session 14, until then `setting('Core.poorMansCron', true)`). Then
+cron"; Settings › General, or `setting('Core.poorMansCron', true)`). Then
 back-office requests run the due tasks **at most once a minute**, after the response:
 
 - with PHP-FPM or LiteSpeed the page is sent first (`fastcgi_finish_request()`), so the user does

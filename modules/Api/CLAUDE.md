@@ -39,7 +39,7 @@ D-10-01 … D-10-05 in `docs/decisions.md`.
 
 ## Open tasks
 
-- Session 14: Settings › Security form for `Api.*`.
+- Done in session 14: `Api.*` are in Settings › Security (`group` `security.api`; `corsOrigins` is a `list` validated by `cors_origins`).
 - Session 23: `avatar_url` in `me`.
 - Session 26: Core endpoints (news, events, notifications, public ones) and the API catalogue
   check in `permissions:check`.

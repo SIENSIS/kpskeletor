@@ -74,6 +74,10 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email inline), scheduled
   tasks in `Tasks/` (`TaskInterface`), both declared in the manifest; one cron line runs
   `php spark schedule:run` (`docs/notifications.md`, `docs/scheduler.md`).
+- **Settings:** declared in the manifest `$settings`; the Settings module generates their forms
+  (`docs/settings.md`). A `group` of `security` or `security.<sub>` puts a setting in Settings ›
+  Security (`settings.security` + re-auth); refuse weakening values with rules
+  (`Modules\Core\Settings\SecurityRules`), never with code in a controller.
 - **Menus:** back-office entries only in the manifest `$menu` (resource or route + permission,
   `zone` `sidebar`/`settings`/`user`, `parent`, `order`); the menu is generated, filtered by
   permission and cached per group set (`docs/menus.md`). Security headers, rate limits
