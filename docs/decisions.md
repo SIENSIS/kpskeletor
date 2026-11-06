@@ -128,6 +128,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-10-03 | 10 | API limits, CORS and login rules | Accepted (proposal) |
 | D-10-04 | 10 | No session on the API, its language and `api/v1/me` | Accepted (proposal) |
 | D-10-05 | 10 | Personal tokens: scopes, expiry, last IP and the administrators' list | Accepted (proposal) |
+| D-11-01 | 11 | The notification type contract | Accepted (proposal) |
+| D-11-02 | 11 | The email channel: queue, sending task and the recipient's language | Accepted (proposal) |
+| D-11-03 | 11 | Recipients, preferences and mandatory types | Accepted (proposal) |
+| D-11-04 | 11 | Notification screens, URLs and the bell | Accepted (proposal) |
+| D-11-05 | 11 | How the scheduler decides, locks and records runs; the `schedule` resource | Accepted (proposal) |
+| D-11-06 | 11 | The poor man's cron | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1348,3 +1354,64 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Decision (2026-11-05):** applied by session 10 as proposed.
 - **Applied in:** `modules/Api/Services/PersonalTokens.php`, `modules/Api/Controllers/{PersonalTokens,Tokens}.php`, `modules/Api/Database/Migrations/`
+
+## D-11-01 — The notification type contract
+
+- **Where:** spec "Notifications" (types: key, title, icon, default channels, a `render()` for the bell and an email template)
+- **Problem:** The specification does not say how a type is identified, what `render()` returns, nor when the text is produced (sending time or reading time, in which language).
+- **Proposal:** an abstract class `Modules\Core\Notifications\NotificationType`: static `title()`, `description()`, `icon()`, `defaultChannels()`, `mandatory()`; `render(): NotificationMessage` (title, body, internal path); `emailSubject()`, `emailView()`. The key is the class name (stored in `notifications.type` and `notification_preferences.type`). The constructor data is stored as JSON and rendered when shown, in the reader's language; types are rebuilt with `fromData()` without their constructor. Only types declared by enabled modules are sent; stored notifications of a vanished type render a generic text. Links are internal paths only.
+- **Alternatives:** A) Store the rendered text (one language, stale after edits). B) A string key separate from the class.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 11 as proposed.
+- **Applied in:** `modules/Core/Notifications/`, `docs/notifications.md`
+
+## D-11-02 — The email channel: queue, sending task and the recipient's language
+
+- **Where:** spec "Notifications" (email "queued or sent by the scheduler, never inline"), D-00-15
+- **Problem:** Where the queue lives, how failures are retried and in which language the email is written are not specified; the Core does not know where users keep their language.
+- **Proposal:** a `mail_queue` table (rendered subject and HTML body, status pending/sent/failed, attempts, last error, available at). The Core scheduled task `SendQueuedEmails` (every minute, without overlapping) sends 50 per run through the `email` service (GuardedEmail: SMTP host in the outbound allow-list), claims each row atomically, retries up to 5 times with growing waits (5, 10, 20, 40 minutes) and deletes sent/failed rows after 30 days. Emails are rendered when queued in the recipient's language: `RecipientLocale` asks a resolver the Auth module registers (profile locale), else the default locale.
+- **Alternatives:** A) Render at sending time (needs the type and data again). B) CodeIgniter's queue package (a new dependency).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 11 as proposed.
+- **Applied in:** `modules/Core/Mail/MailQueue.php`, `modules/Core/Tasks/SendQueuedEmails.php`, `modules/Core/Notifications/{Channels,RecipientLocale.php}`, `modules/Auth/Config/Events.php`
+
+## D-11-03 — Recipients, preferences and mandatory types
+
+- **Where:** spec "Notifications" (`notify()`, by group / permission; preferences per type; mandatory types), D-00-20
+- **Problem:** Which users are skipped, how preferences are stored and what "mandatory" means for the channels.
+- **Proposal:** `notify()` accepts users, ids or a list; each user once per call; banned and deleted users are skipped. `notifyGroup()` reads `auth_groups_users`; `notifyPermission()` checks every user with `Authorization::for($user)` (superadmins included; works without a session). Preferences: one row per user and type with the chosen channels; no row = the type's default channels; users may choose any channel (database, email). Mandatory types always use their default channels; the form shows them disabled and the server ignores them. The 2FA reset (Auth) is mandatory.
+- **Alternatives:** A) Preferences limited to the default channels. B) Notify only active (email-verified) users.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 11 as proposed.
+- **Applied in:** `modules/Core/Notifications/Notifier.php`, `modules/Auth/Notifications/TwoFactorReset.php`
+
+## D-11-04 — Notification screens, URLs and the bell
+
+- **Where:** spec "Notifications" › UI, D-00-17
+- **Problem:** URLs and operations of the list, the bell and the preferences are not specified.
+- **Proposal:** resource `core-notifications` (Core, `list`, `show`, `delete`; granted to every group). `backend/notifications` (kpcrudy, `where('user_id', me)`, mark one / selected / all as read as custom operations checked as `list`); `backend/notifications/bell` (JSON, latest 8 and the unread count); `backend/notifications/open/{id}` (GET: marks the user's own notification as read and redirects to its internal path or detail page; another user's id is "not found"); `POST backend/notifications/read-all`; preferences at `backend/profile/notifications` (GET/POST). All behind `can:core-notifications.list`. The bell is a theme partial (`partials/notifications_bell.php`) with the ES module `core/ui/bell.js`; it works without JavaScript through links and a form.
+- **Alternatives:** A) "Open" as a POST (a form per bell item). B) Preferences inside the Auth profile page (would make the Core depend on Auth's view).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 11 as proposed.
+- **Applied in:** `modules/Core/Config/{Module,Routes}.php`, `modules/Core/Controllers/{Notifications,NotificationPreferences}.php`, `themes/default/Views/partials/notifications_bell.php`
+
+## D-11-05 — How the scheduler decides, locks and records runs; the `schedule` resource
+
+- **Where:** spec "Scheduled tasks"; plan risk "locks on shared hosting (file locks vs DB locks)"
+- **Problem:** "Due" semantics (missed minutes, two processes), where locks live, where `withoutOverlapping()`/`onlyInEnvironment()` are declared, how much history is kept and the permission names of the screen.
+- **Proposal:** `TaskInterface` (`name()`, `schedule(): Schedule`, `run(): TaskResult`); the options are methods of `Schedule` (`daily('03:00')->withoutOverlapping()->onlyInEnvironment('production')`). `scheduled_tasks` keeps each declared class with its `next_run_at`; a task runs when it has passed and the runner first moves it forward in one atomic `UPDATE … WHERE next_run_at = <old>` (two processes never run a slot twice; a missed period runs once; new tasks wait for their first slot). Locks are columns of the same table (`locked_until`, `lock_owner`), so they work on every host and expire. A run blocked by the lock is recorded as `skipped`. `task_runs` keeps the latest 50 runs per task (output up to 60 KB, source cron/manual/web, user of "run now"). Failures are logged and notified (`ScheduledTaskFailed`) to the holders of `schedule.list`. Tasks of disabled modules are marked inactive. Screen: single Core resource `schedule` (D-00-18) with `schedule.list`, `schedule.show`, `schedule.run`; administrators get `schedule.*`.
+- **Alternatives:** A) File locks (`flock`, unreliable on some shared/NFS hosts). B) Run every matching minute without `next_run_at` (missed runs are lost; double runs possible).
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 11 as proposed.
+- **Applied in:** `modules/Core/Scheduler/`, `modules/Core/Commands/Schedule{Run,List}.php`, `modules/Core/Controllers/Schedule.php`, `docs/scheduler.md`
+
+## D-11-06 — The poor man's cron
+
+- **Where:** spec "Scheduled tasks" (fallback "run after the response is sent"); plan risk (`fastcgi_finish_request()` absent with `php spark serve`/mod_php)
+- **Problem:** CodeIgniter triggers `post_system` before sending the response, and not every server can finish a response early.
+- **Proposal:** setting `Core.poorMansCron` (bool, off). The after filter `PoorMansCron` is part of the `backend` chain; at most once a minute (cache timestamp; the runner's atomic claims cover races) it registers a shutdown function that closes the session, calls `fastcgi_finish_request()` / `litespeed_finish_request()` when available and runs the due tasks with source `web`. On other servers the browser waits for the tasks (documented).
+- **Alternatives:** A) An asynchronous HTTP request to a "tick" URL (an outbound call from a regular request, forbidden). B) Only on the dashboard.
+- **Status:** Accepted (proposal)
+- **Decision (2026-11-06):** applied by session 11 as proposed.
+- **Applied in:** `modules/Core/Filters/PoorMansCron.php`, `app/Config/Filters.php`, `modules/Core/Config/Module.php`
+

@@ -6,6 +6,7 @@ namespace Modules\Core\Config;
 
 use CodeIgniter\Config\BaseService;
 use Modules\Core\Frontend\AssetManifest;
+use Modules\Core\Notifications\Notifier;
 use Modules\Core\Theme\ThemeManager;
 
 /**
@@ -36,5 +37,17 @@ class Services extends BaseService
         }
 
         return AssetManifest::create();
+    }
+
+    /**
+     * Notifications: `notify()`, `notifyGroup()`, `notifyPermission()` (docs/notifications.md).
+     */
+    public static function notifications(bool $getShared = true): Notifier
+    {
+        if ($getShared) {
+            return static::getSharedInstance('notifications');
+        }
+
+        return new Notifier();
     }
 }

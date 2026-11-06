@@ -49,6 +49,11 @@ final class Module extends ModuleManifest
         'user'       => ['auth-profile.*', 'auth-sessions.*'],
     ];
 
+    /** @var list<string> Notification types (the user is told when an administrator resets their 2FA). */
+    public array $notifications = [
+        \Modules\Auth\Notifications\TwoFactorReset::class,
+    ];
+
     public array $settings = [
         'minimumPasswordLength' => [
             'type'    => 'int',

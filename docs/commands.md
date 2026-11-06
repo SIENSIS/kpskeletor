@@ -22,6 +22,13 @@ Every `php spark` command added by the skeleton. CodeIgniter's own commands (`mi
 | `permissions:list [--module=<Name>] [--group=<group>]` | The permission catalogue: name, module, description, whether its module is enabled, and the groups that hold it (through an atomic grant or a wildcard; `superadmin` holds every one). `--module` and `--group` filter it. See `docs/rbac.md`. |
 | `permissions:check` | Fails (exit code 1) when a manifest is invalid or generates a duplicate name, a generated permission is not stored (run `modules:sync`), Shield's `AuthGroups` permissions/matrix do not match `group_permissions`, a `backend/` route has no `can:` filter or names a permission outside the catalogue, or an `api/v1/` route lacks kpapy's filter (`kpapy:login` only on `auth/token*`, `kpapy:public` only for GET), or a manifest's `$api` entry has no matching route (`ApiRouteChecker`). Every kpcrudy CRUD must be routed with `CrudFactory::routes()`, built with `CrudFactory::make()`/`$this->crud()` for the route's resource, and ask only about operations its manifest declares (`CrudAuditor`). Warns about stored permissions no manifest generates, grants naming unknown permissions and grants missing the permissions they imply. Run it in CI and before a deploy. |
 
+## Scheduler
+
+| Command | What it does |
+|---|---|
+| `schedule:run [--task=<name>] [--force]` | The single cron entry (`* * * * * php /path/spark schedule:run`): runs the scheduled tasks that are due, records each run and exits with 1 if one failed. `--task` limits it to one task (class or short class name) if it is due; with `--force` it runs now, due or not (the `withoutOverlapping()` lock still applies). See `docs/scheduler.md`. |
+| `schedule:list` | Every scheduled task of the enabled modules with its schedule, next run, last run and result, and notes (inactive, other environment). |
+
 ## Front end
 
 | Command | What it does |

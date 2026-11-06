@@ -266,4 +266,10 @@ return [
         'light' => 'Clar',
         'dark'  => 'Fosc',
     ],
+    'notifications'             => [
+        'twoFactorReset'      => 'Restabliment de l\'autenticació en dos passos',
+        'twoFactorResetHelp'  => 'Un administrador ha desactivat la vostra autenticació en dos passos.',
+        'twoFactorResetTitle' => 'S\'ha restablert la vostra autenticació en dos passos',
+        'twoFactorResetBody'  => 'Un administrador ha desactivat la vostra autenticació en dos passos. Si el vostre grup l\'exigeix, la tornareu a configurar en el proper inici de sessió. Si no ho heu demanat, poseu-vos en contacte amb un administrador.',
+    ],
 ];

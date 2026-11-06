@@ -322,3 +322,12 @@
 .avatar-c6 { background-color: #0e7490; }
 .avatar-c7 { background-color: #be185d; }
 .avatar-c8 { background-color: #4b5563; }
+
+/* Notifications bell (partials/notifications_bell.php, core/ui/bell.js) */
+.bell-menu { width: min(22rem, calc(100vw - 2rem)); }
+.bell-list { max-height: 60vh; }
+.bell-unread { background-color: var(--bs-primary-bg-subtle); }
+.bell-count { font-size: .65rem; }
+@media (max-width: 575.98px) {
+    .notification-bell .bell-menu { position: fixed; top: var(--kp-topbar-height); left: .5rem; right: .5rem; width: auto; }
+}

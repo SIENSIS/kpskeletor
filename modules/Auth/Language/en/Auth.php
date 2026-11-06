@@ -266,4 +266,10 @@ return [
         'light' => 'Light',
         'dark'  => 'Dark',
     ],
+    'notifications'             => [
+        'twoFactorReset'      => 'A user\'s two-factor authentication reset',
+        'twoFactorResetHelp'  => 'An administrator turned off your two-factor authentication.',
+        'twoFactorResetTitle' => 'Your two-factor authentication was reset',
+        'twoFactorResetBody'  => 'An administrator turned off your two-factor authentication. If your group requires it, you will set it up again at your next login. If you did not ask for it, contact an administrator.',
+    ],
 ];

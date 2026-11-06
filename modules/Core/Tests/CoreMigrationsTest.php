@@ -28,7 +28,10 @@ final class CoreMigrationsTest extends CIUnitTestCase
         $this->dropAllTables();
     }
 
-    private const TABLES = ['modules', 'permissions', 'group_permissions', 'module_declarations', 'demo_records'];
+    private const TABLES = [
+        'modules', 'permissions', 'group_permissions', 'module_declarations', 'demo_records',
+        'notifications', 'notification_preferences', 'mail_queue', 'scheduled_tasks', 'task_runs',
+    ];
 
     private const MIGRATIONS = [
         '2026-11-04-000001_CreateModules',
@@ -37,6 +40,11 @@ final class CoreMigrationsTest extends CIUnitTestCase
         '2026-11-04-000004_AddGrantsAppliedToModules',
         '2026-11-04-000005_CreateModuleDeclarations',
         '2026-11-04-000006_CreateDemoRecords',
+        '2026-11-06-000001_CreateNotifications',
+        '2026-11-06-000002_CreateNotificationPreferences',
+        '2026-11-06-000003_CreateMailQueue',
+        '2026-11-06-000004_CreateScheduledTasks',
+        '2026-11-06-000005_CreateTaskRuns',
     ];
 
     public function testUpDownUp(): void

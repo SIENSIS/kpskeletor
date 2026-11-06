@@ -87,7 +87,7 @@ mode"), the profile and "my sessions" on top of Shield.
   optional): a user of a required group without 2FA is sent to the set-up screen by `force2fa`
   and cannot turn it off.
 - **Admin reset:** `(new TwoFactor())->reset($user, $adminId)` turns it off, deletes the recovery
-  codes and a pending code, logs it and fires `twoFactorReset` (notification: session 11; screen:
+  codes and a pending code, logs it and fires `twoFactorReset` (the user gets the mandatory notification `TwoFactorReset`, `docs/notifications.md`; screen:
   session 15). Enabling/disabling fires `twoFactorChanged`.
 
 ## Re-authentication ("sudo mode")
