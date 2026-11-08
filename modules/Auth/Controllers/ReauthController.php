@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Auth\Services\EmailCodes;
+use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\Reauth;
 use Modules\Auth\Services\RecoveryCodes;
 use Modules\Auth\Services\SessionTracker;
@@ -16,7 +17,7 @@ use Modules\Auth\Services\TwoFactor;
 /**
  * Re-authentication screen (`auth/reauth`, auth layout): the password and, when the user has
  * 2FA, a code of their method (or a recovery code). Wrong answers count as failed logins; past
- * the limit the session ends. Success opens the window and returns to the remembered page.
+ * the limit the session ends. Never available while impersonating. Success opens the window and returns to the remembered page.
  */
 final class ReauthController extends AuthController
 {
@@ -33,6 +34,10 @@ final class ReauthController extends AuthController
             return redirect()->to(site_url('login'));
         }
 
+        if (Impersonation::active()) {
+            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+        }
+
         return $this->render(self::VIEW, $this->data($user));
     }
 
@@ -45,6 +50,10 @@ final class ReauthController extends AuthController
 
         if (! $user instanceof User) {
             return redirect()->to(site_url('login'));
+        }
+
+        if (Impersonation::active()) {
+            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
         }
 
         $email = (string) $user->email;
@@ -105,7 +114,7 @@ final class ReauthController extends AuthController
             return redirect()->to(site_url('login'));
         }
 
-        if ((new TwoFactor())->method((int) $user->id) !== TwoFactor::EMAIL) {
+        if (Impersonation::active() || (new TwoFactor())->method((int) $user->id) !== TwoFactor::EMAIL) {
             return redirect()->to(site_url('auth/reauth'));
         }
 

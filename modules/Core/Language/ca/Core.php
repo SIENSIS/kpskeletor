@@ -496,7 +496,6 @@ return [
         'module_disabled' => 'Mòdul desactivat',
         'demo_loaded' => 'Dades de demostració carregades',
         'demo_removed' => 'Dades de demostració esborrades',
-        'group_created' => 'Grup creat',
         'grants_changed' => 'Permisos d\'un grup canviats',
         'permissions_granted' => 'Permisos donats a un usuari',
         'permissions_revoked' => 'Permisos retirats a un usuari',

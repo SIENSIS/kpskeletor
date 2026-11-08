@@ -10,6 +10,7 @@ use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
 use DateTimeZone;
 use Modules\Auth\Models\UserProfileModel;
+use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\LoginListener;
 use Modules\Auth\Services\LoginThrottle;
 use Modules\Auth\Services\PasswordChanger;
@@ -20,7 +21,8 @@ use Modules\Core\Frontend\ThemeMode;
 
 /**
  * The user's own profile (resource `auth-profile`, granted to every group): name, email,
- * language, time zone, colour mode, birth date and the password. Changing the email asks for
+ * language, time zone, colour mode, birth date and the password (the email and the password
+ * cannot be changed while impersonating). Changing the email asks for
  * the current password; changing the password ends the other sessions.
  */
 final class ProfileController extends BackendController
@@ -71,7 +73,7 @@ final class ProfileController extends BackendController
         $emailChanged = mb_strtolower($data['email']) !== mb_strtolower((string) $user->email);
 
         if ($emailChanged) {
-            $error = $this->checkEmailChange($user, $data['email']);
+            $error = Impersonation::active() ? lang('Auth.impersonation.refused') : $this->checkEmailChange($user, $data['email']);
 
             if ($error !== null) {
                 return redirect()->back()->withInput()->with('errors', ['email' => $error]);
@@ -106,9 +108,13 @@ final class ProfileController extends BackendController
         return redirect()->to(site_url('backend/profile'))->withCookies()->with('success', lang('Auth.profile.saved'));
     }
 
-    public function password(): string
+    public function password(): RedirectResponse|string
     {
         $user = $this->user();
+
+        if (Impersonation::active()) {
+            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+        }
 
         $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))->breadcrumb(lang('Auth.profile.passwordTitle'));
 
@@ -126,6 +132,10 @@ final class ProfileController extends BackendController
      */
     public function changePassword()
     {
+        if (Impersonation::active()) {
+            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+        }
+
         $user     = $this->user();
         $throttle = new LoginThrottle();
         $ip       = $this->request->getIPAddress();

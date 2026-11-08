@@ -179,8 +179,6 @@ return [
         'emailLinksPerAccount'      => 'Email links per account and hour',
         'reauthMinutes' => 'Re-authentication window (minutes)',
         'reauthMinutesHelp' => 'Sensitive actions ask for the password again after this time.',
-        'twoFactorPolicy' => 'Two-factor authentication per group',
-        'twoFactorPolicyHelp' => 'Groups marked "required" must set it up after logging in; the others may choose.',
     ],
     'twoFactor'                 => [
         'title'             => 'Two-factor authentication',
@@ -272,6 +270,14 @@ return [
         'twoFactorResetTitle' => 'Your two-factor authentication was reset',
         'twoFactorResetBody'  => 'An administrator turned off your two-factor authentication. If your group requires it, you will set it up again at your next login. If you did not ask for it, contact an administrator.',
     ],
+    'impersonation' => [
+        'banner' => 'You are acting as {0}.',
+        'until' => 'Until {0}',
+        'stop' => 'Back to my account',
+        'stopped' => 'You are back in your own account.',
+        'expired' => 'The impersonation time is over: you are back in your own account.',
+        'refused' => 'This action is not available while impersonating another user.',
+    ],
     // Labels of the activity log actions (Activity module).
     'activity' => [
         'login' => 'Signed in',
@@ -295,14 +301,15 @@ return [
         'token_revoked' => 'API token revoked',
         'group_added' => 'Added to a group',
         'group_removed' => 'Removed from a group',
+        'impersonation_started' => 'Impersonation started',
+        'impersonation_ended' => 'Impersonation ended',
+        'impersonation_refused' => 'Impersonation refused',
+        'impersonation_blocked' => 'Sensitive action refused while impersonating',
     ],
     'settingGroups' => [
         'passwords' => 'Passwords',
         'sessions' => 'Sessions and re-authentication',
         'login' => 'Login and email links',
         'twoFactor' => 'Two-factor authentication',
-    ],
-    'validation' => [
-        'twoFactorPolicy' => 'Write a JSON object of existing groups and "required" or "optional", e.g. {"admin": "required"}.',
     ],
 ];

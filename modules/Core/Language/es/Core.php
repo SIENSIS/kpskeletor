@@ -496,7 +496,6 @@ return [
         'module_disabled' => 'Módulo desactivado',
         'demo_loaded' => 'Datos de demostración cargados',
         'demo_removed' => 'Datos de demostración borrados',
-        'group_created' => 'Grupo creado',
         'grants_changed' => 'Permisos de un grupo cambiados',
         'permissions_granted' => 'Permisos dados a un usuario',
         'permissions_revoked' => 'Permisos retirados a un usuario',

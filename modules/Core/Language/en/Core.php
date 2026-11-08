@@ -496,7 +496,6 @@ return [
         'module_disabled' => 'Module disabled',
         'demo_loaded' => 'Demo data loaded',
         'demo_removed' => 'Demo data removed',
-        'group_created' => 'Group created',
         'grants_changed' => 'Group permissions changed',
         'permissions_granted' => 'Permissions granted to a user',
         'permissions_revoked' => 'Permissions revoked from a user',

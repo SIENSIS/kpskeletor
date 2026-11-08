@@ -179,8 +179,6 @@ return [
         'emailLinksPerAccount'      => 'Enlaces por correo por cuenta y hora',
         'reauthMinutes' => 'Duración de la reautenticación (minutos)',
         'reauthMinutesHelp' => 'Las acciones delicadas vuelven a pedir la contraseña pasado este tiempo.',
-        'twoFactorPolicy' => 'Verificación en dos pasos por grupo',
-        'twoFactorPolicyHelp' => 'Los grupos marcados como "required" deben configurarla al entrar; el resto pueden elegir.',
     ],
     'twoFactor'                 => [
         'title'             => 'Verificación en dos pasos',
@@ -272,6 +270,14 @@ return [
         'twoFactorResetTitle' => 'Se ha restablecido su autenticación en dos pasos',
         'twoFactorResetBody'  => 'Un administrador ha desactivado su autenticación en dos pasos. Si su grupo la exige, la volverá a configurar en el próximo inicio de sesión. Si no lo ha pedido, póngase en contacto con un administrador.',
     ],
+    'impersonation' => [
+        'banner' => 'Está actuando como {0}.',
+        'until' => 'Hasta las {0}',
+        'stop' => 'Volver a mi cuenta',
+        'stopped' => 'Vuelve a estar en su propia cuenta.',
+        'expired' => 'El tiempo de la suplantación ha terminado: vuelve a estar en su propia cuenta.',
+        'refused' => 'Esta acción no está disponible mientras suplanta a otro usuario.',
+    ],
     // Labels of the activity log actions (Activity module).
     'activity' => [
         'login' => 'Ha iniciado la sesión',
@@ -295,14 +301,15 @@ return [
         'token_revoked' => 'Token de API revocado',
         'group_added' => 'Añadido a un grupo',
         'group_removed' => 'Quitado de un grupo',
+        'impersonation_started' => 'Suplantación iniciada',
+        'impersonation_ended' => 'Suplantación terminada',
+        'impersonation_refused' => 'Suplantación denegada',
+        'impersonation_blocked' => 'Acción sensible denegada durante una suplantación',
     ],
     'settingGroups' => [
         'passwords' => 'Contraseñas',
         'sessions' => 'Sesiones y reautenticación',
         'login' => 'Inicio de sesión y enlaces por correo',
         'twoFactor' => 'Autenticación en dos pasos',
-    ],
-    'validation' => [
-        'twoFactorPolicy' => 'Escriba un objeto JSON de grupos existentes y "required" u "optional", p. ej. {"admin": "required"}.',
     ],
 ];

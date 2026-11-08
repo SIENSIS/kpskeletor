@@ -9,7 +9,9 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Entities\User;
+use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\Reauth;
+use Modules\Core\Theme\ErrorPage;
 
 /**
  * `reauth` filter (re-authentication, "sudo mode"): lets the request through only when the user
@@ -18,7 +20,7 @@ use Modules\Auth\Services\Reauth;
  * Otherwise: JSON requests get 401 with the confirmation URL; a GET is remembered and sent to
  * `auth/reauth`, which returns to it; other methods are never replayed: the user confirms and
  * repeats the action (they return to the page they came from when it is on this site).
- * Guests are sent to the login (default deny). Use it after `can:` on the route:
+ * Guests are sent to the login (default deny); while impersonating it always answers 403. Use it after `can:` on the route:
  * `['filter' => ['can:backup.restore', 'reauth']]`, or call `$this->requireReauth()` in a
  * `BackendController`.
  */
@@ -35,6 +37,17 @@ final class RequireReauth implements FilterInterface
 
         if (! $user instanceof User) {
             return redirect()->to(site_url('login'));
+        }
+
+        if (Impersonation::active()) {
+            // Sensitive actions are never available while impersonating.
+            security_log('Auth', 'impersonation_blocked', ['resource' => 'auth-profile', 'summary' => $request instanceof IncomingRequest ? $request->getPath() : '']);
+
+            if ($request instanceof IncomingRequest && str_contains($request->getHeaderLine('Accept'), 'application/json')) {
+                return service('response')->setStatusCode(403)->setJSON(['error' => lang('Auth.impersonation.refused')]);
+            }
+
+            return service('response')->setStatusCode(403)->setContentType('text/html')->setBody(ErrorPage::render(403, lang('Auth.impersonation.refused')));
         }
 
         $reauth = new Reauth();

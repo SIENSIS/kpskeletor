@@ -16,7 +16,9 @@ use CodeIgniter\Shield\Entities\User;
  * - only a superadmin touches the `superadmin` group, a superadmin's groups or permissions, and
  *   the grants of a group they belong to;
  * - the reserved groups cannot be renamed, deleted or created again;
- * - the last superadmin cannot lose the group.
+ * - the last superadmin cannot lose the group;
+ * - only a superadmin manages a superadmin's account, and a user can only manage accounts that
+ *   hold nothing they do not hold (`canManageUser()`).
  *
  * Superadmins pass every rule but the first and the last.
  */
@@ -84,6 +86,36 @@ final class EscalationGuard
         }
 
         return Authorization::isSuperadmin($actor) || ! Authorization::isSuperadmin($target);
+    }
+
+    /**
+     * Whether `$actor` may manage `$target`'s account (edit it, ban, force a password reset,
+     * reset 2FA, log out everywhere): superadmins manage everybody; anybody else only users who
+     * are not superadmins and hold nothing the actor does not hold (their groups' grants and
+     * individual permissions), so nobody can take over a stronger account. Actions on oneself
+     * are decided by the caller.
+     */
+    public function canManageUser(User $actor, User $target): bool
+    {
+        if (Authorization::isSuperadmin($actor)) {
+            return true;
+        }
+
+        if (Authorization::isSuperadmin($target)) {
+            return false;
+        }
+
+        if ($this->isSelf($actor, $target)) {
+            return true;
+        }
+
+        $permissions = $target->getPermissions() ?? [];
+
+        foreach ($target->getGroups() ?? [] as $group) {
+            $permissions = [...$permissions, ...$this->groupPermissions((string) $group)];
+        }
+
+        return $this->holdsAll($actor, $this->expand(array_values(array_unique($permissions)), true));
     }
 
     /**

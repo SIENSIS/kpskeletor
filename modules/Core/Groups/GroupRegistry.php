@@ -8,7 +8,6 @@ use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Events\Events;
 use CodeIgniter\I18n\Time;
-use CodeIgniter\Shield\Entities\User;
 use Config\Database;
 use Modules\Core\Permissions\EscalationGuard;
 use Modules\Core\Permissions\GrantManager;
@@ -208,19 +207,13 @@ final class GroupRegistry
     }
 
     /**
-     * After a group row was inserted: mirror it and give it the common grants.
+     * After a group row was inserted (the Groups CRUD logs the insert): mirror it and give it
+     * the common grants.
      */
-    public function created(string $name, ?User $actor = null): void
+    public function created(string $name): void
     {
         $this->mirror();
         (new GrantManager($this->catalogue))->setGroupGrants(null, $name, $this->commonGrants());
-
-        activity_log('Core', 'group_created', [
-            'user_id'   => $actor?->id,
-            'resource'  => 'groups',
-            'record_id' => $name,
-            'summary'   => $name,
-        ]);
     }
 
     /**
