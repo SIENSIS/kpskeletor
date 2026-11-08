@@ -1,6 +1,6 @@
 # Session 15 — Users module and permission matrix
 
-Branch: `claude/clever-feynman-qsy4k4` · Pull request: PR_LINK · Date: 2026-11-08
+Branch: `claude/clever-feynman-qsy4k4` · Pull request: [SIENSIS/kpskeletor#19](https://github.com/SIENSIS/kpskeletor/pull/19) · Date: 2026-11-08
 
 ## What was built
 
