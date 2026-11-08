@@ -28,8 +28,8 @@ Full description: `docs/settings.md`.
 - `Forms/Field.php` (type rules, casting, display text), `Forms/FormGenerator.php` (views
   `Views/fields/*`, validation).
 - `Controllers/Settings.php` (tabs, saving, logging), `Controllers/Actions.php`.
-- Rules that refuse weakening values live in the Core (`Modules\Core\Settings\SecurityRules`)
-  and Auth (`Modules\Auth\Validation\AuthRules`), registered by their registrars.
+- Rules that refuse weakening values live in the Core (`Modules\Core\Settings\SecurityRules`),
+  registered by its registrar (the 2FA policy is a column of the `groups` table since session 15).
 
 ## Decisions
 
@@ -38,8 +38,6 @@ D-14-03 … D-14-06 accepted (`docs/decisions.md`).
 
 ## Open tasks
 
-- Session 15: the 2FA policy moves to the `groups` table (then remove `Auth.twoFactorPolicy`
-  from Settings › Security).
 - Session 28: maintenance mode; session 30: show the final CSP read-only in the Security status
   page; session 31: default/available locales in the General tab.
 
