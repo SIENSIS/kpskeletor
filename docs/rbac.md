@@ -19,7 +19,10 @@ How the skeleton decides who can do what. Specification: `docs/specification.md`
 
 ## Grants
 
-- **Groups** (`superadmin`, `admin`, `editor`, `user`; data in session 15) get grants in
+- **Groups** are data: the Core `groups` table (name, title, description, reserved, 2FA policy),
+  mirrored into `setting('AuthGroups.groups')` by `Modules\Core\Groups\GroupRegistry`; the four
+  reserved groups (`superadmin`, `admin`, `editor`, `user`) are created by `modules:sync`, and a
+  new group receives the grants every reserved group holds (the personal screens). Groups get grants in
   `group_permissions` (the source of truth): atomic names or Shield wildcards that match some
   catalogue permission (`news-posts.*` grants a whole resource and never matches
   `news-postsx.edit`).
@@ -31,7 +34,8 @@ How the skeleton decides who can do what. Specification: `docs/specification.md`
   `list`…).
 - **Users** can also hold individual atomic permissions (Shield's `addPermission()`, table
   `auth_permissions_users`).
-- Change grants only through `GrantManager` (the matrix screen of session 15 and the console):
+- Change grants only through `GrantManager` (the permission matrix of the Users module,
+  `docs/users.md`, and the console):
 
   ```php
   $grants = new \Modules\Core\Permissions\GrantManager();

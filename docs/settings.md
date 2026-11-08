@@ -75,7 +75,7 @@ the Core's registrar) give:
 | `upload_types` | `Config\Storage::$forbiddenExtensions` (code, HTML, executables…) |
 | `min_config[Auth.minimumPasswordLength]` | a value below the file configuration's (`Config\Auth`, `.env`) |
 
-Auth adds `two_factor_policy` (existing groups, `required`/`optional`). The `cspmodules` filter
+The 2FA policy per group is not a setting (a column of the `groups` table, D-15-02). The `cspmodules` filter
 adds the stored origins to the policy and checks them again (`SecurityRules::isAllowedCspSource()`),
 so a value written another way cannot weaken it. Every change is a `security_settings_changed`
 security entry with the before/after values.

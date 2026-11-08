@@ -150,6 +150,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-14-04 | 14 | What "weakening the baseline" means | Accepted (proposal) |
 | D-14-05 | 14 | Test email and clear caches | Accepted (proposal) |
 | D-14-06 | 14 | Site-wide settings built now | Accepted (proposal) |
+| D-15-01 | 15 | Users permission names, URLs and setting (decide) | Open |
+| D-15-02 | 15 | Groups as data: names, deletion, new groups and the 2FA policy | Accepted (proposal) |
+| D-15-03 | 15 | Adding and editing users; no deletion | Accepted (proposal) |
+| D-15-04 | 15 | Who manages whose account | Accepted (proposal) |
+| D-15-05 | 15 | Impersonation mechanics and the permission matrix save | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1577,3 +1582,44 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** Built now: site name, time zone (display), themes (theme tab), and in Settings › Security the existing idle lock, captcha and 2FA policy. Later: default/available locales (session 31), maintenance mode (session 28, used by `app:update`); the mail transport stays in `.env` (it holds secrets; "send a test email" checks it); the logo is the theme option `logo`. The user's own time zone (profile) is applied by session 31.
 - **Alternatives:** A) A maintenance-mode setting now without the filter.
 - **Status:** Accepted (proposal)
+
+## D-15-01 — Users permission names, URLs and setting (decide)
+
+- **Where:** specification "Modules" › "Users" (users CRUD, row operations, groups CRUD, matrix, impersonation time limit "setting, e.g. 30 minutes"), "RBAC" (names `<module>-<resource>.<operation>`; D-00-18 allows a `'name'` override only for Core resources and single-resource modules)
+- **Problem:** The specification names no permission, URL or setting for the Users module, and all three are public conventions. The module has three resources, so the convention gives `users-users.*`, which reads oddly.
+- **Proposal:** Permissions by the convention: `users-users.{list,show,add,edit,ban,forcereset,reset2fa,logout,impersonate,access}`, `users-groups.{list,show,add,edit,delete}`, `users-matrix.{view,edit}` (operation keys lower case without separators, as kpcrudy custom operations require). URLs `backend/users`, `backend/users/<op>/<masked id>`, `backend/users/access/<id>`, `backend/users/groups`, `backend/users/permissions`, and `POST auth/impersonation/stop`. Setting `Users.impersonationMinutes` (int, 30, 1–120, group `security.impersonation`). Built this way; renaming later means changing the manifest, the routes and the tests (no data migration while unreleased).
+- **Alternatives:** A) `'name'` overrides for a core module with several resources: `users.*`, `groups.*`, `permissions.*` (shorter; needs an exception to D-00-18 for core modules). B) Resources `accounts`/`groups`/`matrix` → `users-accounts.*` (avoids the repetition).
+- **Status:** Open
+
+## D-15-02 — Groups as data: names, deletion, new groups and the 2FA policy
+
+- **Where:** specification "Authentication" › "Groups" (Core `groups` table mirrored into `setting('AuthGroups.groups')`), "Modules" › "Users" (Groups CRUD, 2FA policy per group, "a new group receives the personal-screen grants every group has"); D-00-38, D-06-05
+- **Problem:** The specification does not say whether names change, what deleting a group does to its members, how the "grants every group has" are found, nor where the 2FA policy setting of session 06 goes.
+- **Proposal:** Core migration `groups` (name unique, title, description, reserved, `two_factor`); `GroupRegistry` creates the four reserved groups on `modules:sync` (titles from `Config\AuthGroups`) and mirrors every change into `AuthGroups.groups` with the policy as each group's `twoFactor` key, which `AuthPolicy::twoFactorPolicy()` reads. Names are set once (`[a-z][a-z0-9_-]{1,49}`, never reserved); reserved groups and groups with members cannot be deleted; deleting a group deletes its grants. A new group gets the grants all four reserved groups share (the personal screens). The `Auth.twoFactorPolicy` setting, its rule and its Settings › Security field are removed (stored values are not migrated: nothing is released).
+- **Alternatives:** A) Renaming custom groups (rewrites memberships and grants). B) Deleting a group with members removes their membership. C) Keep `Auth.twoFactorPolicy` written by the Groups screen.
+- **Status:** Accepted (proposal)
+
+## D-15-03 — Adding and editing users; no deletion
+
+- **Where:** specification "Modules" › "Users" ("Shield identities handled through hooks… password changes go through Shield")
+- **Problem:** The email and password are not columns of `users`; letting administrators set passwords hands them other people's credentials; the specification lists no deletion.
+- **Proposal:** kpcrudy over `users` (`deleted_at` rows outside the CRUD) with virtual inputs for the email and an initial password, validated in `beforeInsert` (Shield's local password rules, unique email) and saved through Shield in `afterInsert` (identity, default group, forced password change at the first login). Edit: user name, email (through Shield, logged as a security entry) and "active" (not one's own). Administrators never set another user's password (they force a reset). No deletion: accounts are banned.
+- **Alternatives:** A) Delete through Shield's soft delete (orphaned content in later modules). B) An admin-set password on edit.
+- **Status:** Accepted (proposal)
+
+## D-15-04 — Who manages whose account
+
+- **Where:** specification "RBAC" › "Escalation rules", D-07-04
+- **Problem:** The rules cover grants and groups, but editing an account (email), forcing a reset or resetting the 2FA of a stronger account lets an administrator take it over.
+- **Proposal:** `EscalationGuard::canManageUser()`: superadmins manage every account; anybody else only accounts that are not superadmins and hold nothing they do not hold (groups' grants and individual permissions). Every row operation but edit is refused on one's own account; the groups and permissions screen too. The buttons are hidden and the server refuses the same.
+- **Alternatives:** A) Only the "superadmin" rule (an admin could take over an account with permissions they lack).
+- **Status:** Accepted (proposal)
+
+## D-15-05 — Impersonation mechanics and the permission matrix save
+
+- **Where:** specification "Modules" › "Users" (impersonation), "Authentication" (session id regeneration on impersonation), "RBAC" › "Permission matrix screen"
+- **Problem:** Where the impersonation lives (Users requires Auth, and Auth's filters must refuse sensitive actions), what happens to the session, the expiry and the pending request, and how the matrix treats columns, unknown names and grants it does not show.
+- **Proposal:** Impersonation is an Auth service (session state only, no table): superadmins only, never a superadmin, a banned/inactive user, oneself or twice; started by the Users operation after a re-authentication; the PHP session keeps the impersonator's tracked row; ids regenerated and the re-authentication window forgotten at start and end; the `authsession` filter adds the banner to the top-bar region and ends an expired impersonation without running the pending request; re-authentication (hence every `reauth` route), the password and the email change are refused meanwhile; logout ends both; every step is a security entry. Matrix: columns of the actor's own groups and `superadmin` are read-only; each editable column posts an empty marker and only posted columns change; only atomic names and resource wildcards are accepted (anything else refuses the whole save); grants the screen does not show are kept; every group is checked before any write and all are saved in one transaction.
+- **Alternatives:** A) An `impersonations` table (not needed: the activity log keeps the history). B) Replaying the pending request as the impersonator after expiry.
+- **Status:** Accepted (proposal)
+
