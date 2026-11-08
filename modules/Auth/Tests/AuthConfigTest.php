@@ -59,6 +59,5 @@ final class AuthConfigTest extends CIUnitTestCase
     {
         $this->assertSame(\Modules\Auth\Authentication\UserTwoFactorAction::class, config('Auth')->actions['login']);
         $this->assertSame(15, config('Auth')->reauthMinutes);
-        $this->assertSame([], config('Auth')->twoFactorPolicy);
     }
 }

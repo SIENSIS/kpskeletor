@@ -143,16 +143,6 @@ final class Module extends ModuleManifest
             'help'    => 'Auth.settings.reauthMinutesHelp',
             'group'   => 'security.sessions',
         ],
-        // Group name => 'required' | 'optional' (missing groups are optional). Moves to the
-        // `groups` table with the Groups screen (session 15).
-        'twoFactorPolicy' => [
-            'type'    => 'json',
-            'default' => [],
-            'rules'   => 'permit_empty|valid_json|two_factor_policy',
-            'label'   => 'Auth.settings.twoFactorPolicy',
-            'help'    => 'Auth.settings.twoFactorPolicyHelp',
-            'group'   => 'security.twoFactor',
-        ],
     ];
 
     /** Auth's tables are backed up by the Core's database dump. */

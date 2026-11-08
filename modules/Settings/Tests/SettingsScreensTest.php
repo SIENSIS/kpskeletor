@@ -9,7 +9,6 @@ use CodeIgniter\I18n\Time;
 use Config\Auth;
 use Config\Services;
 use Modules\Auth\Models\UserSessionModel;
-use Modules\Auth\Services\AuthPolicy;
 
 /**
  * The settings screens: `settings.update` opens them, `settings.<module>` is needed to save a
@@ -161,13 +160,11 @@ final class SettingsScreensTest extends SettingsTestCase
             'Core-rateLimitBackend' => '200',
             'Core-outboundHosts'    => "api.example.com\r\n*.example.org\r\napi.example.com",
             'Api-corsOrigins'       => 'https://app.example.com',
-            'Auth-twoFactorPolicy'  => '{"admin": "required"}',
         ]))->assertRedirectTo(site_url('backend/settings/security'));
 
         $this->assertSame(200, setting('Core.rateLimitBackend'));
         $this->assertSame(['api.example.com', '*.example.org'], setting('Core.outboundHosts'));
         $this->assertSame(['https://app.example.com'], setting('Api.corsOrigins'));
-        $this->assertSame(['admin' => 'required'], (new AuthPolicy())->twoFactorPolicy());
 
         $entry = $this->entries('security_settings_changed');
         $this->assertCount(1, $entry);
@@ -196,8 +193,6 @@ final class SettingsScreensTest extends SettingsTestCase
         yield 'short passwords' => ['Auth-minimumPasswordLength', '6'];
         yield 'huge rate limit' => ['Core-rateLimitBackend', '100000'];
         yield 'no remember cap' => ['Auth-rememberLifetime', '9999'];
-        yield 'unknown 2FA group' => ['Auth-twoFactorPolicy', '{"pirates": "required"}'];
-        yield 'bad 2FA rule' => ['Auth-twoFactorPolicy', '{"admin": "never"}'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('weakValues')]

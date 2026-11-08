@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Services;
 
+use Modules\Core\Groups\GroupRegistry;
 use Throwable;
 
 /**
@@ -110,32 +111,14 @@ final class AuthPolicy
     }
 
     /**
-     * 2FA policy per group (`Auth.twoFactorPolicy`): group name => `required` | `optional`;
-     * a group that is not listed is optional.
+     * 2FA policy per group (the `groups` table, mirrored into `setting('AuthGroups.groups')`
+     * by the Core's `GroupRegistry`): group name => `required` | `optional`.
      *
      * @return array<string, string>
      */
     public function twoFactorPolicy(): array
     {
-        $value = $this->read('twoFactorPolicy');
-
-        if (is_string($value)) {
-            $value = json_decode($value, true);
-        }
-
-        if (! is_array($value)) {
-            return [];
-        }
-
-        $policy = [];
-
-        foreach ($value as $group => $rule) {
-            if (is_string($group) && in_array($rule, ['required', 'optional'], true)) {
-                $policy[$group] = $rule;
-            }
-        }
-
-        return $policy;
+        return GroupRegistry::twoFactorPolicy();
     }
 
     /**

@@ -107,6 +107,10 @@ return [
         'notifications' => 'Notifications',
         'schedule' => 'Scheduled tasks',
     ],
+    'groups' => [
+        'invalidName' => 'The name must start with a letter and contain only lower-case letters, digits, "-" and "_" (2 to 50 characters).',
+        'nameTaken' => 'The group "{0}" already exists or is reserved.',
+    ],
     'rbac' => [
         'unknownGroup' => 'The group "{0}" does not exist.',
         'unknownPermission' => 'The permission "{0}" does not exist.',
@@ -492,6 +496,7 @@ return [
         'module_disabled' => 'Module disabled',
         'demo_loaded' => 'Demo data loaded',
         'demo_removed' => 'Demo data removed',
+        'group_created' => 'Group created',
         'grants_changed' => 'Group permissions changed',
         'permissions_granted' => 'Permissions granted to a user',
         'permissions_revoked' => 'Permissions revoked from a user',

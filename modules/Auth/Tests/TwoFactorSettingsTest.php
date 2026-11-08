@@ -8,6 +8,7 @@ use CodeIgniter\I18n\Time;
 use Modules\Auth\Controllers\TwoFactorSettingsController;
 use Modules\Auth\Services\Reauth;
 use Modules\Auth\Services\TwoFactor;
+use Modules\Core\Groups\GroupRegistry;
 
 /**
  * The profile's 2FA screens: enabling email and app (QR as local SVG, a valid code before
@@ -82,7 +83,7 @@ final class TwoFactorSettingsTest extends TwoFactorTestCase
 
     public function testGroupPolicyForcesSetUpAfterLogin(): void
     {
-        setting('Auth.twoFactorPolicy', ['user' => 'required']);
+        (new GroupRegistry())->setTwoFactor('user', GroupRegistry::REQUIRED);
         $user = $this->createUser();
 
         $this->login('ana@example.com')->assertRedirectTo(site_url('backend/profile'));
@@ -102,7 +103,7 @@ final class TwoFactorSettingsTest extends TwoFactorTestCase
 
     public function testOptionalGroupIsNotForced(): void
     {
-        setting('Auth.twoFactorPolicy', ['admin' => 'required']);
+        (new GroupRegistry())->setTwoFactor('admin', GroupRegistry::REQUIRED);
         $this->createUser();
 
         $this->login('ana@example.com');
