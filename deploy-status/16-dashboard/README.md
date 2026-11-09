@@ -1,6 +1,6 @@
 # Session 16 — Dashboard and widgets
 
-Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull request: "Session 16: Dashboard and widgets" · Date: 2026-11-09
+Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#20](https://github.com/SIENSIS/kpskeletor/pull/20) "Session 16: Dashboard and widgets" · Date: 2026-11-09
 
 ## What was built
 
