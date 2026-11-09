@@ -1,8 +1,8 @@
 # Dashboard module
 
 **Purpose:** the back-office home (`backend`) with the widgets of the enabled modules, configured
-per group and arranged per user. Not a core module (it can be disabled; then `backend` answers
-404). Full description: `docs/widgets.md`. The widget framework itself is the Core's
+per group and arranged per user. Core module (cannot be disabled, D-16-05): `backend`, where a login
+lands, always exists; a user who wants an empty home hides their widgets. Full description: `docs/widgets.md`. The widget framework itself is the Core's
 (`modules/Core/Widgets/`).
 
 ## Resources and permissions
@@ -26,7 +26,8 @@ per group and arranged per user. Not a core module (it can be disabled; then `ba
 
 ## Decisions
 
-D-16-01 (names, URLs, login landing) **Open (decide)**; D-16-02 … D-16-04 accepted
+D-16-01 (names, URLs, login landing) **Open (decide)**; D-16-02 … D-16-04 accepted; D-16-05
+(core module) decided by the owner
 (`docs/decisions.md`).
 
 ## Open tasks

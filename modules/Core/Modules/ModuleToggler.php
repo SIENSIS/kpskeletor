@@ -22,7 +22,7 @@ use Modules\Core\Permissions\ShieldMatrix;
 final class ModuleToggler
 {
     /** Modules that can never be disabled. */
-    public const CORE_MODULES = ['Core', 'Auth', 'Api', 'Users', 'Settings'];
+    public const CORE_MODULES = ['Core', 'Auth', 'Api', 'Users', 'Settings', 'Dashboard'];
 
     public function __construct(
         private readonly ModuleDiscovery $discovery = new ModuleDiscovery(),

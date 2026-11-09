@@ -8,7 +8,8 @@ Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull r
   widget has an id, title, icon, permission, allowed sizes, per-group options and a server-side
   `render()`, or loads asynchronously (`data()`), with failure isolation (a broken widget shows an
   error card; the page keeps working).
-- **The back-office home** `backend` (Dashboard module): the user's widgets in a responsive grid.
+- **The back-office home** `backend` (Dashboard module, a core module that cannot be
+  disabled): the user's widgets in a responsive grid.
   A widget is shown only when the user holds its permission **and** it is enabled for one of the
   user's groups (also enforced on its async URL: 403).
 - **Per-user layout:** "Customise" turns on drag and drop (mouse, touch through pointer events,
@@ -60,14 +61,16 @@ Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull r
 ## Decisions and deviations
 
 - **D-16-01 (decide, Open):** permission names `dashboard.view` / `dashboard.configure`, the URLs
-  above, widget ids `<module>.<name>`, login landing on `backend` (404 while Dashboard is
-  disabled). Built as proposed; alternatives in `docs/decisions.md`.
+  above, widget ids `<module>.<name>`, login landing on `backend`. Built as proposed; alternatives in `docs/decisions.md`.
 - **D-16-02 (accepted):** a widget without a group row is enabled with its defaults; the first of
   the user's groups (reserved first) that enables a widget gives its position, size and options;
   users change only order, size and visibility.
 - **D-16-03 (accepted):** the contract, the async protocol (`{widget, data, html}`, 403/500,
   `no-store`, cache read only after the checks) and failure handling.
 - **D-16-04 (accepted):** the home is active in the menu only on itself.
+- **D-16-05 (decided by the owner):** the Dashboard is a core module and cannot be disabled
+  (`ModuleToggler::CORE_MODULES`), so `backend` always exists; an empty home is obtained by
+  hiding widgets.
 - Deviations: `WidgetInterface::icon()` added; `CrudAuditor` now inspects with a GET request
   (an earlier, order-dependent gap: a POST left by a previous test made the groups CRUD ask for
   re-authentication); counting and redirect tests of earlier sessions updated.
@@ -91,8 +94,8 @@ php spark serve
 ## Tests and checks
 
 ```
-vendor/bin/phpunit                         OK (731 tests, 3709 assertions)   [05:00]
-vendor/bin/phpunit modules/Dashboard       OK (25 tests, 123 assertions)
+vendor/bin/phpunit                         OK (732 tests, 3710 assertions)
+vendor/bin/phpunit modules/Dashboard       OK (26 tests, 124 assertions)
 vendor/bin/phpunit modules/Core/Tests/WidgetsTest.php   OK (5 tests, 17 assertions)
 vendor/bin/phpstan analyse                 [OK] No errors
 vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 495 files that can be fixed
@@ -106,7 +109,7 @@ async 403 without permission / disabled for the group / unknown or server-side i
 reorder/resize/hide by form, JSON save with forged widgets dropped, restore, group order, menu
 active entry), `GroupLayoutTest.php` (5: forged POSTs, criterion 6 "admin hides a widget for a
 group", invalid sizes/positions/options, unknown groups, missing-permission warning),
-`DashboardModuleTest.php` (2: manifest, migrations up/down/up), `modules/Core/Tests/WidgetsTest.php`
+`DashboardModuleTest.php` (3: core module, manifest, migrations up/down/up), `modules/Core/Tests/WidgetsTest.php`
 (5). `php spark security:check` arrives in session 30.
 
 ## Screenshots
@@ -142,7 +145,6 @@ the warning when the group lacks a widget's permission.*
 
 ## Known issues
 
-- While the Dashboard module is disabled, `backend` (where a login lands) answers 404 (D-16-01).
 - Acceptance criterion 6 also needs the News *Notices* widget (session 17).
 - Touch drag relies on pointer events and was not tested on a real device.
 - Existing development databases need `php spark modules:sync` (new module and grants).

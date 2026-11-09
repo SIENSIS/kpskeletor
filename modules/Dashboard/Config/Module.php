@@ -17,6 +17,9 @@ use Modules\Core\Config\ModuleManifest;
  * - `dashboard.configure`: Dashboard › Group layouts (which widgets each group has, their order,
  *   size and options).
  *
+ * Core module (`ModuleToggler::CORE_MODULES`, D-16-05): it cannot be disabled, so `backend` (where
+ * a login lands) always exists; users who want no widgets hide them.
+ *
  * The widget framework (interface, registry, renderer, options) is the Core's
  * (`Modules\Core\Widgets`); this module stores the layouts and shows them.
  */

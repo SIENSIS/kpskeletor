@@ -159,6 +159,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-16-02 | 16 | Group layouts: defaults, several groups, what users may change | Accepted (proposal) |
 | D-16-03 | 16 | The widget contract, async data and failures | Accepted (proposal) |
 | D-16-04 | 16 | The back-office home in the menu and breadcrumbs | Accepted (proposal) |
+| D-16-05 | 16 | Dashboard is a core module | Applied (decided) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1633,8 +1634,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 
 - **Where:** specification "Modules" › "Dashboard" ("the dashboard home is the resource `dashboard`, granted to every group"; per-group configuration "from the UI"), "Dashboard widgets"; D-00-17, D-00-18; plan session 16 (routes `backend/`, `backend/dashboard/widgets/(:segment)/data`, `backend/dashboard/groups`); D-05-08 (login on the profile "until session 16")
 - **Problem:** The specification names the resource but not its operations, the permission of the group configuration, the URLs of the user layout, nor where a login lands now; all are public conventions. The Dashboard module is not a core module, so it can be disabled.
-- **Proposal:** One resource `dashboard` with the `'name'` override (single-resource module): `dashboard.view` (home, own layout, async data; granted to every group) and `dashboard.configure` (group layouts; `admin` gets `dashboard.*`). URLs: `backend` (route `dashboard`), `backend/dashboard/customize`, `POST backend/dashboard/layout`, `POST backend/dashboard/layout/reset`, `backend/dashboard/widgets/<id>/data`, `backend/dashboard/groups[/<group>]` (route `dashboard-groups`; menu "Dashboard widgets" in the settings zone). Widget ids `<module>.<name>` (`core.scheduled-tasks`, `core.quick-links`, `users.summary`). A login, the start and the end of an impersonation land on `backend`; while the Dashboard module is disabled `backend` answers 404 (the profile is still reachable from the user menu). Built this way; renaming means changing the manifest, routes, tests and `Config\Auth::$redirects`.
-- **Alternatives:** A) A separate resource for the configuration: `dashboard-groups.{view,edit}` (needs two resources, so no `'name'` override: `dashboard-dashboard.view`). B) Make Dashboard a core module (cannot be disabled), so `backend` always exists. C) Keep the login on `backend/profile`.
+- **Proposal:** One resource `dashboard` with the `'name'` override (single-resource module): `dashboard.view` (home, own layout, async data; granted to every group) and `dashboard.configure` (group layouts; `admin` gets `dashboard.*`). URLs: `backend` (route `dashboard`), `backend/dashboard/customize`, `POST backend/dashboard/layout`, `POST backend/dashboard/layout/reset`, `backend/dashboard/widgets/<id>/data`, `backend/dashboard/groups[/<group>]` (route `dashboard-groups`; menu "Dashboard widgets" in the settings zone). Widget ids `<module>.<name>` (`core.scheduled-tasks`, `core.quick-links`, `users.summary`). A login, the start and the end of an impersonation land on `backend`; `backend` always exists: the Dashboard is a core module (D-16-05). Built this way; renaming means changing the manifest, routes, tests and `Config\Auth::$redirects`.
+- **Alternatives:** A) A separate resource for the configuration: `dashboard-groups.{view,edit}` (needs two resources, so no `'name'` override: `dashboard-dashboard.view`). B) Keep the login on `backend/profile`.
 - **Status:** Open
 
 ## D-16-02 — Group layouts: defaults, several groups, what users may change
@@ -1660,3 +1661,13 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** Path prefixes count only for entries whose path has at least two segments; a one-segment entry (the home) is active only on itself or by route name.
 - **Alternatives:** A) A per-entry `exact` key in the manifest menu.
 - **Status:** Accepted (proposal)
+
+## D-16-05 — Dashboard is a core module
+
+- **Where:** specification "Module lifecycle" (core modules `Core`, `Auth`, `Api`, `Users`, `Settings` cannot be disabled), "Modules" › "Dashboard"; D-16-01
+- **Problem:** The Dashboard module could be disabled, and then `backend`, where a login and an impersonation land, answered 404.
+- **Proposal:** Add `Dashboard` to `ModuleToggler::CORE_MODULES`: it cannot be disabled, so `backend` always exists. Disabling it would give nothing a user cannot already get by hiding every widget (an empty home).
+- **Alternatives:** A) Keep it optional and send the login to the profile when it is disabled.
+- **Status:** Applied (decided)
+- **Decision (2026-11-09):** «Fes que el dashboard no es pugui desactivar, ja que en ell pots eliminar tots els widgets i que et quedi com una pantalla buida, que seria el mateix efecte que desactivar-lo». The Dashboard is a core module that cannot be disabled.
+- **Applied in:** `modules/Core/Modules/ModuleToggler.php`, `modules/Dashboard/Config/Module.php`, `modules/Dashboard/CLAUDE.md`, `docs/specification.md` ("Module lifecycle"), `docs/commands.md`, `docs/widgets.md`; tests `ModuleToggleTest::testCoreModulesCannotBeDisabled`, `DashboardModuleTest::testItIsACoreModule`

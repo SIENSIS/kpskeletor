@@ -16,7 +16,7 @@ sessions 32–34; this page is the reference.
 | `WidgetRenderer` | Core | Renders a card with failure isolation; caches async data per user. |
 | `WidgetOptions` | Core | Defaults, stored values and validation of the per-group options. |
 | `WidgetSizes` | Core | `small`, `medium`, `large`, `full` and their grid columns. |
-| Dashboard module | `modules/Dashboard/` | The home `backend`, the group layouts and the user layouts (`DashboardLayout`). |
+| Dashboard module | `modules/Dashboard/` | The home `backend`, the group layouts and the user layouts (`DashboardLayout`). A core module: it cannot be disabled (D-16-05). |
 
 Shipped widgets: *Scheduled tasks* (`core.scheduled-tasks`, `schedule.list`: failing tasks and
 the next run), *Quick links* (`core.quick-links`, no permission of its own: menu entries chosen

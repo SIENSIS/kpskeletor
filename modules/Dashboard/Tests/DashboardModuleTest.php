@@ -8,12 +8,13 @@ use CodeIgniter\Database\Migration;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Modules\Core\Modules\ManifestValidator;
+use Modules\Core\Modules\ModuleToggler;
 use Modules\Dashboard\Config\Module;
 use Modules\Dashboard\Database\Migrations\CreateDashboardGroupWidgets;
 use Modules\Dashboard\Database\Migrations\CreateDashboardUserLayouts;
 
 /**
- * The manifest (names `dashboard.view` / `dashboard.configure`, granted to every group) and the
+ * A core module (cannot be disabled), the manifest (names `dashboard.view` / `dashboard.configure`, granted to every group) and the
  * migrations (up, down, up).
  *
  * @internal
@@ -39,6 +40,11 @@ final class DashboardModuleTest extends CIUnitTestCase
         }
 
         $this->assertSame(['dashboard.*'], $manifest->defaultGrants['admin']);
+    }
+
+    public function testItIsACoreModule(): void
+    {
+        $this->assertContains('Dashboard', ModuleToggler::CORE_MODULES, 'The back-office home cannot be disabled (D-16-05); users hide widgets instead.');
     }
 
     public function testUpDownUp(): void
