@@ -22,7 +22,7 @@ pull request open), *merged* (in `main`).
 | 12 | Activity log and Activity module | merged | `claude/trusting-curie-sqluwo` | [SIENSIS/kpskeletor#16](https://github.com/SIENSIS/kpskeletor/pull/16) | [`deploy-status/12-activity/`](../deploy-status/12-activity/README.md) |
 | 13 | Storage service and upload rules | merged | `claude/gifted-newton-p029ve` | [SIENSIS/kpskeletor#17](https://github.com/SIENSIS/kpskeletor/pull/17) | [`deploy-status/13-storage/`](../deploy-status/13-storage/README.md) |
 | 14 | Settings module and Settings › Security | merged | `claude/happy-darwin-p8xstn` | [SIENSIS/kpskeletor#18](https://github.com/SIENSIS/kpskeletor/pull/18) | [`deploy-status/14-settings/`](../deploy-status/14-settings/README.md) |
-| 15 | Users module and permission matrix | done | `claude/clever-feynman-qsy4k4` | [SIENSIS/kpskeletor#19](https://github.com/SIENSIS/kpskeletor/pull/19) | [`deploy-status/15-users/`](../deploy-status/15-users/README.md) |
+| 15 | Users module and permission matrix | merged | `claude/clever-feynman-qsy4k4` | [SIENSIS/kpskeletor#19](https://github.com/SIENSIS/kpskeletor/pull/19) | [`deploy-status/15-users/`](../deploy-status/15-users/README.md) |
 
 ## Decisions
 
