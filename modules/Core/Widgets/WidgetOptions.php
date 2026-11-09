@@ -12,12 +12,17 @@ use Modules\Core\Registry\DeclarationRegistry;
  * the per-group configuration form.
  *
  * Types: `int` (`min`, `max`), `bool`, `string` (up to 255 characters, one line), `select`
- * (`options`: value => language key) and `menu` (a list of back-office menu entry keys, e.g.
- * `Users.users` or `settings`; shown to each user only when they can open the entry).
+ * (`options`: value => language key), `menu` (a list of back-office menu entry keys, e.g.
+ * `Users.users` or `settings`; shown to each user only when they can open the entry) and `links`
+ * (an ordered list of up to 20 items, each a menu entry `{"menu": key}` or a free link
+ * `{"label", "url"}` whose address is an `https://` URL or an internal path starting with `/`).
  */
 final class WidgetOptions
 {
-    public const TYPES = ['int', 'bool', 'string', 'select', 'menu'];
+    public const TYPES = ['int', 'bool', 'string', 'select', 'menu', 'links'];
+
+    /** Most items of a `links` option. */
+    public const MAX_LINKS = 20;
 
     public function __construct(private readonly DeclarationRegistry $registry = new DeclarationRegistry())
     {
@@ -77,11 +82,30 @@ final class WidgetOptions
 
         foreach ($widget->settings() as $key => $definition) {
             $type = (string) ($definition['type'] ?? 'string');
-            $raw  = $posted[$key] ?? ($type === 'bool' ? '0' : ($type === 'menu' ? [] : null));
-            $value = $this->normalise($definition, $raw);
+            $raw  = $posted[$key] ?? ($type === 'bool' ? '0' : (in_array($type, ['menu', 'links'], true) ? [] : null));
+
+            if ($type === 'links') {
+                $raw = self::fromRows($raw);
+            }
+
+            $value = $raw === null ? null : $this->normalise($definition, $raw);
 
             if ($type === 'menu' && is_array($value) && array_diff($value, array_keys($this->choices($definition))) !== []) {
                 $value = null; // only entries of the back-office menu
+            }
+
+            if ($type === 'links' && is_array($value)) {
+                $menu = array_filter(array_map(static fn (array $item): ?string => $item['menu'] ?? null, $value));
+
+                if (array_diff($menu, array_keys($this->choices($definition))) !== []) {
+                    $value = null;
+                }
+            }
+
+            if ($type === 'links' && $value === null) {
+                $errors[$key] = lang('Core.widgets.invalidLinks', [lang((string) ($definition['label'] ?? $key)), self::MAX_LINKS]);
+
+                continue;
             }
 
             if ($value === null) {
@@ -117,7 +141,7 @@ final class WidgetOptions
             return $choices;
         }
 
-        if ($type === 'menu') {
+        if ($type === 'menu' || $type === 'links') {
             $choices = [];
 
             foreach ($this->registry->menuEntries() as $key => $declaration) {
@@ -184,6 +208,9 @@ final class WidgetOptions
 
                 return count($keys) === count($value) ? $keys : null;
 
+            case 'links':
+                return self::links($value);
+
             default: // string
                 if (! is_string($value) && ! is_int($value)) {
                     return null;
@@ -196,6 +223,113 @@ final class WidgetOptions
     }
 
     /**
+     * A `links` value (menu keys as plain strings are accepted, as stored by the `menu` type), or
+     * null when an item is invalid or there are too many.
+     *
+     * @return list<array{menu: string}|array{label: string, url: string}>|null
+     */
+    private static function links(mixed $value): ?array
+    {
+        if (! is_array($value) || count($value) > self::MAX_LINKS) {
+            return null;
+        }
+
+        $items = [];
+
+        foreach ($value as $item) {
+            $item = is_string($item) ? ['menu' => $item] : $item;
+
+            if (is_array($item) && is_string($item['menu'] ?? null) && preg_match('/^[A-Za-z0-9_.:-]{1,191}$/', $item['menu']) === 1) {
+                $items[] = ['menu' => $item['menu']];
+
+                continue;
+            }
+
+            $label = is_array($item) && is_string($item['label'] ?? null) ? trim($item['label']) : '';
+            $url   = is_array($item) && is_string($item['url'] ?? null) ? self::linkUrl($item['url']) : null;
+
+            if ($label === '' || mb_strlen($label) > 100 || preg_match('/[\x00-\x1F\x7F]/', $label) === 1 || $url === null) {
+                return null;
+            }
+
+            $items[] = ['label' => $label, 'url' => $url];
+        }
+
+        return $items;
+    }
+
+    /**
+     * A free link's address: an `https://` URL without credentials or an internal path starting
+     * with one `/`; null for anything else (`http:`, `javascript:`, `data:`, `//host`…).
+     */
+    public static function linkUrl(string $url): ?string
+    {
+        $url = trim($url);
+
+        if ($url === '' || strlen($url) > 500 || preg_match('/[\s\x00-\x1F\x7F\\\\]/', $url) === 1) {
+            return null;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return str_starts_with($url, '//') || parse_url($url) === false ? null : $url;
+        }
+
+        $parts = parse_url($url);
+
+        if (! is_array($parts) || strtolower($parts['scheme'] ?? '') !== 'https' || ($parts['host'] ?? '') === ''
+            || isset($parts['user']) || isset($parts['pass']) || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return null;
+        }
+
+        return $url;
+    }
+
+    /**
+     * The rows of the group layout form (`ref` = "menu:<key>", "url" or "" for an empty row,
+     * `label`, `url`, `position`) as a `links` value in the order of their positions; null when
+     * the rows are malformed.
+     *
+     * @return list<array<string, string>>|null
+     */
+    private static function fromRows(mixed $rows): ?array
+    {
+        if (! is_array($rows)) {
+            return null;
+        }
+
+        $items = [];
+        $index = 0;
+
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                return null;
+            }
+
+            $ref      = is_string($row['ref'] ?? null) ? $row['ref'] : '';
+            $position = is_string($row['position'] ?? null) && preg_match('/^\d{1,4}$/', $row['position']) === 1 ? (int) $row['position'] : 10000 + $index;
+            $index++;
+
+            if ($ref === '') {
+                continue;
+            }
+
+            if (str_starts_with($ref, 'menu:')) {
+                $item = ['menu' => substr($ref, 5)];
+            } elseif ($ref === 'url') {
+                $item = ['label' => is_string($row['label'] ?? null) ? $row['label'] : '', 'url' => is_string($row['url'] ?? null) ? $row['url'] : ''];
+            } else {
+                return null;
+            }
+
+            $items[] = ['position' => $position, 'index' => $index, 'item' => $item];
+        }
+
+        usort($items, static fn (array $a, array $b): int => [$a['position'], $a['index']] <=> [$b['position'], $b['index']]);
+
+        return array_map(static fn (array $entry): array => $entry['item'], $items);
+    }
+
+    /**
      * @param array<string, mixed> $definition
      */
     private function fallback(array $definition): mixed
@@ -203,7 +337,7 @@ final class WidgetOptions
         return match ($definition['type'] ?? 'string') {
             'int'    => (int) ($definition['min'] ?? 0),
             'bool'   => false,
-            'menu'   => [],
+            'menu', 'links' => [],
             'select' => (string) (array_key_first((array) ($definition['options'] ?? [])) ?? ''),
             default  => '',
         };

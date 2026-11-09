@@ -27,7 +27,8 @@ lands, always exists; a user who wants an empty home hides their widgets. Full d
 ## Decisions
 
 D-16-01 (names, URLs, login landing) decided by the owner as proposed; D-16-02 … D-16-04 accepted; D-16-05
-(core module) decided by the owner
+(core module) and D-16-06 (quick links: free links, order set by the administrator; editor
+`Views/links_editor.php` + `Assets/js/links-editor.js`) decided by the owner
 (`docs/decisions.md`).
 
 ## Open tasks

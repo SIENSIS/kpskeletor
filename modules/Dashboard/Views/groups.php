@@ -91,6 +91,14 @@ $old = is_array($old) ? $old : null;
                                                     <option value="<?= esc((string) $choice, 'attr') ?>"<?= (string) $choice === (string) $value ? ' selected' : '' ?>><?= esc($text) ?></option>
                                                 <?php endforeach ?>
                                             </select>
+                                        <?php elseif ($type === 'links'): ?>
+                                            <?= view('Modules\Dashboard\Views\links_editor', [
+                                                'name'    => $input,
+                                                'id'      => $id,
+                                                'choices' => $definition['choices'],
+                                                'items'   => is_array($value) ? $value : [],
+                                                'old'     => is_array($prev['options'][$name] ?? null),
+                                            ]) ?>
                                         <?php elseif ($type === 'menu'): ?>
                                             <?php $selected = is_array($value) ? $value : []; ?>
                                             <select class="form-select form-select-sm" id="<?= esc($id, 'attr') ?>" name="<?= esc($input, 'attr') ?>[]" multiple size="6">

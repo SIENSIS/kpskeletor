@@ -532,6 +532,7 @@ return [
         'loading'       => 'Loading…',
         'failed'        => 'This widget could not be shown. The error has been logged.',
         'invalidOption' => 'The value of “{0}” is not valid.',
+        'invalidLinks'  => '“{0}”: each link needs a menu entry, or a label (up to 100 characters) and an https:// address or an internal path starting with /; at most {1} links.',
         'size'          => [
             'small'  => 'Small',
             'medium' => 'Medium',
@@ -550,8 +551,8 @@ return [
         'quickLinks' => [
             'title'     => 'Quick links',
             'links'     => 'Links',
-            'linksHelp' => 'Back-office screens shown as shortcuts; each user only sees the ones they can open.',
             'empty'     => 'No shortcuts available.',
+            'newTab'    => 'opens in a new tab',
         ],
     ],
     'settingGroups' => [

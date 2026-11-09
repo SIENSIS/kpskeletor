@@ -342,3 +342,5 @@
 .dashboard-size { width: auto; }
 .dashboard-col-number { width: 8rem; }
 .dashboard-stat { font-size: 1.75rem; font-weight: 600; line-height: 1.1; }
+.dashboard-links-ref { min-width: 12rem; }
+.dashboard-links-position { width: 6rem; }

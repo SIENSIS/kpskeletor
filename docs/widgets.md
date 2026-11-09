@@ -19,8 +19,9 @@ sessions 32–34; this page is the reference.
 | Dashboard module | `modules/Dashboard/` | The home `backend`, the group layouts and the user layouts (`DashboardLayout`). A core module: it cannot be disabled (D-16-05). |
 
 Shipped widgets: *Scheduled tasks* (`core.scheduled-tasks`, `schedule.list`: failing tasks and
-the next run), *Quick links* (`core.quick-links`, no permission of its own: menu entries chosen
-per group, each user sees only the ones they can open) and *Users summary* (`users.summary`,
+the next run), *Quick links* (`core.quick-links`, no permission of its own: an ordered list per
+group of menu entries, which each user sees only when they can open them, and free links with an
+`https://` address or an internal path, shown to every user of the group; see below) and *Users summary* (`users.summary`,
 `users-users.list`, async: active accounts, users online, accounts without 2FA). Later modules
 add theirs (News, Events, Updates, Backup, Security status).
 
@@ -113,8 +114,11 @@ can only choose among them; anything else falls back to the default.
 
 `settings()` declares the options an administrator sets **per group** (users do not change
 options). Types: `int` (`min`, `max`), `bool`, `string` (one line, up to 255 characters), `select`
-(`options`: value => language key) and `menu` (back-office menu entry keys such as
-`Users.users` or `settings`). `render()`/`data()` always receive every option, already
+(`options`: value => language key), `menu` (back-office menu entry keys such as
+`Users.users` or `settings`) and `links` (an ordered list of at most 20 items, each a menu entry
+`{"menu": "settings"}` or a free link `{"label": "…", "url": "…"}`; addresses are `https://`
+URLs without credentials or internal paths starting with one `/`, checked by
+`WidgetOptions::linkUrl()`; `http:`, `javascript:`, `data:`, `mailto:` and `//host` are refused). `render()`/`data()` always receive every option, already
 validated; invalid stored values fall back to the default.
 
 ## Async widgets
@@ -176,7 +180,13 @@ Settings › *Dashboard widgets* (`backend/dashboard/groups[/<group>]`, `dashboa
 granted to `admin`): one tab per group, one card per widget with *enabled*, *position*, *size*
 and the widget's options. The screen warns when the group does not hold the widget's
 permission. Saving is validated (sizes, positions 0–9999, options) and written to the activity
-log (`group_layout_saved`, with the before/after summary). Table: `dashboard_group_widgets`
+log (`group_layout_saved`, with the before/after summary).
+
+A `links` option (the *Quick links*) is edited as one ordered list: each row is a screen of the
+back-office menu or a "free link" (label + address). The order of the list is the order users
+see; with JavaScript (`dashboard/links-editor`) rows are dragged (mouse, touch, arrow keys) or
+moved with up/down buttons, removed and added; without it, a position field per row and three
+empty rows do the same. External links open in a new tab (`rel="noopener noreferrer"`). Table: `dashboard_group_widgets`
 (`group_name`, `widget`, `enabled`, `position`, `size`, `options` JSON).
 
 ## The user's layout

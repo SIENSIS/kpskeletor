@@ -9,9 +9,10 @@ use Modules\Core\Menus\MenuBuilder;
 use Modules\Core\Menus\MenuEntry;
 
 /**
- * Core widget "Quick links": shortcuts to back-office screens chosen per group (option `links`,
- * menu entry keys). Each user only sees the entries of the generated menu they can open, so the
- * widget needs no permission of its own.
+ * Core widget "Quick links": shortcuts chosen and ordered per group (option `links`): entries of
+ * the back-office menu, which each user sees only when they can open them, and free links
+ * (`https://` sites, opened in a new tab, or internal paths) shown to every user of the group
+ * (D-16-06). The widget needs no permission of its own.
  */
 final class QuickLinks extends Widget
 {
@@ -39,10 +40,15 @@ final class QuickLinks extends Widget
     {
         return [
             'links' => [
-                'type'    => 'menu',
-                'default' => ['Core.notifications', 'Activity.mine', 'api-personal-tokens', 'Users.users', 'settings'],
+                'type'    => 'links',
+                'default' => [
+                    ['menu' => 'Core.notifications'],
+                    ['menu' => 'Activity.mine'],
+                    ['menu' => 'api-personal-tokens'],
+                    ['menu' => 'Users.users'],
+                    ['menu' => 'settings'],
+                ],
                 'label'   => 'Core.widgets.quickLinks.links',
-                'help'    => 'Core.widgets.quickLinks.linksHelp',
             ],
         ];
     }
@@ -53,12 +59,29 @@ final class QuickLinks extends Widget
         $visible = $user instanceof User ? self::flatten((new MenuBuilder())->tree($user)) : [];
         $links   = [];
 
-        foreach ((array) $options['links'] as $key) {
-            $entry = is_string($key) ? ($visible[$key] ?? null) : null;
-
-            if ($entry !== null && $entry->url() !== null) {
-                $links[] = ['label' => $entry->text(), 'icon' => $entry->icon, 'url' => (string) $entry->url()];
+        foreach ((array) $options['links'] as $item) {
+            if (! is_array($item)) {
+                continue;
             }
+
+            if (isset($item['menu'])) {
+                $entry = $visible[$item['menu']] ?? null;
+
+                if ($entry !== null && $entry->url() !== null) {
+                    $links[] = ['label' => $entry->text(), 'icon' => $entry->icon, 'url' => (string) $entry->url(), 'external' => false];
+                }
+
+                continue;
+            }
+
+            $url      = (string) $item['url'];
+            $external = ! str_starts_with($url, '/');
+            $links[]  = [
+                'label'    => (string) $item['label'],
+                'icon'     => $external ? 'bi bi-box-arrow-up-right' : 'bi bi-link-45deg',
+                'url'      => $external ? $url : site_url(ltrim($url, '/')),
+                'external' => $external,
+            ];
         }
 
         if ($links === []) {

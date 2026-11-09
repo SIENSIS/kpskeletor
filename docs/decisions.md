@@ -160,6 +160,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-16-03 | 16 | The widget contract, async data and failures | Accepted (proposal) |
 | D-16-04 | 16 | The back-office home in the menu and breadcrumbs | Accepted (proposal) |
 | D-16-05 | 16 | Dashboard is a core module | Applied (decided) |
+| D-16-06 | 16 | Quick links: free URLs and the order chosen by the administrator (decide) | Applied (decided) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1673,3 +1674,13 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Applied (decided)
 - **Decision (2026-11-09):** «Fes que el dashboard no es pugui desactivar, ja que en ell pots eliminar tots els widgets i que et quedi com una pantalla buida, que seria el mateix efecte que desactivar-lo». The Dashboard is a core module that cannot be disabled.
 - **Applied in:** `modules/Core/Modules/ModuleToggler.php`, `modules/Dashboard/Config/Module.php`, `modules/Dashboard/CLAUDE.md`, `docs/specification.md` ("Module lifecycle"), `docs/commands.md`, `docs/widgets.md`; tests `ModuleToggleTest::testCoreModulesCannotBeDisabled`, `DashboardModuleTest::testItIsACoreModule`
+
+## D-16-06 — Quick links: free URLs and the order chosen by the administrator (decide)
+
+- **Where:** specification "Modules" › "Dashboard" (*Quick links*: "configurable shortcuts per group"); `modules/Core/Widgets/QuickLinks.php`, `WidgetOptions`
+- **Problem:** The quick links could only be entries of the back-office menu, shown in alphabetical order; the owner wants links to external sites and the order set by the administrator.
+- **Proposal:** A new option type `links`: one ordered list (at most 20) whose items are either a back-office menu entry (filtered by each user's permissions, as before) or a free link (one label, up to 100 characters, and an address). Addresses: `https://` URLs (no credentials) or internal paths starting with `/`; `http:`, `javascript:`, `data:`, `mailto:` and the rest are refused. Free links are shown to every user of the group (an internal path still answers 403 when the user lacks its permission). External links open in a new tab with `rel="noopener noreferrer"` and an "external" icon. The editor in Dashboard › Group layouts is a single ordered list with up/down/remove/add buttons and drag and drop (a position field without JavaScript). Stored lists of menu keys keep working.
+- **Alternatives:** A) Also `http://`. B) Also `mailto:`/`tel:`. C) An optional permission per free link. D) One label per language. E) Two separate lists (menu entries, free links).
+- **Status:** Applied
+- **Decision (2026-11-09):** «https + camins interns», «Tots els del grup», «Un sol text», «Llista única ordenable» (the four recommended options). Free links accept `https://` URLs and internal paths only, are shown to every user of the group, have one untranslated label, and are edited with menu entries in one list whose order the administrator sets.
+- **Applied in:** `modules/Core/Widgets/WidgetOptions.php` (type `links`, `linkUrl()`), `modules/Core/Widgets/QuickLinks.php`, `modules/Core/Views/widgets/quick_links.php`, `modules/Dashboard/Views/links_editor.php`, `modules/Dashboard/Assets/js/links-editor.js`, `modules/Dashboard/Views/groups.php`, language files (Core, Dashboard), `docs/specification.md`, `docs/widgets.md`; tests `GroupLayoutTest::testFreeLinksAndTheOrderChosenByTheAdministrator`, `GroupLayoutTest::testInvalidValuesAreRefused`, `WidgetsTest::testFreeLinkAddresses`, `WidgetsTest::testStoredMenuKeysStillWorkAsLinks`

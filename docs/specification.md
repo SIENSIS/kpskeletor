@@ -933,7 +933,7 @@ granularity instead of collapsing it into read/create/update/delete.
   `AsyncWidget`): `id()` (`<module>.<name>`, e.g. `core.quick-links`), `title()`, `icon()`,
   `permission()` (null: the dashboard's own permission is enough), `sizes()` (allowed sizes
   among `small`, `medium`, `large`, `full`; the first is the default), `settings()` (optional
-  per-group options typed `int`, `bool`, `string`, `select`, `menu`), `render(array $options):
+  per-group options typed `int`, `bool`, `string`, `select`, `menu`, `links`), `render(array $options):
   string` (server-side HTML) or, for widgets that load asynchronously (`AsyncWidgetInterface`),
   `data()` plus `renderData()` or their own ES component.
 * The registry collects them from the enabled manifests (`$widgets`; `modules:sync` refuses a
@@ -1138,7 +1138,10 @@ The generated forms described above (one tab per module and one for the theme), 
   * *System version* (Updates): installed core version, and a badge when a newer one exists;
   * *Backups* (Backup): last backup, its result and size, next scheduled run;
   * *Scheduled tasks* (Core): failing tasks;
-  * *Quick links* (Core): configurable shortcuts per group;
+  * *Quick links* (Core): shortcuts chosen and ordered per group by the administrator: screens
+    of the back-office menu (shown only to users who can open them) and free links with one
+    label and an `https://` address (opened in a new tab) or an internal path, shown to every
+    user of the group;
   * *Users summary* (Users): active users, users online, accounts without 2FA.
 
 ### Activity

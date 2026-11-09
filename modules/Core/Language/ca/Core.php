@@ -532,6 +532,7 @@ return [
         'loading'       => 'S’està carregant…',
         'failed'        => 'No s’ha pogut mostrar aquest giny. L’error s’ha registrat.',
         'invalidOption' => 'El valor de «{0}» no és vàlid.',
+        'invalidLinks'  => '«{0}»: cada enllaç necessita una entrada del menú, o una etiqueta (fins a 100 caràcters) i una adreça https:// o un camí intern que comenci per /; com a màxim {1} enllaços.',
         'size'          => [
             'small'  => 'Petit',
             'medium' => 'Mitjà',
@@ -550,8 +551,8 @@ return [
         'quickLinks' => [
             'title'     => 'Enllaços ràpids',
             'links'     => 'Enllaços',
-            'linksHelp' => 'Pantalles del back office que es mostren com a dreceres; cada usuari només veu les que pot obrir.',
             'empty'     => 'No hi ha dreceres disponibles.',
+            'newTab'    => 's’obre en una pestanya nova',
         ],
     ],
     'settingGroups' => [

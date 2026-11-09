@@ -68,6 +68,10 @@ Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull r
 - **D-16-03 (accepted):** the contract, the async protocol (`{widget, data, html}`, 403/500,
   `no-store`, cache read only after the checks) and failure handling.
 - **D-16-04 (accepted):** the home is active in the menu only on itself.
+- **D-16-06 (decided by the owner):** *Quick links* take free links too (one label, an `https://`
+  address or an internal path; shown to every user of the group; external ones in a new tab)
+  and the administrator sets the order, in one list edited with drag and drop or up/down
+  buttons (option type `links`, `dashboard/links-editor`).
 - **D-16-05 (decided by the owner):** the Dashboard is a core module and cannot be disabled
   (`ModuleToggler::CORE_MODULES`), so `backend` always exists; an empty home is obtained by
   hiding widgets.
@@ -94,8 +98,8 @@ php spark serve
 ## Tests and checks
 
 ```
-vendor/bin/phpunit                         OK (732 tests, 3710 assertions)
-vendor/bin/phpunit modules/Dashboard       OK (26 tests, 124 assertions)
+vendor/bin/phpunit                         OK (735 tests, 3755 assertions)
+vendor/bin/phpunit modules/Dashboard       OK (27 tests, 160 assertions)
 vendor/bin/phpunit modules/Core/Tests/WidgetsTest.php   OK (5 tests, 17 assertions)
 vendor/bin/phpstan analyse                 [OK] No errors
 vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 495 files that can be fixed
@@ -142,6 +146,14 @@ the warning when the group lacks a widget's permission.*
 
 ![Dark mode](screenshots/08-dashboard-dark.png)
 *08 — Dark mode.*
+
+![Quick links editor](screenshots/09-quick-links-editor.png)
+*09 — Group layouts › Quick links: one ordered list mixing a free link (label + https address)
+and screens of the menu; drag handle, up/down and remove buttons, "add a link".*
+
+![Quick links as a user](screenshots/10-quick-links-user.png)
+*10 — The same list as `usuari` sees it: the external link first (new-tab icon), then the screens
+it can open (Users and Settings are hidden).*
 
 ## Known issues
 

@@ -115,6 +115,24 @@ final class WidgetsTest extends CIUnitTestCase
         $this->assertSame(['on', 'mode', 'title'], array_keys($bad['errors']));
     }
 
+    public function testFreeLinkAddresses(): void
+    {
+        foreach (['https://example.com', 'https://example.com/a/b?c=d#e', '/backend/news', '/'] as $url) {
+            $this->assertSame($url, WidgetOptions::linkUrl($url), $url);
+        }
+
+        foreach (['http://example.com', 'javascript:alert(1)', 'data:text/html,x', 'mailto:a@b.c', '//evil.example',
+            'https://user:pw@example.com', 'https://', 'backend/news', "/a\nb", '/a b', 'https://exa mple.com', '/\\evil'] as $url) {
+            $this->assertNull(WidgetOptions::linkUrl($url), $url);
+        }
+    }
+
+    public function testStoredMenuKeysStillWorkAsLinks(): void
+    {
+        $this->assertSame(['links' => [['menu' => 'settings'], ['label' => 'Web', 'url' => 'https://example.com']]], (new WidgetOptions())->resolve(new QuickLinks(), ['links' => ['settings', ['label' => 'Web', 'url' => 'https://example.com']]]));
+        $this->assertSame((new WidgetOptions())->defaults(new QuickLinks()), (new WidgetOptions())->resolve(new QuickLinks(), ['links' => [['label' => 'Bad', 'url' => 'javascript:x']]]), 'An invalid stored list falls back to the default.');
+    }
+
     public function testAFailingWidgetIsIsolated(): void
     {
         $widget = new class () extends Widget {

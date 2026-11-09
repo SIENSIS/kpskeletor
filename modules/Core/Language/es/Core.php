@@ -532,6 +532,7 @@ return [
         'loading'       => 'Cargando…',
         'failed'        => 'No se ha podido mostrar este widget. El error se ha registrado.',
         'invalidOption' => 'El valor de «{0}» no es válido.',
+        'invalidLinks'  => '«{0}»: cada enlace necesita una entrada del menú, o una etiqueta (hasta 100 caracteres) y una dirección https:// o una ruta interna que empiece por /; como máximo {1} enlaces.',
         'size'          => [
             'small'  => 'Pequeño',
             'medium' => 'Mediano',
@@ -550,8 +551,8 @@ return [
         'quickLinks' => [
             'title'     => 'Enlaces rápidos',
             'links'     => 'Enlaces',
-            'linksHelp' => 'Pantallas del back office que se muestran como atajos; cada usuario solo ve las que puede abrir.',
             'empty'     => 'No hay atajos disponibles.',
+            'newTab'    => 'se abre en una pestaña nueva',
         ],
     ],
     'settingGroups' => [
