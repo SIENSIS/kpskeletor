@@ -131,7 +131,8 @@ final class CrudAuditor
 
         $error    = null;
         $previous = service('request');
-        $request  = $previous instanceof IncomingRequest ? $previous : Services::incomingrequest(null, false);
+        // Always a GET (the list screen), whatever the previous request was (a POST in tests).
+        $request  = ($previous instanceof IncomingRequest ? $previous : Services::incomingrequest(null, false))->withMethod('GET');
         Services::injectMock('request', $request); // kpcrudy needs a web request (spark has a CLI one)
         CrudFactory::inspect();
 
