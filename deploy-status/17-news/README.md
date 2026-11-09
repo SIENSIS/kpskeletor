@@ -1,6 +1,6 @@
 # Session 17 — News module (reference module)
 
-Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull request: "Session 17: News module (reference module)" (link in `docs/progress.md`) · Date: 2026-11-09
+Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull request: [SIENSIS/kpskeletor#21](https://github.com/SIENSIS/kpskeletor/pull/21) "Session 17: News module (reference module)" · Date: 2026-11-09
 
 ## What was built
 
