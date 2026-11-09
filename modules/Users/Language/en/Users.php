@@ -25,6 +25,14 @@ return [
         'groups' => 'Groups',
         'matrix' => 'Permissions',
     ],
+    'widget' => [
+        'title'            => 'Users summary',
+        'onlineMinutes'    => 'Online window (minutes)',
+        'active'           => 'Active accounts',
+        'online'           => 'Online (last {0} min)',
+        'withoutTwoFactor' => 'Without 2FA',
+        'open'             => 'Open the users',
+    ],
     'settings' => [
         'impersonationMinutes' => 'Impersonation time limit (minutes)',
         'impersonationMinutesHelp' => 'After this time the superadmin gets their own account back.',

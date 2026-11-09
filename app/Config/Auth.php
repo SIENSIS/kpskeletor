@@ -45,13 +45,13 @@ class Auth extends ShieldAuth
     ];
 
     /**
-     * Until the dashboard exists (session 16) a login lands on the profile.
+     * A login lands on the dashboard (`backend`, Dashboard module; D-16-01).
      *
      * @var array<string, string>
      */
     public array $redirects = [
         'register'          => 'login',
-        'login'             => 'backend/profile',
+        'login'             => 'backend',
         'logout'            => 'login',
         'force_reset'       => 'backend/profile/password',
         'permission_denied' => 'login',

@@ -71,6 +71,9 @@ final class Module extends ModuleManifest
         ['route' => 'users-matrix', 'permission' => 'users-matrix.view', 'label' => 'Users.menu.matrix', 'icon' => 'bi bi-grid-3x3', 'order' => 62, 'zone' => 'settings'],
     ];
 
+    /** @var list<string> Dashboard widget "Users summary" (active users, online, without 2FA). */
+    public array $widgets = [\Modules\Users\Widgets\UsersSummary::class];
+
     /** Edited in Settings › Security. */
     public array $settings = [
         // Minutes an impersonation lasts before the superadmin gets their own account back.

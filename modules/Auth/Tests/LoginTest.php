@@ -30,7 +30,7 @@ final class LoginTest extends AuthTestCase
 
         $response = $this->login('ana@example.com');
 
-        $response->assertRedirectTo(site_url('backend/profile'));
+        $response->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $user->id, $this->loggedInUserId());
 
         $rows = model(UserSessionModel::class)->where('user_id', $user->id)->findAll();

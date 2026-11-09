@@ -21,7 +21,7 @@ final class ImpersonationTest extends UsersTestCase
         $ana  = $this->createUser('ana@example.com', 'user');
         $this->login('root@example.com');
 
-        $this->send('POST', 'backend/users/impersonate/' . $this->code($ana->id))->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'backend/users/impersonate/' . $this->code($ana->id))->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $ana->id, $this->loggedInUserId());
         $this->assertTrue(Impersonation::active());
 
@@ -120,7 +120,7 @@ final class ImpersonationTest extends UsersTestCase
 
         $this->later(31 * 60);
         // The pending request is not run as anybody: back to the impersonator's profile.
-        $this->send('POST', 'backend/profile', ['name' => 'Changed'])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'backend/profile', ['name' => 'Changed'])->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $root->id, $this->loggedInUserId());
         $this->assertFalse(Impersonation::active());
         $this->assertSame(1, db_connect()->table('activity_log')->where('action', 'impersonation_ended')->where('summary', Impersonation::END_EXPIRED)->countAllResults());

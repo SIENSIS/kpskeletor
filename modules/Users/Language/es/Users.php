@@ -25,6 +25,14 @@ return [
         'groups' => 'Grupos',
         'matrix' => 'Permisos',
     ],
+    'widget' => [
+        'title'            => 'Resumen de usuarios',
+        'onlineMinutes'    => 'Ventana de conexión (minutos)',
+        'active'           => 'Cuentas activas',
+        'online'           => 'Conectados (últimos {0} min)',
+        'withoutTwoFactor' => 'Sin 2FA',
+        'open'             => 'Abrir los usuarios',
+    ],
     'settings' => [
         'impersonationMinutes' => 'Tiempo máximo de suplantación (minutos)',
         'impersonationMinutesHelp' => 'Pasado este tiempo el superadministrador vuelve a su cuenta.',

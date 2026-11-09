@@ -14,6 +14,8 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 - Setting `Users.impersonationMinutes` (30, 1–120, Settings › Security › Impersonation).
 - No tables of its own (Shield's tables and the Core `groups` table), no demo data (the demo users
   are Auth's), no outbound hosts or CSP sources. Asset: `Assets/js/matrix.js` (`users/matrix`).
+- Widget `users.summary` (`Widgets/UsersSummary.php`, async, `users-users.list`): active accounts,
+  users online (option `onlineMinutes`), active accounts without 2FA.
 
 ## Main pieces
 
@@ -37,7 +39,7 @@ D-15-01 (names and URLs) decided by the owner as proposed; D-15-02 … D-15-05 a
   today: search by user name, filters active, banned and last activity).
 - Custom groups created after a module's first sync do not receive that module's later default
   grants for "every group" (only the grants shared by the reserved groups at creation time).
-- Session 16: a users widget for the dashboard; session 23: avatars in the list.
+- Session 23: avatars in the list.
 
 ## How to test
 

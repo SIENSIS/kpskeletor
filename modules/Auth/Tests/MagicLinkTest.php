@@ -42,7 +42,7 @@ final class MagicLinkTest extends AuthTestCase
         $this->assertSame(hash('sha256', $token), $identity->secret);
         $this->assertNotSame($token, $identity->secret);
 
-        $this->send('GET', 'login/verify-magic-link?token=' . $token, [], [])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('GET', 'login/verify-magic-link?token=' . $token, [], [])->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $user->id, $this->loggedInUserId());
 
         $this->send('GET', 'login/verify-magic-link?token=' . $token, [], [])->assertRedirectTo(site_url('login/magic-link'));

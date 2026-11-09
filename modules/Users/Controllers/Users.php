@@ -152,7 +152,7 @@ final class Users extends BackendController
                 return $crud->backToList('danger', lang('Users.users.cannotImpersonate'));
             }
 
-            return redirect()->to(site_url('backend/profile'))->with('warning', lang('Auth.impersonation.banner', [$user->username]));
+            return redirect()->to(site_url('backend'))->with('warning', lang('Auth.impersonation.banner', [$user->username]));
         }, ['label' => lang('Users.ops.impersonate'), 'icon' => 'bi bi-incognito', 'confirm' => lang('Users.ops.impersonateConfirm'),
             'visible' => static fn (?array $row): bool => $row === null || (($user = $target($row)) !== null && (new Impersonation())->allowed($actor, $user))]);
 
