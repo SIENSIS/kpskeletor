@@ -46,7 +46,8 @@ requests never load the manifests.
 - An entry whose parent does not exist (e.g. a disabled module) is shown at the root; entries in
   a parent cycle are dropped.
 - The **active entry** is the one whose route name is the current route, else the one with the
-  longest path that is the current path or one of its parents; its ancestors are opened.
+  longest path that is the current path or one of its parents; its ancestors are opened. Parent
+  paths count from two segments, so the home (`backend`) is active only on itself (D-16-04).
 - **Breadcrumbs**: `BackendController` uses the trail to the active entry when the controller
   adds no breadcrumbs of its own (`breadcrumb()`).
 - Guests get no menu. Permissions always win: the menu only hides what the routes' `can:` filters
