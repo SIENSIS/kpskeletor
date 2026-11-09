@@ -99,7 +99,7 @@ php spark serve
 
 ```
 vendor/bin/phpunit                         OK (735 tests, 3755 assertions)
-vendor/bin/phpunit modules/Dashboard       OK (27 tests, 160 assertions)
+vendor/bin/phpunit modules/Dashboard       OK (27 tests, 150 assertions)
 vendor/bin/phpunit modules/Core/Tests/WidgetsTest.php   OK (5 tests, 17 assertions)
 vendor/bin/phpstan analyse                 [OK] No errors
 vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 495 files that can be fixed
