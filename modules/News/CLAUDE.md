@@ -12,9 +12,10 @@ description: `docs/news.md`.
   `author`: author hidden, only own posts changed.
 - `news-mine` (crud − `import`, `export`, trash; extra `publish`): "My posts" (`where()`).
 - `news-categories` (crud − `import`, trash).
-- `news-read` (page: `view`; extras `list`, `show` for the API, D-17-01 open).
+- `news-read` (page: `view`): the reader screen.
+- `news-api` (crud − everything but `list`, `show`): the `news` API resource (D-17-01).
 - Grants: admin all; editor posts list/show/add/edit/publish, categories list/show, `news-mine.*`,
-  `news-read.*`; user and superadmin `news-read.*`.
+  `news-read.*`, `news-api.*`; user and superadmin `news-read.*`, `news-api.*`.
 - Settings `News.perPage`, `News.feedItems`. Menu: "News" (reader) with "All posts", "My posts",
   "Categories". Widgets `news.notices`, `news.latest`. Task `Tasks/ExpireNotices.php`.
   Notification `Notifications/NewNotice.php`. Link type `Menu/CategoryLink.php`. API
@@ -34,13 +35,13 @@ description: `docs/news.md`.
 
 ## Decisions
 
-D-17-01 (names, URLs, settings, API permissions; **open**), D-17-08 (images inside the body; **open**), D-17-02 … D-17-06 accepted, D-17-07 applied (kpapy `where(Closure)`)
+D-17-01 (separate API resource `news-api`) and D-17-08 ("Insert image" with the file picker in session 23) decided by the owner, D-17-02 … D-17-06 accepted, D-17-07 applied (kpapy `where(Closure)`)
 (`docs/decisions.md`); D-00-35, D-00-36, D-00-40, D-00-41, D-00-42.
 
 ## Open tasks
 
 - Session 20: the body uses the rich-text editor (`forms/editor.js`); update the tests.
-- Session 23: the cover uses the file picker (TODO in `Storage/CoverUploads.php`).
+- Session 23: the cover uses the file picker (TODO in `Storage/CoverUploads.php`); "Insert image" in the body and only the site's own images in `BodySanitizer` (D-17-08).
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
 - Session 25: the `news.notices` calendar (`groups` → `restricted`, D-00-41).
 - Session 26: read receipts and notices in the API.

@@ -15,8 +15,8 @@ use Modules\Core\Config\ModuleManifest;
  *   and change the author, and change posts of other authors) and `readers` (read receipts);
  * - `categories` (kpcrudy): the categories;
  * - `mine` (kpcrudy, "My posts"): the posts of the signed-in author, `where()` pattern;
- * - `read` (page, D-00-42): the reader screen every group gets (`news-read.view`), plus `list`
- *   and `show` for the `news` API resource (D-17-01).
+ * - `read` (page, D-00-42): the reader screen every group gets (`news-read.view`);
+ * - `api` (D-17-01): the `news` API resource (`news-api.list`, `news-api.show`), every group.
  *
  * No `import`: posts and categories are written through the forms (sanitised body, slugs).
  */
@@ -54,22 +54,23 @@ final class Module extends ModuleManifest
         'read' => [
             'label' => 'News.res.read',
             'type'  => 'page',
-            'extra' => [
-                'list' => 'News.perm.apiList',
-                'show' => 'News.perm.apiShow',
-            ],
+        ],
+        'api' => [
+            'label'  => 'News.res.api',
+            'type'   => 'crud',
+            'except' => ['add', 'edit', 'delete', 'export', 'import', 'trash', 'restore', 'purge'],
         ],
     ];
 
     public array $defaultGrants = [
-        'superadmin' => ['news-read.*'],
-        'admin'      => ['news-posts.*', 'news-categories.*', 'news-mine.*', 'news-read.*'],
+        'superadmin' => ['news-read.*', 'news-api.*'],
+        'admin'      => ['news-posts.*', 'news-categories.*', 'news-mine.*', 'news-read.*', 'news-api.*'],
         'editor'     => [
             'news-posts.list', 'news-posts.show', 'news-posts.add', 'news-posts.edit', 'news-posts.publish',
             'news-categories.list', 'news-categories.show',
-            'news-mine.*', 'news-read.*',
+            'news-mine.*', 'news-read.*', 'news-api.*',
         ],
-        'user' => ['news-read.*'],
+        'user' => ['news-read.*', 'news-api.*'],
     ];
 
     public array $menu = [

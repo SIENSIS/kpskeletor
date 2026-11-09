@@ -21,7 +21,7 @@ use Modules\News\Storage\CoverUploads;
  * API resource `news` (`GET api/v1/news`, `GET api/v1/news/{id}`; kpapy, read-only): the posts
  * the token's user may read, with the same rules as the reader screen (`NewsVisibility::apply()`
  * through kpapy's `where(Closure)`, so list, details, counts, search and filters are all limited). Permissions
- * `news-read.list` / `news-read.show` (D-17-01), granted to every group; the scopes of a token
+ * `news-api.list` / `news-api.show` (D-17-01), granted to every group; the scopes of a token
  * still narrow them. Ids are masked like the back office's (`app.maskKey`, context `news`).
  *
  * Read receipts and the notices endpoint arrive in session 26.
@@ -34,7 +34,7 @@ final class Posts extends Controller
 
         return (new Resource())
             ->setTable('news')
-            ->setResource('news-read')
+            ->setResource('news-api')
             ->where(static fn (BaseBuilder $builder): BaseBuilder => NewsVisibility::apply($builder, $user))
             ->setTranslations('news_translations', 'news_id', 'locale', ['title', 'summary', 'body'], array_keys(PostsCrud::LOCALES), ['required' => ['ca']])
             ->fields(['id', 'slug', 'type', 'priority', 'pinned', 'visibility', 'category', 'title', 'summary', 'body', 'cover_url', 'published_at', 'expires_at', 'read'])

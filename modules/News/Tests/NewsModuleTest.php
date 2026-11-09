@@ -39,9 +39,12 @@ final class NewsModuleTest extends CIUnitTestCase
 
         $this->assertSame([], (new ManifestValidator())->validate($manifest, dirname(__DIR__)));
         $this->assertSame('news-posts', $manifest->permissionPrefix('posts'));
+        $this->assertArrayNotHasKey('extra', $manifest->resources['read'], 'news-read is only the reader screen (D-17-01).');
+        $this->assertSame('news-api', $manifest->permissionPrefix('api'));
 
         foreach (['superadmin', 'admin', 'editor', 'user'] as $group) {
             $this->assertContains('news-read.*', $manifest->defaultGrants[$group], "{$group} reads the news (D-00-42).");
+            $this->assertContains('news-api.*', $manifest->defaultGrants[$group], "{$group} reads the news through the API (D-17-01).");
         }
 
         $this->assertNotContains('news-posts.author', $manifest->defaultGrants['editor']);

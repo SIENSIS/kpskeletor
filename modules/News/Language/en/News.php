@@ -12,13 +12,12 @@ return [
         'categories' => 'News categories',
         'mine'       => 'My posts',
         'read'       => 'News (reader)',
+        'api'        => 'News API',
     ],
     'perm' => [
         'publish' => 'Publish and unpublish',
         'author'  => 'See and change the author; change posts of other authors',
         'readers' => 'See who has read a post',
-        'apiList' => 'List the readable news through the API',
-        'apiShow' => 'Read a news item through the API',
     ],
     'menu' => [
         'read'       => 'News',

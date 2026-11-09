@@ -12,13 +12,12 @@ return [
         'categories' => 'Categorías de noticias',
         'mine'       => 'Mis publicaciones',
         'read'       => 'Noticias (lectura)',
+        'api'        => 'API de noticias',
     ],
     'perm' => [
         'publish' => 'Publicar y despublicar',
         'author'  => 'Ver y cambiar el autor; modificar publicaciones de otros autores',
         'readers' => 'Ver quién ha leído una publicación',
-        'apiList' => 'Listar las noticias legibles por la API',
-        'apiShow' => 'Leer una noticia por la API',
     ],
     'menu' => [
         'read'       => 'Noticias',

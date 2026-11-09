@@ -84,9 +84,11 @@ final class NewsApiTest extends ApiTestCase
         $user = $this->createUser('ana@example.com', 'user');
         $this->newsPost('Visible', 'private');
 
-        $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['news-read.list']))->assertStatus(200);
-        $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['news-read.*']))->assertStatus(200);
+        $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['news-api.list']))->assertStatus(200);
+        $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['news-api.*']))->assertStatus(200);
         $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['activity-mine.list']))->assertStatus(403);
+        // The reader screen's permission is not the API's (D-17-01).
+        $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['news-read.view']))->assertStatus(403);
     }
 
     /**

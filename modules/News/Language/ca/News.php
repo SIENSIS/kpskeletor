@@ -12,13 +12,12 @@ return [
         'categories' => 'Categories de notícies',
         'mine'       => 'Les meves publicacions',
         'read'       => 'Notícies (lectura)',
+        'api'        => 'API de notícies',
     ],
     'perm' => [
         'publish' => 'Publicar i despublicar',
         'author'  => 'Veure i canviar l’autor; modificar publicacions d’altres autors',
         'readers' => 'Veure qui ha llegit una publicació',
-        'apiList' => 'Llistar les notícies llegibles per l’API',
-        'apiShow' => 'Llegir una notícia per l’API',
     ],
     'menu' => [
         'read'       => 'Notícies',
