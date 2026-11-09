@@ -28,7 +28,7 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 
 ## Decisions
 
-D-15-01 (names and URLs, decide), D-15-02 … D-15-05 (`docs/decisions.md`).
+D-15-01 (names and URLs) decided by the owner as proposed; D-15-02 … D-15-05 accepted (`docs/decisions.md`).
 
 ## Open tasks
 

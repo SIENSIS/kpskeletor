@@ -75,9 +75,8 @@ Branch: `claude/clever-feynman-qsy4k4` · Pull request: [SIENSIS/kpskeletor#19](
 
 ## Decisions and deviations
 
-- **D-15-01 (decide, Open):** permission names `users-users.*`, `users-groups.*`,
-  `users-matrix.*`, the URLs and `Users.impersonationMinutes` — built this way, can still be
-  renamed (alternatives: `users.*`/`groups.*`/`permissions.*` overrides, or `users-accounts.*`).
+- **D-15-01 (decided by the owner, 2026-11-09, as proposed):** permission names `users-users.*`,
+  `users-groups.*`, `users-matrix.*`, the URLs and `Users.impersonationMinutes` stay as built.
 - D-15-02 (accepted): groups as data — names set once, reserved/with-members not deletable, new
   groups get the grants the reserved groups share, `Auth.twoFactorPolicy` replaced by the
   `two_factor` column (stored values not migrated).
@@ -194,7 +193,7 @@ activity. Email, group and 2FA cannot be searched or filtered yet (kpcrudy reque
 
 ## Notes for the next session
 
-- D-15-01 is Open (decide): run `deploy/decide.md` before relying on the Users permission names.
+- D-15-01 decided (Decisions 15): the Users permission names, URLs and setting are final.
 - Session 16: a users widget (`users-users.list`) and a security widget can read the
   `Users.*`/`Auth.impersonation_*` activity entries; once the Dashboard exists, impersonation can
   redirect to `backend` again.

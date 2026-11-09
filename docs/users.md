@@ -18,7 +18,7 @@ Auth's `GroupRules`, and grants through the Core's `GrantManager`, so every esca
 
 Default grants: `admin` gets every Users permission except `users-users.impersonate` (the
 superadmin, who bypasses the checks, is the only one who impersonates). Menu: "Users", "Groups"
-and "Permissions" in the `settings` zone. Names and URLs: D-15-01.
+and "Permissions" in the `settings` zone. Names and URLs: D-15-01 (decided: the convention).
 
 ## Users
 

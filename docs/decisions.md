@@ -150,7 +150,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-14-04 | 14 | What "weakening the baseline" means | Accepted (proposal) |
 | D-14-05 | 14 | Test email and clear caches | Accepted (proposal) |
 | D-14-06 | 14 | Site-wide settings built now | Accepted (proposal) |
-| D-15-01 | 15 | Users permission names, URLs and setting (decide) | Open |
+| D-15-01 | 15 | Users permission names, URLs and setting (decide) | Applied (decided) |
 | D-15-02 | 15 | Groups as data: names, deletion, new groups and the 2FA policy | Accepted (proposal) |
 | D-15-03 | 15 | Adding and editing users; no deletion | Accepted (proposal) |
 | D-15-04 | 15 | Who manages whose account | Accepted (proposal) |
@@ -1589,7 +1589,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The specification names no permission, URL or setting for the Users module, and all three are public conventions. The module has three resources, so the convention gives `users-users.*`, which reads oddly.
 - **Proposal:** Permissions by the convention: `users-users.{list,show,add,edit,ban,forcereset,reset2fa,logout,impersonate,access}`, `users-groups.{list,show,add,edit,delete}`, `users-matrix.{view,edit}` (operation keys lower case without separators, as kpcrudy custom operations require). URLs `backend/users`, `backend/users/<op>/<masked id>`, `backend/users/access/<id>`, `backend/users/groups`, `backend/users/permissions`, and `POST auth/impersonation/stop`. Setting `Users.impersonationMinutes` (int, 30, 1–120, group `security.impersonation`). Built this way; renaming later means changing the manifest, the routes and the tests (no data migration while unreleased).
 - **Alternatives:** A) `'name'` overrides for a core module with several resources: `users.*`, `groups.*`, `permissions.*` (shorter; needs an exception to D-00-18 for core modules). B) Resources `accounts`/`groups`/`matrix` → `users-accounts.*` (avoids the repetition).
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-09):** «Convenció actual (recomanada)». The Users module keeps the generated names `users-users.{list,show,add,edit,ban,forcereset,reset2fa,logout,impersonate,access}`, `users-groups.{list,show,add,edit,delete}` and `users-matrix.{view,edit}` (no exception to D-00-18), the URLs `backend/users`, `backend/users/<op>/<masked id>`, `backend/users/access/<id>`, `backend/users/groups`, `backend/users/permissions` and `POST auth/impersonation/stop`, and the setting `Users.impersonationMinutes`. Nothing to change in the code: session 15 built it this way.
+- **Applied in:** `docs/specification.md` ("Modules" › "Users"), `docs/users.md`; code of session 15 (`modules/Users/Config/Module.php`, `modules/Users/Config/Routes.php`, `modules/Auth/Config/Routes.php`)
 
 ## D-15-02 — Groups as data: names, deletion, new groups and the 2FA policy
 
