@@ -8,7 +8,8 @@ use CodeIgniter\Router\RouteCollection;
  * Routes of the Auth module (discovered by CodeIgniter; never queries the database).
  *
  * Public: login, logout, magic link, password reset, captcha image, the idle lock screen, the
- * 2FA step of a pending login and the re-authentication screen (both check the session).
+ * 2FA step of a pending login, the re-authentication screen (both check the session) and the
+ * end of an impersonation.
  * Back office (every route has its `can:` filter; `session` and `forcereset` cover `backend/*`
  * in app/Config/Filters.php): the profile and its 2FA screens (`auth-profile`; changes also need
  * `reauth`) and "my sessions" (`auth-sessions`).
@@ -45,6 +46,9 @@ $routes->group('', ['namespace' => 'Modules\Auth\Controllers'], static function 
     $routes->get('auth/reauth', 'ReauthController::show', ['as' => 'auth-reauth']);
     $routes->post('auth/reauth', 'ReauthController::confirm');
     $routes->post('auth/reauth/send-code', 'ReauthController::sendCode');
+
+    // The way back of an impersonation (the controller requires one; CSRF).
+    $routes->post('auth/impersonation/stop', 'ImpersonationController::stop', ['as' => 'auth-impersonation-stop']);
 });
 
 $routes->group('backend/profile', ['namespace' => 'Modules\Auth\Controllers'], static function (RouteCollection $routes): void {

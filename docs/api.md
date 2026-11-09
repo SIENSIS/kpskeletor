@@ -88,7 +88,7 @@ Content-Type: application/json
 | `POST auth/token`, `POST auth/token/verify` | `kpapy:login` | app login |
 | `POST auth/token/refresh`, `DELETE auth/token` | `kpapy` | refresh, sign out |
 | `GET me` | `kpapy` | the token's user: masked id, name, email, language, time zone, colour mode, groups, 2FA method, the token's name, scopes and expiry |
-| `GET me/tokens`, `DELETE me/tokens/{id}` | `kpapy` | the user's tokens (kpapy's `TokenController`) |
+| `GET me/tokens`, `DELETE me/tokens/{id}` | `kpapy` | the user's tokens (kpapy's `TokenController`); since kpapy 1.1 only tokens with unrestricted scopes (`*`) or the `tokens.manage` scope (`Config\Kpapy::$tokensScope`) |
 | `GET openapi.json` | `kpapy:public` | only with the setting `Api.publicSpec` |
 
 ## A module's resources

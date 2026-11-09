@@ -7,6 +7,7 @@ namespace Modules\Core\Tests;
 use CodeIgniter\I18n\Time;
 use Config\Database;
 use Modules\Core\Cache\CoreCache;
+use Modules\Core\Groups\GroupRegistry;
 use Modules\Core\Modules\ModuleDiscovery;
 use Modules\Core\Permissions\CatalogueBuilder;
 use Modules\Core\Permissions\CrudPermissions;
@@ -16,7 +17,7 @@ use Modules\Core\Permissions\ShieldMatrix;
 
 /**
  * For feature tests with a migrated database: does what `modules:sync` does for the RBAC
- * (registry rows, permission catalogue, default grants, Shield's matrix) without migrations,
+ * (registry rows, permission catalogue, default grants, reserved groups, Shield's groups and matrix) without migrations,
  * namespaces or assets. Shield has no permissions otherwise (Config\AuthGroups is empty).
  */
 trait RbacFixtureTrait
@@ -56,6 +57,13 @@ trait RbacFixtureTrait
         }
 
         (new CoreCache())->invalidate('permissions');
+
+        if ($db->tableExists(GroupRegistry::TABLE)) {
+            $groups = new GroupRegistry($catalogue);
+            $groups->ensureReserved();
+            $groups->mirror();
+        }
+
         (new ShieldMatrix($catalogue))->write();
         CrudPermissions::reset();
     }

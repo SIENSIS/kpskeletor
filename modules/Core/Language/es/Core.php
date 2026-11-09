@@ -107,6 +107,10 @@ return [
         'notifications' => 'Notificaciones',
         'schedule' => 'Tareas programadas',
     ],
+    'groups' => [
+        'invalidName' => 'El nombre debe empezar con una letra y solo puede tener letras minúsculas, cifras, "-" y "_" (de 2 a 50 caracteres).',
+        'nameTaken' => 'El grupo "{0}" ya existe o es reservado.',
+    ],
     'rbac' => [
         'unknownGroup' => 'El grupo «{0}» no existe.',
         'unknownPermission' => 'El permiso «{0}» no existe.',

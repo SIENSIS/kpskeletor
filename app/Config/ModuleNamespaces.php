@@ -16,4 +16,5 @@ return [
     'Modules\Auth' => __DIR__ . '/../../modules/Auth',
     'Modules\Core' => __DIR__ . '/../../modules/Core',
     'Modules\Settings' => __DIR__ . '/../../modules/Settings',
+    'Modules\Users' => __DIR__ . '/../../modules/Users',
 ];

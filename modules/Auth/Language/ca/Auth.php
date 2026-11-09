@@ -179,8 +179,6 @@ return [
         'emailLinksPerAccount'      => 'Enllaços per correu per compte i hora',
         'reauthMinutes' => 'Durada de la reautenticació (minuts)',
         'reauthMinutesHelp' => 'Les accions delicades tornen a demanar la contrasenya passat aquest temps.',
-        'twoFactorPolicy' => 'Verificació en dos passos per grup',
-        'twoFactorPolicyHelp' => 'Els grups marcats com a "required" l\'han de configurar en entrar; la resta poden triar.',
     ],
     'twoFactor'                 => [
         'title'             => 'Verificació en dos passos',
@@ -272,6 +270,14 @@ return [
         'twoFactorResetTitle' => 'S\'ha restablert la vostra autenticació en dos passos',
         'twoFactorResetBody'  => 'Un administrador ha desactivat la vostra autenticació en dos passos. Si el vostre grup l\'exigeix, la tornareu a configurar en el proper inici de sessió. Si no ho heu demanat, poseu-vos en contacte amb un administrador.',
     ],
+    'impersonation' => [
+        'banner' => 'Esteu actuant com a {0}.',
+        'until' => 'Fins a les {0}',
+        'stop' => 'Torna al meu compte',
+        'stopped' => 'Torneu a ser al vostre compte.',
+        'expired' => 'El temps de la suplantació s\'ha acabat: torneu a ser al vostre compte.',
+        'refused' => 'Aquesta acció no està disponible mentre suplanteu un altre usuari.',
+    ],
     // Labels of the activity log actions (Activity module).
     'activity' => [
         'login' => 'Ha iniciat la sessió',
@@ -295,14 +301,15 @@ return [
         'token_revoked' => 'Testimoni d\'API revocat',
         'group_added' => 'Afegit a un grup',
         'group_removed' => 'Tret d\'un grup',
+        'impersonation_started' => 'Suplantació iniciada',
+        'impersonation_ended' => 'Suplantació acabada',
+        'impersonation_refused' => 'Suplantació denegada',
+        'impersonation_blocked' => 'Acció sensible denegada durant una suplantació',
     ],
     'settingGroups' => [
         'passwords' => 'Contrasenyes',
         'sessions' => 'Sessions i reautenticació',
         'login' => 'Inici de sessió i enllaços per correu',
         'twoFactor' => 'Autenticació en dos passos',
-    ],
-    'validation' => [
-        'twoFactorPolicy' => 'Escriviu un objecte JSON de grups existents i "required" o "optional", p. ex. {"admin": "required"}.',
     ],
 ];

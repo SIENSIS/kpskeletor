@@ -107,6 +107,10 @@ return [
         'notifications' => 'Notifications',
         'schedule' => 'Scheduled tasks',
     ],
+    'groups' => [
+        'invalidName' => 'The name must start with a letter and contain only lower-case letters, digits, "-" and "_" (2 to 50 characters).',
+        'nameTaken' => 'The group "{0}" already exists or is reserved.',
+    ],
     'rbac' => [
         'unknownGroup' => 'The group "{0}" does not exist.',
         'unknownPermission' => 'The permission "{0}" does not exist.',

@@ -10,6 +10,7 @@ use Config\Database;
 use Modules\Core\Config\ModuleManifest;
 use Modules\Core\Demo\DemoDataManager;
 use Modules\Core\Frontend\AssetPublisher;
+use Modules\Core\Groups\GroupRegistry;
 use Modules\Core\Models\ModuleModel;
 use Modules\Core\Permissions\CatalogueBuilder;
 use Modules\Core\Permissions\DefaultGrants;
@@ -164,7 +165,11 @@ final class ModuleSynchronizer
             $this->caches->invalidate();
         }
 
-        // 9. Shield's permissions and group matrix, computed from the catalogue and the grants.
+        // 9. The reserved groups and Shield's groups, permissions and group matrix, computed
+        //    from the `groups` table, the catalogue and the grants.
+        $groups = new GroupRegistry($this->permissions);
+        $groups->ensureReserved();
+        $groups->mirror();
         (new ShieldMatrix($this->permissions))->write();
 
         // Demo data (optional): after the caches, so the registry is current.

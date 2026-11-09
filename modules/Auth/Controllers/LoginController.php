@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Authentication\Authenticators\Session;
 use Modules\Auth\Authentication\SessionAuthenticator;
+use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\Reauth;
 use Modules\Auth\Services\TwoFactor;
 use Modules\Core\Activity\ActivityLogger;
@@ -127,6 +128,9 @@ final class LoginController extends AuthController
 
     public function logout(): RedirectResponse
     {
+        // Logging out while impersonating ends the impersonation and the impersonator's session.
+        (new Impersonation())->stop(Impersonation::END_LOGOUT);
+
         if (auth('session')->loggedIn()) {
             auth('session')->logout();
         }

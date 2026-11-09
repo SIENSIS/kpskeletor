@@ -14,7 +14,7 @@ use Modules\Auth\Services\TwoFactor;
 
 /**
  * `force2fa` filter (`backend/*`): a user in a group whose policy is `required`
- * (`Auth.twoFactorPolicy`) and without 2FA can only reach the 2FA set-up screens (and the
+ * (the group's 2FA policy in the `groups` table) and without 2FA can only reach the 2FA set-up screens (and the
  * forced password change, which runs first) until they enable a method.
  */
 final class ForceTwoFactor implements FilterInterface

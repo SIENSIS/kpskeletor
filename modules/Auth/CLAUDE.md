@@ -28,7 +28,8 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
   `GroupRules` (delegates to the Core's `EscalationGuard`), `LoginListener` (Shield
   `login`/`logout` events and the Core's `privilegesChanged` in `Config/Events.php`),
   `TwoFactor` (method, encrypted TOTP secret, reset), `Totp` (otphp + QR SVG), `RecoveryCodes`,
-  `EmailCodes`, `Reauth`.
+  `EmailCodes`, `Reauth`, `Impersonation` (state in the PHP session; started by the Users
+  module, ended by `ImpersonationController`, logout or the `authsession` filter on expiry).
 - Tables: `user_profiles`, `user_sessions`, `known_devices`, `user_two_factor`,
   `user_recovery_codes`.
 - Demo users (`php spark modules:demo Auth`): superadmin@, admin@, editor@, usuari@example.com,
@@ -48,9 +49,11 @@ as re-authentication, decided by the owner).
 ## Open tasks
 
 - Session 10: kpapy 2FA providers reading `TwoFactor::method()` and the TOTP secret.
-- Done in session 14: the `Auth.*` settings are in Settings › Security (`security.*` groups, `min_config` and `two_factor_policy` rules in `Validation/AuthRules.php`).
-- Session 15: 2FA reset row operation, policy in the `groups` table, refuse `reauth` while
-  impersonating.
+- Done in session 14: the `Auth.*` settings are in Settings › Security (`security.*` groups; the `two_factor_policy` rule was removed in session 15).
+- Done in session 15: the 2FA reset row operation (Users), the policy in the Core `groups`
+  table (`AuthPolicy::twoFactorPolicy()` reads `AuthGroups.groups`), impersonation
+  (`Services/Impersonation.php`, banner `Views/impersonation_banner.php`, `POST
+  auth/impersonation/stop`; `reauth`, password and email changes refused meanwhile).
 - Session 23: avatar with the file picker.
 
 ## How to test

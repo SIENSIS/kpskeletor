@@ -15,6 +15,7 @@ use CodeIgniter\Shield\Models\UserModel;
 use Config\Services;
 use Modules\Auth\Models\UserProfileModel;
 use Modules\Auth\Services\AuthPolicy;
+use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\SessionTracker;
 use Throwable;
 
@@ -27,7 +28,9 @@ use Throwable;
  * 3. for a logged-in session: ends it when it was logged out remotely or passed the absolute
  *    lifetime (`Auth.absoluteLifetime`; remember-me may then re-create it), regenerates the
  *    session id after a privilege change, locks it after `Auth.idleTimeout` and records activity;
- * 4. applies the user's language.
+ * 4. applies the user's language;
+ * 5. while impersonating: ends an expired impersonation (the request is not run; back to the
+ *    impersonator's back office) and shows the impersonation banner in the top bar.
  *
  * Sessions re-created by remember-me are tracked as "remembered".
  */
@@ -102,6 +105,13 @@ final class AuthSession implements FilterInterface
             return null;
         }
 
+        if (Impersonation::expired()) {
+            // Never run the pending request as the impersonator: back to their profile.
+            (new Impersonation())->stop(Impersonation::END_EXPIRED);
+
+            return $this->toBackend($request, lang('Auth.impersonation.expired'));
+        }
+
         $row = $tracker->current();
 
         if ($row === null) {
@@ -144,6 +154,11 @@ final class AuthSession implements FilterInterface
 
         $tracker->touch($row);
         $this->applyLocale($request, (int) $userId);
+
+        if (Impersonation::active()) {
+            // After the locale, so the banner speaks the page's language.
+            $this->impersonationBanner((int) $userId);
+        }
 
         return null;
     }
@@ -250,6 +265,34 @@ final class AuthSession implements FilterInterface
         $session->set(self::ACTIVITY_KEY, time());
 
         return null;
+    }
+
+    private function toBackend(IncomingRequest $request, string $message): ResponseInterface
+    {
+        if (str_contains($request->getHeaderLine('Accept'), 'application/json')) {
+            return service('response')->setStatusCode(401)->setJSON(['error' => $message]);
+        }
+
+        return redirect()->to(site_url('backend/profile'))->with('warning', $message);
+    }
+
+    /**
+     * The banner of an impersonation (top bar of the back-office layout): who is being
+     * impersonated, until when, and the button back to the impersonator's account.
+     */
+    private function impersonationBanner(int $userId): void
+    {
+        $user  = model(UserModel::class)->findById($userId);
+        $state = Impersonation::state();
+
+        if (! $user instanceof User || $state === null) {
+            return;
+        }
+
+        service('theme')->regions()->add('topbar', view('Modules\Auth\Views\impersonation_banner', [
+            'username' => (string) $user->username,
+            'expires'  => $state['expires'],
+        ], ['saveData' => false]), 0);
     }
 
     private function toLogin(IncomingRequest $request, string $message): ResponseInterface

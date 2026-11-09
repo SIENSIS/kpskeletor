@@ -107,6 +107,10 @@ return [
         'notifications' => 'Notificacions',
         'schedule' => 'Tasques programades',
     ],
+    'groups' => [
+        'invalidName' => 'El nom ha de començar amb una lletra i només pot tenir lletres minúscules, xifres, "-" i "_" (de 2 a 50 caràcters).',
+        'nameTaken' => 'El grup "{0}" ja existeix o és reservat.',
+    ],
     'rbac' => [
         'unknownGroup' => 'El grup «{0}» no existeix.',
         'unknownPermission' => 'El permís «{0}» no existeix.',

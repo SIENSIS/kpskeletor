@@ -157,11 +157,4 @@ class Auth extends ShieldAuth
      * Minutes a re-authentication ("sudo mode") lasts for the session.
      */
     public int $reauthMinutes = 15;
-
-    /**
-     * 2FA policy per group: group name => 'required' | 'optional' (a missing group is optional).
-     *
-     * @var array<string, string>
-     */
-    public array $twoFactorPolicy = [];
 }

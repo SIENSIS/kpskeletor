@@ -83,12 +83,13 @@ mode"), the profile and "my sessions" on top of Shield.
 - **Remember-me:** for a user with 2FA the token is issued only after the code
   (`SessionAuthenticator`); a remember-me login does not ask the code again (trusted device)
   but sensitive actions do.
-- **Group policy** (`Auth.twoFactorPolicy`, e.g. `{"admin": "required"}`; missing groups are
-  optional): a user of a required group without 2FA is sent to the set-up screen by `force2fa`
+- **Group policy** (column `two_factor` of the Core `groups` table, edited in Users › Groups and
+  mirrored as each group's `twoFactor` key of `setting('AuthGroups.groups')`; read with
+  `AuthPolicy::twoFactorPolicy()`): a user of a required group without 2FA is sent to the set-up screen by `force2fa`
   and cannot turn it off.
 - **Admin reset:** `(new TwoFactor())->reset($user, $adminId)` turns it off, deletes the recovery
   codes and a pending code, logs it and fires `twoFactorReset` (the user gets the mandatory notification `TwoFactorReset`, `docs/notifications.md`; screen:
-  session 15). Enabling/disabling fires `twoFactorChanged`.
+  the `reset2fa` row operation of Users, with re-authentication). Enabling/disabling fires `twoFactorChanged`.
 
 ## Re-authentication ("sudo mode")
 
@@ -99,13 +100,34 @@ mode"), the profile and "my sessions" on top of Shield.
 - Wrong answers count as failed logins; past the limit the session ends.
 - A GET is sent to `auth/reauth` and back afterwards; a POST is never replayed: the user confirms
   and repeats the action. JSON requests get 401 `{"error": …, "reauth": url}`.
+- While impersonating, re-authentication is never possible: the `reauth` filter answers 403 and
+  `auth/reauth` sends back to the profile.
+
+## Impersonation
+
+`Modules\Auth\Services\Impersonation` (started by the Users module's `impersonate` row
+operation, `docs/users.md`): a superadmin acts as another user inside their own PHP session.
+
+- Only superadmins, never as another superadmin, a banned or inactive user or themselves, never
+  twice; the starting operation needs a re-authentication. The time limit is
+  `Users.impersonationMinutes` (30, 1–120; Settings › Security).
+- The session keeps the impersonator's tracked row (`user_sessions`: absolute lifetime and remote
+  logout still apply); the session id is regenerated and the re-authentication window forgotten
+  at the start and at the end.
+- The global `authsession` filter shows the banner in the back office's top bar (who, until when,
+  "Back to my account" → `POST auth/impersonation/stop`) and ends an expired impersonation
+  without running the pending request (back to the profile as the impersonator).
+- Refused meanwhile: re-authentication (so everything behind `reauth`: 2FA, API tokens, the
+  permission matrix, groups, access, other impersonations), the password and the email change.
+- Logging out ends the impersonation and the session. Start, end (`stopped`, `expired`,
+  `logout`), refusals and blocked actions are security entries of the activity log.
 
 ## Settings (Settings › Security)
 
 `Auth.minimumPasswordLength`, `absoluteLifetime`, `idleTimeout`, `rememberLifetime`, `captcha`,
 `newDeviceNotice`, `loginAttemptsPerIp`, `loginAttemptsPerAccount`, `loginLockMinutes`,
-`emailLinksPerIp`, `emailLinksPerAccount`, `reauthMinutes` (15, 1–240), `twoFactorPolicy` (json,
-group → `required`|`optional`). Defaults live in `app/Config/Auth.php`. They are edited in
+`emailLinksPerIp`, `emailLinksPerAccount`, `reauthMinutes` (15, 1–240). The 2FA policy per group
+is a column of the `groups` table (Users › Groups, D-15-02). Defaults live in `app/Config/Auth.php`. They are edited in
 Settings › Security (`settings.security` + re-authentication, docs/settings.md); the minimum
 password length can never go below `Config\Auth::$minimumPasswordLength` (`min_config`).
 
