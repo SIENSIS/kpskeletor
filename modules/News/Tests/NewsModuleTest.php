@@ -101,8 +101,10 @@ final class NewsModuleTest extends CIUnitTestCase
         $this->assertSame('post', Slugger::slug('¡¿?!'));
 
         $this->db->table('news')->insert(['slug' => 'cafe-i-pa', 'type' => 'article', 'visibility' => 'public', 'status' => 'draft']);
+        // Read the id at once: MySQLi resets insert_id after any other query (a SELECT included).
+        $id = (int) $this->db->insertID();
         $this->assertSame('cafe-i-pa-2', Slugger::unique('news', 'Cafè i pa'));
-        $this->assertSame('cafe-i-pa', Slugger::unique('news', 'Cafè i pa', (int) $this->db->insertID()));
+        $this->assertSame('cafe-i-pa', Slugger::unique('news', 'Cafè i pa', $id));
     }
 
     public function testTheCategoryLinkType(): void
