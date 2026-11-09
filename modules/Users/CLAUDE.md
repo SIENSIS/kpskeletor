@@ -32,8 +32,9 @@ D-15-01 (names and URLs, decide), D-15-02 … D-15-05 (`docs/decisions.md`).
 
 ## Open tasks
 
-- Search by email in the users list (the email lives in `auth_identities`; kpcrudy searches table
-  columns only).
+- Search by email and filters by group or 2FA in the users list: they live in other tables and
+  kpcrudy only searches/filters the CRUD table's columns (request in `docs/library-requests.md`;
+  today: search by user name, filters active, banned and last activity).
 - Custom groups created after a module's first sync do not receive that module's later default
   grants for "every group" (only the grants shared by the reserved groups at creation time).
 - Session 16: a users widget for the dashboard; session 23: avatars in the list.

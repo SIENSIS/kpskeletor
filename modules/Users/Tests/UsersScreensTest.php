@@ -196,4 +196,32 @@ final class UsersScreensTest extends UsersTestCase
         $page->assertSee(lang('Users.users.statusBanned'));
         $page->assertSee('Editor');
     }
+
+    public function testTheListFiltersByActiveBannedAndLastActivity(): void
+    {
+        $this->createUser('boss@example.com', 'admin');
+        $ana = $this->createUser('ana@example.com', 'user');
+        $bob = $this->createUser('bob@example.com', 'user');
+        $cat = $this->createUser('cat@example.com', 'user');
+        $bob->ban();
+        db_connect()->table('users')->where('id', $cat->id)->update(['active' => 0, 'last_active' => '2026-01-10 10:00:00']);
+        db_connect()->table('users')->where('id', $ana->id)->update(['last_active' => '2026-06-10 10:00:00']);
+        $this->login('boss@example.com');
+
+        $banned = $this->send('GET', 'backend/users?f[status]=banned');
+        $banned->assertSee('bob@example.com');
+        $banned->assertDontSee('ana@example.com');
+
+        $inactive = $this->send('GET', 'backend/users?f[active]=0');
+        $inactive->assertSee('cat@example.com');
+        $inactive->assertDontSee('ana@example.com');
+
+        $range = $this->send('GET', 'backend/users?f[last_active][from]=2026-06-01&f[last_active][to]=2026-06-30');
+        $range->assertSee('ana@example.com');
+        $range->assertDontSee('cat@example.com');
+
+        $search = $this->send('GET', 'backend/users?q=bo');
+        $search->assertSee('bob@example.com');
+        $search->assertDontSee('cat@example.com');
+    }
 }

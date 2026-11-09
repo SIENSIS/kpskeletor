@@ -90,8 +90,8 @@ Branch: `claude/clever-feynman-qsy4k4` · Pull request: [SIENSIS/kpskeletor#19](
   and superadmin columns, empty marker per editable column, unknown names refuse the whole save,
   hidden grants kept, one transaction).
 - Deviations: impersonation start/stop and expiry redirect to `backend/profile` (`backend` has no
-  page until the Dashboard of session 16); the users list searches by user name only (the email
-  is in `auth_identities`); updated counting tests (`CoreMigrationsTest`, `ModulesSyncTest`,
+  page until the Dashboard of session 16); the users list searches by user name only and filters
+  `users` columns (active, banned, last activity; library request for the rest); updated counting tests (`CoreMigrationsTest`, `ModulesSyncTest`,
   `PermissionsCommandsTest`, `ShieldMatrixTest`, `CrudAuditorTest`) and the tests that used
   `Auth.twoFactorPolicy`.
 
@@ -115,7 +115,7 @@ php spark serve
 
 ```
 vendor/bin/phpunit                         OK (700 tests, 3547 assertions)   [04:28]
-vendor/bin/phpunit modules/Users           OK (39 tests, 234 assertions)
+vendor/bin/phpunit modules/Users           OK (40 tests, 246 assertions)
 vendor/bin/phpstan analyse                 [OK] No errors
 vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 466 files that can be fixed
 php spark permissions:check                Permissions OK: 50 permission(s) in the catalogue, 115 route(s) checked.
@@ -123,7 +123,7 @@ php spark csp:check                        No inline scripts, handlers or styles
 php spark assets:publish --check           The published assets are up to date.
 ```
 
-New tests: `modules/Users/Tests/UsersScreensTest.php` (12), `ImpersonationTest.php` (10),
+New tests: `modules/Users/Tests/UsersScreensTest.php` (13), `ImpersonationTest.php` (10),
 `GroupsAndMatrixTest.php` (13), `UsersModuleTest.php` (4). `php spark security:check` arrives in
 session 30.
 
@@ -175,11 +175,17 @@ the form (2FA required).*
 ![Refused while impersonating](screenshots/12-impersonation-refused.png)
 *12 — Opening the password change while impersonating sends back to the profile with an error.*
 
+![Users filters](screenshots/13-users-filters.png)
+*13 — Users list filters on the columns of `users`: active, banned (Estat) and a range of last
+activity. Email, group and 2FA cannot be searched or filtered yet (kpcrudy request).*
+
 ## Known issues
 
 - The matrix is wide: at phone width the table scrolls horizontally inside its card.
-- The users list cannot search by email (kpcrudy searches table columns; the email is in
-  `auth_identities`).
+- The users list searches by user name only and filters by active, banned and last activity:
+  kpcrudy only searches and filters columns of the CRUD's table, and the email, groups and 2FA
+  live in other tables (`auth_identities`, `auth_groups_users`, `user_two_factor`). Requested to
+  kpcrudy (custom search and filter conditions) in `docs/library-requests.md`.
 - A custom group does not receive the "every group" default grants of modules installed after
   it was created (only the grants the reserved groups shared when it was created).
 - "My sessions" of an impersonated user does not show the impersonation (the session stays the

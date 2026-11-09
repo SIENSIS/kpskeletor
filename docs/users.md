@@ -23,7 +23,9 @@ and "Permissions" in the `settings` zone. Names and URLs: D-15-01.
 ## Users
 
 - **List and details:** user name, email (Shield's `email_password` identity), groups, 2FA method,
-  status (active, inactive, banned) and last activity; search by user name, filter by "active".
+  status (active, inactive, banned) and last activity; search by user name; filters "active",
+  "banned" and a range of last activity. Only columns of `users` can be searched or filtered: the
+  email, groups and 2FA live in other tables (kpcrudy request in `docs/library-requests.md`).
 - **Add:** user name, email and an initial password (Shield's local password rules). The account
   is created by the CRUD, then `UserAccounts::completeNewAccount()` stores the identity through
   Shield, adds the default group (`AuthGroups.defaultGroup`) and forces a password change at the

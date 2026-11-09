@@ -18,7 +18,7 @@ use Modules\Users\Services\UserAccounts;
  * Users (resource `users-users`, kpcrudy over Shield's `users` table; docs/users.md).
  *
  * - List and details with the email (Shield's identity), groups, 2FA method and status; search by
- *   user name.
+ *   user name, filters "active", "banned" and a range of last activity (columns of `users` only).
  * - Add: user name, email and an initial password (the user must change it at the first login,
  *   and joins the default group). Edit: user name, email and "active". Both go through Shield
  *   for the identity; no deletion (D-15-03).
@@ -57,8 +57,10 @@ final class Users extends BackendController
             ->addFields(['username', 'email', 'password', 'password_confirm'])
             ->editFields(['username', 'email', 'active'])
             ->showFields(['username', 'email', 'groups', 'permissions', 'two_factor', 'status', 'active', 'last_active', 'created_at'])
+            // Only columns of `users` can be searched or filtered: the email, groups and 2FA live
+            // in other tables (kpcrudy request in docs/library-requests.md).
             ->searchFields(['username'])
-            ->filters(['active'])
+            ->filters(['active', 'status', 'last_active'])
             ->unsortable(['email', 'groups', 'two_factor', 'status'])
             ->displayAs([
                 'username'         => lang('Users.users.username'),
@@ -74,6 +76,8 @@ final class Users extends BackendController
                 'created_at'       => lang('Users.users.created'),
             ])
             ->fieldType('active', 'boolean')
+            ->fieldType('status', 'select', ['options' => ['banned' => lang('Users.users.statusBanned')]])
+            ->fieldType('last_active', 'datetime')
             ->setRules('username', self::USERNAME_RULES)
             ->requiredFields(['email', 'password', 'password_confirm'])
             ->setHelp('password', lang('Users.users.passwordHelp'))
