@@ -16,8 +16,8 @@ use Modules\Core\Permissions\ShieldMatrix;
 
 /**
  * Base of the RBAC tests: every namespace migrated, the catalogue and default grants as
- * `modules:sync` leaves them, plus a fake "News" module (posts, categories) in the registry and
- * the catalogue so wildcards, implied permissions and disabled modules can be exercised.
+ * `modules:sync` leaves them, plus the "News" permissions the tests rely on (the real module's and
+ * a fixture `news-postsx.edit`) so wildcards, implied permissions and disabled modules can be exercised.
  */
 abstract class RbacTestCase extends CIUnitTestCase
 {
@@ -60,13 +60,24 @@ abstract class RbacTestCase extends CIUnitTestCase
     {
         $now = Time::now()->toDateTimeString();
         $db  = db_connect();
-        $db->table('modules')->insert([
-            'name' => 'News', 'version' => '1.0.0', 'enabled' => $enabled ? 1 : 0,
-            'grants_applied' => 1, 'installed_at' => $now, 'updated_at' => $now,
-        ]);
+
+        // The real News module (session 17) is already registered by syncPermissions(): reuse its
+        // row and add only the fixture's permissions it does not declare (e.g. `news-postsx.edit`).
+        if ($db->table('modules')->where('name', 'News')->countAllResults() === 0) {
+            $db->table('modules')->insert([
+                'name' => 'News', 'version' => '1.0.0', 'enabled' => $enabled ? 1 : 0,
+                'grants_applied' => 1, 'installed_at' => $now, 'updated_at' => $now,
+            ]);
+        } else {
+            $db->table('modules')->where('name', 'News')->update(['enabled' => $enabled ? 1 : 0]);
+        }
 
         foreach (self::NEWS as $resource => $operations) {
             foreach ($operations as $operation) {
+                if ($db->table('permissions')->where('name', "{$resource}.{$operation}")->countAllResults() > 0) {
+                    continue;
+                }
+
                 $db->table('permissions')->insert([
                     'module' => 'News', 'resource' => substr($resource, 5), 'operation' => $operation,
                     'name' => "{$resource}.{$operation}", 'description' => 'Core.perm.' . $operation,
@@ -75,6 +86,7 @@ abstract class RbacTestCase extends CIUnitTestCase
             }
         }
 
+        (new CoreCache())->invalidate('permissions');
         $this->refreshMatrix();
     }
 

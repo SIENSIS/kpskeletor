@@ -111,10 +111,10 @@ final class CrudPermissionsTest extends RbacTestCase
         $crud = (new Crud())->setTable('modules')->setResource('news-categories')
             ->addOperation('archive', static fn (): null => null);
 
-        $this->assertSame(['archive', 'export'], (new CrudPermissions())->undeclared('news-categories', $crud));
+        $this->assertSame(['archive'], (new CrudPermissions())->undeclared('news-categories', $crud), 'The News manifest declares the rest (session 17).');
 
         $this->expectException(UndeclaredPermissionException::class);
-        $this->expectExceptionMessage('archive, export');
+        $this->expectExceptionMessage('archive');
         (new CrudPermissions())->allows('news-categories', 'list', null, $crud);
     }
 

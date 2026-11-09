@@ -142,12 +142,12 @@ final class MenuBuilderTest extends RbacTestCase
 
     public function testCachedPerGroupSetAndInvalidatedByGrantChanges(): void
     {
-        $ana  = $this->createUser('ana@example.com', 'editor');
-        $joan = $this->createUser('joan@example.com', 'editor');
+        $ana  = $this->createUser('ana@example.com', 'user');
+        $joan = $this->createUser('joan@example.com', 'user');
         $this->assertSame(MenuBuilder::cacheKey($ana), MenuBuilder::cacheKey($joan));
         $this->assertNotSame(MenuBuilder::cacheKey($ana), MenuBuilder::cacheKey($this->createUser('eva@example.com', 'admin')));
 
-        $this->assertSame([], $this->keys($this->builder()->zone('sidebar', $ana)));
+        $this->assertSame([], $this->keys($this->builder()->zone('sidebar', $ana)), 'The `user` group holds no news-posts permission.');
 
         // A cached tree is served to the same group set even if the declarations change…
         db_connect()->table('module_declarations')->where('kind', 'menu')->delete();
@@ -155,7 +155,7 @@ final class MenuBuilderTest extends RbacTestCase
         $this->storeMenu(new NewsMenuManifest());
 
         // …until a grant change invalidates the menus.
-        (new GrantManager())->setGroupGrants(null, 'editor', ['news-posts.list']);
+        (new GrantManager())->setGroupGrants(null, 'user', ['news-posts.list']);
         $this->assertSame(['News.posts', 'news-reports'], $this->keys($this->builder()->zone('sidebar', $this->reload($joan))));
 
         // Individual permissions change the key.

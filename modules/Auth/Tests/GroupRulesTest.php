@@ -97,6 +97,6 @@ final class GroupRulesTest extends AuthTestCase
         $this->send('POST', 'logout');
         $this->login('super@example.com');
         $this->assertNull((new Can())->before(service('request'), ['modules.upload']));
-        $this->assertNotNull((new Can())->before(service('request'), ['news-posts.delete']), 'Not in the catalogue: refused even to a superadmin.');
+        $this->assertNotNull((new Can())->before(service('request'), ['news-post.delete']), 'Not in the catalogue (a typo of news-posts): refused even to a superadmin.');
     }
 }
