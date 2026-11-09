@@ -94,6 +94,23 @@ final class WidgetsAndTaskTest extends NewsTestCase
         $this->assertStringNotContainsString('Leaked text', $html);
     }
 
+    public function testDemoDataLoadsAndIsRemovedCompletely(): void
+    {
+        $manager = new \Modules\Core\Demo\DemoDataManager(null, 'development');
+        $tables  = ['news_categories', 'news_category_translations', 'news', 'news_translations', 'news_groups'];
+
+        $this->assertTrue($manager->load('News'));
+        $this->assertSame(9, db_connect()->table('news')->countAllResults());
+        $this->assertSame(1, db_connect()->table('news_groups')->countAllResults(), 'The editors\' notice.');
+        $this->assertFalse($manager->load('News'), 'Loading twice does nothing.');
+
+        $manager->remove('News');
+
+        foreach ($tables as $table) {
+            $this->assertSame(0, db_connect()->table($table)->countAllResults(), $table);
+        }
+    }
+
     private function refreshMatrixForTests(): void
     {
         (new \Modules\Core\Cache\CoreCache())->invalidate('permissions');

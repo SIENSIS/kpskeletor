@@ -137,8 +137,7 @@ final class NewsDemoSeeder extends DemoSeeder
             $row = db_connect()->table('groups')->select('id')->where('name', $group)->get()->getRowArray();
 
             if (is_array($row)) {
-                db_connect()->table('news_groups')->insert(['news_id' => $id, 'group_id' => (int) $row['id']]);
-                // The junction row goes away with its post (ON DELETE CASCADE).
+                $demo->insert('news_groups', ['news_id' => $id, 'group_id' => (int) $row['id']]);
             }
         }
     }

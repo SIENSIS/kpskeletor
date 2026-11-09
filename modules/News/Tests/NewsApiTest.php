@@ -53,6 +53,21 @@ final class NewsApiTest extends ApiTestCase
         $this->api('GET', 'api/v1/news/' . Crud::maskId($hidden, 'news'), null, $token)->assertStatus(404);
     }
 
+    public function testTheBodyIsCleanedOnOutputToo(): void
+    {
+        $user = $this->createUser('ana@example.com', 'user');
+        $id   = $this->newsPost('Crua', 'private');
+        // A row written without the form (e.g. a future import) keeps raw HTML in the database.
+        db_connect()->table('news_translations')->where('news_id', $id)->update(['body' => '<p onclick="alert(1)">Hola</p><script>alert(2)</script>']);
+        $token = $this->tokenFor($user);
+
+        $one = $this->json($this->api('GET', 'api/v1/news/' . Crud::maskId($id, 'news'), null, $token))['data']['body'];
+        $all = $this->json($this->api('GET', 'api/v1/news/' . Crud::maskId($id, 'news') . '?lang=*', null, $token))['data']['body'];
+
+        $this->assertSame('<p>Hola</p>', $one);
+        $this->assertSame('<p>Hola</p>', $all['ca']);
+    }
+
     public function testItIsReadOnlyAndNeedsAToken(): void
     {
         $user = $this->createUser('ana@example.com', 'admin');

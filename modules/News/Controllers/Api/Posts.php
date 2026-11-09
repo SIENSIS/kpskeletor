@@ -11,6 +11,7 @@ use CodeIgniter\Shield\Models\UserModel;
 use Kpapy\Auth\Context;
 use Kpapy\Resource;
 use Modules\News\Controllers\Posts as PostsCrud;
+use Modules\News\Services\BodySanitizer;
 use Modules\News\Services\NewsVisibility;
 use Modules\News\Services\ReadReceipts;
 use Modules\News\Storage\CoverUploads;
@@ -42,6 +43,17 @@ final class Posts extends Controller
             ->callbackField('category', static fn ($value, array $row): ?string => self::categorySlug($row['category_id'] ?? null))
             ->callbackField('cover_url', static fn ($value, array $row): ?string => CoverUploads::urlOf(is_string($row['cover'] ?? null) ? $row['cover'] : null))
             ->callbackField('read', static fn ($value, array $row): bool => $user !== null && (new ReadReceipts())->isRead((int) $row['id'], (int) $user->id))
+            // The body was sanitised when saved; cleaned again on output, like the reader and the
+            // public pages, in case a row was written another way (one language, or all with ?lang=*).
+            ->transform(static function (array $item): array {
+                if (is_string($item['body'] ?? null)) {
+                    $item['body'] = BodySanitizer::clean($item['body']);
+                } elseif (is_array($item['body'] ?? null)) {
+                    $item['body'] = array_map(static fn ($text): ?string => is_string($text) ? BodySanitizer::clean($text) : null, $item['body']);
+                }
+
+                return $item;
+            })
             ->filters(['type', 'priority', 'visibility', 'pinned'])
             ->searchFields(['title', 'summary'])
             ->defaultOrder('published_at', 'desc')

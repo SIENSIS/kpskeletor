@@ -45,6 +45,11 @@ final class NewsModuleTest extends CIUnitTestCase
         }
 
         $this->assertNotContains('news-posts.author', $manifest->defaultGrants['editor']);
+
+        // The body is sanitised when the form is posted (D-17-02): a CSV import would skip it.
+        foreach (['posts', 'mine'] as $resource) {
+            $this->assertContains('import', $manifest->resources[$resource]['except'], "news-{$resource} must not enable the CSV import without sanitising the body.");
+        }
     }
 
     public function testUpDownUp(): void

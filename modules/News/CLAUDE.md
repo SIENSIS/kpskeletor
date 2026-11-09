@@ -20,7 +20,7 @@ description: `docs/news.md`.
   Notification `Notifications/NewNotice.php`. Link type `Menu/CategoryLink.php`. API
   `Controllers/Api/Posts.php` (`api/v1/news`).
 - Tables: `news_categories`, `news_category_translations`, `news`, `news_translations`,
-  `news_groups`, `news_reads` (one migration each).
+  `news_groups` (surrogate `id`, unique pair), `news_reads` (one migration each).
 
 ## Main pieces
 
@@ -44,7 +44,7 @@ D-17-01 (names, URLs, settings, API permissions; **open**), D-17-02 … D-17-07 
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
 - Session 25: the `news.notices` calendar (`groups` → `restricted`, D-00-41).
 - Session 26: read receipts and notices in the API.
-- Session 31: dates in the user's time zone in the forms.
+- When kpcrudy 1.2.0 and kpapy 1.2.0 are on Packagist: dates in the site's time zone (`Config\Kpcrudy::$timezone`) and `where(Closure)` in `Controllers/Api/Posts.php` instead of the `RawSql` subquery.
 
 ## How to test
 
