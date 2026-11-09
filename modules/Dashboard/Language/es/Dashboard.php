@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Dashboard module (es).
+ */
+return [
+    'res'  => ['dashboard' => 'Panel'],
+    'perm' => ['configure' => 'Configurar las disposiciones de los grupos'],
+    'menu' => [
+        'home'   => 'Panel',
+        'groups' => 'Widgets del panel',
+    ],
+    'title'          => 'Panel',
+    'customize'      => 'Personalizar',
+    'customizeHelp'  => 'Elige el orden, el tamaño y la visibilidad de tus widgets.',
+    'done'           => 'Hecho',
+    'editHelp'       => 'Arrastra los widgets por el asa (o usa las flechas del teclado sobre ella) para reordenarlos, cambia su tamaño u ocúltalos. Los cambios se guardan al instante.',
+    'restore'        => 'Restaurar la disposición del grupo',
+    'restoreConfirm' => 'Se olvidarán tu orden, los tamaños y los widgets ocultos. ¿Quieres continuar?',
+    'empty'          => 'No hay widgets que mostrar',
+    'emptyHelp'      => 'Tus grupos no tienen ningún widget activado, o no tienes los permisos que necesitan.',
+    'emptyHidden'    => 'Has ocultado todos los widgets. Usa «Personalizar» para volver a mostrarlos.',
+    'hiddenTitle'    => 'Widgets ocultos',
+    'hiddenHelp'     => 'Usa «Personalizar» para volver a mostrarlos.',
+    'widget'         => 'Widget',
+    'position'       => 'Posición',
+    'size'           => 'Tamaño',
+    'visible'        => 'Visible',
+    'cancel'         => 'Cancelar',
+    'save'           => 'Guardar',
+    'saved'          => 'Se ha guardado la disposición de tu panel.',
+    'restored'       => 'Se ha restaurado la disposición del grupo.',
+    'invalid'        => 'No se ha podido leer la disposición.',
+    'forbidden'      => 'No puedes ver este widget.',
+    'groups'         => [
+        'title'           => 'Disposiciones de los grupos',
+        'subtitle'        => 'Qué widgets tiene cada grupo, en qué orden, tamaño y opciones.',
+        'groups'          => 'Grupos',
+        'help'            => 'Widgets activados para «{0}» y sus valores por defecto. Los usuarios solo ven un widget si también tienen su permiso, y pueden reordenar, cambiar el tamaño y ocultar sus widgets.',
+        'none'            => 'Ningún módulo ofrece widgets.',
+        'noPermission'    => 'Este grupo no tiene {0}: sus usuarios no verán el widget salvo que tengan el permiso por otra vía.',
+        'permission'      => 'Permiso:',
+        'saved'           => 'Se ha guardado la disposición del grupo.',
+        'invalidPosition' => '«{0}»: la posición debe ser un número entero entre 0 y 9999.',
+        'invalidSize'     => '«{0}»: elige uno de los tamaños ofrecidos.',
+    ],
+    'links' => [
+        'item'     => 'Enlace',
+        'none'     => '— (fila vacía, se ignora)',
+        'free'     => 'Enlace libre (dirección)',
+        'menu'     => 'Pantallas del back office',
+        'label'    => 'Etiqueta',
+        'url'      => 'Dirección',
+        'up'       => 'Subir',
+        'down'     => 'Bajar',
+        'remove'   => 'Quitar',
+        'move'     => 'Arrastra para reordenar (o usa las flechas)',
+        'add'      => 'Añadir un enlace',
+        'help'     => 'El orden de la lista es el que ven los usuarios. Enlaces libres: direcciones https:// (se abren en una pestaña nueva) o rutas internas que empiecen por / — los ven todos los usuarios del grupo; las pantallas del menú solo aparecen a quien puede abrirlas. Como máximo {0} enlaces.',
+    ],
+    'js' => [
+        'move'  => 'Mover (teclas de flecha)',
+        'size'  => 'Tamaño',
+        'hide'  => 'Ocultar',
+        'show'  => 'Mostrar',
+        'saved' => 'Guardado',
+        'moved' => 'Movido a la posición {0}',
+    ],
+    'activity' => [
+        'group_layout_saved' => 'Disposición del panel de un grupo guardada',
+        'widget_forbidden'   => 'Datos de un widget denegados',
+    ],
+];

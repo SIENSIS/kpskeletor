@@ -42,7 +42,7 @@ final class EscalationTest extends RbacTestCase
                 $grants->setGroupGrants(null, 'editor', ['news-posts.list', $invalid]);
                 $this->fail("{$invalid} was accepted.");
             } catch (EscalationException) {
-                $this->assertSame(['activity-mine.*', 'api.tokens', 'auth-profile.*', 'auth-sessions.*', 'core-notifications.*'], (new PermissionCatalogue())->grants('editor'), 'Nothing changed.');
+                $this->assertSame(['activity-mine.*', 'api.tokens', 'auth-profile.*', 'auth-sessions.*', 'core-notifications.*', 'dashboard.view'], (new PermissionCatalogue())->grants('editor'), 'Nothing changed.');
             }
         }
 

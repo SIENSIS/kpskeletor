@@ -25,6 +25,14 @@ return [
         'groups' => 'Grups',
         'matrix' => 'Permisos',
     ],
+    'widget' => [
+        'title'            => 'Resum d’usuaris',
+        'onlineMinutes'    => 'Finestra de connexió (minuts)',
+        'active'           => 'Comptes actius',
+        'online'           => 'Connectats (últims {0} min)',
+        'withoutTwoFactor' => 'Sense 2FA',
+        'open'             => 'Obre els usuaris',
+    ],
     'settings' => [
         'impersonationMinutes' => 'Temps màxim de suplantació (minuts)',
         'impersonationMinutesHelp' => 'Passat aquest temps el superadministrador torna al seu compte.',

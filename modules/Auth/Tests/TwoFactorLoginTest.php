@@ -22,7 +22,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
     {
         $user = $this->createUser();
 
-        $this->login('ana@example.com')->assertRedirectTo(site_url('backend/profile'));
+        $this->login('ana@example.com')->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $user->id, $this->loggedInUserId());
         $this->assertFalse($this->isPending());
     }
@@ -54,7 +54,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $wrong->assertSee(lang('Auth.twoFactor.wrongCode'));
         $this->assertTrue($this->isPending());
 
-        $this->send('POST', 'auth/a/verify', ['code' => $code])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['code' => $code])->assertRedirectTo(site_url('backend'));
         $this->assertFalse($this->isPending());
         $this->assertSame((int) $user->id, $this->loggedInUserId());
         $this->send('GET', 'backend/profile')->assertOK();
@@ -88,7 +88,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
             $this->send('POST', 'auth/a/verify', ['code' => $first])->assertSee(lang('Auth.twoFactor.wrongCode'));
         }
 
-        $this->send('POST', 'auth/a/verify', ['code' => $second])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['code' => $second])->assertRedirectTo(site_url('backend'));
     }
 
     public function testAuthenticatorAppLogin(): void
@@ -101,7 +101,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $this->assertSame([], $this->sentEmails, 'The app method sends no email.');
         $this->send('GET', 'auth/a/show')->assertSee(lang('Auth.twoFactor.enterAppCode'));
 
-        $this->send('POST', 'auth/a/verify', ['code' => $this->totpCode($secret)])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['code' => $this->totpCode($secret)])->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $user->id, $this->loggedInUserId());
     }
 
@@ -112,7 +112,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $code     = $this->totpCode($secret);
 
         $this->login('ana@example.com');
-        $this->send('POST', 'auth/a/verify', ['code' => $code])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['code' => $code])->assertRedirectTo(site_url('backend'));
         $this->send('POST', 'logout');
 
         $this->login('ana@example.com');
@@ -162,7 +162,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $this->assertSame(0, db_connect()->table('user_recovery_codes')->whereIn('code_hash', $codes)->countAllResults(), 'Only hashes are stored.');
 
         $this->login('ana@example.com');
-        $this->send('POST', 'auth/a/verify', ['recovery_code' => strtolower($codes[0])])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['recovery_code' => strtolower($codes[0])])->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $user->id, $this->loggedInUserId());
         $this->assertSame(9, (new TwoFactor())->recoveryCodesLeft((int) $user->id));
         $this->send('POST', 'logout');
@@ -178,7 +178,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $codes = (new TwoFactor())->enableEmail($user);
 
         $this->login('ana@example.com');
-        $this->send('POST', 'auth/a/verify', ['recovery_code' => $codes[3]])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['recovery_code' => $codes[3]])->assertRedirectTo(site_url('backend'));
     }
 
     public function testTooManyWrongCodesEndTheLogin(): void
@@ -225,7 +225,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $this->send('GET', 'login/verify-magic-link?token=' . $token)->assertRedirectTo(site_url('auth/a/show'));
         $this->assertTrue($this->isPending());
 
-        $this->send('POST', 'auth/a/verify', ['code' => $this->totpCode($secret)])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['code' => $this->totpCode($secret)])->assertRedirectTo(site_url('backend'));
         $this->assertSame((int) $user->id, $this->loggedInUserId());
         $this->assertFalse((new Reauth())->confirmed($user), 'A magic link is not a re-authentication.');
     }
@@ -245,7 +245,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         $this->assertSame(0, (new TwoFactor())->recoveryCodesLeft((int) $user->id));
         $this->assertSame([(int) $user->id, 99], $fired);
 
-        $this->login('ana@example.com')->assertRedirectTo(site_url('backend/profile'));
+        $this->login('ana@example.com')->assertRedirectTo(site_url('backend'));
     }
 
     public function testRememberMeIsIssuedOnlyAfterTheCode(): void
@@ -269,7 +269,7 @@ final class TwoFactorLoginTest extends TwoFactorTestCase
         [$secret] = $this->enrolTotp($user);
 
         $this->login('ana@example.com', null, true);
-        $this->send('POST', 'auth/a/verify', ['code' => $this->totpCode($secret)])->assertRedirectTo(site_url('backend/profile'));
+        $this->send('POST', 'auth/a/verify', ['code' => $this->totpCode($secret)])->assertRedirectTo(site_url('backend'));
         $this->assertSame(1, db_connect()->table('auth_remember_tokens')->where('user_id', $user->id)->countAllResults());
 
         $this->send('GET', 'backend/profile', [], [])->assertOK();

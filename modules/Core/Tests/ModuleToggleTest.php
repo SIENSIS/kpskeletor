@@ -83,7 +83,7 @@ final class ModuleToggleTest extends CIUnitTestCase
         $this->assertTrue($this->toggler()->disable($name));
         $this->assertFalse((new ModuleState())->isEnabled($name));
         $this->assertRouteNotFound($routes);
-        $this->assertSame([], (new DeclarationRegistry())->widgets(), 'hidden from the registries');
+        $this->assertNotContains("Modules\\{$name}\\Widgets\\{$name}Widget", (new DeclarationRegistry())->widgets(), 'hidden from the registries');
         $this->assertNotContains(strtolower($name) . '-main.view', (new PermissionCatalogue())->enabledNames());
         $this->assertContains(strtolower($name) . '-main.view', array_keys((new PermissionCatalogue())->stored()), 'nothing is deleted');
 
@@ -91,7 +91,7 @@ final class ModuleToggleTest extends CIUnitTestCase
         $result = $this->withRoutes($routes)->get('fixture-ping');
         $result->assertOK();
         $result->assertSee('pong');
-        $this->assertSame(["Modules\\{$name}\\Widgets\\{$name}Widget"], (new DeclarationRegistry())->widgets());
+        $this->assertContains("Modules\\{$name}\\Widgets\\{$name}Widget", (new DeclarationRegistry())->widgets());
         $this->assertContains(strtolower($name) . '-main.view', (new PermissionCatalogue())->enabledNames());
     }
 
@@ -123,7 +123,7 @@ final class ModuleToggleTest extends CIUnitTestCase
             }
         }
 
-        $this->assertSame(['Core', 'Auth', 'Api', 'Users', 'Settings'], ModuleToggler::CORE_MODULES);
+        $this->assertSame(['Core', 'Auth', 'Api', 'Users', 'Settings', 'Dashboard'], ModuleToggler::CORE_MODULES);
     }
 
     public function testDependantsBlockDisablingAndDependenciesAreOffered(): void

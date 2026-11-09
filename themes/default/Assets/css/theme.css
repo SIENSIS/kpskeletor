@@ -331,3 +331,16 @@
 @media (max-width: 575.98px) {
     .notification-bell .bell-menu { position: fixed; top: var(--kp-topbar-height); left: .5rem; right: .5rem; width: auto; }
 }
+
+/* Dashboard widgets (Core WidgetRenderer, modules/Dashboard; component dashboard/dashboard) */
+.empty-state-compact .empty-state-icon { font-size: 1.75rem; }
+.dashboard-widget-body { overflow-wrap: anywhere; }
+.dashboard-widget-editing > .card { outline: 2px dashed var(--bs-border-color); outline-offset: 2px; }
+.dashboard-widget-dragging > .card { opacity: .6; box-shadow: var(--bs-box-shadow-lg) !important; }
+.dashboard-handle { cursor: grab; touch-action: none; }
+.dashboard-widget-dragging .dashboard-handle { cursor: grabbing; }
+.dashboard-size { width: auto; }
+.dashboard-col-number { width: 8rem; }
+.dashboard-stat { font-size: 1.75rem; font-weight: 600; line-height: 1.1; }
+.dashboard-links-ref { min-width: 12rem; }
+.dashboard-links-position { width: 6rem; }

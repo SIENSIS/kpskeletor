@@ -66,6 +66,7 @@ import { toast } from 'core/ui/toast.js';
 | `core/ui/modal.js` | `openModal({ title, body, buttons, size })` → value of the button pressed; full-screen on phones. |
 | `core/ui/confirm.js` | `confirm(message, { title, okLabel, variant })` → boolean; `data-confirm="…"` on links, buttons and forms. |
 | `core/ui/sidebar.js` | Back-office sidebar toggle (icon-only/full), remembered in the `kp_sidebar` cookie. |
+| `core/ui/widget.js` | Async dashboard widget (`data-component="core/ui/widget"`): loads `data-url`, shows `html`, refreshes; `load(root, render)` for widgets with their own component (`docs/widgets.md`). |
 | `core/ui/tabs-memory.js` | Remembers the active tab of each `[data-tabs]` component per page (session storage, URL hash). |
 | `core/ui/theme-switch.js` | Light/dark/auto switch, `kp_theme` cookie. |
 | `core/ui/cookie-notice.js` | Remembers the closed cookie notice (`kp_cookies`). |

@@ -155,6 +155,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-15-03 | 15 | Adding and editing users; no deletion | Accepted (proposal) |
 | D-15-04 | 15 | Who manages whose account | Accepted (proposal) |
 | D-15-05 | 15 | Impersonation mechanics and the permission matrix save | Accepted (proposal) |
+| D-16-01 | 16 | Dashboard permission names, URLs and the login landing page (decide) | Applied (decided) |
+| D-16-02 | 16 | Group layouts: defaults, several groups, what users may change | Accepted (proposal) |
+| D-16-03 | 16 | The widget contract, async data and failures | Accepted (proposal) |
+| D-16-04 | 16 | The back-office home in the menu and breadcrumbs | Accepted (proposal) |
+| D-16-05 | 16 | Dashboard is a core module | Applied (decided) |
+| D-16-06 | 16 | Quick links: free URLs and the order chosen by the administrator (decide) | Applied (decided) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1625,3 +1631,56 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) An `impersonations` table (not needed: the activity log keeps the history). B) Replaying the pending request as the impersonator after expiry.
 - **Status:** Accepted (proposal)
 
+## D-16-01 — Dashboard permission names, URLs and the login landing page (decide)
+
+- **Where:** specification "Modules" › "Dashboard" ("the dashboard home is the resource `dashboard`, granted to every group"; per-group configuration "from the UI"), "Dashboard widgets"; D-00-17, D-00-18; plan session 16 (routes `backend/`, `backend/dashboard/widgets/(:segment)/data`, `backend/dashboard/groups`); D-05-08 (login on the profile "until session 16")
+- **Problem:** The specification names the resource but not its operations, the permission of the group configuration, the URLs of the user layout, nor where a login lands now; all are public conventions. The Dashboard module is not a core module, so it can be disabled.
+- **Proposal:** One resource `dashboard` with the `'name'` override (single-resource module): `dashboard.view` (home, own layout, async data; granted to every group) and `dashboard.configure` (group layouts; `admin` gets `dashboard.*`). URLs: `backend` (route `dashboard`), `backend/dashboard/customize`, `POST backend/dashboard/layout`, `POST backend/dashboard/layout/reset`, `backend/dashboard/widgets/<id>/data`, `backend/dashboard/groups[/<group>]` (route `dashboard-groups`; menu "Dashboard widgets" in the settings zone). Widget ids `<module>.<name>` (`core.scheduled-tasks`, `core.quick-links`, `users.summary`). A login, the start and the end of an impersonation land on `backend`; `backend` always exists: the Dashboard is a core module (D-16-05). Built this way; renaming means changing the manifest, routes, tests and `Config\Auth::$redirects`.
+- **Alternatives:** A) A separate resource for the configuration: `dashboard-groups.{view,edit}` (needs two resources, so no `'name'` override: `dashboard-dashboard.view`). B) Keep the login on `backend/profile`.
+- **Status:** Applied
+- **Decision (2026-11-09):** «Com està (recomanada)». The Dashboard keeps `dashboard.view` (every group) and `dashboard.configure` (admin), the URLs `backend` (route `dashboard`), `backend/dashboard/customize`, `POST backend/dashboard/layout`, `POST backend/dashboard/layout/reset`, `backend/dashboard/widgets/<id>/data` and `backend/dashboard/groups[/<group>]` (route `dashboard-groups`), widget ids `<module>.<name>`, and a login or an impersonation lands on `backend`. Nothing to change in the code: session 16 built it this way.
+- **Applied in:** `docs/specification.md` ("Modules" › "Dashboard", "Dashboard widgets"), `docs/widgets.md`; code of session 16 (`modules/Dashboard/Config/Module.php`, `modules/Dashboard/Config/Routes.php`, `app/Config/Auth.php`)
+
+## D-16-02 — Group layouts: defaults, several groups, what users may change
+
+- **Where:** specification "Modules" › "Dashboard" (per group: available widgets, default order and size, options; per user: reorder, resize, hide, restore)
+- **Problem:** The specification does not say what a group without configuration shows, which group wins when a user is in several, nor what users may change.
+- **Proposal:** Table `dashboard_group_widgets` (`group_name`, `widget`, `enabled`, `position`, `size`, `options` JSON); a widget without a row is **enabled** with its defaults (manifest order, first size, default options), so new modules' widgets appear for groups holding their permission and the shipped dashboard is useful without configuration; the permission check is never skipped. A widget is available when one of the user's groups enables it; position, size and options come from the first such group in `GroupRegistry` order (reserved first). Users change only order, size (within `sizes()`) and visibility, stored as one JSON row per user (`dashboard_user_layouts`); options stay per group. Saving a group layout is logged (`group_layout_saved`); a user's layout is a personal preference and is not.
+- **Alternatives:** A) Disabled by default (an empty dashboard until an administrator configures each group). B) Options per user.
+- **Status:** Accepted (proposal)
+
+## D-16-03 — The widget contract, async data and failures
+
+- **Where:** specification "Dashboard widgets" (`id()`, `title()`, `permission()`, `sizes()`, `settings()`, `render()` or `data()`; "slow widgets load asynchronously and are cached per user for a few minutes"; isolation), "Security baseline" (rate limit of async widget URLs)
+- **Problem:** The specification lists the methods but not how async widgets are marked, what the data URL returns, how options are typed, nor where the framework lives.
+- **Proposal:** Framework in the Core (`Modules\Core\Widgets`: `WidgetInterface` + `icon()`, `AsyncWidgetInterface` with `data()`, `renderData()`, `component()`, `cacheSeconds()`, `refreshSeconds()`; base classes `Widget`/`AsyncWidget`; `WidgetRegistry`, `WidgetRenderer`, `WidgetOptions`, `WidgetSizes`); the Dashboard module stores and shows the layouts. Sizes `small|medium|large|full`; permission null = only `dashboard.view`. Option types `int`, `bool`, `string`, `select`, `menu`. The data URL answers `{widget, data, html}` (`no-store`), 403 for unknown, server-side or unavailable widgets (security log `widget_forbidden`), 500 with a generic message on failure; the cache (scope `widgets`) is keyed by user, language and options and read only after the checks. Failures are written to the application log, never shown. `ManifestValidator` refuses `$widgets` classes that do not implement `WidgetInterface`; the `make:module` widget stub implements it.
+- **Alternatives:** A) A `async(): bool` flag on one interface. B) Rendering async widgets' HTML only in the browser.
+- **Status:** Accepted (proposal)
+
+## D-16-04 — The back-office home in the menu and breadcrumbs
+
+- **Where:** D-08-01 (active entry by route, then exact path, then longest path prefix)
+- **Problem:** The home's path `backend` is a prefix of every back-office path, so the "Dashboard" entry was marked active on every screen.
+- **Proposal:** Path prefixes count only for entries whose path has at least two segments; a one-segment entry (the home) is active only on itself or by route name.
+- **Alternatives:** A) A per-entry `exact` key in the manifest menu.
+- **Status:** Accepted (proposal)
+
+## D-16-05 — Dashboard is a core module
+
+- **Where:** specification "Module lifecycle" (core modules `Core`, `Auth`, `Api`, `Users`, `Settings` cannot be disabled), "Modules" › "Dashboard"; D-16-01
+- **Problem:** The Dashboard module could be disabled, and then `backend`, where a login and an impersonation land, answered 404.
+- **Proposal:** Add `Dashboard` to `ModuleToggler::CORE_MODULES`: it cannot be disabled, so `backend` always exists. Disabling it would give nothing a user cannot already get by hiding every widget (an empty home).
+- **Alternatives:** A) Keep it optional and send the login to the profile when it is disabled.
+- **Status:** Applied (decided)
+- **Decision (2026-11-09):** «Fes que el dashboard no es pugui desactivar, ja que en ell pots eliminar tots els widgets i que et quedi com una pantalla buida, que seria el mateix efecte que desactivar-lo». The Dashboard is a core module that cannot be disabled.
+- **Applied in:** `modules/Core/Modules/ModuleToggler.php`, `modules/Dashboard/Config/Module.php`, `modules/Dashboard/CLAUDE.md`, `docs/specification.md` ("Module lifecycle"), `docs/commands.md`, `docs/widgets.md`; tests `ModuleToggleTest::testCoreModulesCannotBeDisabled`, `DashboardModuleTest::testItIsACoreModule`
+
+## D-16-06 — Quick links: free URLs and the order chosen by the administrator (decide)
+
+- **Where:** specification "Modules" › "Dashboard" (*Quick links*: "configurable shortcuts per group"); `modules/Core/Widgets/QuickLinks.php`, `WidgetOptions`
+- **Problem:** The quick links could only be entries of the back-office menu, shown in alphabetical order; the owner wants links to external sites and the order set by the administrator.
+- **Proposal:** A new option type `links`: one ordered list (at most `Core.widgetMaxLinks` items: a Core setting, default 20, 1–100, added at the owner's request) whose items are either a back-office menu entry (filtered by each user's permissions, as before) or a free link (one label, up to 100 characters, and an address). Addresses: `https://` URLs (no credentials) or internal paths starting with `/`; `http:`, `javascript:`, `data:`, `mailto:` and the rest are refused. Free links are shown to every user of the group (an internal path still answers 403 when the user lacks its permission). External links open in a new tab with `rel="noopener noreferrer"` and an "external" icon. The editor in Dashboard › Group layouts is a single ordered list with up/down/remove/add buttons and drag and drop (a position field without JavaScript). Stored lists of menu keys keep working.
+- **Alternatives:** A) Also `http://`. B) Also `mailto:`/`tel:`. C) An optional permission per free link. D) One label per language. E) Two separate lists (menu entries, free links).
+- **Status:** Applied
+- **Decision (2026-11-09):** «https + camins interns», «Tots els del grup», «Un sol text», «Llista única ordenable» (the four recommended options). Free links accept `https://` URLs and internal paths only, are shown to every user of the group, have one untranslated label, and are edited with menu entries in one list whose order the administrator sets.
+- **Applied in:** `modules/Core/Config/Module.php` (setting `Core.widgetMaxLinks`, group `dashboard`), `modules/Core/Widgets/WidgetOptions.php` (type `links`, `linkUrl()`, `maxLinks()`), `modules/Core/Widgets/QuickLinks.php`, `modules/Core/Views/widgets/quick_links.php`, `modules/Dashboard/Views/links_editor.php`, `modules/Dashboard/Assets/js/links-editor.js`, `modules/Dashboard/Views/groups.php`, language files (Core, Dashboard), `docs/specification.md`, `docs/widgets.md`; tests `GroupLayoutTest::testFreeLinksAndTheOrderChosenByTheAdministrator`, `GroupLayoutTest::testInvalidValuesAreRefused`, `WidgetsTest::testFreeLinkAddresses`, `WidgetsTest::testStoredMenuKeysStillWorkAsLinks`, `WidgetsTest::testTheMostLinksComeFromTheSetting`, `GroupLayoutTest::testTheLimitOfLinksIsASetting`; `SettingsScreensTest` posts the new field

@@ -61,6 +61,12 @@ final class Module extends ModuleManifest
         \Modules\Core\Tasks\PurgeActivityLog::class,
     ];
 
+    /** @var list<string> Dashboard widgets (docs/widgets.md): failing scheduled tasks, shortcuts per group */
+    public array $widgets = [
+        \Modules\Core\Widgets\ScheduledTasks::class,
+        \Modules\Core\Widgets\QuickLinks::class,
+    ];
+
     /** @var list<string> */
     public array $notifications = [
         \Modules\Core\Notifications\Types\ScheduledTaskFailed::class,
@@ -90,6 +96,15 @@ final class Module extends ModuleManifest
             'label'   => 'Core.settings.timezone',
             'help'    => 'Core.settings.timezoneHelp',
             'group'   => 'general',
+        ],
+        // Dashboard widgets: most items of a `links` option (the "Quick links" of each group).
+        'widgetMaxLinks' => [
+            'type'    => 'int',
+            'default' => 20,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
+            'label'   => 'Core.settings.widgetMaxLinks',
+            'help'    => 'Core.settings.widgetMaxLinksHelp',
+            'group'   => 'dashboard',
         ],
         'pwa' => [
             'type'    => 'bool',

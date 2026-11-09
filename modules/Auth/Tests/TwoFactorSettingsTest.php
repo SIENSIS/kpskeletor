@@ -86,7 +86,7 @@ final class TwoFactorSettingsTest extends TwoFactorTestCase
         (new GroupRegistry())->setTwoFactor('user', GroupRegistry::REQUIRED);
         $user = $this->createUser();
 
-        $this->login('ana@example.com')->assertRedirectTo(site_url('backend/profile'));
+        $this->login('ana@example.com')->assertRedirectTo(site_url('backend'));
         $this->send('GET', 'backend/profile')->assertRedirectTo(site_url('backend/profile/two-factor'));
         $this->send('GET', 'backend/profile/sessions')->assertRedirectTo(site_url('backend/profile/two-factor'));
         $page = $this->send('GET', 'backend/profile/two-factor');

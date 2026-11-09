@@ -74,6 +74,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email inline), scheduled
   tasks in `Tasks/` (`TaskInterface`), both declared in the manifest; one cron line runs
   `php spark schedule:run` (`docs/notifications.md`, `docs/scheduler.md`).
+- **Dashboard widgets:** classes in `Widgets/` extending `Modules\Core\Widgets\Widget` (or
+  `AsyncWidget`), declared in the manifest `$widgets`, id `<module>.<name>`, a `permission()`;
+  shown only with the permission **and** enabled for one of the user's groups (`docs/widgets.md`).
 - **Settings:** declared in the manifest `$settings`; the Settings module generates their forms
   (`docs/settings.md`). A `group` of `security` or `security.<sub>` puts a setting in Settings ›
   Security (`settings.security` + re-auth); refuse weakening values with rules

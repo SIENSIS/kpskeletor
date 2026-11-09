@@ -22,6 +22,6 @@ final class ImpersonationController extends Controller
 
         $back = route_to('users-users');
 
-        return redirect()->to(is_string($back) && $back !== '' ? $back : site_url('backend/profile'))->with('message', lang('Auth.impersonation.stopped'));
+        return redirect()->to(is_string($back) && $back !== '' ? $back : site_url('backend'))->with('message', lang('Auth.impersonation.stopped'));
     }
 }

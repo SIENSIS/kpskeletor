@@ -470,7 +470,7 @@ A hand-written screen in Core (`modules.*` permissions) to manage modules withou
     restores everything as it was;
   * dependencies are respected: a module cannot be disabled while enabled modules depend on it
     (the screen names them), and enabling a module offers to enable its disabled dependencies
-    too; core modules (`Core`, `Auth`, `Api`, `Users`, `Settings`) cannot be disabled;
+    too; core modules (`Core`, `Auth`, `Api`, `Users`, `Settings`, `Dashboard`) cannot be disabled;
   * enabling a module with pending migrations runs them (database only, no code is written) and
     publishes its assets, like `modules:sync` for that module; errors leave it disabled and are
     shown with the log;
@@ -929,13 +929,19 @@ granularity instead of collapsing it into read/create/update/delete.
 
 ### Dashboard widgets
 
-* Widgets implement `WidgetInterface`: `id()`, `title()`, `permission()`, `sizes()` (allowed
-  sizes and default), `settings()` (optional per-widget options), `render(array $options):
-  string` (server-side HTML) or `data()` for widgets that load asynchronously.
-* The registry collects them from the enabled manifests. A widget is only shown if the user has
-  its permission **and** it is enabled for one of the user's groups (see Dashboard).
+* Widgets implement `WidgetInterface` (Core, `Modules\Core\Widgets`; base classes `Widget` and
+  `AsyncWidget`): `id()` (`<module>.<name>`, e.g. `core.quick-links`), `title()`, `icon()`,
+  `permission()` (null: the dashboard's own permission is enough), `sizes()` (allowed sizes
+  among `small`, `medium`, `large`, `full`; the first is the default), `settings()` (optional
+  per-group options typed `int`, `bool`, `string`, `select`, `menu`, `links`), `render(array $options):
+  string` (server-side HTML) or, for widgets that load asynchronously (`AsyncWidgetInterface`),
+  `data()` plus `renderData()` or their own ES component.
+* The registry collects them from the enabled manifests (`$widgets`; `modules:sync` refuses a
+  class that does not implement the interface). A widget is only shown if the user has its
+  permission **and** it is enabled for one of the user's groups (see Dashboard).
 * A failing widget is isolated: the error is logged and an error card is rendered; slow widgets
-  load asynchronously and are cached per user for a few minutes.
+  load asynchronously from `backend/dashboard/widgets/<id>/data` (403 unless the widget is
+  available to the user, rate limited) and are cached per user for a few minutes.
 
 ### Storage
 
@@ -1111,12 +1117,20 @@ The generated forms described above (one tab per module and one for the theme), 
 
 ### Dashboard
 
-* The dashboard home is the resource `dashboard`, granted to every group.
-* **Configurable from the UI, per group:** for each group, the admin chooses which widgets are
-  available, their default order and size, and their options. A widget not enabled for any of
-  the user's groups is never shown (also not through its async URL).
-* **Per user:** within what their groups allow, each user can reorder, resize and hide widgets
-  (drag and drop, saved as a user preference), and "restore the group layout".
+* The dashboard home is `backend` (resource `dashboard`: `dashboard.view`, granted to every
+  group); a login and an impersonation land on it. The Dashboard is a core module: it cannot be
+  disabled (a user who wants an empty home hides every widget).
+* **Configurable from the UI, per group** (`backend/dashboard/groups[/<group>]`,
+  `dashboard.configure`, granted to `admin`): for each group, the admin chooses which widgets are
+  available, their default order and size, and their options; changes are written to the
+  activity log. A widget the group layout does not mention is enabled with its defaults. A
+  widget not enabled for any of the user's groups is never shown (also not through its async
+  URL); when several of the user's groups enable it, the first group (reserved groups first)
+  gives its order, size and options.
+* **Per user:** within what their groups allow, each user can reorder, resize (within the
+  widget's sizes) and hide widgets (drag and drop with mouse, touch or keyboard, saved at once as
+  a user preference; a form without JavaScript at `backend/dashboard/customize`), and "restore
+  the group layout".
 * **Example widgets (shipped):**
   * *Notices* (News): unread private notices and warnings, with "mark as read";
   * *Latest news* (News);
@@ -1124,7 +1138,10 @@ The generated forms described above (one tab per module and one for the theme), 
   * *System version* (Updates): installed core version, and a badge when a newer one exists;
   * *Backups* (Backup): last backup, its result and size, next scheduled run;
   * *Scheduled tasks* (Core): failing tasks;
-  * *Quick links* (Core): configurable shortcuts per group;
+  * *Quick links* (Core): shortcuts chosen and ordered per group by the administrator: screens
+    of the back-office menu (shown only to users who can open them) and free links with one
+    label and an `https://` address (opened in a new tab) or an internal path, shown to every
+    user of the group (at most `Core.widgetMaxLinks` links, a Core setting: default 20, 1–100);
   * *Users summary* (Users): active users, users online, accounts without 2FA.
 
 ### Activity
