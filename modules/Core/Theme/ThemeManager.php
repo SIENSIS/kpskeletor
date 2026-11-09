@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Theme;
 
 use Closure;
+use Config\Services;
 use Config\Theme as ThemeConfig;
 use InvalidArgumentException;
 use Modules\Core\Frontend\AssetPublisher;
@@ -196,11 +197,23 @@ final class ThemeManager
 
     /**
      * @param array<string, mixed> $data
-     * @param array<string, mixed> $options view() options
+     * @param array<string, mixed> $options view() options; `isolated` => true renders with a new
+     *                                      renderer that sees only `$data` (components)
      */
     public function render(string $view, array $data = [], array $options = [], ?string $area = null): string
     {
-        return view($this->resolve($view, $area), $data, $options);
+        $name = $this->resolve($view, $area);
+
+        if (($options['isolated'] ?? false) === true) {
+            unset($options['isolated'], $options['saveData']);
+
+            // The shared renderer keeps the data of every view rendered with saveData (CodeIgniter's
+            // default), and `saveData => false` still reads it: a component would see variables it
+            // was not given (e.g. a `$message` of an earlier view). A new renderer sees only $data.
+            return Services::renderer(null, null, false)->setData($data, 'raw')->render($name, $options, false);
+        }
+
+        return view($name, $data, $options);
     }
 
     public function options(?string $area = null): ThemeOptions

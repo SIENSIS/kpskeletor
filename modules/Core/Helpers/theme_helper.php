@@ -60,7 +60,7 @@ if (! function_exists('theme_component')) {
      */
     function theme_component(string $name, array $data = []): string
     {
-        return theme()->render('components/' . $name, $data, ['saveData' => false]);
+        return theme()->render('components/' . $name, $data, ['isolated' => true]);
     }
 }
 

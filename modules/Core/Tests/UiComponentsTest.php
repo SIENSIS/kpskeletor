@@ -24,6 +24,19 @@ final class UiComponentsTest extends CIUnitTestCase
         return trim((string) preg_replace('/<!-- DEBUG-VIEW [^>]*-->\s*/', '', $html));
     }
 
+    public function testComponentsSeeOnlyTheirOwnData(): void
+    {
+        // A view rendered with the shared renderer saves its data (CodeIgniter's default)…
+        view('Modules\\Core\\Views\\components\\badge', ['text' => 'Before', 'variant' => 'info', 'message' => 'Leaked text', 'action' => ['label' => 'Leaked action', 'url' => '/x']]);
+
+        // …but a component given no message nor action must not show them.
+        $html = theme_component('empty_state', ['title' => 'Nothing here']);
+
+        $this->assertStringContainsString('Nothing here', $html);
+        $this->assertStringNotContainsString('Leaked text', $html);
+        $this->assertStringNotContainsString('Leaked action', $html);
+    }
+
     public function testBadgeEscapesAndWhitelistsTheVariant(): void
     {
         $html = $this->clean(ui_badge('<b>x</b>', 'primary" onclick="alert(1)'));
@@ -60,6 +73,21 @@ final class UiComponentsTest extends CIUnitTestCase
         $this->assertStringContainsString('11–20', ui_pagination_info(2, 10, 45));
         $this->assertStringContainsString('41–45', ui_pagination_info(5, 10, 45));
         $this->assertStringContainsString(lang('Core.ui.paginationEmpty'), ui_pagination_info(1, 10, 0));
+    }
+
+    public function testRelativeDatesAreTranslatedToCatalan(): void
+    {
+        $locale = service('request')->getLocale();
+        service('request')->setLocale('ca');
+        service('language')->setLocale('ca');
+
+        try {
+            $this->assertStringContainsString('fa 5 hores', ui_date(date('Y-m-d H:i:s', time() - 5 * 3600 - 60), 'relative'));
+            $this->assertStringContainsString('fa 2 dies', ui_date(date('Y-m-d H:i:s', time() - 2 * 86400 - 60), 'relative'));
+        } finally {
+            service('request')->setLocale($locale);
+            service('language')->setLocale($locale);
+        }
     }
 
     public function testLinksAreSafe(): void
