@@ -32,6 +32,7 @@ return [
         'cspSource'         => 'tiene una fuente no permitida: "{0}" (solo hosts https, self, none o blob:)',
         'host'              => 'tiene un nombre de host no válido "{0}"',
         'classMissing'      => 'hace referencia a la clase {0}, que no existe',
+        'notWidget'         => 'hace referencia a la clase {0}, que no implementa {1}',
         'configClass'       => 'no puede ser una clase de configuración: CodeIgniter da un significado especial al nombre de archivo "{0}"',
         'notManifest'       => 'debe definir la clase {0}, que extiende ModuleManifest',
         'dependencyMissing' => 'necesita el módulo {0}, que no está presente',
@@ -352,6 +353,10 @@ return [
             'crossOrigin' => 'No se permiten peticiones a otros sitios.',
         ],
         'demo' => ['reset' => 'Se ha reiniciado el contador.'],
+        'widget' => [
+            'error' => 'No se ha podido cargar el widget.',
+            'empty' => 'No hay nada que mostrar.',
+        ],
         'bell' => [
             'label' => 'Notificaciones ({count} por leer)',
             'empty' => 'No tiene ninguna notificación.',
@@ -521,6 +526,32 @@ return [
             'image' => 'No se ha podido leer la imagen o es demasiado grande.',
             'svg' => 'Las imágenes SVG no están permitidas o el archivo no es un SVG válido.',
             'content' => 'El archivo contiene código o HTML y se ha rechazado.',
+        ],
+    ],
+    'widgets' => [
+        'loading'       => 'Cargando…',
+        'failed'        => 'No se ha podido mostrar este widget. El error se ha registrado.',
+        'invalidOption' => 'El valor de «{0}» no es válido.',
+        'size'          => [
+            'small'  => 'Pequeño',
+            'medium' => 'Mediano',
+            'large'  => 'Grande',
+            'full'   => 'Ancho completo',
+        ],
+        'scheduledTasks' => [
+            'title'   => 'Tareas programadas',
+            'limit'   => 'Tareas fallidas que se muestran',
+            'allOk'   => 'Las {0} tareas programadas se han ejecutado correctamente.',
+            'failing' => '{0, plural, one{# tarea ha fallado} other{# tareas han fallado}} en su última ejecución.',
+            'lastRun' => 'última ejecución',
+            'nextRun' => 'Próxima ejecución:',
+            'open'    => 'Abrir las tareas programadas',
+        ],
+        'quickLinks' => [
+            'title'     => 'Enlaces rápidos',
+            'links'     => 'Enlaces',
+            'linksHelp' => 'Pantallas del back office que se muestran como atajos; cada usuario solo ve las que puede abrir.',
+            'empty'     => 'No hay atajos disponibles.',
         ],
     ],
     'settingGroups' => [

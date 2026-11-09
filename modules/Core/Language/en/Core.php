@@ -32,6 +32,7 @@ return [
         'cspSource'         => 'has a source that is not allowed: "{0}" (https hosts, self, none or blob: only)',
         'host'              => 'has an invalid host name "{0}"',
         'classMissing'      => 'refers to class {0}, which does not exist',
+        'notWidget'         => 'refers to class {0}, which does not implement {1}',
         'configClass'       => 'must not be a config class: CodeIgniter gives the file name "{0}" a special meaning',
         'notManifest'       => 'must define the class {0} extending ModuleManifest',
         'dependencyMissing' => 'requires the module {0}, which is not present',
@@ -352,6 +353,10 @@ return [
             'crossOrigin' => 'Requests to other sites are not allowed.',
         ],
         'demo' => ['reset' => 'The counter was reset.'],
+        'widget' => [
+            'error' => 'The widget could not be loaded.',
+            'empty' => 'Nothing to show.',
+        ],
         'bell' => [
             'label' => 'Notifications ({count} unread)',
             'empty' => 'You have no notifications.',
@@ -521,6 +526,32 @@ return [
             'image' => 'The image could not be read or is too large.',
             'svg' => 'SVG images are not allowed or the file is not a valid SVG.',
             'content' => 'The file contains code or HTML and was refused.',
+        ],
+    ],
+    'widgets' => [
+        'loading'       => 'Loading…',
+        'failed'        => 'This widget could not be shown. The error has been logged.',
+        'invalidOption' => 'The value of “{0}” is not valid.',
+        'size'          => [
+            'small'  => 'Small',
+            'medium' => 'Medium',
+            'large'  => 'Large',
+            'full'   => 'Full width',
+        ],
+        'scheduledTasks' => [
+            'title'   => 'Scheduled tasks',
+            'limit'   => 'Failing tasks shown',
+            'allOk'   => 'All {0} scheduled tasks ran correctly.',
+            'failing' => '{0, plural, one{# task failed} other{# tasks failed}} on their last run.',
+            'lastRun' => 'last run',
+            'nextRun' => 'Next run:',
+            'open'    => 'Open the scheduled tasks',
+        ],
+        'quickLinks' => [
+            'title'     => 'Quick links',
+            'links'     => 'Links',
+            'linksHelp' => 'Back-office screens shown as shortcuts; each user only sees the ones they can open.',
+            'empty'     => 'No shortcuts available.',
         ],
     ],
     'settingGroups' => [

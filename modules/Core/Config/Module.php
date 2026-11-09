@@ -61,6 +61,12 @@ final class Module extends ModuleManifest
         \Modules\Core\Tasks\PurgeActivityLog::class,
     ];
 
+    /** @var list<string> Dashboard widgets (docs/widgets.md): failing scheduled tasks, shortcuts per group */
+    public array $widgets = [
+        \Modules\Core\Widgets\ScheduledTasks::class,
+        \Modules\Core\Widgets\QuickLinks::class,
+    ];
+
     /** @var list<string> */
     public array $notifications = [
         \Modules\Core\Notifications\Types\ScheduledTaskFailed::class,

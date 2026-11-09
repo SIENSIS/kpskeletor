@@ -32,6 +32,7 @@ return [
         'cspSource'         => 'té una font no permesa: "{0}" (només hosts https, self, none o blob:)',
         'host'              => 'té un nom de host no vàlid "{0}"',
         'classMissing'      => 'fa referència a la classe {0}, que no existeix',
+        'notWidget'         => 'fa referència a la classe {0}, que no implementa {1}',
         'configClass'       => 'no pot ser una classe de configuració: CodeIgniter dona un significat especial al nom de fitxer "{0}"',
         'notManifest'       => 'ha de definir la classe {0}, que estén ModuleManifest',
         'dependencyMissing' => 'necessita el mòdul {0}, que no hi és',
@@ -352,6 +353,10 @@ return [
             'crossOrigin' => 'No es permeten peticions a altres llocs.',
         ],
         'demo' => ['reset' => 'S\'ha reiniciat el comptador.'],
+        'widget' => [
+            'error' => 'No s’ha pogut carregar el giny.',
+            'empty' => 'No hi ha res a mostrar.',
+        ],
         'bell' => [
             'label' => 'Notificacions ({count} per llegir)',
             'empty' => 'No teniu cap notificació.',
@@ -521,6 +526,32 @@ return [
             'image' => 'No s\'ha pogut llegir la imatge o és massa gran.',
             'svg' => 'Les imatges SVG no estan permeses o el fitxer no és un SVG vàlid.',
             'content' => 'El fitxer conté codi o HTML i s\'ha rebutjat.',
+        ],
+    ],
+    'widgets' => [
+        'loading'       => 'S’està carregant…',
+        'failed'        => 'No s’ha pogut mostrar aquest giny. L’error s’ha registrat.',
+        'invalidOption' => 'El valor de «{0}» no és vàlid.',
+        'size'          => [
+            'small'  => 'Petit',
+            'medium' => 'Mitjà',
+            'large'  => 'Gran',
+            'full'   => 'Amplada completa',
+        ],
+        'scheduledTasks' => [
+            'title'   => 'Tasques programades',
+            'limit'   => 'Tasques fallides que es mostren',
+            'allOk'   => 'Les {0} tasques programades s’han executat correctament.',
+            'failing' => '{0, plural, one{# tasca ha fallat} other{# tasques han fallat}} en l’última execució.',
+            'lastRun' => 'última execució',
+            'nextRun' => 'Propera execució:',
+            'open'    => 'Obre les tasques programades',
+        ],
+        'quickLinks' => [
+            'title'     => 'Enllaços ràpids',
+            'links'     => 'Enllaços',
+            'linksHelp' => 'Pantalles del back office que es mostren com a dreceres; cada usuari només veu les que pot obrir.',
+            'empty'     => 'No hi ha dreceres disponibles.',
         ],
     ],
     'settingGroups' => [

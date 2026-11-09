@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Modules;
 
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Widgets\WidgetInterface;
 
 /**
  * Validates a module manifest. Every error names the module and the manifest key
@@ -73,7 +74,7 @@ final class ManifestValidator
         $this->checkMenu();
         $this->checkClassList('menuLinks');
         $this->checkSettings();
-        $this->checkClassList('widgets');
+        $this->checkClassList('widgets', WidgetInterface::class);
         $this->checkClassList('tasks');
         $this->checkClassList('notifications');
         $this->checkBackup();
@@ -464,7 +465,7 @@ final class ManifestValidator
         }
     }
 
-    private function checkClassList(string $key): void
+    private function checkClassList(string $key, ?string $interface = null): void
     {
         $classes = $this->raw[$key] ?? [];
 
@@ -477,6 +478,8 @@ final class ManifestValidator
         foreach ($classes as $class) {
             if (! class_exists($class)) {
                 $this->error($key, 'classMissing', [$class]);
+            } elseif ($interface !== null && ! is_subclass_of($class, $interface)) {
+                $this->error($key, 'notWidget', [$class, $interface]);
             }
         }
     }
