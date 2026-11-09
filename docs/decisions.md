@@ -1707,7 +1707,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 
 - **Where:** specification "News" ("HTML sanitised with HTMLPurifier in a `before*` hook"), "Translations" (`setTranslations()`), D-00-35
 - **Problem:** The body is a translated field (`news_translations`); kpcrudy's `before*` hooks receive only the main table's data, and `postedTranslations()` is read-only, so a hook cannot change the stored body.
-- **Proposal:** The controller cleans `kp_tr[<locale>][body]` with `BodySanitizer` (HTMLPurifier: paragraphs, headings, lists, emphasis, links `http`/`https`/`mailto` with `rel="noopener noreferrer"`, images, quotes, code, tables; no scripts, handlers, styles, iframes or forms) **before** kpcrudy reads the form (`IncomingRequest::setGlobal('post', …)`); the reader screen and the public page clean it again on output (one post at a time). Library request: let `before*` hooks change translated values.
+- **Proposal:** The controller cleans `kp_tr[<locale>][body]` with `BodySanitizer` (HTMLPurifier: paragraphs, headings, lists, emphasis, links `http`/`https`/`mailto` with `rel="noopener noreferrer"`, images, quotes, code, tables; no scripts, handlers, styles, iframes or forms) **before** kpcrudy reads the form (`IncomingRequest::setGlobal('post', …)`); the reader screen, the public page and the API (`transform()`) clean it again on output; the CSV import stays disabled on `news-posts` and `news-mine` (a test enforces it). Library request: let `before*` hooks change translated values.
 - **Alternatives:** A) Body not translated (one body in the main table). B) Clean only on output.
 - **Status:** Accepted (proposal)
 
@@ -1747,7 +1747,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 
 - **Where:** "JSON API (kpapy)", `CLAUDE.md` ("No raw SQL with interpolated values"; Query Builder only)
 - **Problem:** kpapy's `where()` takes a column and a value (equality or an operator in the key); the visibility rule is an `OR` of conditions with a group subquery, which cannot be written that way, and the Query Builder prefixes table aliases inconsistently in subqueries.
-- **Proposal:** `NewsVisibility::condition()` returns `[<news>.id, RawSql('(SELECT v.id FROM news v WHERE v.id = <news>.id AND <readable>)')]`: a correlated subquery compiled by the Query Builder (every value escaped by it; only table names, with the connection prefix, are written by hand; the alias carries the prefix so it is never prefixed twice). List, details, search and filters are all limited; an unreadable post is a 404. Library request: a `where()` that takes a closure over the builder.
+- **Proposal:** `NewsVisibility::condition()` returns `[<news>.id, RawSql('(SELECT v.id FROM news v WHERE v.id = <news>.id AND <readable>)')]`: a correlated subquery compiled by the Query Builder (every value escaped by it; only table names, with the connection prefix, are written by hand; the alias carries the prefix so it is never prefixed twice). List, details, search and filters are all limited; an unreadable post is a 404. Library request: a `where()` that takes a closure over the builder — done in kpapy `main` (`where(Closure)`, for 1.2.0); once released, the resource uses `where(fn ($builder) => NewsVisibility::apply($builder, $user))` and the `RawSql` goes away.
 - **Alternatives:** A) A per-record `setPermission('show')` rule (403 instead of 404; lists still need a query). B) A database view.
 - **Status:** Accepted (proposal)
 

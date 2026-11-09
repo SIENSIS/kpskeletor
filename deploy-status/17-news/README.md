@@ -174,16 +174,26 @@ violation or horizontal page scroll.
 ![Dark mode](screenshots/13-dashboard-dark.png)
 *13 — Dark mode, after one notice was marked as read.*
 
+## Follow-ups after the review
+
+- The API cleans the body on output too (`transform()`, also with `?lang=*`); a test keeps the CSV
+  import disabled on `news-posts`/`news-mine`.
+- `theme_component()` renders on a new renderer that sees only its own data (the root cause of the
+  widget failure); test `UiComponentsTest::testComponentsSeeOnlyTheirOwnData`.
+- Relative dates in Catalan (`app/Language/ca/Time.php`, "fa 5 hores").
+- `news_groups` has an `id`: demo data records its rows and removes them exactly (test
+  `testDemoDataLoadsAndIsRemovedCompletely`).
+- kpcrudy `main` (commit `4764c73`): `Config::$timezone` / `setTimezone()` show and edit `datetime`
+  fields in a time zone and store UTC. kpapy `main` (commit `7b6f78b`): `where(Closure)`. The
+  skeleton adopts both when 1.2.0 of each library is tagged and on Packagist (`CLAUDE.md`: Packagist
+  releases only).
+
 ## Known issues
 
-- Relative dates in the widgets ("5 hours ago") stay in English in Catalan (known issue of
-  session 11, `ui_date(…, 'relative')`); guests see the default locale `en` (session 31).
-- Dates in the post form are stored and edited as server time (UTC) until the user's time zone
-  (session 31).
+- Guests see the default locale `en` (session 31).
+- Dates in the post form are edited in UTC until kpcrudy 1.2.0 is released (see above).
 - The body is a plain textarea of HTML until the rich-text editor (session 20); the cover is a
   plain upload field until the file picker (session 23).
-- Demo `news_groups` rows are removed by the foreign key cascade when the demo posts are removed
-  (the junction table has a composite key and is not recorded in `demo_records`).
 - Composer could not download `phpstan/phpstan` again (known issue 04): its zip was built from a
   shallow fetch of the release commit and seeded into Composer's cache; a full clone of that
   repository is >10 GB, fetch only the commit.
