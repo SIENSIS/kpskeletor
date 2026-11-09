@@ -155,7 +155,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-15-03 | 15 | Adding and editing users; no deletion | Accepted (proposal) |
 | D-15-04 | 15 | Who manages whose account | Accepted (proposal) |
 | D-15-05 | 15 | Impersonation mechanics and the permission matrix save | Accepted (proposal) |
-| D-16-01 | 16 | Dashboard permission names, URLs and the login landing page (decide) | Open |
+| D-16-01 | 16 | Dashboard permission names, URLs and the login landing page (decide) | Applied (decided) |
 | D-16-02 | 16 | Group layouts: defaults, several groups, what users may change | Accepted (proposal) |
 | D-16-03 | 16 | The widget contract, async data and failures | Accepted (proposal) |
 | D-16-04 | 16 | The back-office home in the menu and breadcrumbs | Accepted (proposal) |
@@ -1636,7 +1636,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The specification names the resource but not its operations, the permission of the group configuration, the URLs of the user layout, nor where a login lands now; all are public conventions. The Dashboard module is not a core module, so it can be disabled.
 - **Proposal:** One resource `dashboard` with the `'name'` override (single-resource module): `dashboard.view` (home, own layout, async data; granted to every group) and `dashboard.configure` (group layouts; `admin` gets `dashboard.*`). URLs: `backend` (route `dashboard`), `backend/dashboard/customize`, `POST backend/dashboard/layout`, `POST backend/dashboard/layout/reset`, `backend/dashboard/widgets/<id>/data`, `backend/dashboard/groups[/<group>]` (route `dashboard-groups`; menu "Dashboard widgets" in the settings zone). Widget ids `<module>.<name>` (`core.scheduled-tasks`, `core.quick-links`, `users.summary`). A login, the start and the end of an impersonation land on `backend`; `backend` always exists: the Dashboard is a core module (D-16-05). Built this way; renaming means changing the manifest, routes, tests and `Config\Auth::$redirects`.
 - **Alternatives:** A) A separate resource for the configuration: `dashboard-groups.{view,edit}` (needs two resources, so no `'name'` override: `dashboard-dashboard.view`). B) Keep the login on `backend/profile`.
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-09):** «Com està (recomanada)». The Dashboard keeps `dashboard.view` (every group) and `dashboard.configure` (admin), the URLs `backend` (route `dashboard`), `backend/dashboard/customize`, `POST backend/dashboard/layout`, `POST backend/dashboard/layout/reset`, `backend/dashboard/widgets/<id>/data` and `backend/dashboard/groups[/<group>]` (route `dashboard-groups`), widget ids `<module>.<name>`, and a login or an impersonation lands on `backend`. Nothing to change in the code: session 16 built it this way.
+- **Applied in:** `docs/specification.md` ("Modules" › "Dashboard", "Dashboard widgets"), `docs/widgets.md`; code of session 16 (`modules/Dashboard/Config/Module.php`, `modules/Dashboard/Config/Routes.php`, `app/Config/Auth.php`)
 
 ## D-16-02 — Group layouts: defaults, several groups, what users may change
 

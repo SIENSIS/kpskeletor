@@ -1,7 +1,7 @@
 # Dashboard widgets
 
 How the back-office home works and how a module adds a widget (specification: "Dashboard
-widgets", "Modules" › "Dashboard"; decisions D-16-01 … D-16-04). The step-by-step tutorial
+widgets", "Modules" › "Dashboard"; decisions D-16-01 … D-16-05). The step-by-step tutorial
 "A new widget" (the `Tasks` module's *My pending tasks* and *Task activity chart*) is written in
 sessions 32–34; this page is the reference.
 

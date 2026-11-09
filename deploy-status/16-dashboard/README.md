@@ -60,7 +60,7 @@ Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull r
 
 ## Decisions and deviations
 
-- **D-16-01 (decide, Open):** permission names `dashboard.view` / `dashboard.configure`, the URLs
+- **D-16-01 (decided by the owner as proposed):** permission names `dashboard.view` / `dashboard.configure`, the URLs
   above, widget ids `<module>.<name>`, login landing on `backend`. Built as proposed; alternatives in `docs/decisions.md`.
 - **D-16-02 (accepted):** a widget without a group row is enabled with its defaults; the first of
   the user's groups (reserved first) that enables a widget gives its position, size and options;
@@ -156,4 +156,4 @@ the warning when the group lacks a widget's permission.*
   (`addTestWidgets()`, `cards()`, `postJson()`).
 - Session 17 (News): *Notices* (unread private notices with "mark as read"; can be an
   `AsyncWidget` with its own component) and *Latest news*.
-- D-16-01 is Open (decide): run `deploy/decide.md`.
+- D-16-01 decided as proposed and D-16-05 (core module) decided by the owner: nothing open.
