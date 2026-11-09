@@ -281,9 +281,9 @@ final class Module extends ModuleManifest
      * completed with the implied permissions (see "RBAC"); the validator warns about incomplete sets.
      */
     public array $defaultGrants = [
-        'admin'  => ['news-posts.*', 'news-categories.*', 'news-stats.*', 'news-read.*'],
-        'editor' => ['news-posts.list', 'news-posts.show', 'news-posts.add', 'news-posts.edit', 'news-posts.publish', 'news-categories.list', 'news-read.view'],
-        'user'   => ['news-read.view'],
+        'admin'  => ['news-posts.*', 'news-categories.*', 'news-stats.*', 'news-read.*', 'news-api.*'],
+        'editor' => ['news-posts.list', 'news-posts.show', 'news-posts.add', 'news-posts.edit', 'news-posts.publish', 'news-categories.list', 'news-read.view', 'news-api.*'],
+        'user'   => ['news-read.view', 'news-api.*'],
     ];
 
     /**
@@ -1284,6 +1284,12 @@ field declares how it works:
   space's default rights.
 * In `browse` / `both` mode, what the user can see and upload is limited by `browseRoot` **and**
   the folder ACL (e.g. editors choose a news cover from `news/` and their personal space).
+* **Images inside rich text:** the rich-text editor has an "Insert image" button that opens the
+  picker (`mode` `both`, images only: JPG, PNG, WebP, GIF; public disk, folder
+  `modules/<module>` of the content, e.g. `modules/news`; the Storage service's rules and
+  re-encoding) and inserts the image with an alt text; pasted or dropped images go through the
+  same signed upload. HTMLPurifier then keeps only images of the site itself (internal
+  `/uploads/…` URLs or the site's hosts); external images are removed. Used by News and Pages.
 * **Avatars** are stored on the **private** disk: they are only served to logged-in users (the
   personal folder's `avatar` subfolder grants `view` to "all logged-in users"), with long cache
   headers and a versioned URL so they stay fast.
@@ -1312,6 +1318,11 @@ field declares how it works:
 * **Reader screen:** a read-only back-office screen (resource `news-read`, `type: page`,
   permission `news-read.view` granted to every group) that lists the posts the user may see, with
   the detail page and "mark as read"; ordinary users never need `news-posts.list`.
+* **API:** resource `news-api` (`list`, `show`, granted to every group; `api/v1/news`): the
+  posts the token's user may read, with the reader screen's visibility rules. Settings
+  `News.perPage` (public list) and `News.feedItems` (RSS).
+* **Images inside the body:** the editor's "Insert image" button opens the file picker (see
+  "Files"); the body keeps only images of the site itself.
 * Public routes (`/news`, `/news/{slug}`, `/news/category/{slug}`, RSS feed) for public news;
   private news only in the back office (reader screen) and the dashboard.
 * Widgets *Notices* and *Latest news*, a task that expires notices, two settings, the menu link

@@ -161,14 +161,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-16-04 | 16 | The back-office home in the menu and breadcrumbs | Accepted (proposal) |
 | D-16-05 | 16 | Dashboard is a core module | Applied (decided) |
 | D-16-06 | 16 | Quick links: free URLs and the order chosen by the administrator (decide) | Applied (decided) |
-| D-17-01 | 17 | News permission names, URLs, settings and the reader's API permissions (decide) | Open |
+| D-17-01 | 17 | News permission names, URLs, settings and the reader's API permissions (decide) | Applied (decided) |
 | D-17-02 | 17 | Sanitising a translated body before kpcrudy reads the form | Accepted (proposal) |
 | D-17-03 | 17 | Post statuses, publishing, scheduling and expiry | Accepted (proposal) |
 | D-17-04 | 17 | Who reads what: visibility rules and the notice audience | Accepted (proposal) |
 | D-17-05 | 17 | The menu link type before the Menus module | Accepted (proposal) |
 | D-17-06 | 17 | The cover through a kpcrudy upload handler on the Storage service | Accepted (proposal) |
 | D-17-07 | 17 | The API's visibility as a `where()` condition | Applied |
-| D-17-08 | 17 | Images inside the rich-text body (decide) | Open |
+| D-17-08 | 17 | Images inside the rich-text body (decide) | Applied (decided) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1702,7 +1702,9 @@ questions") and from each session's report; they are answered with `deploy/decid
   - Back office: `backend/news` (reader, route `news-read`), `backend/news/read/{masked id}`, `POST backend/news/read/{masked id}/mark`, `backend/news/posts` (+ operations `publish`, `unpublish`, `readers`), `backend/news/mine`, `backend/news/categories`. Public: `news`, `news/{slug}`, `news/category/{slug}`, `news/feed.xml`. API: `api/v1/news` (resource name `news-read`).
   - Settings: `News.perPage` (public list, 10) and `News.feedItems` (RSS, 20), group "Public site".
 - **Alternatives:** A) The API uses `news-read.view` for both operations through a resource-level resolver (no new names; a token needs the scope `news-read.*` or `*`, a token scoped `news-read.view` gets 403). B) The API on `news-posts` (authors only; ordinary users get nothing). C) A separate API resource `news-api.{list,show}`. D) "My posts" without its own resource (a filter of `news-posts`; editors without `news-posts.list` lose it).
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-09):** «Recurs API separat». The News API gets its own resource `news-api` with the operations `list` and `show` (granted to every group, like the reader screen), instead of extra `list`/`show` operations on `news-read`; `news-read` keeps only `view`. The other names, URLs and settings stay as built (`news-posts`, `news-mine`, `news-categories`, `news-read.view`; `backend/news…`, `news…`, `api/v1/news`; `News.perPage`, `News.feedItems`). **Must change:** `modules/News/Config/Module.php` (resources, grants), `modules/News/Controllers/Api/Posts.php` (`setResource('news-api')`), tests (`NewsApiTest` scopes, `NewsModuleTest`), counting tests of earlier sessions, `docs/news.md`, `modules/News/CLAUDE.md`, specification "News"
+- **Applied in:** `modules/News/Config/Module.php` (resource `api`, grants), `modules/News/Controllers/Api/Posts.php` (`setResource('news-api')`), `modules/News/Language/{ca,es,en}/News.php`, `docs/specification.md` ("News", manifest example), `docs/news.md`, `modules/News/CLAUDE.md`; tests `NewsApiTest::testScopesNarrowTheToken` (`news-read.view` alone is refused), `NewsModuleTest::testManifestIsValid`, `ShieldMatrixTest`. Existing development databases: `php spark modules:sync --prune` removes `news-read.list`/`news-read.show`; the new grants apply on a fresh install (grants are applied once per module).
 
 ## D-17-02 — Sanitising a translated body before kpcrudy reads the form
 
@@ -1759,5 +1761,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Session 20 brings a WYSIWYG editor and session 23 the file picker, but no session says that authors can **insert images inside the text** (only the cover is planned). Authors who do not know HTML cannot add an image to a post today, and the sanitiser accepts images from any `https` site (external images leak the readers' IP addresses to that site and may disappear).
 - **Proposal:** In session 23 (file picker), add an "Insert image" button to the editor of session 20 that opens the file picker (upload or choose; images only: JPG, PNG, WebP, GIF; the Storage service's rules, re-encoding and limits; public disk, folder `modules/<module>` of the content, e.g. `modules/news`), and inserts `<img src="/uploads/…" alt="…">` with an alt text field. HTMLPurifier then keeps only images of the site itself (`URI.Host`/a custom URI filter: relative `/uploads/…` URLs or the site's own host); external images are removed. Pages (session 20) use the same component. Paste or drop of images in the editor goes through the same upload.
 - **Alternatives:** A) Allow external `https` images as today (no upload; authors paste URLs). B) Images only as attachments/gallery under the text, never inside it. C) Do it already in session 20 with a simple upload dialog, before the file picker exists.
-- **Status:** Open
+- **Status:** Applied
+- **Decision (2026-11-09):** «Botó a la sessió 23 (recomanada)». As proposed: session 23 adds an "Insert image" button to the editor of session 20 that opens the file picker (upload or choose; JPG, PNG, WebP, GIF; the Storage service's rules and re-encoding; an alt text), for News and Pages, pasted or dropped images go through the same upload, and HTMLPurifier then keeps only images of the site itself. **Must change:** `deploy/23-files-picker.md` (scope and tests), specification "Files" (file picker) and "News", `modules/News/Services/BodySanitizer.php` in session 23
+- **Applied in:** `deploy/23-files-picker.md` (scope and tests), `docs/specification.md` ("Files" › file picker, "News"), `modules/News/CLAUDE.md` (open tasks); the code changes are session 23's.
 

@@ -29,10 +29,11 @@ the Core; a kpapy resource; the Storage service; HTMLPurifier; demo data; tests.
 | `backend/news/categories` | `news-categories.*` | Categories (kpcrudy) |
 | `news`, `news/{slug}`, `news/category/{slug}` | public | Public posts only (`News.perPage` per page) |
 | `news/feed.xml` | public | RSS 2.0 of the latest public posts (`News.feedItems`) |
-| `GET api/v1/news`, `GET api/v1/news/{id}` | `news-read.list` / `news-read.show` | Readable posts as JSON (kpapy, read-only) |
+| `GET api/v1/news`, `GET api/v1/news/{id}` | `news-api.list` / `news-api.show` (every group) | Readable posts as JSON (kpapy, read-only) |
 
-Permission names and URLs are decision **D-17-01** (open: the owner may still rename them).
-Images inside the body (editor + file picker) are decision **D-17-08** (open).
+Permission names and URLs: decision **D-17-01** (decided: the API has its own resource
+`news-api`). Images inside the body: decision **D-17-08** (decided: an "Insert image" button with
+the file picker, session 23).
 
 ## Rules
 

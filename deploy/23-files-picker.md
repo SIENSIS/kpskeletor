@@ -44,7 +44,14 @@ A reusable file picker for every module field.
   sizes), signed upload tokens, folders created on demand.
 - Avatars on the private disk (logged-in users only, versioned URL, cache headers) in the profile.
 - Replace the simple upload field of News with the picker.
-- Tests: tampered token refused, avatars not served to guests.
+- "Insert image" in the rich-text editor of session 20 (D-17-08): a button that opens the picker
+  (upload or choose; JPG, PNG, WebP, GIF; public disk, folder `modules/<module>`, e.g.
+  `modules/news`; the Storage service's rules and re-encoding) and inserts the image with an alt
+  text; pasted or dropped images use the same signed upload; News and Pages. Restrict
+  `img src` in `Modules\News\Services\BodySanitizer` (and the Pages sanitiser) to images of the
+  site itself.
+- Tests: tampered token refused, avatars not served to guests, an image inserted in a News body is
+  stored through the Storage service, an external `img src` is removed from the body.
 
 ## Done when
 

@@ -63,9 +63,9 @@ Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull r
 
 ## Decisions and deviations
 
-- **D-17-01 (decide, Open):** permission names, URLs, settings and the reader's API permissions
-  (`news-read.list`/`news-read.show` added so tokens can be scoped). Built as proposed; the
-  alternatives are in `docs/decisions.md`.
+- **D-17-01 (decided by the owner, «Recurs API separat»):** the API has its own resource
+  `news-api` (`list`, `show`, every group); `news-read` is only the reader screen (`view`); the
+  other names, URLs and settings as built.
 - **D-17-02 (accepted):** the body is sanitised before kpcrudy reads the form (its hooks do not
   receive translations) and again on output.
 - **D-17-03 (accepted):** statuses draft/scheduled/published/expired; only the `publish`
@@ -77,8 +77,8 @@ Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull r
   Storage service (TODO: file picker in session 23).
 - **D-17-07 (applied):** the API's visibility goes through kpapy 1.2's `where(Closure)` (first a
   correlated `RawSql` subquery; replaced once kpapy 1.2.0 was released).
-- **D-17-08 (decide, Open):** images inside the rich-text body (editor of session 20 + file picker
-  of session 23).
+- **D-17-08 (decided by the owner, as proposed):** session 23 adds "Insert image" to the editor
+  (file picker, the site's own images only).
 - Deviations: tests of earlier sessions updated for the real News module (permission counts 52 →
   80, admin's grants, CRUD count 9 → 12, a fixture permission in `RbacTestCase`, the menu cache
   test uses the `user` group); `DashboardTestCase` declares only the widgets of
@@ -198,8 +198,6 @@ violation or horizontal page scroll.
 - Composer could not download `phpstan/phpstan` again (known issue 04): its zip was built from a
   shallow fetch of the release commit and seeded into Composer's cache; a full clone of that
   repository is >10 GB, fetch only the commit.
-- D-17-01 and D-17-08 are open: renaming permissions or URLs means changing the manifest, routes, views,
-  tests and docs.
 
 ## What the next session must know
 
