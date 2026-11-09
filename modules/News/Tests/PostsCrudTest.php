@@ -220,6 +220,31 @@ final class PostsCrudTest extends NewsTestCase
         $this->assertSame(1, db_connect()->table('news_categories')->where('slug', 'ambit-social')->countAllResults());
     }
 
+    public function testDatesAreEditedInTheSiteTimeZoneAndStoredInUtc(): void
+    {
+        setting()->set('Core.timezone', 'Europe/Madrid');
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+
+        try {
+            $this->send('POST', 'backend/news/posts/add', [
+                'kp_tr' => ['ca' => ['title' => 'Hora local', 'summary' => '', 'body' => '']], 'type' => 'notice', 'priority' => 'info',
+                'visibility' => 'private', 'published_at' => '2026-01-15T09:00', 'expires_at' => '2026-07-15T09:00',
+            ])->assertRedirect();
+
+            $row = db_connect()->table('news')->where('slug', 'hora-local')->get()->getRowArray();
+            $this->assertIsArray($row);
+            $this->assertSame('2026-01-15 08:00:00', $row['published_at'], 'Winter: UTC+1.');
+            $this->assertSame('2026-07-15 07:00:00', $row['expires_at'], 'Summer: UTC+2.');
+
+            $form = $this->body('GET', 'backend/news/posts/edit/' . $this->code((int) $row['id']));
+            $this->assertStringContainsString('value="2026-01-15T09:00"', $form);
+            $this->assertStringContainsString('value="2026-07-15T09:00"', $form);
+        } finally {
+            setting()->forget('Core.timezone');
+        }
+    }
+
     private function assertRefused(TestResponse $response): void
     {
         $this->assertTrue($response->response()->getStatusCode() >= 300, 'Refused (redirect or error).');

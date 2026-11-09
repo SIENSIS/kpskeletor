@@ -29,8 +29,8 @@
         "ezyang/htmlpurifier": "^4.18",
         "league/flysystem": "^3.29",
         "league/flysystem-local": "^3.29",
-        "siensis/kpapy": "^1.0",
-        "siensis/kpcrudy": "^1.0",
+        "siensis/kpapy": "^1.2",
+        "siensis/kpcrudy": "^1.2",
         "spomky-labs/otphp": "^11.3"
     },
     "require-dev": {

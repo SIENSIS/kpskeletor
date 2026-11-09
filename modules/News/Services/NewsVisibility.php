@@ -6,7 +6,6 @@ namespace Modules\News\Services;
 
 use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Database\BaseConnection;
-use CodeIgniter\Database\RawSql;
 use CodeIgniter\I18n\Time;
 use CodeIgniter\Shield\Entities\User;
 
@@ -68,29 +67,6 @@ final class NewsVisibility
         }
 
         return $builder->groupEnd();
-    }
-
-    /**
-     * The column and value of a kpapy/kpcrudy `where()` that limits a resource on `news` to the
-     * posts the user may read: `<news>.id = (SELECT v.id FROM news v WHERE v.id = <news>.id AND
-     * <readable>)`, a correlated subquery returning the post's own id only when it is readable, so
-     * list, details, search and operations of the library are all limited.
-     *
-     * The subquery is compiled by the Query Builder (every value escaped by it); only table names
-     * (with the connection's prefix) are written here.
-     *
-     * @return array{0: string, 1: RawSql}
-     */
-    public static function condition(?User $user): array
-    {
-        $db    = db_connect();
-        $outer = $db->prefixTable('news');
-        // The alias carries the prefix too, so the Query Builder never prefixes it twice.
-        $alias = $db->prefixTable('news_visible');
-        $sub   = self::apply($db->table('news ' . $alias)->select($alias . '.id'), $user, $alias)
-            ->where(new RawSql($alias . '.id = ' . $outer . '.id'));
-
-        return [$outer . '.id', new RawSql('(' . $sub->getCompiledSelect() . ')')];
     }
 
     /**

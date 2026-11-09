@@ -16,6 +16,7 @@ records the owner's decisions; they override the specification when they disagre
   `$api` (`docs/api.md`; the API core is the `Api` module).
 - Install from Packagist only: `composer require siensis/kpcrudy:^1.0 siensis/kpapy:^1.0`. Never
   `dev-main`, a `repositories` entry or a local path. If Composer fails, stop and report it.
+  `composer.json` requires `^1.2` of both (time zones of `datetime` fields, `where(Closure)`).
 - **Read their docs in `vendor/` before using them**, not from memory:
   `vendor/siensis/<lib>/README_EN.md`, `docs/functions_EN.md` (every method and option),
   `docs/howto_EN.md` (recipes), `docs/commands_EN.md`. Their demos (`src/Demo/`) show working
