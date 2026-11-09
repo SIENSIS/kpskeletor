@@ -276,7 +276,8 @@ final class MenuBuilder
             return 50000;
         }
 
-        if ($entry->path !== '' && str_starts_with($path, $entry->path . '/')) {
+        // Prefixes count from two segments: the back-office home (`backend`) is only active on itself.
+        if (str_contains($entry->path, '/') && str_starts_with($path, $entry->path . '/')) {
             return strlen($entry->path) + 1;
         }
 
