@@ -34,7 +34,7 @@ description: `docs/news.md`.
 
 ## Decisions
 
-D-17-01 (names, URLs, settings, API permissions; **open**), D-17-02 … D-17-07 accepted
+D-17-01 (names, URLs, settings, API permissions; **open**), D-17-08 (images inside the body; **open**), D-17-02 … D-17-06 accepted, D-17-07 applied (kpapy `where(Closure)`)
 (`docs/decisions.md`); D-00-35, D-00-36, D-00-40, D-00-41, D-00-42.
 
 ## Open tasks
@@ -44,7 +44,6 @@ D-17-01 (names, URLs, settings, API permissions; **open**), D-17-02 … D-17-07 
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
 - Session 25: the `news.notices` calendar (`groups` → `restricted`, D-00-41).
 - Session 26: read receipts and notices in the API.
-- When kpcrudy 1.2.0 and kpapy 1.2.0 are on Packagist: dates in the site's time zone (`Config\Kpcrudy::$timezone`) and `where(Closure)` in `Controllers/Api/Posts.php` instead of the `RawSql` subquery.
 
 ## How to test
 

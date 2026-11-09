@@ -38,7 +38,7 @@ Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull r
   cover key, author, `notified_at`, soft deletes), `news_translations`, `news_groups` (junction,
   `setRelationNN()`), `news_reads`.
 - **Services** (`modules/News/Services/`): `NewsVisibility` (the one visibility rule as Query
-  Builder conditions, plus a correlated-subquery `where()` for kpapy), `NewsRepository` (reader,
+  Builder conditions, also used by kpapy's `where(Closure)`), `NewsRepository` (reader,
   widgets, public queries; texts in the user's language with Catalan fallback), `Publisher`
   (publish/schedule, notify once, release, expire), `ReadReceipts`, `BodySanitizer`
   (HTMLPurifier), `Slugger`, `FeedWriter` (RSS with XMLWriter).
@@ -58,7 +58,7 @@ Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull r
   view data during a request, so a `$message` left by an earlier view (a `NotificationMessage`)
   made the News widgets fail. It now passes every variable (test
   `WidgetsAndTaskTest::testAnEmptyWidgetDoesNotPickUpDataOfEarlierViews`).
-- Docs: new `docs/news.md`; `docs/decisions.md` (D-17-01 … D-17-07), `docs/library-requests.md`
+- Docs: new `docs/news.md`; `docs/decisions.md` (D-17-01 … D-17-08), `docs/library-requests.md`
   (two kpcrudy/kpapy requests), `docs/cruds.md` (upload handler exception), `docs/widgets.md`.
 
 ## Decisions and deviations
@@ -75,8 +75,10 @@ Branch: `claude/wonderful-pascal-rn7hdc` (assigned by the environment) · Pull r
 - **D-17-05 (accepted):** the menu link type is a module class until session 21.
 - **D-17-06 (accepted):** the cover uses kpcrudy's `image` field with an upload handler on the
   Storage service (TODO: file picker in session 23).
-- **D-17-07 (accepted):** the API's visibility is a correlated subquery passed to kpapy's
-  `where()` as `RawSql` compiled by the Query Builder.
+- **D-17-07 (applied):** the API's visibility goes through kpapy 1.2's `where(Closure)` (first a
+  correlated `RawSql` subquery; replaced once kpapy 1.2.0 was released).
+- **D-17-08 (decide, Open):** images inside the rich-text body (editor of session 20 + file picker
+  of session 23).
 - Deviations: tests of earlier sessions updated for the real News module (permission counts 52 →
   80, admin's grants, CRUD count 9 → 12, a fixture permission in `RbacTestCase`, the menu cache
   test uses the `user` group); `DashboardTestCase` declares only the widgets of
@@ -183,21 +185,20 @@ violation or horizontal page scroll.
 - Relative dates in Catalan (`app/Language/ca/Time.php`, "fa 5 hores").
 - `news_groups` has an `id`: demo data records its rows and removes them exactly (test
   `testDemoDataLoadsAndIsRemovedCompletely`).
-- kpcrudy `main` (commit `4764c73`): `Config::$timezone` / `setTimezone()` show and edit `datetime`
-  fields in a time zone and store UTC. kpapy `main` (commit `7b6f78b`): `where(Closure)`. The
-  skeleton adopts both when 1.2.0 of each library is tagged and on Packagist (`CLAUDE.md`: Packagist
-  releases only).
+- kpcrudy 1.2.0 and kpapy 1.2.0 (released by the owner, `composer.json` requires `^1.2`):
+  `CrudFactory` sets the site's time zone on every CRUD (dates edited in `Core.timezone`, stored
+  in UTC; test `PostsCrudTest::testDatesAreEditedInTheSiteTimeZoneAndStoredInUtc`), and the News
+  API uses `where(Closure)` instead of the `RawSql` subquery.
 
 ## Known issues
 
 - Guests see the default locale `en` (session 31).
-- Dates in the post form are edited in UTC until kpcrudy 1.2.0 is released (see above).
 - The body is a plain textarea of HTML until the rich-text editor (session 20); the cover is a
   plain upload field until the file picker (session 23).
 - Composer could not download `phpstan/phpstan` again (known issue 04): its zip was built from a
   shallow fetch of the release commit and seeded into Composer's cache; a full clone of that
   repository is >10 GB, fetch only the commit.
-- D-17-01 is open: renaming permissions or URLs means changing the manifest, routes, views,
+- D-17-01 and D-17-08 are open: renaming permissions or URLs means changing the manifest, routes, views,
   tests and docs.
 
 ## What the next session must know

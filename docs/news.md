@@ -32,6 +32,7 @@ the Core; a kpapy resource; the Storage service; HTMLPurifier; demo data; tests.
 | `GET api/v1/news`, `GET api/v1/news/{id}` | `news-read.list` / `news-read.show` | Readable posts as JSON (kpapy, read-only) |
 
 Permission names and URLs are decision **D-17-01** (open: the owner may still rename them).
+Images inside the body (editor + file picker) are decision **D-17-08** (open).
 
 ## Rules
 
@@ -39,11 +40,13 @@ Permission names and URLs are decision **D-17-01** (open: the owner may still re
   deleted, its status is `published` or `scheduled`, `published_at` has passed and `expires_at`
   (if any) has not. Guests and the public site: only `public`. Signed-in users: `public`,
   `private` and `groups` posts of one of their groups. The same rule serves the reader screen, the
-  widgets, the public site, the feed and the API (there, as a `where()` subquery, D-17-07).
+  widgets, the public site, the feed and the API (there, through kpapy's `where(Closure)`, D-17-07).
 - **Own posts** (`Controllers/Posts.php`): without `news-posts.author` the author field is hidden
   everywhere (`hideFields()`) and a user only edits, deletes and (un)publishes their own posts
   (per-record `setPermission()` rules, checked again by kpcrudy on every row and bulk action). New
   posts belong to their author.
+- **Dates** are edited in the site's time zone (`Core.timezone`) and stored in UTC (kpcrudy 1.2,
+  set by `CrudFactory`).
 - **Statuses** (`Services/Publisher.php`, D-17-03): new posts are drafts; `publish` makes a post
   `published` (or `scheduled` when `published_at` is in the future); `unpublish` turns it back
   into a draft; the form never sets the status. The task *Publish scheduled news and expire

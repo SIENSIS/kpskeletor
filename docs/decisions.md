@@ -167,7 +167,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-17-04 | 17 | Who reads what: visibility rules and the notice audience | Accepted (proposal) |
 | D-17-05 | 17 | The menu link type before the Menus module | Accepted (proposal) |
 | D-17-06 | 17 | The cover through a kpcrudy upload handler on the Storage service | Accepted (proposal) |
-| D-17-07 | 17 | The API's visibility as a `where()` subquery | Accepted (proposal) |
+| D-17-07 | 17 | The API's visibility as a `where()` condition | Applied |
+| D-17-08 | 17 | Images inside the rich-text body (decide) | Open |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1743,11 +1744,20 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) No cover until session 23. B) A custom upload screen.
 - **Status:** Accepted (proposal)
 
-## D-17-07 — The API's visibility as a `where()` subquery
+## D-17-07 — The API's visibility as a `where()` condition
 
 - **Where:** "JSON API (kpapy)", `CLAUDE.md` ("No raw SQL with interpolated values"; Query Builder only)
 - **Problem:** kpapy's `where()` takes a column and a value (equality or an operator in the key); the visibility rule is an `OR` of conditions with a group subquery, which cannot be written that way, and the Query Builder prefixes table aliases inconsistently in subqueries.
 - **Proposal:** `NewsVisibility::condition()` returns `[<news>.id, RawSql('(SELECT v.id FROM news v WHERE v.id = <news>.id AND <readable>)')]`: a correlated subquery compiled by the Query Builder (every value escaped by it; only table names, with the connection prefix, are written by hand; the alias carries the prefix so it is never prefixed twice). List, details, search and filters are all limited; an unreadable post is a 404. Library request: a `where()` that takes a closure over the builder — done in kpapy `main` (`where(Closure)`, for 1.2.0); once released, the resource uses `where(fn ($builder) => NewsVisibility::apply($builder, $user))` and the `RawSql` goes away.
 - **Alternatives:** A) A per-record `setPermission('show')` rule (403 instead of 404; lists still need a query). B) A database view.
-- **Status:** Accepted (proposal)
+- **Status:** Applied
+- **Applied in:** kpapy 1.2.0 (`where(Closure)`, requested and added after the session 17 review; `composer.json` requires `^1.2`): `modules/News/Controllers/Api/Posts.php` uses `where(fn (BaseBuilder $builder) => NewsVisibility::apply($builder, $user))`; the `RawSql` subquery (`NewsVisibility::condition()`) was removed. Tests: `NewsApiTest`.
+
+## D-17-08 — Images inside the rich-text body (decide)
+
+- **Where:** specification "News" (body sanitised with HTMLPurifier), "Files" (file picker), "Front-end assets" (vendored rich-text editor); `deploy/20-pages.md` (editor, News switches to it), `deploy/23-files-picker.md` (picker, News cover); `modules/News/Services/BodySanitizer.php` (allows `img[src|alt|width|height]` with any `http`/`https` source)
+- **Problem:** Session 20 brings a WYSIWYG editor and session 23 the file picker, but no session says that authors can **insert images inside the text** (only the cover is planned). Authors who do not know HTML cannot add an image to a post today, and the sanitiser accepts images from any `https` site (external images leak the readers' IP addresses to that site and may disappear).
+- **Proposal:** In session 23 (file picker), add an "Insert image" button to the editor of session 20 that opens the file picker (upload or choose; images only: JPG, PNG, WebP, GIF; the Storage service's rules, re-encoding and limits; public disk, folder `modules/<module>` of the content, e.g. `modules/news`), and inserts `<img src="/uploads/…" alt="…">` with an alt text field. HTMLPurifier then keeps only images of the site itself (`URI.Host`/a custom URI filter: relative `/uploads/…` URLs or the site's own host); external images are removed. Pages (session 20) use the same component. Paste or drop of images in the editor goes through the same upload.
+- **Alternatives:** A) Allow external `https` images as today (no upload; authors paste URLs). B) Images only as attachments/gallery under the text, never inside it. C) Do it already in session 20 with a simple upload dialog, before the file picker exists.
+- **Status:** Open
 
