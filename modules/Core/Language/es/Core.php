@@ -375,6 +375,8 @@ return [
         'rateLimitFeeds' => 'Peticiones a los feeds de calendario por token y hora',
         'rateLimitUploads' => 'Subidas de archivos por usuario y hora',
         'rateLimitForms' => 'Envíos de formularios públicos por dirección IP y hora',
+        'widgetMaxLinks'     => 'Máximo de enlaces por widget',
+        'widgetMaxLinksHelp' => 'Número máximo de elementos de una lista de enlaces, como los enlaces rápidos de cada grupo (1–100).',
         'rateLimitWidgets' => 'Actualizaciones de widgets del panel por usuario y minuto',
         'outboundHosts' => 'Otros servidores externos permitidos',
         'outboundHostsHelp' => 'Nombres de servidor a los que el sitio puede conectar por HTTPS o usar como servidor SMTP (p. ej. api.example.com o *.example.com), además de los de la configuración y los módulos.',
@@ -556,6 +558,7 @@ return [
         ],
     ],
     'settingGroups' => [
+        'dashboard' => 'Panel',
         'general' => 'Sitio',
         'pwa' => 'Aplicación web',
         'scheduler' => 'Tareas programadas',

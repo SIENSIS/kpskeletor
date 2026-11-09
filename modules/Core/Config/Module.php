@@ -97,6 +97,15 @@ final class Module extends ModuleManifest
             'help'    => 'Core.settings.timezoneHelp',
             'group'   => 'general',
         ],
+        // Dashboard widgets: most items of a `links` option (the "Quick links" of each group).
+        'widgetMaxLinks' => [
+            'type'    => 'int',
+            'default' => 20,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
+            'label'   => 'Core.settings.widgetMaxLinks',
+            'help'    => 'Core.settings.widgetMaxLinksHelp',
+            'group'   => 'dashboard',
+        ],
         'pwa' => [
             'type'    => 'bool',
             'default' => false,

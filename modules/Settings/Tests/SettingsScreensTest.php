@@ -70,6 +70,7 @@ final class SettingsScreensTest extends SettingsTestCase
             'Core-pwa'          => '1',
             'Core-pwaStart'     => 'backend',
             'Core-poorMansCron' => '0',
+            'Core-widgetMaxLinks' => '20',
         ])->assertRedirectTo(site_url('backend/settings/core'));
 
         $this->assertSame('Institut Demo', setting('Core.siteName'));
@@ -92,7 +93,7 @@ final class SettingsScreensTest extends SettingsTestCase
         $this->loginWith('settings.update', 'settings.core');
         setting('Core.siteName', 'Old name');
 
-        $this->send('POST', 'backend/settings/core', ['Core-siteName' => '', 'Core-timezone' => 'UTC', 'Core-pwaStart' => 'public']);
+        $this->send('POST', 'backend/settings/core', ['Core-siteName' => '', 'Core-timezone' => 'UTC', 'Core-pwaStart' => 'public', 'Core-widgetMaxLinks' => '20']);
 
         $this->assertSame(0, $this->storedCount('Core', 'siteName'));
         $this->assertSame(lang('Core.app.name'), site_name());

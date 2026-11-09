@@ -98,6 +98,7 @@ $old = is_array($old) ? $old : null;
                                                 'choices' => $definition['choices'],
                                                 'items'   => is_array($value) ? $value : [],
                                                 'old'     => is_array($prev['options'][$name] ?? null),
+                                                'max'     => (int) $definition['maxLinks'],
                                             ]) ?>
                                         <?php elseif ($type === 'menu'): ?>
                                             <?php $selected = is_array($value) ? $value : []; ?>

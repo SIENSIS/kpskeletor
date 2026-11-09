@@ -1141,7 +1141,7 @@ The generated forms described above (one tab per module and one for the theme), 
   * *Quick links* (Core): shortcuts chosen and ordered per group by the administrator: screens
     of the back-office menu (shown only to users who can open them) and free links with one
     label and an `https://` address (opened in a new tab) or an internal path, shown to every
-    user of the group;
+    user of the group (at most `Core.widgetMaxLinks` links, a Core setting: default 20, 1–100);
   * *Users summary* (Users): active users, users online, accounts without 2FA.
 
 ### Activity

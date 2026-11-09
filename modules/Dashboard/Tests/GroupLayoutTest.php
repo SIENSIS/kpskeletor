@@ -116,6 +116,21 @@ final class GroupLayoutTest extends DashboardTestCase
         $this->assertStringContainsString(esc("Moodle de l'institut"), $body);
     }
 
+    public function testTheLimitOfLinksIsASetting(): void
+    {
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+        setting()->set('Core.widgetMaxLinks', 25);
+
+        $form                                = self::form();
+        $form['core.quick-links']['options'] = ['links' => array_fill(0, 25, ['ref' => 'menu:settings'])];
+        $this->send('POST', 'backend/dashboard/groups/admin', ['widgets' => $form]);
+        $this->assertSame(3, db_connect()->table('dashboard_group_widgets')->countAllResults(), '25 links are accepted with the setting at 25.');
+
+        $this->assertStringContainsString('data-max="25"', (string) $this->send('GET', 'backend/dashboard/groups/admin')->response()->getBody());
+        setting()->forget('Core.widgetMaxLinks');
+    }
+
     public function testUnknownGroupsAreNotFound(): void
     {
         $this->createUser('boss@example.com', 'admin');

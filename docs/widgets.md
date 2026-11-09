@@ -115,7 +115,8 @@ can only choose among them; anything else falls back to the default.
 `settings()` declares the options an administrator sets **per group** (users do not change
 options). Types: `int` (`min`, `max`), `bool`, `string` (one line, up to 255 characters), `select`
 (`options`: value => language key), `menu` (back-office menu entry keys such as
-`Users.users` or `settings`) and `links` (an ordered list of at most 20 items, each a menu entry
+`Users.users` or `settings`) and `links` (an ordered list of at most `Core.widgetMaxLinks` items
+— a setting in Settings › General › Dashboard, default 20, 1–100; a definition's `max` overrides it —, each a menu entry
 `{"menu": "settings"}` or a free link `{"label": "…", "url": "…"}`; addresses are `https://`
 URLs without credentials or internal paths starting with one `/`, checked by
 `WidgetOptions::linkUrl()`; `http:`, `javascript:`, `data:`, `mailto:` and `//host` are refused). `render()`/`data()` always receive every option, already

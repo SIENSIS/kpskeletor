@@ -117,7 +117,11 @@ final class GroupLayout extends BackendController
             $fields     = [];
 
             foreach ($widget->settings() as $key => $definition) {
-                $fields[$key] = $definition + ['choices' => $options->choices($definition), 'value' => $config['options'][$key] ?? null];
+                $fields[$key] = $definition + [
+                    'choices'  => $options->choices($definition),
+                    'value'    => $config['options'][$key] ?? null,
+                    'maxLinks' => WidgetOptions::maxLinks($definition),
+                ];
             }
 
             $rows[] = [

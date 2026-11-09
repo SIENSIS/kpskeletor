@@ -127,6 +127,21 @@ final class WidgetsTest extends CIUnitTestCase
         }
     }
 
+    public function testTheMostLinksComeFromTheSetting(): void
+    {
+        $this->assertSame(20, WidgetOptions::maxLinks());
+        $this->assertSame(3, WidgetOptions::maxLinks(['max' => 3]), 'A widget may set its own limit.');
+
+        setting()->set('Core.widgetMaxLinks', 25);
+        $this->assertSame(25, WidgetOptions::maxLinks());
+        $twentyFive = array_fill(0, 25, ['label' => 'Web', 'url' => 'https://example.com']);
+        $this->assertSame(['links' => $twentyFive], (new WidgetOptions())->resolve(new QuickLinks(), ['links' => $twentyFive]));
+
+        setting()->set('Core.widgetMaxLinks', 500);
+        $this->assertSame(100, WidgetOptions::maxLinks(), 'Never above 100.');
+        setting()->forget('Core.widgetMaxLinks');
+    }
+
     public function testStoredMenuKeysStillWorkAsLinks(): void
     {
         $this->assertSame(['links' => [['menu' => 'settings'], ['label' => 'Web', 'url' => 'https://example.com']]], (new WidgetOptions())->resolve(new QuickLinks(), ['links' => ['settings', ['label' => 'Web', 'url' => 'https://example.com']]]));

@@ -375,6 +375,8 @@ return [
         'rateLimitFeeds' => 'Peticions als feeds de calendari per token i hora',
         'rateLimitUploads' => 'Pujades de fitxers per usuari i hora',
         'rateLimitForms' => 'Enviaments de formularis públics per adreça IP i hora',
+        'widgetMaxLinks'     => 'Màxim d’enllaços per giny',
+        'widgetMaxLinksHelp' => 'Nombre màxim d’elements d’una llista d’enllaços, com els enllaços ràpids de cada grup (1–100).',
         'rateLimitWidgets' => 'Actualitzacions de ginys del tauler per usuari i minut',
         'outboundHosts' => 'Altres servidors externs permesos',
         'outboundHostsHelp' => 'Noms de servidor als quals el lloc pot connectar per HTTPS o fer servir com a servidor SMTP (p. ex. api.example.com o *.example.com), a més dels de la configuració i els mòduls.',
@@ -556,6 +558,7 @@ return [
         ],
     ],
     'settingGroups' => [
+        'dashboard' => 'Tauler',
         'general' => 'Lloc',
         'pwa' => 'Aplicació web',
         'scheduler' => 'Tasques programades',

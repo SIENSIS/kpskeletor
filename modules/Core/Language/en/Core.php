@@ -375,6 +375,8 @@ return [
         'rateLimitFeeds' => 'Calendar feed requests per token and hour',
         'rateLimitUploads' => 'Uploads per user and hour',
         'rateLimitForms' => 'Public form submissions per IP address and hour',
+        'widgetMaxLinks'     => 'Most links per widget',
+        'widgetMaxLinksHelp' => 'Most items of a links list, such as the quick links of each group (1–100).',
         'rateLimitWidgets' => 'Dashboard widget refreshes per user and minute',
         'outboundHosts' => 'Extra allowed outbound hosts',
         'outboundHostsHelp' => 'Host names the site may call over HTTPS or use as SMTP server (e.g. api.example.com or *.example.com), besides those of the configuration and the modules.',
@@ -556,6 +558,7 @@ return [
         ],
     ],
     'settingGroups' => [
+        'dashboard' => 'Dashboard',
         'general' => 'Site',
         'pwa' => 'Web app',
         'scheduler' => 'Scheduled tasks',

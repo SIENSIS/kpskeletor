@@ -71,7 +71,8 @@ Branch: `claude/vigilant-ritchie-b3pizn` (assigned by the environment) · Pull r
 - **D-16-06 (decided by the owner):** *Quick links* take free links too (one label, an `https://`
   address or an internal path; shown to every user of the group; external ones in a new tab)
   and the administrator sets the order, in one list edited with drag and drop or up/down
-  buttons (option type `links`, `dashboard/links-editor`).
+  buttons (option type `links`, `dashboard/links-editor`); at most `Core.widgetMaxLinks` links
+  (setting in Settings › General › Dashboard, default 20, 1–100).
 - **D-16-05 (decided by the owner):** the Dashboard is a core module and cannot be disabled
   (`ModuleToggler::CORE_MODULES`), so `backend` always exists; an empty home is obtained by
   hiding widgets.
@@ -98,8 +99,8 @@ php spark serve
 ## Tests and checks
 
 ```
-vendor/bin/phpunit                         OK (735 tests, 3755 assertions)
-vendor/bin/phpunit modules/Dashboard       OK (27 tests, 150 assertions)
+vendor/bin/phpunit                         OK (737 tests, 3767 assertions)
+vendor/bin/phpunit modules/Dashboard       OK (28 tests, 153 assertions)
 vendor/bin/phpunit modules/Core/Tests/WidgetsTest.php   OK (5 tests, 17 assertions)
 vendor/bin/phpstan analyse                 [OK] No errors
 vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 495 files that can be fixed

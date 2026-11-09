@@ -10,6 +10,7 @@
  * @var array<string, string> $choices Menu entry key => label
  * @var list<mixed>           $items   Stored items ({menu} or {label, url}), or the posted rows when `old`
  * @var bool                  $old     Whether `items` are the rows posted with a validation error
+ * @var int                   $max     Most links (`WidgetOptions::maxLinks()`, setting `Core.widgetMaxLinks`)
  */
 $rows = [];
 
@@ -31,7 +32,7 @@ for ($i = 0; $i < 3; $i++) {
     $rows[] = ['ref' => '', 'label' => '', 'url' => ''];
 }
 ?>
-<div data-component="dashboard/links-editor" data-max="<?= \Modules\Core\Widgets\WidgetOptions::MAX_LINKS ?>" data-options='<?= esc(json_encode([
+<div data-component="dashboard/links-editor" data-max="<?= (int) $max ?>" data-options='<?= esc(json_encode([
     'up' => lang('Dashboard.links.up'), 'down' => lang('Dashboard.links.down'), 'remove' => lang('Dashboard.links.remove'), 'move' => lang('Dashboard.links.move'),
 ], JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP), 'attr') ?>'>
     <ol class="list-group mb-2 dashboard-links" data-links-list id="<?= esc($id, 'attr') ?>">
@@ -71,5 +72,5 @@ for ($i = 0; $i < 3; $i++) {
         <?php endforeach ?>
     </ol>
     <button type="button" class="btn btn-sm btn-outline-secondary d-none" data-links-add><i class="bi bi-plus-lg me-1" aria-hidden="true"></i><?= esc(lang('Dashboard.links.add')) ?></button>
-    <div class="form-text"><?= esc(lang('Dashboard.links.help', [\Modules\Core\Widgets\WidgetOptions::MAX_LINKS])) ?></div>
+    <div class="form-text"><?= esc(lang('Dashboard.links.help', [(int) $max])) ?></div>
 </div>

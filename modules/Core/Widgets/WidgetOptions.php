@@ -14,15 +14,17 @@ use Modules\Core\Registry\DeclarationRegistry;
  * Types: `int` (`min`, `max`), `bool`, `string` (up to 255 characters, one line), `select`
  * (`options`: value => language key), `menu` (a list of back-office menu entry keys, e.g.
  * `Users.users` or `settings`; shown to each user only when they can open the entry) and `links`
- * (an ordered list of up to 20 items, each a menu entry `{"menu": key}` or a free link
+ * (an ordered list of at most `maxLinks()` items: setting `Core.widgetMaxLinks`, default 20, each a menu entry `{"menu": key}` or a free link
  * `{"label", "url"}` whose address is an `https://` URL or an internal path starting with `/`).
  */
 final class WidgetOptions
 {
     public const TYPES = ['int', 'bool', 'string', 'select', 'menu', 'links'];
 
-    /** Most items of a `links` option. */
+    /** Default and upper bound of the most items of a `links` option (setting `Core.widgetMaxLinks`). */
     public const MAX_LINKS = 20;
+
+    public const MAX_LINKS_LIMIT = 100;
 
     public function __construct(private readonly DeclarationRegistry $registry = new DeclarationRegistry())
     {
@@ -103,7 +105,7 @@ final class WidgetOptions
             }
 
             if ($type === 'links' && $value === null) {
-                $errors[$key] = lang('Core.widgets.invalidLinks', [lang((string) ($definition['label'] ?? $key)), self::MAX_LINKS]);
+                $errors[$key] = lang('Core.widgets.invalidLinks', [lang((string) ($definition['label'] ?? $key)), self::maxLinks($definition)]);
 
                 continue;
             }
@@ -209,7 +211,7 @@ final class WidgetOptions
                 return count($keys) === count($value) ? $keys : null;
 
             case 'links':
-                return self::links($value);
+                return self::links($value, self::maxLinks($definition));
 
             default: // string
                 if (! is_string($value) && ! is_int($value)) {
@@ -228,9 +230,9 @@ final class WidgetOptions
      *
      * @return list<array{menu: string}|array{label: string, url: string}>|null
      */
-    private static function links(mixed $value): ?array
+    private static function links(mixed $value, int $max): ?array
     {
-        if (! is_array($value) || count($value) > self::MAX_LINKS) {
+        if (! is_array($value) || count($value) > $max) {
             return null;
         }
 
@@ -256,6 +258,24 @@ final class WidgetOptions
         }
 
         return $items;
+    }
+
+    /**
+     * The most items of a `links` option: the definition's `max` when given, otherwise the setting
+     * `Core.widgetMaxLinks` (default 20); always between 1 and 100.
+     *
+     * @param array<string, mixed> $definition
+     */
+    public static function maxLinks(array $definition = []): int
+    {
+        $max = $definition['max'] ?? null;
+
+        if (! is_int($max)) {
+            $setting = function_exists('setting') ? setting('Core.widgetMaxLinks') : null;
+            $max     = is_numeric($setting) ? (int) $setting : self::MAX_LINKS;
+        }
+
+        return max(1, min(self::MAX_LINKS_LIMIT, $max));
     }
 
     /**
