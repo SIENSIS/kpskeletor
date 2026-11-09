@@ -56,7 +56,7 @@ final class Posts extends BackendController
             'method'     => 'get',
             'permission' => 'readers',
             'label'      => lang('News.readers'),
-            'icon'       => 'bi bi-eye',
+            'icon'       => 'bi bi-people',
         ]);
 
         return $this->renderCrud($crud);

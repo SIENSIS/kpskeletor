@@ -10,7 +10,7 @@
 ?>
 <div class="card shadow-sm">
     <div class="card-body">
-        <p class="fs-5 mb-3"><i class="bi bi-eye" aria-hidden="true"></i> <?= esc(lang('News.readersCount', [$count])) ?></p>
+        <p class="fs-5 mb-3"><i class="bi bi-people" aria-hidden="true"></i> <?= esc(lang('News.readersCount', [$count])) ?></p>
         <?php if ($readers === []): ?>
             <?= theme_component('empty_state', ['icon' => 'bi bi-eye-slash', 'title' => lang('News.readersEmpty'), 'message' => null, 'action' => null, 'compact' => true]) ?>
         <?php else: ?>
