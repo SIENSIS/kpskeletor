@@ -181,9 +181,21 @@ final class ProfileController extends BackendController
      */
     private function checkEmailChange(User $user, string $email): ?string
     {
+        // Same attempt limit as the login and the password change: the session holder must not be
+        // able to guess the account password through this form.
+        $throttle = new LoginThrottle();
+        $ip       = $this->request->getIPAddress();
+        $wait     = $throttle->loginBlockedFor($ip, (string) $user->email);
+
+        if ($wait > 0) {
+            return lang('Auth.msg.throttled', [max(1, (int) ceil($wait / 60))]);
+        }
+
         $password = $this->request->getPost('current_password');
 
         if (! is_string($password) || ! service('passwords')->verify($password, (string) $user->password_hash)) {
+            $throttle->loginFailed($ip, (string) $user->email);
+
             return lang('Auth.profile.emailNeedsPassword');
         }
 

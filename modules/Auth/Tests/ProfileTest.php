@@ -114,6 +114,23 @@ final class ProfileTest extends AuthTestCase
         $this->assertStringContainsString('minutes', (string) ($_SESSION['error'] ?? ''));
     }
 
+    public function testWrongPasswordForAnEmailChangeIsThrottled(): void
+    {
+        config('Auth')->loginAttemptsPerAccount = 2;
+        $user = $this->createUser();
+        $this->login('ana@example.com');
+
+        foreach ([1, 2] as $attempt) {
+            $this->send('POST', 'backend/profile', $this->form(['email' => 'anna@example.com', 'current_password' => 'Wrong-' . $attempt]));
+            $this->assertSame(lang('Auth.profile.emailNeedsPassword'), $_SESSION['errors']['email'] ?? null);
+        }
+
+        // Blocked: even the right password is refused until the lock time passes.
+        $this->send('POST', 'backend/profile', $this->form(['email' => 'anna@example.com', 'current_password' => self::$password]));
+        $this->assertStringContainsString('minutes', (string) ($_SESSION['errors']['email'] ?? ''));
+        $this->assertSame('ana@example.com', model(UserModel::class)->findById($user->id)?->email);
+    }
+
     public function testForcedResetOnlyReachesThePasswordScreen(): void
     {
         $user = $this->createUser();
