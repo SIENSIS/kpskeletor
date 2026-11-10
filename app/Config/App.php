@@ -229,6 +229,34 @@ class App extends BaseConfig
         // HTTPS for every request in production (docs/specification.md, "Security baseline").
         $this->forceGlobalSecureRequests = ENVIRONMENT === 'production';
 
+        // Before installation (no .env, no writable/install.lock) the web installer answers on
+        // whatever host the site is reached at: the base URL comes from the request
+        // (Modules\Core\Install\InstallState; decision D-18-02).
+        if (! is_cli() && ! is_file(ROOTPATH . '.env') && ! is_file(WRITEPATH . 'install.lock')) {
+            $this->baseURL = self::requestBaseURL() ?? $this->baseURL;
+        }
+
         parent::__construct();
+    }
+
+    /**
+     * The base URL of the current web request (scheme, a well-formed host and the folder of the
+     * front controller), or null when the host is missing or malformed.
+     */
+    public static function requestBaseURL(): ?string
+    {
+        // Read while the config is being built, before the superglobals service exists.
+        $server = $_SERVER;
+        $host   = (string) ($server['HTTP_HOST'] ?? '');
+
+        if (preg_match('/^(?:[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*|\[[0-9A-Fa-f:.]+\])(?::\d{1,5})?$/', $host) !== 1) {
+            return null;
+        }
+
+        $https  = (isset($server['HTTPS']) && strtolower((string) $server['HTTPS']) !== 'off') || (string) ($server['SERVER_PORT'] ?? '') === '443';
+        $folder = str_replace('\\', '/', dirname((string) ($server['SCRIPT_NAME'] ?? '/index.php')));
+        $folder = '/' . trim($folder, '/.');
+
+        return ($https ? 'https' : 'http') . '://' . $host . rtrim($folder, '/') . '/';
     }
 }
