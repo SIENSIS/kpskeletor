@@ -12,4 +12,6 @@
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
 <?= theme_component('empty_state', ['icon' => 'bi-box', 'title' => $title, 'message' => lang('{{Name}}.intro')]) ?>
+<?php /* Example ES module (Assets/js/{{name}}.js), mounted by core/components.js; never inline scripts. */ ?>
+<p class="text-body-secondary small" data-component="{{name}}/{{name}}" data-options="<?= esc(json_encode(['message' => lang('{{Name}}.component')], JSON_THROW_ON_ERROR)) ?>" hidden></p>
 <?= $this->endSection() ?>
