@@ -24,7 +24,7 @@ pull request open), *merged* (in `main`).
 | 14 | Settings module and Settings › Security | merged | `claude/happy-darwin-p8xstn` | [SIENSIS/kpskeletor#18](https://github.com/SIENSIS/kpskeletor/pull/18) | [`deploy-status/14-settings/`](../deploy-status/14-settings/README.md) |
 | 15 | Users module and permission matrix | merged | `claude/clever-feynman-qsy4k4` | [SIENSIS/kpskeletor#19](https://github.com/SIENSIS/kpskeletor/pull/19) | [`deploy-status/15-users/`](../deploy-status/15-users/README.md) |
 | 16 | Dashboard and widgets | merged | `claude/vigilant-ritchie-b3pizn` | [SIENSIS/kpskeletor#20](https://github.com/SIENSIS/kpskeletor/pull/20) | [`deploy-status/16-dashboard/`](../deploy-status/16-dashboard/README.md) |
-| 17 | News module (reference module) | done | `claude/wonderful-pascal-rn7hdc` | [SIENSIS/kpskeletor#21](https://github.com/SIENSIS/kpskeletor/pull/21) | [`deploy-status/17-news/`](../deploy-status/17-news/README.md) |
+| 17 | News module (reference module) | merged | `claude/wonderful-pascal-rn7hdc` | [SIENSIS/kpskeletor#21](https://github.com/SIENSIS/kpskeletor/pull/21) | [`deploy-status/17-news/`](../deploy-status/17-news/README.md) |
 
 ## Decisions
 
