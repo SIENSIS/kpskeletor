@@ -26,7 +26,7 @@ pull request open), *merged* (in `main`).
 | 16 | Dashboard and widgets | merged | `claude/vigilant-ritchie-b3pizn` | [SIENSIS/kpskeletor#20](https://github.com/SIENSIS/kpskeletor/pull/20) | [`deploy-status/16-dashboard/`](../deploy-status/16-dashboard/README.md) |
 | 17 | News module (reference module) | merged | `claude/wonderful-pascal-rn7hdc` | [SIENSIS/kpskeletor#21](https://github.com/SIENSIS/kpskeletor/pull/21) | [`deploy-status/17-news/`](../deploy-status/17-news/README.md) |
 | 18 | Installer and CLI completion | merged | `session-18-installer` | [SIENSIS/kpskeletor#22](https://github.com/SIENSIS/kpskeletor/pull/22) | [`deploy-status/18-installer/`](../deploy-status/18-installer/README.md) |
-| 19 | Checkpoint: MVP review | done | `claude/wizardly-bell-3a9yne` | (pending) | [`deploy-status/19-mvp-review/`](../deploy-status/19-mvp-review/README.md) |
+| 19 | Checkpoint: MVP review | done | `claude/wizardly-bell-3a9yne` | [SIENSIS/kpskeletor#23](https://github.com/SIENSIS/kpskeletor/pull/23) | [`deploy-status/19-mvp-review/`](../deploy-status/19-mvp-review/README.md) |
 
 ## MVP review (session 19)
 

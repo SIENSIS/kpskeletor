@@ -1,6 +1,6 @@
 # Session 19 — Checkpoint: MVP review
 
-Branch: `claude/wizardly-bell-3a9yne` · Pull request: see `docs/progress.md` · Date: 2026-11-10
+Branch: `claude/wizardly-bell-3a9yne` · Pull request: [SIENSIS/kpskeletor#23](https://github.com/SIENSIS/kpskeletor/pull/23) · Date: 2026-11-10
 
 ## What was built
 
