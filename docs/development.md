@@ -15,11 +15,15 @@ How to install, run and check kpskeletor while developing. Per-computer setup:
 
 ```bash
 composer install
-cp env .env              # then set CI_ENVIRONMENT, app.baseURL, app.maskKey and the database
-php spark key:generate
-php spark modules:sync   # migrations, registry, permissions, settings; --demo loads demo data
+php spark app:install --env=development --db=sqlite --demo   # .env, keys, modules:sync, superadmin, demo data
 npm ci                   # optional, Playwright
 ```
+
+`app:install` asks for the rest (database, superadmin, 2FA); see `docs/commands.md`. By hand
+instead: `cp env .env` (set `CI_ENVIRONMENT`, `app.baseURL`, `app.maskKey`, the database),
+`php spark key:generate`, `php spark modules:sync --demo`. With an existing `.env`,
+`php spark app:install --keep-env` only adds missing keys. To start again, delete `.env`,
+`writable/install.lock` and the database (or its tables).
 
 `.env` is never committed. The `env` template defaults to `CI_ENVIRONMENT = production`; set
 `development` only on your own computer.

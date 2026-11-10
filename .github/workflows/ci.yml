@@ -65,6 +65,19 @@ jobs:
       - name: Published assets up to date (assets:publish is idempotent, manifest in sync)
         run: php spark assets:publish && php spark assets:publish --check
 
+      # Acceptance criterion 1 on SQLite: a fresh clone installs with one command (last step: it writes .env).
+      - name: Fresh install (SQLite) and smoke test
+        env:
+          INSTALL_ADMIN_PASSWORD: Ci-Install-Tramuntana-2026
+        run: |
+          php spark app:install --no-interaction --env=development --db=sqlite --db-name=ci-install.db --email=admin@example.com --demo --2fa=none
+          php spark permissions:check
+          php spark about
+          php spark serve --port 8080 > /tmp/serve.log 2>&1 &
+          sleep 3
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/login)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/install)" = 404
+
   mariadb:
     name: Tests on MariaDB (PHP 8.3)
     runs-on: ubuntu-latest
@@ -117,3 +130,15 @@ jobs:
 
       - name: Tests (MariaDB)
         run: vendor/bin/phpunit
+
+      # Acceptance criterion 1 on MariaDB: production install into an empty database.
+      - name: Fresh install (MariaDB, production)
+        env:
+          INSTALL_DB_PASSWORD: root
+          INSTALL_ADMIN_PASSWORD: Ci-Install-Tramuntana-2026
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e 'CREATE DATABASE kpskeletor CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci'
+          php spark app:install --no-interaction --url=https://intranet.example.com/ --db=mysql --db-host=127.0.0.1 --db-name=kpskeletor --db-user=root --email=admin@example.com --2fa=none
+          grep -q '^CI_ENVIRONMENT = production$' .env
+          php spark permissions:check
+          php spark about
