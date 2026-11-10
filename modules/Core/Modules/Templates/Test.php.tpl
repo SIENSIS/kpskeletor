@@ -37,15 +37,18 @@ final class {{Name}}ModuleTest extends AuthTestCase
     {
         $this->loginWith('{{name}}-main.view');
 
-        $this->send('GET', 'backend/{{name}}')->assertOK()->assertSee(lang('{{Name}}.title'));
+        $response = $this->send('GET', 'backend/{{name}}');
+        $response->assertOK();
+        $response->assertSee(lang('{{Name}}.title'));
     }
 
     public function testForgedPostsAreRefused(): void
     {
         $this->loginWith();
 
-        // No POST route yet: without the permission a forged POST never reaches a controller.
-        $this->assertNotSame(200, $this->send('POST', 'backend/{{name}}', ['anything' => '1'])->response()->getStatusCode());
+        // No POST route yet: answered 404. When you add a write route (or a CRUD), post to it here
+        // without its permission and assert the 403 or `assertCrudRefused()`, and that nothing changed.
+        $this->assertNotFound('POST', 'backend/{{name}}', ['anything' => '1']);
     }
 
     public function testMigrationsGoDownAndUpAgain(): void
