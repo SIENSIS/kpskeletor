@@ -102,7 +102,10 @@ manifest (`extra`) and run `modules:sync`.
   build them (28, 12).
 - Every `backend/` route also has its own `can:` filter; sensitive ones add `reauth`.
 - Every `api/v1/` route has `kpapy`, `kpapy:optional` or `kpapy:hmac`; `kpapy:login` only on the
-  `auth/token*` login routes; `kpapy:public` only for GET.
+  `auth/token*` login routes; `kpapy:public` only for GET. No other route may live under `api/`
+  (it has no CSRF or session filters): the auditor refuses `api/internal/…` or `api/v2/…`.
+- The sensitive routes that use the `reauth` filter are listed in
+  `RoutesSecurityTest::testSensitiveRoutesRequireReauthentication`: add a new one there.
 - `tests/feature/Security/RoutesSecurityTest.php` walks every route with `RouteSecurityAuditor`
   and fails on any breach (also on a `can:` naming a permission outside the catalogue);
   `php spark permissions:check` reports the same.

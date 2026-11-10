@@ -86,8 +86,8 @@ named limits whose capacities are Core settings (Settings › Security, docs/set
 | `backend` | `Core.rateLimitBackend` | 300 / minute | user | the `backend` filter chain |
 | `apiToken` | `Core.rateLimitApiToken` | 120 / minute | API token | kpapy (session 10) |
 | `apiIp` | `Core.rateLimitApiIp` | 60 / minute | IP | public API endpoints (session 10) |
-| `feeds` | `Core.rateLimitFeeds` | 60 / hour | iCal token | feeds (session 25) |
-| `uploads` | `Core.rateLimitUploads` | 100 / hour | user | upload tokens (session 13) |
+| `feeds` | `Core.rateLimitFeeds` | 60 / hour | iCal token, IP | News RSS (`news/feed.xml`), iCal feeds (session 25) |
+| `uploads` | `Core.rateLimitUploads` | 100 / hour | user | upload routes of the file picker (sessions 22–23; unused until then) |
 | `forms` | `Core.rateLimitForms` | 10 / hour | IP | public forms (with captcha) |
 | `widgets` | `Core.rateLimitWidgets` | 120 / minute | user | async widget URLs (session 16) |
 

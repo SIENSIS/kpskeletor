@@ -46,7 +46,13 @@ security_log('Storage', 'upload_refused', ['summary' => $originalName, 'changes'
 - Writing never breaks the action: a database failure goes to the application log.
 - Do not log a second entry for a CRUD write: it is already logged. `->skipActivity('key')` on a
   CRUD leaves out operations that only change the user's own view (marking a notification read)
-  or that write a richer entry themselves ("run now").
+  or that write a richer entry themselves ("run now", Users' ban/force reset/2FA reset/logout/
+  impersonate). Skip every operation that can return without acting (e.g. a `requireReauth()`
+  redirect) and log it in the service when it happens: `AuditedCrud` logs whatever the callback
+  returns except `false`.
+- Every logged custom operation and bulk action needs a label `<Module>.activity.<key>` (or a
+  generic `Activity.actions.<key>`) in ca, es and en; `tests/feature/Crud/ActivityLabelsTest.php`
+  scans the modules' controllers and fails on a missing one.
 
 ## Log-injection safety
 
