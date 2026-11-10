@@ -124,7 +124,12 @@ OK (5 tests, 12 assertions)
 
 ## Tests and checks
 
-RESULTS_PLACEHOLDER
+- `vendor/bin/phpunit`: **OK (817 tests, 4364 assertions)** (809 before the session).
+- `vendor/bin/phpstan analyse`: **[OK] No errors**.
+- `vendor/bin/php-cs-fixer fix --dry-run --diff`: **Found 0 of 561 files that can be fixed**.
+- `php spark csp:check`: *No inline scripts, handlers or styles in the project views.*
+- `php spark assets:publish --check`: *The published assets are up to date.*
+- `php spark permissions:check` (development install with demo data): *Permissions OK: 80 permission(s) in the catalogue, 156 route(s) checked.*
 
 New or extended tests: `InstallerTest::testDemoUsersGetRandomPasswordsShownOnce`,
 `DemoDataTest::testRandomPasswordsAreLongAndDifferent`, `ModuleGeneratorTest` (setting, asset,
