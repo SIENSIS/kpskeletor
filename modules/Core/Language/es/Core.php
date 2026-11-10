@@ -193,7 +193,7 @@ return [
         'schedule' => 'Tareas programadas',
     ],
     'ui' => [
-        'backOffice'      => 'Back office',
+        'backOffice'      => 'Administración',
         'breadcrumbs'     => 'Ruta de navegación',
         'cancel'          => 'Cancelar',
         'save'            => 'Guardar',
@@ -369,7 +369,7 @@ return [
         'pwaHelp'         => 'Publica un manifiesto de aplicación web e iconos para que los móviles puedan añadir el sitio a la pantalla de inicio. No se guarda nada sin conexión.',
         'pwaStart'        => 'Página que abre la aplicación instalada',
         'pwaStartPublic'  => 'Página de inicio pública',
-        'pwaStartBackend' => 'Back office',
+        'pwaStartBackend' => 'Administración',
         'rateLimitBackend' => 'Peticiones al back office por usuario y minuto',
         'rateLimitApiToken' => 'Peticiones a la API por token y minuto',
         'rateLimitApiIp' => 'Peticiones a la API pública por dirección IP y minuto',

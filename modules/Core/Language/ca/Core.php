@@ -193,7 +193,7 @@ return [
         'schedule' => 'Tasques programades',
     ],
     'ui' => [
-        'backOffice'      => 'Back office',
+        'backOffice'      => 'Administració',
         'breadcrumbs'     => 'Fil d\'Ariadna',
         'cancel'          => 'Cancel·la',
         'save'            => 'Desa',
@@ -369,7 +369,7 @@ return [
         'pwaHelp'         => 'Publica un manifest d\'aplicació web i icones perquè els mòbils puguin afegir el lloc a la pantalla d\'inici. No es desa res fora de línia.',
         'pwaStart'        => 'Pàgina que obre l\'aplicació instal·lada',
         'pwaStartPublic'  => 'Pàgina d\'inici pública',
-        'pwaStartBackend' => 'Back office',
+        'pwaStartBackend' => 'Administració',
         'rateLimitBackend' => 'Peticions al back office per usuari i minut',
         'rateLimitApiToken' => 'Peticions a l\'API per token i minut',
         'rateLimitApiIp' => 'Peticions a l\'API pública per adreça IP i minut',
