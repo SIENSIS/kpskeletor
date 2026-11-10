@@ -77,6 +77,11 @@ jobs:
           sleep 3
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/login)" = 200
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/install)" = 404
+          # The public site with the demo News, and the back office asking for a login.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/news)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/news/feed.xml)" = 200
+          curl -s -o /dev/null -w '%{redirect_url}' http://localhost:8080/backend | grep -Eq '^http://localhost:8080/(index\.php/)?login$'
 
   mariadb:
     name: Tests on MariaDB (PHP 8.3)
