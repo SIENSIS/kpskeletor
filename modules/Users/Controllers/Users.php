@@ -49,6 +49,11 @@ final class Users extends BackendController
         $email = static fn (array $row): string => UserAccounts::email((int) ($row['id'] ?? 0));
 
         $crud = $this->crud('users-users')
+            // The account services write their own security entries (user_banned, reset_forced,
+            // 2fa_reset, logged_out_everywhere, impersonation_started) only when the action
+            // happens: a generic entry would duplicate them, or record a re-authentication
+            // redirect as if the action had been done.
+            ->skipActivity('ban', 'forcereset', 'reset2fa', 'logout', 'impersonate')
             ->setTable('users')
             ->softDeletes(false)
             ->where(['deleted_at' => null])

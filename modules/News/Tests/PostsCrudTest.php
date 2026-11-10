@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\News\Tests;
 
-use CodeIgniter\Test\TestResponse;
+use CodeIgniter\Exceptions\PageNotFoundException;
+
 
 /**
  * The back office of the posts (acceptance criterion 4 on News): read-only users, forged POSTs,
@@ -18,35 +19,90 @@ final class PostsCrudTest extends NewsTestCase
     public function testAReadOnlyUserSeesTheListWithoutWriteButtons(): void
     {
         $id = $this->newsPost('Notícia de prova');
+        $this->newsPost('Esborrany de prova', ['status' => 'draft', 'published_at' => null]);
         $this->loginWith('news-posts.list', 'news-posts.show');
 
         $list = $this->body('GET', 'backend/news/posts');
 
         $this->assertStringContainsString('Notícia de prova', $list);
-        $this->assertStringNotContainsString('backend/news/posts/add', $list);
-        $this->assertStringNotContainsString('backend/news/posts/edit/', $list);
-        $this->assertStringNotContainsString('backend/news/posts/publish/', $list);
-        $this->assertStringNotContainsString('backend/news/posts/delete/', $list);
+        $this->assertStringContainsString('Esborrany de prova', $list);
+
+        // Neither the published post (unpublish) nor the draft (publish) offers a write action.
+        foreach (['add', 'edit/', 'publish/', 'unpublish/', 'delete/', 'trash', 'export', 'import', 'readers/'] as $operation) {
+            $this->assertStringNotContainsString('backend/news/posts/' . $operation, $list, $operation);
+        }
+
+        $this->assertDoesNotMatchRegularExpression('/<input[^>]+name="ids\[\]"/', $list, 'No bulk selection boxes.');
         $this->assertStringContainsString('backend/news/posts/show/' . $this->code($id), $list);
     }
 
     public function testForgedPostsOfAReadOnlyUserChangeNothing(): void
     {
-        $id   = $this->newsPost('Intacta', ['status' => 'draft', 'published_at' => null]);
-        $code = $this->code($id);
+        $draft     = $this->newsPost('Intacta', ['status' => 'draft', 'published_at' => null]);
+        $published = $this->newsPost('Publicada');
+        $trashed   = $this->newsPost('A la paperera', ['deleted_at' => '2026-01-01 10:00:00']);
         $this->loginWith('news-posts.list', 'news-posts.show');
+        $before = $this->snapshot();
 
-        $this->assertRefused($this->send('POST', 'backend/news/posts/add', ['kp_tr' => ['ca' => ['title' => 'Forjada']], 'type' => 'article', 'visibility' => 'public']));
-        $this->assertRefused($this->send('POST', 'backend/news/posts/edit/' . $code, ['kp_tr' => ['ca' => ['title' => 'Canviada']]]));
-        $this->assertRefused($this->send('POST', 'backend/news/posts/delete/' . $code));
-        $this->assertRefused($this->send('POST', 'backend/news/posts/publish/' . $code));
-        $this->assertRefused($this->send('POST', 'backend/news/posts/bulk', ['action' => 'publish', 'ids' => [$code]]));
-        $this->assertRefused($this->send('GET', 'backend/news/posts/readers/' . $code));
+        foreach ([
+            ['POST', 'add', ['kp_tr' => ['ca' => ['title' => 'Forjada']], 'type' => 'article', 'visibility' => 'public']],
+            ['POST', 'edit/' . $this->code($draft), ['kp_tr' => ['ca' => ['title' => 'Canviada']]]],
+            ['POST', 'delete/' . $this->code($draft), []],
+            ['POST', 'publish/' . $this->code($draft), []],
+            ['POST', 'unpublish/' . $this->code($published), []],
+            ['POST', 'restore/' . $this->code($trashed), []],
+            ['POST', 'purge/' . $this->code($trashed), []],
+            ['POST', 'emptytrash', []],
+            ['POST', 'bulk', ['action' => 'publish', 'ids' => [$this->code($draft)]]],
+            ['POST', 'bulk', ['action' => 'delete', 'ids' => [$this->code($draft), $this->code($published)]]],
+            ['POST', 'bulk', ['action' => 'restore', 'ids' => [$this->code($trashed)]]],
+            ['POST', 'bulk', ['action' => 'purge', 'ids' => [$this->code($trashed)]]],
+            ['GET', 'trash', []],
+            ['GET', 'export', []],
+            ['GET', 'readers/' . $this->code($published), []],
+        ] as [$method, $operation, $params]) {
+            try {
+                $response = $this->send($method, 'backend/news/posts/' . $operation, $params);
+            } catch (PageNotFoundException $e) {
+                // kpcrudy answers some screens it does not offer this user (e.g. the trash) with
+                // a 404 "not allowed".
+                $this->assertSame(lang('Kpcrudy.notAllowed'), $e->getMessage(), "{$method} {$operation}");
 
-        $this->assertSame(1, db_connect()->table('news')->countAllResults());
-        $this->assertSame('draft', $this->row($id)['status']);
-        $this->assertNull($this->row($id)['deleted_at']);
-        $this->assertSame('Intacta', db_connect()->table('news_translations')->where('news_id', $id)->get()->getRowArray()['title']);
+                continue;
+            }
+
+            $this->assertCrudRefused($response, 'backend/news/posts', "{$method} {$operation}");
+            unset($_SESSION['error'], $_SESSION['success']);
+        }
+
+        $this->assertSame($before, $this->snapshot(), 'Nothing changed.');
+        $this->assertSame('draft', $this->row($draft)['status']);
+        $this->assertSame('published', $this->row($published)['status']);
+        $this->assertNotNull($this->row($trashed)['deleted_at']);
+    }
+
+    public function testForgedCategoryWritesOfAnEditorAreRefused(): void
+    {
+        $this->createUser('ed@example.com', 'editor');
+        $this->login('ed@example.com');
+        db_connect()->table('news_categories')->insert(['slug' => 'intacta', 'created_at' => '2026-01-01 10:00:00', 'updated_at' => '2026-01-01 10:00:00']);
+        $id    = (int) db_connect()->insertID();
+        $code  = \Kpcrudy\Crud::maskId($id, 'news_categories');
+        $count = db_connect()->table('news_categories')->countAllResults();
+
+        $this->send('GET', 'backend/news/categories')->assertOK();
+
+        foreach ([
+            ['add', ['kp_tr' => ['ca' => ['name' => 'Forjada']], 'slug' => 'forjada']],
+            ['edit/' . $code, ['kp_tr' => ['ca' => ['name' => 'Canviada']], 'slug' => 'canviada']],
+            ['delete/' . $code, []],
+        ] as [$operation, $params]) {
+            $this->assertCrudRefused($this->send('POST', 'backend/news/categories/' . $operation, $params), 'backend/news/categories', $operation);
+            unset($_SESSION['error'], $_SESSION['success']);
+        }
+
+        $this->assertSame($count, db_connect()->table('news_categories')->countAllResults());
+        $this->assertSame('intacta', db_connect()->table('news_categories')->where('id', $id)->get()->getRowArray()['slug'] ?? null);
     }
 
     public function testUsersWithoutListGetForbiddenAndGuestsTheLogin(): void
@@ -76,6 +132,10 @@ final class PostsCrudTest extends NewsTestCase
         $this->assertSame('Seva', db_connect()->table('news_translations')->where('news_id', $theirs)->get()->getRowArray()['title']);
         $this->assertSame('draft', $this->row($theirs)['status']);
 
+        $published = $this->newsPost('Seva publicada', ['author_id' => $other->id]);
+        $this->assertCrudRefused($this->send('POST', 'backend/news/posts/unpublish/' . $this->code($published)), 'backend/news/posts', 'unpublish theirs');
+        $this->assertSame('published', $this->row($published)['status']);
+
         $this->send('POST', 'backend/news/posts/publish/' . $this->code($mine))->assertRedirect();
         $this->assertSame('published', $this->row($mine)['status']);
     }
@@ -103,6 +163,26 @@ final class PostsCrudTest extends NewsTestCase
         $this->send('POST', 'logout');
         $this->login('boss@example.com');
         $this->assertStringContainsString('boss', $this->body('GET', 'backend/news/posts/show/' . $this->code($id)));
+    }
+
+    public function testTheExportAndEditsNeverExposeOrChangeTheAuthorWithoutThePermission(): void
+    {
+        $boss = $this->createUser('boss@example.com', 'admin');
+        $ana  = $this->loginWith('news-posts.list', 'news-posts.show', 'news-posts.export', 'news-posts.edit');
+        $this->newsPost('Del cap', ['author_id' => $boss->id]);
+        $own = $this->newsPost('Pròpia', ['author_id' => $ana->id, 'status' => 'draft', 'published_at' => null]);
+
+        $csv = $this->body('GET', 'backend/news/posts/export');
+        $this->assertStringContainsString('Del cap', $csv, 'The export works.');
+        $this->assertStringNotContainsString('boss', $csv);
+        $this->assertStringNotContainsString(lang('News.fields.author_id'), $csv);
+
+        // A forged author_id on an edit of one's own post is ignored.
+        $this->send('POST', 'backend/news/posts/edit/' . $this->code($own), [
+            'kp_tr' => ['ca' => ['title' => 'Pròpia', 'summary' => '', 'body' => '']], 'type' => 'article', 'priority' => 'info',
+            'visibility' => 'private', 'author_id' => (string) $boss->id,
+        ]);
+        $this->assertSame((int) $ana->id, (int) $this->row($own)['author_id']);
     }
 
     public function testTheBodyIsSanitisedAndTheSlugIsGenerated(): void
@@ -245,8 +325,19 @@ final class PostsCrudTest extends NewsTestCase
         }
     }
 
-    private function assertRefused(TestResponse $response): void
+    /**
+     * Every row of the News tables, to prove forged requests changed nothing.
+     *
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function snapshot(): array
     {
-        $this->assertTrue($response->response()->getStatusCode() >= 300, 'Refused (redirect or error).');
+        $tables = [];
+
+        foreach (['news', 'news_translations', 'news_groups', 'news_reads'] as $table) {
+            $tables[$table] = db_connect()->table($table)->orderBy('id')->get()->getResultArray();
+        }
+
+        return $tables;
     }
 }

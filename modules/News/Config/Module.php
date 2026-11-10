@@ -114,6 +114,12 @@ final class Module extends ModuleManifest
     /** Covers: files of the Storage service in the folder `modules/news` (public disk). */
     public array $backup = ['files' => ['modules/news']];
 
+    /** No extra Content-Security-Policy sources: covers and images are served by the site itself. */
+    public array $csp = [];
+
+    /** No outbound requests (the RSS feed is generated, not fetched). */
+    public array $outboundHosts = [];
+
     /** Calendar `news.notices` arrives in session 25. */
     public array $calendars = [];
 
