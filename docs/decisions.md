@@ -177,6 +177,10 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-18-06 | 18 | `app:install` with an existing `.env` | Accepted (proposal) |
 | D-18-07 | 18 | The `security:check` summary before session 30 | Accepted (proposal) |
 | D-18-08 | 18 | Order of the steps, `.env` permissions and the lock file | Accepted (proposal) |
+| D-19-01 | 19 | Demo users' random passwords: shown once, how | Accepted (proposal) |
+| D-19-02 | 19 | Routes under `api/` outside `api/v1/` | Accepted (proposal) |
+| D-19-03 | 19 | `make:module --api` | Accepted (proposal) |
+| D-19-04 | 19 | Shared Core helpers extracted from News | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1844,3 +1848,40 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** —
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Install/{Installer,RuntimeConfig,InstallState,EnvWriter}.php`; tests `InstallerTest`
+
+## D-19-01 — Demo users' random passwords: shown once, how
+
+- **Where:** spec "Modules" › "Demo data" › "Safety" ("demo users get random passwords shown once (never fixed passwords)"); known issue of session 18
+- **Problem:** The Auth demo users shared the fixed password `Demo-kpskeletor-2026`; the spec does not say how "shown once" works for the console, the installer and the future Modules screen.
+- **Proposal:** Each demo user gets its own random password (`DemoData::randomPassword()`: 4 groups of 5 characters without look-alikes, about 99 bits). Seeders register it with `$demo->secret($label, $value)`; `DemoDataManager::takeSecrets()` returns them once, in memory only (never stored in clear, never in the activity log). `modules:demo`, `modules:sync --demo` and `app:install --demo` print them once; the web installer's last page shows them (as it shows the `.env`); the Modules screen (session 29) shows them once after loading.
+- **Alternatives:** A) One random password for every demo user (simpler to type, but one leak opens every demo account). B) Send them by email (no mail server in a fresh development install).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Demo/{DemoData,DemoDataManager}.php`, `modules/Auth/Database/Seeds/AuthDemoSeeder.php`, `modules/Core/Commands/{ModulesDemo,ModulesSync,AppInstall}.php`, `modules/Core/Views/install/done.php`; tests `InstallerTest::testDemoUsersGetRandomPasswordsShownOnce`, `DemoDataTest::testRandomPasswordsAreLongAndDifferent`
+
+## D-19-02 — Routes under `api/` outside `api/v1/`
+
+- **Where:** spec "RBAC" › "Enforcement on routes" (every `api/v1/` route has kpapy's filter); `app/Config/Filters.php` (no `csrf`/`authsession` on `api/*`)
+- **Problem:** The route audit only looked at `api/v1/`; a module route such as `api/internal/x` or `api/v2/x` would have neither CSRF, session hardening nor an auth filter, and pass `permissions:check`.
+- **Proposal:** `RouteSecurityAuditor` refuses any route under `api/` that is not under `api/v1/` ("API routes must live under api/v1/"). A future API version is a decision of its own.
+- **Alternatives:** A) Require kpapy on any `api/*` route (keeps the door open to `api/v2/` without a review).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Permissions/RouteSecurityAuditor.php`, `docs/rbac.md`; test `RoutesSecurityTest::testApiRoutesNeedKpapy`
+
+## D-19-03 — `make:module --api`
+
+- **Where:** spec "Modules" (`make:module` "With `--api`, it also generates the kpapy resource"), "API", `CLAUDE.md` ("`php spark make:module <Name> [--crud=<table>] [--api]`")
+- **Problem:** `make:module` only implements `--crud`; `--api` was never built (no session file names it explicitly). It is not part of acceptance criterion 2.
+- **Proposal:** Build it in session 26 (Core API endpoints, where the API catalogue checks are completed): with `--crud`, run `kpapy:make` for the same table, route it under `api/v1/<module>` with the `kpapy` filter, `setResource()` = the CRUD's resource, add the `$api` entry and an API scope test. Until then the manifest template shows the `$api` format and `docs/api.md` the manual steps.
+- **Alternatives:** A) Build it now (new feature, out of this session's scope). B) Remove `--api` from `CLAUDE.md` and the spec (changes a documented command; owner's call).
+- **Status:** Accepted (proposal)
+- **Applied in:** `docs/plan.md` (session 26 and 32 notes)
+
+## D-19-04 — Shared Core helpers extracted from News
+
+- **Where:** `deploy/19-mvp-review.md` ("Refactor duplication that later modules would copy")
+- **Problem:** Pages and Events need the slug generator and the HTML sanitiser of News; nine controllers had their own "current user" method; four test base classes repeated helpers.
+- **Proposal:** `Modules\Core\Text\Slugger` (scope and fallback word added, `rules()`), `Modules\Core\Security\HtmlSanitizer` (formerly `Modules\News\Services\BodySanitizer`, same allow-list), `BackendController::currentUser()` / `currentUserOrNobody()`, and `AuthTestCase::loginWith()` / `assertNotFound()` / `assertCrudRefused()`. No public convention changes (manifest keys, permission names, URLs). The translation fallback, the group audience and the publish workflow are extracted by session 20 when Pages shows what they share (recorded in `docs/plan.md`).
+- **Alternatives:** A) Extract everything now (guessing the needs of Pages and Events).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/{Text/Slugger,Security/HtmlSanitizer,Controllers/BackendController}.php`, `modules/Auth/Tests/AuthTestCase.php`, News, Users, Auth, Api, Dashboard controllers
+

@@ -483,6 +483,9 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Risks:** criterion 2 requires `modules/Events2/CLAUDE.md` and `/check-module`, which only exist
   after session 32 (contradiction 31); refactors here ripple into every later module.
 
+- **Done (session 19):** review table in `docs/progress.md` ("MVP review"). Changes that affect
+  the next sessions are listed under each session below as "From session 19".
+
 ## 20 — Pages module (`deploy/20-pages.md`)
 
 - **Goal:** content pages for the public site.
@@ -500,6 +503,14 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
   reserved slugs); editors and sanitised content with `style` attributes vs CSP
   (contradiction 25); licence of the editor (MIT/BSD only; e.g. TinyMCE 7 is GPL); tree indentation
   is not a kpcrudy feature (library request).
+
+- **From session 19:** use the Core's `Modules\Core\Text\Slugger` (`unique(…, scope: ['parent_id' => …, 'locale' => …])`,
+  `Slugger::rules()`) and `Modules\Core\Security\HtmlSanitizer` (formerly News' `BodySanitizer`);
+  extract to the Core what Pages shares with News instead of copying it: the translation lookup
+  with the Catalan fallback (`NewsRepository`, `Posts::LOCALES`), the public/private/groups
+  audience (`NewsVisibility::groupIds()` + link table, for `page_groups`) and the publish
+  workflow (draft/scheduled/published, `Publisher`). Feature tests extend `AuthTestCase`
+  (`loginWith()`, `assertCrudRefused()`); controllers use `$this->currentUser()`.
 
 ## 21 — Menus module: public menus and back-office customisation (`deploy/21-menus.md`)
 
@@ -534,6 +545,9 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Risks:** upload progress bars without `style=""` (contradiction 25); keeping `files` rows and
   disk contents consistent on failures.
 
+- **From session 19:** `ratelimit:uploads` is still unused: put it on the upload routes;
+  `docs/security.md` lists it for sessions 22–23.
+
 ## 23 — Files module: file picker, upload tokens and avatars (`deploy/23-files-picker.md`)
 
 - **Goal:** reusable file picker for every module field.
@@ -549,6 +563,10 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** 22, 05, 17.
 - **Risks:** placeholder names `{id}` vs `{user_id}` (contradiction 44); kpcrudy has no picker field
   type (use `callbackField`).
+
+- **From session 19:** "only the site's own images" (D-17-08) goes into the Core's
+  `Modules\Core\Security\HtmlSanitizer` (it replaced `modules/News/Services/BodySanitizer.php`
+  named in `deploy/23-files-picker.md`); add `ratelimit:uploads` to the picker's upload routes.
 
 ## 24 — Events module: calendar, administration and audiences (`deploy/24-events-core.md`)
 
@@ -566,6 +584,10 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** 04, 09, 11, 15, 16.
 - **Risks:** CSV import of translated fields (contradiction 40); a searchable AJAX users field is not
   a kpcrudy feature (library request); calendar library CSP compatibility.
+
+- **From session 19:** reuse the Core's `Slugger`, `HtmlSanitizer` and the audience helper
+  extracted in session 20 (`event_audience` also targets users); the `feeds` limit already
+  covers the News RSS.
 
 ## 25 — Events module: iCal feeds and calendar API (`deploy/25-events-ical-api.md`)
 
@@ -599,6 +621,8 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** 10, 17, 24, 25, 11.
 - **Risks:** resource names shared with CRUDs (`news-posts`) but different routes; "OpenAPI
   generation on `modules:sync`" writes a file the web can serve (keep it in `writable/`).
+
+- **From session 19:** build `make:module --api` (D-19-03).
 
 ## 27 — Backup module (`deploy/27-backup.md`)
 
@@ -697,6 +721,11 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** 01–31.
 - **Risks:** the child-theme override of tutorial 9 cannot live inside the module (contradiction
   32); names (`Tasks` module vs `Tasks/` folder of scheduled tasks).
+
+- **From session 19:** `make:module` already generates a setting, an ES-module component, the
+  empty `$backup`/`$api`/`$csp`/`$outboundHosts`, and tests (permissions, forged POST,
+  migrations); still missing for criterion 2: `modules/<Name>/CLAUDE.md`, `--standalone`,
+  `--api` (named in `CLAUDE.md`) and `/check-module` (D-00-31).
 
 ## 33 — Documentation (`deploy/33-docs.md`)
 
