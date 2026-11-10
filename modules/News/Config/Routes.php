@@ -31,7 +31,7 @@ $routes->group('backend/news', ['namespace' => 'Modules\News\Controllers'], stat
 
 $routes->group('news', ['namespace' => 'Modules\News\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('/', 'PublicNews::index', ['as' => 'news-public']);
-    $routes->get('feed.xml', 'PublicNews::feed', ['as' => 'news-feed']);
+    $routes->get('feed.xml', 'PublicNews::feed', ['as' => 'news-feed', 'filter' => 'ratelimit:feeds']);
     $routes->get('category/(:segment)', 'PublicNews::category/$1');
     $routes->get('(:segment)', 'PublicNews::show/$1');
 });

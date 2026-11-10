@@ -56,10 +56,10 @@ the file picker, session 23).
 - **Notifications** (`Notifications/NewNotice.php`): a `private` notice notifies every user with
   `news-read.view`, a `groups` notice the members of its groups, once (`news.notified_at`), when
   it is published or released. Users choose the channels in their notification preferences.
-- **Body**: sanitised with HTMLPurifier (`Services/BodySanitizer.php`) before kpcrudy reads the
+- **Body**: sanitised with HTMLPurifier (the Core's `Modules\Core\Security\HtmlSanitizer`, shared with later modules) before kpcrudy reads the
   form (D-17-02) and again when a post is shown. The rich-text editor replaces the textarea in
   session 20.
-- **Slugs** (`Services/Slugger.php`): from the Catalan title (or the given slug), transliterated,
+- **Slugs** (the Core's `Modules\Core\Text\Slugger`): from the Catalan title (or the given slug), transliterated,
   unique (`-2`, `-3`…); kept when the title changes unless the slug field is edited.
 - **Cover**: kpcrudy `image` field with an upload handler on the Storage service
   (`Storage/CoverUploads.php`, D-17-06): public disk, folder `modules/news`, JPG/PNG/WebP up to

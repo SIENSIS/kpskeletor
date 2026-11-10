@@ -33,7 +33,7 @@
             <p class="lead"><?= esc($post['summary']) ?></p>
         <?php endif ?>
         <div class="news-body text-break">
-            <?php /* Sanitised with HTMLPurifier when it was saved (BodySanitizer). */ ?>
+            <?php /* Sanitised with HTMLPurifier when it was saved (Core HtmlSanitizer). */ ?>
             <?= $post['body'] ?>
         </div>
     </div>

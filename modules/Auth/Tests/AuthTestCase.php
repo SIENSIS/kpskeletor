@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Auth\Tests;
 
 use CodeIgniter\Events\Events;
+use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
 use CodeIgniter\Test\CIUnitTestCase;
@@ -119,6 +120,51 @@ abstract class AuthTestCase extends CIUnitTestCase
         }
 
         return $response;
+    }
+
+    /**
+     * A user of the `user` group with these individual permissions, logged in.
+     */
+    protected function loginWith(string ...$permissions): User
+    {
+        $user = $this->createUser('ana@example.com', 'user');
+
+        if ($permissions !== []) {
+            $user->addPermission(...$permissions);
+        }
+
+        $this->login('ana@example.com');
+
+        return $user;
+    }
+
+    /**
+     * The request answers 404 (a feature test gets the exception, a real request the error page).
+     *
+     * @param array<string, mixed> $params
+     */
+    protected function assertNotFound(string $method, string $path, array $params = []): void
+    {
+        try {
+            $status = $this->send($method, $path, $params)->response()->getStatusCode();
+        } catch (PageNotFoundException) {
+            $status = 404;
+        }
+
+        $this->assertSame(404, $status, "{$method} {$path}");
+    }
+
+    /**
+     * kpcrudy refused the request: a redirect to the CRUD's list with its "not allowed" (or
+     * "invalid request", e.g. a GET to a POST-only operation) message and no success message.
+     * A plain redirect is not enough: kpcrudy also redirects after a successful write.
+     */
+    protected function assertCrudRefused(TestResponse $response, string $listPath, string $what = ''): void
+    {
+        $this->assertTrue($response->isRedirect(), "{$what}: redirected to the list.");
+        $this->assertSame(site_url($listPath), $response->response()->getHeaderLine('Location'), $what);
+        $this->assertContains($_SESSION['error'] ?? null, [lang('Kpcrudy.notAllowed'), lang('Kpcrudy.invalidRequest')], "{$what}: refused with an error message.");
+        $this->assertArrayNotHasKey('success', $_SESSION, "{$what}: no success message.");
     }
 
     protected function login(string $email, ?string $password = null, bool $remember = false): TestResponse

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Users\Tests;
 
-use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\I18n\Time;
 use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
@@ -48,17 +47,6 @@ abstract class UsersTestCase extends SettingsTestCase
         return $fresh;
     }
 
-    /**
-     * Whether a request answers "not found" (the feature tests get the exception).
-     */
-    protected function assertNotFound(string $method, string $path): void
-    {
-        try {
-            $this->send($method, $path)->assertStatus(404);
-        } catch (PageNotFoundException) {
-            $this->addToAssertionCount(1);
-        }
-    }
 
     protected function later(int $seconds): void
     {

@@ -55,6 +55,7 @@ final class ModulesDemo extends BaseCommand
 
             if ($action === 'load') {
                 CLI::write(lang($manager->load($name) ? 'Core.demo.loaded' : 'Core.demo.alreadyLoaded', [$name]), 'green');
+                self::writeSecrets($manager->takeSecrets());
 
                 return EXIT_SUCCESS;
             }
@@ -70,9 +71,28 @@ final class ModulesDemo extends BaseCommand
 
         if ($action === 'reload' && $removal->kept === []) {
             CLI::write(lang('Core.demo.loaded', [$name]), 'green');
+            self::writeSecrets($manager->takeSecrets());
         }
 
         return $removal->kept === [] ? EXIT_SUCCESS : EXIT_ERROR;
+    }
+
+    /**
+     * Prints the one-time secrets of demo data (demo users' random passwords) once.
+     *
+     * @param array<string, string> $secrets label => value
+     */
+    public static function writeSecrets(array $secrets): void
+    {
+        if ($secrets === []) {
+            return;
+        }
+
+        CLI::write(lang('Core.demo.secrets'), 'yellow');
+
+        foreach ($secrets as $label => $value) {
+            CLI::write('  ' . $label . '  ' . $value);
+        }
     }
 
     private function report(string $name, DemoRemoval $removal): void

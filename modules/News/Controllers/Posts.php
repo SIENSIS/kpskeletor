@@ -8,12 +8,12 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Kpcrudy\Crud;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Crud\AuditedCrud;
-use Modules\News\Services\BodySanitizer;
+use Modules\Core\Security\HtmlSanitizer;
+use Modules\Core\Text\Slugger;
 use Modules\News\Services\NewsRepository;
 use Modules\News\Services\NewsVisibility;
 use Modules\News\Services\Publisher;
 use Modules\News\Services\ReadReceipts;
-use Modules\News\Services\Slugger;
 use Modules\News\Storage\CoverUploads;
 
 /**
@@ -135,7 +135,7 @@ final class Posts extends BackendController
             ->searchFields(['title', 'summary', 'slug'])
             ->filters(['type', 'category_id', 'visibility', 'status', 'groups', 'author_id'])
             ->setRules([
-                'slug'         => ['permit_empty', 'max_length[180]', 'regex_match[/^[a-z0-9]+(?:-[a-z0-9]+)*$/]'],
+                'slug'         => Slugger::rules(),
                 'published_at' => 'permit_empty|valid_date',
                 'expires_at'   => 'permit_empty|valid_date',
             ])
@@ -216,7 +216,7 @@ final class Posts extends BackendController
         $slug  = trim((string) ($data['slug'] ?? ''));
 
         if ($id === null || array_key_exists('slug', $data)) {
-            $data['slug'] = Slugger::unique('news', $slug !== '' ? $slug : $title, $id);
+            $data['slug'] = Slugger::unique('news', $slug !== '' ? $slug : $title, $id, fallback: 'post');
         }
 
         if ($id === null) {
@@ -255,7 +255,7 @@ final class Posts extends BackendController
 
         foreach ($post['kp_tr'] as $locale => $fields) {
             if (is_array($fields) && array_key_exists('body', $fields)) {
-                $post['kp_tr'][$locale]['body'] = is_string($fields['body']) ? BodySanitizer::clean($fields['body']) : '';
+                $post['kp_tr'][$locale]['body'] = is_string($fields['body']) ? HtmlSanitizer::clean($fields['body']) : '';
             }
         }
 

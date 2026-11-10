@@ -14,7 +14,8 @@ use CodeIgniter\Router\Router;
  *   permission it names exists in the catalogue (when one is given);
  * - every route under `api/v1/` has kpapy's filter: `kpapy`, `kpapy:optional` or `kpapy:hmac`;
  *   `kpapy:login` only on the `auth/token*` login routes; `kpapy:public` only for GET (and the
- *   HEAD/OPTIONS that go with it).
+ *   HEAD/OPTIONS that go with it);
+ * - no other route under `api/` (it has no CSRF or session filters).
  *
  * Used by `RoutesSecurityTest` (CI) and `php spark permissions:check`.
  */
@@ -45,6 +46,10 @@ final class RouteSecurityAuditor
                 foreach ($this->apiProblems($verb, substr($path, strlen('api/v1/')), $filters) as $problem) {
                     $problems[] = $label . ': ' . $problem;
                 }
+            } elseif ($path === 'api' || str_starts_with($path, 'api/')) {
+                // `api/*` has no CSRF or session filters (app/Config/Filters.php): only kpapy's
+                // routes under api/v1/ may live there.
+                $problems[] = $label . ': API routes must live under api/v1/ (with the kpapy filter)';
             }
         }
 

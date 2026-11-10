@@ -292,10 +292,15 @@ final class Installer
             }
         }
 
-        foreach ($order as $module) {
-            if (in_array($module, $wanted, true) && $manager->load($module)) {
-                $result->demoLoaded[] = $module;
+        try {
+            foreach ($order as $module) {
+                if (in_array($module, $wanted, true) && $manager->load($module)) {
+                    $result->demoLoaded[] = $module;
+                }
             }
+        } finally {
+            // Also after a failure: the modules loaded before it keep their demo users.
+            $result->demoSecrets = $manager->takeSecrets();
         }
     }
 

@@ -137,6 +137,8 @@ return [
         'newNoticeBody'  => 'Prioritat: {0}. Obriu-lo per llegir-lo i marcar-lo com a llegit.',
     ],
     'activity' => [
+        'publish'         => 'Publicació publicada',
+        'unpublish'       => 'Publicació retirada',
         'notices_updated' => 'Notícies programades publicades i avisos caducats',
     ],
     'api' => [

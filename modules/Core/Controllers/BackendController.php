@@ -8,6 +8,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\Shield\Entities\User;
 use Kpcrudy\Crud;
 use Modules\Core\Crud\AuditedCrud;
 use Modules\Core\Crud\CrudFactory;
@@ -28,6 +29,34 @@ abstract class BackendController extends BaseController
 {
     /** @var list<array{label: string, url: string|null}> */
     protected array $breadcrumbs = [];
+
+    /**
+     * The logged-in user. Back-office routes run the `session` filter, so a request without a
+     * user never reaches an action.
+     *
+     * @throws \RuntimeException when nobody is logged in
+     */
+    protected function currentUser(): User
+    {
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            throw new \RuntimeException('No logged-in user.');
+        }
+
+        return $user;
+    }
+
+    /**
+     * The logged-in user, or a stand-in that holds nothing when there is none (only
+     * `permissions:check` builds a CRUD that way): record rules written against it deny.
+     */
+    protected function currentUserOrNobody(): User
+    {
+        $user = auth()->user();
+
+        return $user instanceof User ? $user : new User(['id' => 0, 'username' => '']);
+    }
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {

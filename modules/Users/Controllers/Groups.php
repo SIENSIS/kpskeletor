@@ -28,7 +28,7 @@ final class Groups extends BackendController
             return $response;
         }
 
-        $actor    = $this->actor();
+        $actor    = $this->currentUserOrNobody();
         $registry = new GroupRegistry();
         $policies = [
             GroupRegistry::OPTIONAL => lang('Users.groups.optional'),
@@ -101,16 +101,5 @@ final class Groups extends BackendController
     private function changes(): bool
     {
         return $this->request->getMethod() !== 'GET' || preg_match('#/(add|edit)(/|$)#', uri_string()) === 1;
-    }
-
-    /**
-     * The logged-in user. Without one (only `permissions:check` inspects the CRUD that way), a
-     * stand-in that holds nothing, so every record rule denies.
-     */
-    private function actor(): User
-    {
-        $user = auth()->user();
-
-        return $user instanceof User ? $user : new User(['id' => 0, 'username' => '']);
     }
 }

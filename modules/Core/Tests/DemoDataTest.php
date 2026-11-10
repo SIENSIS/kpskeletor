@@ -7,6 +7,7 @@ namespace Modules\Core\Tests;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
+use Modules\Core\Demo\DemoData;
 use Modules\Core\Demo\DemoDataException;
 use Modules\Core\Demo\DemoDataManager;
 use Modules\Core\Modules\ModuleToggler;
@@ -217,6 +218,18 @@ final class DemoDataTest extends CIUnitTestCase
         $again = $this->synchronizer()->sync(false, null, []);
         $this->assertNotContains($this->module, $again->demoLoaded, 'idempotent');
         $this->assertCount(2, $this->names());
+    }
+
+    public function testRandomPasswordsAreLongAndDifferent(): void
+    {
+        $passwords = [];
+
+        for ($i = 0; $i < 50; $i++) {
+            $passwords[] = DemoData::randomPassword();
+        }
+
+        $this->assertCount(50, array_unique($passwords));
+        $this->assertSame(23, strlen($passwords[0]));
     }
 
     public function testRunningTheSeederDirectlyIsRefused(): void

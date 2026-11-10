@@ -9,7 +9,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\Shield\Entities\User;
 use Kpcrudy\Crud;
 use Modules\Core\Controllers\BackendController;
-use Modules\News\Services\BodySanitizer;
+use Modules\Core\Security\HtmlSanitizer;
 use Modules\News\Services\NewsRepository;
 use Modules\News\Services\NewsVisibility;
 use Modules\News\Services\ReadReceipts;
@@ -30,7 +30,7 @@ final class Reader extends BackendController
 
     public function index(): string
     {
-        $user    = $this->user();
+        $user    = $this->currentUser();
         $type    = (string) $this->request->getGet('type');
         $filters = [
             'type'     => in_array($type, NewsVisibility::TYPES, true) ? $type : '',
@@ -58,7 +58,7 @@ final class Reader extends BackendController
 
     public function show(string $code): string
     {
-        $user = $this->user();
+        $user = $this->currentUser();
         $row  = $this->readable($code, $user);
         $read = (new ReadReceipts())->isRead((int) $row['id'], (int) $user->id);
 
@@ -67,14 +67,14 @@ final class Reader extends BackendController
         return $this->render('Modules\News\Views\reader\show', [
             'title' => (string) $row['title'],
             // Sanitised when saved; cleaned again here in case a row was written another way.
-            'post'  => self::item($row, $read) + ['body' => BodySanitizer::clean((string) $row['body'])],
+            'post'  => self::item($row, $read) + ['body' => HtmlSanitizer::clean((string) $row['body'])],
             'cover' => CoverUploads::urlOf(is_string($row['cover']) ? $row['cover'] : null),
         ]);
     }
 
     public function mark(string $code): RedirectResponse
     {
-        $user = $this->user();
+        $user = $this->currentUser();
         $row  = $this->readable($code, $user);
 
         (new ReadReceipts())->markRead((int) $row['id'], (int) $user->id);
@@ -128,16 +128,5 @@ final class Reader extends BackendController
         }
 
         return $row;
-    }
-
-    private function user(): User
-    {
-        $user = auth()->user();
-
-        if (! $user instanceof User) {
-            throw PageNotFoundException::forPageNotFound();
-        }
-
-        return $user;
     }
 }

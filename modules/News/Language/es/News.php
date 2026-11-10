@@ -137,6 +137,8 @@ return [
         'newNoticeBody'  => 'Prioridad: {0}. Ábralo para leerlo y marcarlo como leído.',
     ],
     'activity' => [
+        'publish'         => 'Publicación publicada',
+        'unpublish'       => 'Publicación retirada',
         'notices_updated' => 'Noticias programadas publicadas y avisos caducados',
     ],
     'api' => [

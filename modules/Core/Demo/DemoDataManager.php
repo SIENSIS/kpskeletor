@@ -21,6 +21,13 @@ use Modules\Core\Models\ModuleModel;
 final class DemoDataManager
 {
     /**
+     * One-time secrets of the demo data loaded by this instance (see takeSecrets()).
+     *
+     * @var array<string, string>
+     */
+    private array $secrets = [];
+
+    /**
      * @param BaseConnection<object|resource, object|resource>|null $db Default: the default connection
      */
     public function __construct(
@@ -114,8 +121,10 @@ final class DemoDataManager
         // make transComplete() roll back silently.
         $db->resetTransStatus()->transException(true)->transStart();
 
+        $demo = new DemoData($module, $db);
+
         try {
-            $seeder->load(new DemoData($module, $db));
+            $seeder->load($demo);
 
             if (! $db->transComplete()) {
                 throw new \RuntimeException(lang('Core.demo.notCommitted'));
@@ -128,9 +137,26 @@ final class DemoDataManager
             $db->transException(false);
         }
 
+        // The secrets (demo passwords) are kept in memory only, to be shown once; never logged.
+        $this->secrets = array_merge($this->secrets, $demo->secrets());
+
         activity_log('Core', 'demo_loaded', ['resource' => 'modules', 'summary' => $module]);
 
         return true;
+    }
+
+    /**
+     * Returns and forgets the one-time secrets (e.g. demo users' random passwords) of the demo
+     * data loaded so far, label => value: show them once, never store or log them.
+     *
+     * @return array<string, string>
+     */
+    public function takeSecrets(): array
+    {
+        $secrets       = $this->secrets;
+        $this->secrets = [];
+
+        return $secrets;
     }
 
     /**

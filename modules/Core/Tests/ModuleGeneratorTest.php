@@ -38,7 +38,7 @@ final class ModuleGeneratorTest extends CIUnitTestCase
             'Config/Module.php', 'Config/Routes.php', 'Controllers/Home.php', 'Views/index.php',
             "Language/ca/{$name}.php", "Language/es/{$name}.php", "Language/en/{$name}.php",
             "Database/Seeds/{$name}Seeder.php", "Database/Seeds/{$name}DemoSeeder.php", "Widgets/{$name}Widget.php", "Tasks/{$name}Task.php",
-            "Tests/{$name}ModuleTest.php", 'Assets/js/.gitkeep', 'Assets/css/.gitkeep', 'Assets/img/.gitkeep',
+            "Tests/{$name}ModuleTest.php", "Assets/js/{$lower}.js", 'Assets/css/.gitkeep', 'Assets/img/.gitkeep',
         ] as $file) {
             $this->assertFileExists($path . '/' . $file);
         }
@@ -69,6 +69,18 @@ final class ModuleGeneratorTest extends CIUnitTestCase
         $manifest = new $class();
         $this->assertInstanceOf(ModuleManifest::class, $manifest);
         $this->assertSame([], (new ManifestValidator())->validate($manifest, $path));
+
+        // Criterion 2: menu, permissions, a setting, an asset, a widget and a task.
+        $this->assertNotSame([], $manifest->menu);
+        $this->assertSame(["{$lower}-main.*"], $manifest->defaultGrants['admin']);
+        $this->assertArrayHasKey('perPage', $manifest->settings);
+        $this->assertCount(1, $manifest->widgets);
+        $this->assertCount(1, $manifest->tasks);
+        $this->assertSame([], $manifest->csp);
+        $this->assertSame([], $manifest->outboundHosts);
+        $this->assertStringContainsString("data-component=\"{$lower}/{$lower}\"", (string) file_get_contents($path . '/Views/index.php'));
+        $this->assertStringContainsString('export function mount(root, options)', (string) file_get_contents($path . "/Assets/js/{$lower}.js"));
+        $this->assertStringContainsString('extends AuthTestCase', (string) file_get_contents($path . "/Tests/{$name}ModuleTest.php"));
     }
 
     public function testRefusesInvalidReservedAndExistingNames(): void

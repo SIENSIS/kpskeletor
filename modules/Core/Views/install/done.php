@@ -35,6 +35,17 @@
                 <p><?= esc(lang('Install.cli.demoLoaded', [implode(', ', $result->demoLoaded)])) ?></p>
             <?php endif ?>
 
+            <?php if ($result->demoSecrets !== []) : ?>
+                <p class="mb-1"><?= esc(lang('Core.demo.secrets')) ?></p>
+                <table class="table table-sm small mb-3">
+                    <tbody>
+                    <?php foreach ($result->demoSecrets as $label => $value) : ?>
+                        <tr><td><?= esc($label) ?></td><td><code><?= esc($value) ?></code></td></tr>
+                    <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php endif ?>
+
             <h2 class="h5 mt-4"><?= esc(lang('Install.web.cronTitle')) ?></h2>
             <p class="mb-1"><?= esc(lang('Install.cli.cron')) ?></p>
             <pre class="bg-body border rounded p-2 small text-wrap text-break"><code><?= esc($result->cronLine) ?></code></pre>

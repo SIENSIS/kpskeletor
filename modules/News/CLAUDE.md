@@ -28,7 +28,8 @@ description: `docs/news.md`.
 - `Services/NewsVisibility.php` (who reads what; the only place the rule lives),
   `NewsRepository.php` (read queries with texts in the user's language, Catalan fallback),
   `Publisher.php` (publish, notify once, release scheduled, expire), `ReadReceipts.php`,
-  `BodySanitizer.php` (HTMLPurifier), `Slugger.php`, `FeedWriter.php` (RSS with XMLWriter).
+  `FeedWriter.php` (RSS with XMLWriter). From the Core: `Modules\Core\Security\HtmlSanitizer`
+  (HTMLPurifier) and `Modules\Core\Text\Slugger` (moved there in session 19 for Pages and Events).
 - `Controllers/Posts.php` (`index` = `news-posts`, `mine` = `news-mine`), `Categories.php`,
   `Reader.php`, `PublicNews.php`, `Api/Posts.php`; `Storage/CoverUploads.php` (kpcrudy upload
   handler on the Storage service).
@@ -41,7 +42,7 @@ D-17-01 (separate API resource `news-api`) and D-17-08 ("Insert image" with the 
 ## Open tasks
 
 - Session 20: the body uses the rich-text editor (`forms/editor.js`); update the tests.
-- Session 23: the cover uses the file picker (TODO in `Storage/CoverUploads.php`); "Insert image" in the body and only the site's own images in `BodySanitizer` (D-17-08).
+- Session 23: the cover uses the file picker (TODO in `Storage/CoverUploads.php`); "Insert image" in the body and only the site's own images in the Core's `HtmlSanitizer` (D-17-08; it was News' `BodySanitizer` until session 19).
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
 - Session 25: the `news.notices` calendar (`groups` → `restricted`, D-00-41).
 - Session 26: read receipts and notices in the API.

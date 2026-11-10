@@ -223,6 +223,29 @@ final class InstallerTest extends CIUnitTestCase
         $this->assertGreaterThan(0, $this->db->table('news')->countAllResults());
     }
 
+    public function testDemoUsersGetRandomPasswordsShownOnce(): void
+    {
+        $result = $this->installer()->install($this->options('development', ['Auth']));
+
+        // One random password per demo user, returned once to the installer, never fixed.
+        $this->assertSame(['superadmin@example.com', 'admin@example.com', 'editor@example.com', 'usuari@example.com'], array_keys($result->demoSecrets));
+        $this->assertCount(4, array_unique($result->demoSecrets));
+
+        foreach ($result->demoSecrets as $email => $password) {
+            $this->assertMatchesRegularExpression('/^[A-Za-z2-9]{5}(-[A-Za-z2-9]{5}){3}$/', $password);
+            $user = model(UserModel::class)->findByCredentials(['email' => $email]);
+            $this->assertNotNull($user, $email);
+            $this->assertTrue(service('passwords')->verify($password, (string) $user->password_hash), $email);
+        }
+
+        // Not written to the activity log.
+        foreach ($this->db->table('activity_log')->get()->getResultArray() as $row) {
+            foreach ($result->demoSecrets as $password) {
+                $this->assertStringNotContainsString($password, json_encode($row, JSON_THROW_ON_ERROR));
+            }
+        }
+    }
+
     public function testDemoUsersNeverReplaceTheSuperadmin(): void
     {
         $options                = $this->options('development', []);

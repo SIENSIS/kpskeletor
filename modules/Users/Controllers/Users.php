@@ -34,7 +34,7 @@ final class Users extends BackendController
 
     public function index(): ResponseInterface|string
     {
-        $actor    = $this->actor();
+        $actor    = $this->currentUserOrNobody();
         $accounts = new UserAccounts();
         $targets  = [];
         $target   = static function (array $row) use ($accounts, &$targets): ?User {
@@ -49,6 +49,11 @@ final class Users extends BackendController
         $email = static fn (array $row): string => UserAccounts::email((int) ($row['id'] ?? 0));
 
         $crud = $this->crud('users-users')
+            // The account services write their own security entries (user_banned, reset_forced,
+            // 2fa_reset, logged_out_everywhere, impersonation_started) only when the action
+            // happens: a generic entry would duplicate them, or record a re-authentication
+            // redirect as if the action had been done.
+            ->skipActivity('ban', 'forcereset', 'reset2fa', 'logout', 'impersonate')
             ->setTable('users')
             ->softDeletes(false)
             ->where(['deleted_at' => null])
@@ -225,17 +230,6 @@ final class Users extends BackendController
     private function posted(string $field): mixed
     {
         return $this->request instanceof IncomingRequest ? $this->request->getPost($field) : null;
-    }
-
-    /**
-     * The logged-in user. Without one (only `permissions:check` inspects the CRUD that way), a
-     * stand-in that holds nothing, so every record rule denies.
-     */
-    private function actor(): User
-    {
-        $user = auth()->user();
-
-        return $user instanceof User ? $user : new User(['id' => 0, 'username' => '']);
     }
 
     /**

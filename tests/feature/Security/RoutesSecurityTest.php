@@ -70,13 +70,46 @@ final class RoutesSecurityTest extends CIUnitTestCase
         $routes->post('api/v1/login', 'Login::index', ['filter' => 'kpapy:login']);
         $routes->post('api/v1/comments', 'Comments::create', ['filter' => 'kpapy:public']);
         $routes->get('api/v1/odd', 'Odd::index', ['filter' => 'kpapy:anything']);
+        // Outside api/v1/ there is no kpapy, CSRF or session filter: refused even with kpapy.
+        $routes->post('api/internal/sync', 'Sync::run');
+        $routes->get('api/v2/posts', 'Posts::index', ['filter' => 'kpapy']);
 
         $this->assertSame([
             'GET api/v1/odd: unknown kpapy mode "anything"',
             'GET api/v1/open: no kpapy filter',
+            'GET api/v2/posts: API routes must live under api/v1/ (with the kpapy filter)',
+            'POST api/internal/sync: API routes must live under api/v1/ (with the kpapy filter)',
             'POST api/v1/comments: kpapy:public is only for GET routes',
             'POST api/v1/login: kpapy:login is only for the auth/token* login routes',
         ], $this->sorted((new RouteSecurityAuditor())->audit($routes)));
+    }
+
+    /**
+     * Sensitive actions (docs/specification.md, "Re-authentication") keep the `reauth` filter. The
+     * actions that ask for it in the controller (`requireReauth()`: Users' 2FA reset and
+     * impersonation, group changes) are covered by their own tests.
+     */
+    public function testSensitiveRoutesRequireReauthentication(): void
+    {
+        $routes = Services::routes(false)->loadRoutes();
+
+        foreach ([
+            ['POST', 'backend/profile/two-factor/email'],
+            ['GET', 'backend/profile/two-factor/app'],
+            ['POST', 'backend/profile/two-factor/app'],
+            ['POST', 'backend/profile/two-factor/disable'],
+            ['POST', 'backend/profile/two-factor/recovery-codes'],
+            ['POST', 'backend/profile/api-tokens'],
+            ['GET', 'backend/settings/security'],
+            ['POST', 'backend/settings/security'],
+            ['POST', 'backend/settings/actions/assets'],
+            ['GET', 'backend/users/access/([0-9]+)'],
+            ['POST', 'backend/users/access/([0-9]+)'],
+            ['POST', 'backend/users/permissions'],
+        ] as [$verb, $path]) {
+            $this->assertArrayHasKey($path, $routes->getRoutes($verb), "{$verb} {$path} exists.");
+            $this->assertContains('reauth', $routes->getFiltersForRoute($path, $verb), "{$verb} {$path} asks for re-authentication.");
+        }
     }
 
     /**

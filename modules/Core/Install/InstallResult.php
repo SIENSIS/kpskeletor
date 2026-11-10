@@ -29,6 +29,13 @@ final class InstallResult
     /** @var list<string> */
     public array $demoLoaded = [];
 
+    /**
+     * Demo users' random passwords (label => value), shown once on the last page / console.
+     *
+     * @var array<string, string>
+     */
+    public array $demoSecrets = [];
+
     /** Why the demo data could not be loaded ('' when it was, or was not asked for). */
     public string $demoError = '';
 

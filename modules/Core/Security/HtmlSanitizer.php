@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Modules\News\Services;
+namespace Modules\Core\Security;
 
 use HTMLPurifier;
 use HTMLPurifier_Config;
 
 /**
- * Sanitises the HTML body of a post with HTMLPurifier before it is stored (specification
- * "Security baseline": rich text through HTMLPurifier). Allowed: paragraphs, headings, lists,
+ * Sanitises rich text (news bodies, pages, event descriptions…) with HTMLPurifier before it is
+ * stored and again when it is shown (specification "Security baseline": rich text through
+ * HTMLPurifier). Allowed: paragraphs, headings, lists,
  * emphasis, links (`http`, `https`, `mailto`; external ones open with `rel="noopener noreferrer"`),
  * images over `https`, quotes, code, tables. Scripts, event handlers, styles, iframes, forms and
  * `javascript:`/`data:` URLs are removed.
  */
-final class BodySanitizer
+final class HtmlSanitizer
 {
     private static ?HTMLPurifier $purifier = null;
 

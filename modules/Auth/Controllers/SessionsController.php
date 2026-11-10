@@ -20,7 +20,7 @@ final class SessionsController extends BackendController
 {
     public function index(): string
     {
-        $user    = $this->user();
+        $user    = $this->currentUser();
         $tracker = new SessionTracker();
         $current = $tracker->current();
         $rows    = [];
@@ -57,7 +57,7 @@ final class SessionsController extends BackendController
 
     public function revoke(int $id): RedirectResponse
     {
-        $user    = $this->user();
+        $user    = $this->currentUser();
         $tracker = new SessionTracker();
         $current = $tracker->current();
 
@@ -76,7 +76,7 @@ final class SessionsController extends BackendController
 
     public function revokeOthers(): RedirectResponse
     {
-        $user  = $this->user();
+        $user  = $this->currentUser();
         $ended = (new SessionTracker())->endOthers((int) $user->id, SessionTracker::END_REVOKED);
 
         security_log('Auth', 'sessions_revoked', ['resource' => 'auth-sessions', 'summary' => (string) $ended]);
@@ -86,7 +86,7 @@ final class SessionsController extends BackendController
 
     public function revokeToken(int $id): RedirectResponse
     {
-        $user  = $this->user();
+        $user  = $this->currentUser();
         $token = $user->getAccessTokenById($id);
 
         if ($token === null) {
@@ -102,16 +102,5 @@ final class SessionsController extends BackendController
     private function back(string $type, string $message): RedirectResponse
     {
         return redirect()->to(site_url('backend/profile/sessions'))->with($type, $message);
-    }
-
-    private function user(): User
-    {
-        $user = auth('session')->user();
-
-        if (! $user instanceof User) {
-            throw new \RuntimeException('No logged-in user.');
-        }
-
-        return $user;
     }
 }

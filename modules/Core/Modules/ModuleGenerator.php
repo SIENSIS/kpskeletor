@@ -9,8 +9,10 @@ use Modules\Core\Config\Version;
 
 /**
  * Generates an empty module from the templates in `Modules/Templates` (`make:module <Name>`):
- * manifest, routes, language files (ca, es, en), controller, view, asset folders, a migration,
- * the initial-data seeder, a widget stub, a scheduled-task stub and a test.
+ * manifest (resource, menu, grants, a setting, widget, task and the empty backup/api/csp/outbound
+ * declarations), routes, language files (ca, es, en), controller, view with an example ES-module
+ * component, asset folders, a migration, the initial-data and demo seeders, a widget stub, a
+ * scheduled-task stub and feature tests (manifest, permissions, migration up/down/up).
  *
  * With a CRUD table (`make:module <Name> --crud=<table>`) the migration creates that table and
  * the manifest, menu and language files declare its `crud` resource (`CrudScaffold`); the
@@ -33,10 +35,11 @@ final class ModuleGenerator
         'Widget.php.tpl'      => 'Widgets/{{Name}}Widget.php',
         'Task.php.tpl'        => 'Tasks/{{Name}}Task.php',
         'Test.php.tpl'        => 'Tests/{{Name}}ModuleTest.php',
+        'component.js.tpl'    => 'Assets/js/{{name}}.js',
     ];
 
     /** Empty folders kept with a .gitkeep file. */
-    private const FOLDERS = ['Assets/js', 'Assets/css', 'Assets/img', 'Models', 'Entities', 'Services', 'Notifications'];
+    private const FOLDERS = ['Assets/css', 'Assets/img', 'Models', 'Entities', 'Services', 'Notifications'];
 
     private readonly string $root;
 

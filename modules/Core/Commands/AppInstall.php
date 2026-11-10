@@ -116,6 +116,8 @@ final class AppInstall extends BaseCommand
             CLI::write(lang('Install.cli.demoLoaded', [implode(', ', $result->demoLoaded)]), 'green');
         }
 
+        ModulesDemo::writeSecrets($result->demoSecrets);
+
         CLI::write(lang('Install.cli.superadmin', [$options->adminUsername, $options->adminEmail]), 'green');
         CLI::newLine();
         CLI::write(lang('Install.cli.cron'));

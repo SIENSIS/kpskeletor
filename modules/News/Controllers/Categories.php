@@ -6,7 +6,7 @@ namespace Modules\News\Controllers;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Core\Controllers\BackendController;
-use Modules\News\Services\Slugger;
+use Modules\Core\Text\Slugger;
 
 /**
  * Categories of the posts (`backend/news/categories`, resource `news-categories`): translated
@@ -36,7 +36,7 @@ final class Categories extends BackendController
             ->searchFields(['name', 'slug'])
             ->filters(['active'])
             ->setRules([
-                'slug'     => ['permit_empty', 'max_length[120]', 'regex_match[/^[a-z0-9]+(?:-[a-z0-9]+)*$/]'],
+                'slug'     => Slugger::rules(120),
                 'position' => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[9999]',
             ])
             ->setDefault('active', 1)
@@ -69,7 +69,7 @@ final class Categories extends BackendController
         $slug = trim((string) ($data['slug'] ?? ''));
 
         if ($id === null || array_key_exists('slug', $data)) {
-            $data['slug'] = Slugger::unique('news_categories', $slug !== '' ? $slug : (string) ($translations['ca']['name'] ?? ''), $id);
+            $data['slug'] = Slugger::unique('news_categories', $slug !== '' ? $slug : (string) ($translations['ca']['name'] ?? ''), $id, fallback: 'category');
         }
 
         $data['position'] = (int) ($data['position'] ?? 0);

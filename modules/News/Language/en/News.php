@@ -137,6 +137,8 @@ return [
         'newNoticeBody'  => 'Priority: {0}. Open it to read it and mark it as read.',
     ],
     'activity' => [
+        'publish'         => 'Post published',
+        'unpublish'       => 'Post unpublished',
         'notices_updated' => 'Scheduled news published and notices expired',
     ],
     'api' => [

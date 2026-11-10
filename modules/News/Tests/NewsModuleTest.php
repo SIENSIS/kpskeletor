@@ -8,6 +8,8 @@ use CodeIgniter\Database\Migration;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Modules\Core\Modules\ManifestValidator;
+use Modules\Core\Security\HtmlSanitizer;
+use Modules\Core\Text\Slugger;
 use Modules\News\Config\Module;
 use Modules\News\Database\Migrations\CreateNews;
 use Modules\News\Database\Migrations\CreateNewsCategories;
@@ -16,8 +18,6 @@ use Modules\News\Database\Migrations\CreateNewsGroups;
 use Modules\News\Database\Migrations\CreateNewsReads;
 use Modules\News\Database\Migrations\CreateNewsTranslations;
 use Modules\News\Menu\CategoryLink;
-use Modules\News\Services\BodySanitizer;
-use Modules\News\Services\Slugger;
 
 /**
  * The manifest, the migrations (up, down, up), the sanitiser, slugs and the menu link type.
@@ -84,7 +84,7 @@ final class NewsModuleTest extends CIUnitTestCase
 
     public function testTheSanitiserKeepsFormattingAndDropsScripts(): void
     {
-        $clean = BodySanitizer::clean('<h2>Títol</h2><p style="color:red" onmouseover="x()">Text <a href="https://example.com" target="_blank">enllaç</a> <a href="javascript:alert(1)">mal</a></p><script>alert(1)</script><iframe src="https://evil.example"></iframe>');
+        $clean = HtmlSanitizer::clean('<h2>Títol</h2><p style="color:red" onmouseover="x()">Text <a href="https://example.com" target="_blank">enllaç</a> <a href="javascript:alert(1)">mal</a></p><script>alert(1)</script><iframe src="https://evil.example"></iframe>');
 
         $this->assertStringContainsString('<h2>Títol</h2>', $clean);
         $this->assertStringContainsString('href="https://example.com"', $clean);
@@ -94,20 +94,24 @@ final class NewsModuleTest extends CIUnitTestCase
         $this->assertStringNotContainsString('javascript:', $clean);
         $this->assertStringNotContainsString('<script', $clean);
         $this->assertStringNotContainsString('<iframe', $clean);
-        $this->assertSame('', BodySanitizer::clean('  '));
+        $this->assertSame('', HtmlSanitizer::clean('  '));
     }
 
     public function testSlugs(): void
     {
         $this->assertSame('l-escola-obre-l-estiu', Slugger::slug('L’escola obre l’estiu!'));
         $this->assertSame('cafe-i-pa', Slugger::slug('Cafè i pa'));
-        $this->assertSame('post', Slugger::slug('¡¿?!'));
+        $this->assertSame('post', Slugger::slug('¡¿?!', 'post'));
 
         $this->db->table('news')->insert(['slug' => 'cafe-i-pa', 'type' => 'article', 'visibility' => 'public', 'status' => 'draft']);
         // Read the id at once: MySQLi resets insert_id after any other query (a SELECT included).
         $id = (int) $this->db->insertID();
         $this->assertSame('cafe-i-pa-2', Slugger::unique('news', 'Cafè i pa'));
         $this->assertSame('cafe-i-pa', Slugger::unique('news', 'Cafè i pa', $id));
+        // A scope limits the clash to some rows (e.g. pages of the same parent).
+        $this->assertSame('cafe-i-pa', Slugger::unique('news', 'Cafè i pa', null, ['type' => 'notice']));
+        $this->assertSame('cafe-i-pa-2', Slugger::unique('news', 'Cafè i pa', null, ['type' => 'article']));
+        $this->assertSame(['permit_empty', 'max_length[120]', 'regex_match[/^[a-z0-9]+(?:-[a-z0-9]+)*$/]'], Slugger::rules(120));
     }
 
     public function testTheCategoryLinkType(): void

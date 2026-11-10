@@ -23,7 +23,7 @@ final class Dashboard extends BackendController
 {
     public function index(): string
     {
-        $user     = $this->user();
+        $user     = $this->currentUser();
         $layout   = new DashboardLayout();
         $renderer = new WidgetRenderer();
         $cards    = [];
@@ -68,7 +68,7 @@ final class Dashboard extends BackendController
      */
     public function customize(): string
     {
-        $user = $this->user();
+        $user = $this->currentUser();
         $rows = [];
 
         foreach ((new DashboardLayout())->forUser($user) as $i => $entry) {
@@ -113,7 +113,7 @@ final class Dashboard extends BackendController
             return $this->answer(lang('Dashboard.invalid'), 'error', 422);
         }
 
-        (new DashboardLayout())->saveUser($this->user(), $entries);
+        (new DashboardLayout())->saveUser($this->currentUser(), $entries);
 
         return $this->answer(lang('Dashboard.saved'), 'success');
     }
@@ -123,7 +123,7 @@ final class Dashboard extends BackendController
      */
     public function reset(): ResponseInterface
     {
-        (new DashboardLayout())->resetUser($this->user());
+        (new DashboardLayout())->resetUser($this->currentUser());
 
         return $this->answer(lang('Dashboard.restored'), 'success');
     }
@@ -178,16 +178,5 @@ final class Dashboard extends BackendController
         }
 
         return redirect()->to(site_url('backend'))->with($type, $message);
-    }
-
-    private function user(): User
-    {
-        $user = auth()->user();
-
-        if (! $user instanceof User) {
-            throw new \RuntimeException('No logged-in user.');
-        }
-
-        return $user;
     }
 }

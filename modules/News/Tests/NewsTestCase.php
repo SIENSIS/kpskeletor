@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\News\Tests;
 
-use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\I18n\Time;
 use Kpcrudy\Crud;
 use Modules\Core\Permissions\CrudPermissions;
@@ -88,21 +87,6 @@ abstract class NewsTestCase extends DashboardTestCase
         return html_entity_decode((string) $this->send($method, $path, $params)->response()->getBody(), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
-    /**
-     * The request answers 404 (a feature test gets the exception, a real request the error page).
-     *
-     * @param array<string, mixed> $params
-     */
-    protected function assertNotFound(string $method, string $path, array $params = []): void
-    {
-        try {
-            $status = $this->send($method, $path, $params)->response()->getStatusCode();
-        } catch (PageNotFoundException) {
-            $status = 404;
-        }
-
-        $this->assertSame(404, $status, "{$method} {$path}");
-    }
 
     /**
      * Notifications stored for a user (database channel).

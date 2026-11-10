@@ -120,6 +120,7 @@ final class UsersScreensTest extends UsersTestCase
         $this->assertTrue($this->fresh($ana)->isBanned());
         $this->assertSame([], (new SessionTracker())->activeFor((int) $ana->id));
         $this->assertSame(1, db_connect()->table('activity_log')->where('action', 'user_banned')->countAllResults());
+        $this->assertSame(0, db_connect()->table('activity_log')->where('action', 'ban')->countAllResults(), 'One entry per ban, written by the service.');
 
         $this->send('POST', 'backend/users/ban/' . $this->code($ana->id))->assertRedirect();
         $this->assertFalse($this->fresh($ana)->isBanned());
@@ -149,6 +150,7 @@ final class UsersScreensTest extends UsersTestCase
         $this->later(16 * 60);
         $this->send('POST', 'backend/users/reset2fa/' . $this->code($ana->id))->assertRedirectTo(site_url('auth/reauth'));
         $this->assertSame(TwoFactor::EMAIL, (new TwoFactor())->method((int) $ana->id));
+        $this->assertSame(0, db_connect()->table('activity_log')->whereIn('action', ['reset2fa', '2fa_reset'])->countAllResults(), 'Nothing logged: the reset did not happen.');
     }
 
     public function testResettingTwoFactorNotifiesTheUser(): void

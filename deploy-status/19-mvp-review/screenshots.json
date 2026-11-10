@@ -1,0 +1,54 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/19-mvp-review/screenshots",
+  "deviceScaleFactor": 2,
+  "login": {
+    "url": "/login",
+    "user": "owner@example.com",
+    "password": "<superadmin password typed at install>",
+    "waitFor": "/backend"
+  },
+  "shots": [
+    {
+      "url": "/backend/events2",
+      "name": "01-generated-module",
+      "waitFor": "[data-component='events2/events2']:not([hidden])"
+    },
+    {
+      "url": "/backend",
+      "name": "02-dashboard-generated-widget",
+      "fullPage": true
+    },
+    {
+      "url": "/backend/settings/events2",
+      "name": "03-generated-setting"
+    },
+    {
+      "url": "/backend/events2",
+      "name": "04-generated-module-phone-dark",
+      "width": 390,
+      "height": 844,
+      "dark": true
+    },
+    {
+      "url": "/backend/news/posts",
+      "name": "05-news-read-only-user",
+      "login": {
+        "user": "usuari@example.com",
+        "password": "<password printed by app:install --demo>"
+      }
+    },
+    {
+      "url": "/",
+      "name": "06-public-home",
+      "login": false
+    },
+    {
+      "url": "/news",
+      "name": "07-public-news-phone",
+      "login": false,
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

@@ -7,7 +7,7 @@ namespace Modules\News\Database\Seeds;
 use CodeIgniter\I18n\Time;
 use Modules\Core\Demo\DemoData;
 use Modules\Core\Demo\DemoSeeder;
-use Modules\News\Services\BodySanitizer;
+use Modules\Core\Security\HtmlSanitizer;
 
 /**
  * Demo data of the News module, in Catalan only (`php spark modules:demo News`): two categories,
@@ -130,7 +130,7 @@ final class NewsDemoSeeder extends DemoSeeder
             'locale'  => 'ca',
             'title'   => $post['title'],
             'summary' => $post['summary'],
-            'body'    => BodySanitizer::clean((string) $post['body']),
+            'body'    => HtmlSanitizer::clean((string) $post['body']),
         ]);
 
         foreach ($post['groups'] ?? [] as $group) {

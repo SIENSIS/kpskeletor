@@ -29,7 +29,7 @@ final class ProfileController extends BackendController
 {
     public function index(): string
     {
-        $user = $this->user();
+        $user = $this->currentUser();
 
         $this->breadcrumb(lang('Auth.profile.title'));
 
@@ -48,7 +48,7 @@ final class ProfileController extends BackendController
 
     public function update(): RedirectResponse
     {
-        $user  = $this->user();
+        $user  = $this->currentUser();
         $data  = [
             'name'       => trim((string) $this->request->getPost('name')),
             'email'      => trim((string) $this->request->getPost('email')),
@@ -110,7 +110,7 @@ final class ProfileController extends BackendController
 
     public function password(): RedirectResponse|string
     {
-        $user = $this->user();
+        $user = $this->currentUser();
 
         if (Impersonation::active()) {
             return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
@@ -136,7 +136,7 @@ final class ProfileController extends BackendController
             return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
         }
 
-        $user     = $this->user();
+        $user     = $this->currentUser();
         $throttle = new LoginThrottle();
         $ip       = $this->request->getIPAddress();
         $wait     = $throttle->loginBlockedFor($ip, (string) $user->email);
@@ -181,9 +181,21 @@ final class ProfileController extends BackendController
      */
     private function checkEmailChange(User $user, string $email): ?string
     {
+        // Same attempt limit as the login and the password change: the session holder must not be
+        // able to guess the account password through this form.
+        $throttle = new LoginThrottle();
+        $ip       = $this->request->getIPAddress();
+        $wait     = $throttle->loginBlockedFor($ip, (string) $user->email);
+
+        if ($wait > 0) {
+            return lang('Auth.msg.throttled', [max(1, (int) ceil($wait / 60))]);
+        }
+
         $password = $this->request->getPost('current_password');
 
         if (! is_string($password) || ! service('passwords')->verify($password, (string) $user->password_hash)) {
+            $throttle->loginFailed($ip, (string) $user->email);
+
             return lang('Auth.profile.emailNeedsPassword');
         }
 
@@ -194,17 +206,5 @@ final class ProfileController extends BackendController
         }
 
         return null;
-    }
-
-    private function user(): User
-    {
-        $user = auth('session')->user();
-
-        if (! $user instanceof User) {
-            // The `session` filter covers backend/*: unreachable without a user.
-            throw new \RuntimeException('No logged-in user.');
-        }
-
-        return $user;
     }
 }

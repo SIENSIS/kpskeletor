@@ -9,7 +9,6 @@ use CodeIgniter\Shield\Entities\User;
 use InvalidArgumentException;
 use Modules\Api\Services\PersonalTokens as Tokens;
 use Modules\Core\Controllers\BackendController;
-use RuntimeException;
 
 /**
  * "My API tokens" (`api.tokens`): the user's tokens with name, scopes, expiry, last use and
@@ -20,7 +19,7 @@ final class PersonalTokens extends BackendController
 {
     public function index(): string
     {
-        $user    = $this->user();
+        $user    = $this->currentUser();
         $service = new Tokens();
 
         // Shown once: removed from the session as soon as it is read.
@@ -42,7 +41,7 @@ final class PersonalTokens extends BackendController
 
     public function create(): RedirectResponse
     {
-        $user   = $this->user();
+        $user   = $this->currentUser();
         $name   = $this->request->getPost('name');
         $scope  = $this->request->getPost('scope');
         $scopes = $scope === 'all' ? ['*'] : (array) ($this->request->getPost('scopes') ?? []);
@@ -61,21 +60,10 @@ final class PersonalTokens extends BackendController
 
     public function revoke(int $id): RedirectResponse
     {
-        if (! (new Tokens())->revoke($this->user(), $id)) {
+        if (! (new Tokens())->revoke($this->currentUser(), $id)) {
             return redirect()->to(site_url('backend/profile/api-tokens'))->with('error', lang('Api.personal.notFound'));
         }
 
         return redirect()->to(site_url('backend/profile/api-tokens'))->with('success', lang('Api.personal.revoked'));
-    }
-
-    private function user(): User
-    {
-        $user = auth('session')->user();
-
-        if (! $user instanceof User) {
-            throw new RuntimeException('No logged-in user.');
-        }
-
-        return $user;
     }
 }
