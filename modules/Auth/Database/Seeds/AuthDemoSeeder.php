@@ -34,7 +34,9 @@ final class AuthDemoSeeder extends DemoSeeder
         $profiles = model(UserProfileModel::class);
 
         foreach (self::USERS as $row) {
-            if ($users->findByCredentials(['email' => $row['email']]) !== null) {
+            // An existing account with the same email or username (e.g. the superadmin created by
+            // the installer) is kept and its demo user skipped.
+            if ($users->findByCredentials(['email' => $row['email']]) !== null || $users->where('username', $row['username'])->countAllResults() > 0) {
                 continue;
             }
 

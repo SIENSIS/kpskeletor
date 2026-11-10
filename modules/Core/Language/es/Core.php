@@ -515,6 +515,8 @@ return [
         'preferences_saved' => 'Preferencias de notificaciones guardadas',
         'purge' => 'Entradas antiguas borradas',
         'upload_refused' => 'Subida rechazada',
+        'installed' => 'Aplicación instalada',
+        'superadmin_created' => 'Primer superadministrador creado',
     ],
     // Upload rules of the Storage service.
     'storage' => [

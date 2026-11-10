@@ -515,6 +515,8 @@ return [
         'preferences_saved' => 'Preferències de notificacions desades',
         'purge' => 'Entrades antigues esborrades',
         'upload_refused' => 'Pujada rebutjada',
+        'installed' => 'Aplicació instal·lada',
+        'superadmin_created' => 'Primer superadministrador creat',
     ],
     // Upload rules of the Storage service.
     'storage' => [

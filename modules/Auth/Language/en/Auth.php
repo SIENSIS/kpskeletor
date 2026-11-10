@@ -312,4 +312,16 @@ return [
         'login' => 'Login and email links',
         'twoFactor' => 'Two-factor authentication',
     ],
+    // php spark app:install: 2FA for the first superadmin (Services/InstallTwoFactor.php).
+    'install' => [
+        'ask' => 'Set up two-factor authentication for this superadmin? (none, totp = authenticator app, email = codes by email)',
+        'emailOn' => 'Two-factor authentication by email is on: a code is emailed at each login (configure the mail settings).',
+        'totpScan' => 'Add this account to your authenticator app (open the URI or type the secret):',
+        'totpSecret' => 'Secret: {0}',
+        'totpCode' => 'Code shown by the app',
+        'totpWrong' => 'Wrong code.',
+        'totpOn' => 'Two-factor authentication with the authenticator app is on.',
+        'totpLater' => '2FA not set up: do it from your profile after the first login.',
+        'recovery' => 'Recovery codes (shown only once; keep them in a safe place):',
+    ],
 ];

@@ -28,7 +28,7 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
   `GroupRules` (delegates to the Core's `EscalationGuard`), `LoginListener` (Shield
   `login`/`logout` events and the Core's `privilegesChanged` in `Config/Events.php`),
   `TwoFactor` (method, encrypted TOTP secret, reset), `Totp` (otphp + QR SVG), `RecoveryCodes`,
-  `EmailCodes`, `Reauth`, `Impersonation` (state in the PHP session; started by the Users
+  `EmailCodes`, `Reauth`, `InstallTwoFactor` (2FA offered to the first superadmin by `php spark app:install`, listener of the Core's `install.superadmin`; D-18-05), `Impersonation` (state in the PHP session; started by the Users
   module, ended by `ImpersonationController`, logout or the `authsession` filter on expiry).
 - Tables: `user_profiles`, `user_sessions`, `known_devices`, `user_two_factor`,
   `user_recovery_codes`.
