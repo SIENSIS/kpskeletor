@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Settings\Tests;
 
-use CodeIgniter\Shield\Entities\User;
 use Modules\Auth\Tests\AuthTestCase;
 use Modules\Core\Cache\CoreCache;
 use Modules\Core\Modules\ModuleDiscovery;
@@ -34,21 +33,6 @@ abstract class SettingsTestCase extends AuthTestCase
         (new CoreCache())->invalidate('settings');
     }
 
-    /**
-     * A user of the `user` group with these individual permissions, logged in.
-     */
-    protected function loginWith(string ...$permissions): User
-    {
-        $user = $this->createUser('ana@example.com', 'user');
-
-        if ($permissions !== []) {
-            $user->addPermission(...$permissions);
-        }
-
-        $this->login('ana@example.com');
-
-        return $user;
-    }
 
     /**
      * @return list<array<string, mixed>>
