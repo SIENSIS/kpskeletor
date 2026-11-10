@@ -17,6 +17,14 @@ use InvalidArgumentException;
 final class DemoData
 {
     /**
+     * One-time secrets created by the seeder (label => value), shown once to whoever loaded the
+     * demo data and never stored or logged.
+     *
+     * @var array<string, string>
+     */
+    private array $secrets = [];
+
+    /**
      * @param BaseConnection<object|resource, object|resource>|null $db Default: the default connection
      */
     public function __construct(
@@ -68,6 +76,45 @@ final class DemoData
             'file_path'  => ltrim($path, '/'),
             'created_at' => Time::now()->toDateTimeString(),
         ]);
+    }
+
+    /**
+     * A random password for a demo account (never a fixed password): 4 groups of 5 characters
+     * from an alphabet without look-alikes, about 99 bits. Register it with secret() so it is
+     * shown once.
+     */
+    public static function randomPassword(): string
+    {
+        $alphabet = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $groups   = [];
+
+        for ($g = 0; $g < 4; $g++) {
+            $group = '';
+
+            for ($i = 0; $i < 5; $i++) {
+                $group .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+            }
+
+            $groups[] = $group;
+        }
+
+        return implode('-', $groups);
+    }
+
+    /**
+     * Registers a secret (e.g. a demo user's password) to show once after loading.
+     */
+    public function secret(string $label, string $value): void
+    {
+        $this->secrets[$label] = $value;
+    }
+
+    /**
+     * @return array<string, string> label => value
+     */
+    public function secrets(): array
+    {
+        return $this->secrets;
     }
 
     /**

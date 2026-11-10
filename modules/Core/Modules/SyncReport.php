@@ -57,6 +57,14 @@ final class SyncReport
     /** @var list<string> modules whose demo data was loaded */
     public array $demoLoaded = [];
 
+    /**
+     * One-time secrets of the demo data (demo users' passwords), label => value: shown once by
+     * the command, not part of lines().
+     *
+     * @var array<string, string>
+     */
+    public array $demoSecrets = [];
+
     public function hasChanges(): bool
     {
         return $this->namespacesChanged

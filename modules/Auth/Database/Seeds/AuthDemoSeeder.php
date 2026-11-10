@@ -12,14 +12,12 @@ use Modules\Core\Demo\DemoSeeder;
 
 /**
  * Demo users of the Auth module, one per group, loaded with `php spark modules:demo Auth`.
- * Password of every demo user: `Demo-kpskeletor-2026` (never in production; remove them with
- * `php spark modules:demo Auth --remove`). Deleting a user removes its identities, groups and
- * profile through the foreign keys.
+ * Each one gets a random password, shown once by whoever loaded the demo data (never a fixed
+ * password; remove them with `php spark modules:demo Auth --remove`). Deleting a user removes
+ * its identities, groups and profile through the foreign keys.
  */
 final class AuthDemoSeeder extends DemoSeeder
 {
-    public const PASSWORD = 'Demo-kpskeletor-2026';
-
     /** @var list<array{username: string, email: string, name: string, group: string}> */
     private const USERS = [
         ['username' => 'superadmin', 'email' => 'superadmin@example.com', 'name' => 'Montserrat Puig', 'group' => 'superadmin'],
@@ -40,8 +38,10 @@ final class AuthDemoSeeder extends DemoSeeder
                 continue;
             }
 
-            $user = new User(['username' => $row['username'], 'email' => $row['email'], 'password' => self::PASSWORD, 'active' => 1]);
+            $password = DemoData::randomPassword();
+            $user     = new User(['username' => $row['username'], 'email' => $row['email'], 'password' => $password, 'active' => 1]);
             $users->save($user);
+            $demo->secret($row['email'], $password);
 
             $id   = (int) $users->getInsertID();
             $user = $users->findById($id);

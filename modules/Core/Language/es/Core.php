@@ -175,6 +175,7 @@ return [
         ],
         'loaded'            => '{0}: se han cargado los datos de demostración.',
         'alreadyLoaded'     => '{0}: los datos de demostración ya están cargados (use --reload para volver a cargarlos).',
+        'secrets'       => 'Contraseñas de los usuarios de demostración (solo se muestran ahora; guárdelas):',
         'removed'           => '{0}: se han eliminado los datos de demostración ({1} filas, {2} ficheros).',
         'notCommitted' => 'Se ha deshecho la transacción.',
         'kept'              => 'Se conservan porque otros datos dependen de ellos: {0}.',

@@ -83,6 +83,8 @@ final class ModulesSync extends BaseCommand
             CLI::write($line);
         }
 
+        ModulesDemo::writeSecrets($report->demoSecrets);
+
         CLI::write($report->hasChanges() || $report->demoLoaded !== [] ? lang('Core.sync.done') : lang('Core.sync.nothing'), 'green');
 
         return EXIT_SUCCESS;

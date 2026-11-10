@@ -175,6 +175,7 @@ return [
         ],
         'loaded'            => '{0}: s\'han carregat les dades de demostració.',
         'alreadyLoaded'     => '{0}: les dades de demostració ja estan carregades (feu servir --reload per tornar-les a carregar).',
+        'secrets'       => 'Contrasenyes dels usuaris de demostració (només es mostren ara; deseu-les):',
         'removed'           => '{0}: s\'han eliminat les dades de demostració ({1} files, {2} fitxers).',
         'notCommitted' => 'S\'ha desfet la transacció.',
         'kept'              => 'Es conserven perquè altres dades en depenen: {0}.',

@@ -182,6 +182,8 @@ final class ModuleSynchronizer
                     $report->demoLoaded[] = $module;
                 }
             }
+
+            $report->demoSecrets = $manager->takeSecrets();
         }
 
         return $report;

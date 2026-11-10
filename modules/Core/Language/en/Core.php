@@ -175,6 +175,7 @@ return [
         ],
         'loaded'            => '{0}: demo data loaded.',
         'alreadyLoaded'     => '{0}: the demo data is already loaded (use --reload to load it again).',
+        'secrets'       => "Demo users' passwords (shown only once; save them now):",
         'removed'           => '{0}: demo data removed ({1} row(s), {2} file(s)).',
         'notCommitted' => 'The transaction was rolled back.',
         'kept'              => 'Kept because other data depends on them: {0}.',

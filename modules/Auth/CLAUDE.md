@@ -33,7 +33,8 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
 - Tables: `user_profiles`, `user_sessions`, `known_devices`, `user_two_factor`,
   `user_recovery_codes`.
 - Demo users (`php spark modules:demo Auth`): superadmin@, admin@, editor@, usuari@example.com,
-  password `Demo-kpskeletor-2026`.
+  each with a random password printed once by the command that loaded them (`DemoData::randomPassword()`
+  + `$demo->secret()`; never a fixed password).
 
 ## Activity log
 
