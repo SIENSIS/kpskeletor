@@ -101,6 +101,7 @@ view. See `docs/activity.md` (D-12-02).
 | `permissionResolver`, `denyByDefault` | `CrudPermissions`, `true` | Central RBAC, default deny |
 | `maskIds`, `maskKey` | `true`, `app.maskKey` | Masked ids; the same key as kpapy |
 | `uploadPath` | `writable/kpcrudy-unused-uploads` | kpcrudy upload fields are never used |
+| time zone | `CrudFactory::make()` → `setTimezone(site_timezone())` | `datetime` fields are shown, edited, filtered, exported and imported in `Core.timezone` and stored in UTC (kpcrudy 1.2) |
 | `bootstrapCss`, `bootstrapJs`, `iconsCss` | `public/assets/vendor/…` | Local copies (only the library's own layout uses them) |
 
 **`app.maskKey`** (`.env`, 64 random hex characters:
@@ -110,8 +111,11 @@ kpapy. Production refuses web requests without it, and no environment accepts a 
 
 ## Files and uploads
 
-Never use kpcrudy's `image`/`upload` field types: they write files outside the Storage service.
-File fields use the Core's file picker (`callbackField()`, session 23). `make:module --crud`
+Never use kpcrudy's `image`/`upload` field types **on their own**: without a handler they write
+files outside the Storage service. File fields use the Core's file picker (`callbackField()`,
+session 23). Until then, a field may use kpcrudy 1.1's upload handler with the Storage service, as
+the News cover does (`modules/News/Storage/CoverUploads.php`, D-17-06: `fieldType('cover', 'image',
+['handler' => new CoverUploads()])`, the column keeps the file key). `make:module --crud`
 replaces the upload fields kpcrudy guesses with a comment (`docs/library-requests.md`).
 
 ## Look and behaviour

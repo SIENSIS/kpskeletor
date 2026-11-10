@@ -23,7 +23,7 @@ the next run), *Quick links* (`core.quick-links`, no permission of its own: an o
 group of menu entries, which each user sees only when they can open them, and free links with an
 `https://` address or an internal path, shown to every user of the group; see below) and *Users summary* (`users.summary`,
 `users-users.list`, async: active accounts, users online, accounts without 2FA). Later modules
-add theirs (News, Events, Updates, Backup, Security status).
+add theirs: News has *Notices* (`news.notices`) and *Latest news* (`news.latest`, `docs/news.md`); Events, Updates, Backup and Security status follow.
 
 ## Who sees a widget
 
@@ -59,7 +59,7 @@ final class LatestNews extends Widget
     public function id(): string { return 'news.latest'; }            // "<module>.<name>", lower case
     public function title(): string { return lang('News.widget.latest'); }
     public function icon(): string { return 'bi bi-newspaper'; }
-    public function permission(): string { return 'news-posts.list'; }
+    public function permission(): string { return 'news-read.view'; }
 
     public function sizes(): array                                       // first = default
     {

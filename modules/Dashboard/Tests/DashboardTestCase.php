@@ -17,9 +17,18 @@ use Modules\Settings\Tests\SettingsTestCase;
  */
 abstract class DashboardTestCase extends SettingsTestCase
 {
+    /**
+     * Modules whose widgets the tests see: the Dashboard tests count exact widget lists, so the
+     * widgets of modules added later (News…) are left out; their own tests add their module.
+     *
+     * @var list<string>
+     */
+    protected array $widgetModules = ['Core', 'Dashboard', 'Users'];
+
     protected function setUp(): void
     {
         parent::setUp();
+        db_connect()->table('module_declarations')->where('kind', 'widget')->whereNotIn('module', $this->widgetModules)->delete();
         CountingWidget::$calls = 0;
         CountingWidget::$fail  = false;
         (new CoreCache())->invalidate('widgets');

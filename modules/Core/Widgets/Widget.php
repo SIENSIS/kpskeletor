@@ -59,6 +59,7 @@ abstract class Widget implements WidgetInterface
      */
     protected function empty(string $message, string $icon = 'bi bi-inbox'): string
     {
-        return theme_component('empty_state', ['title' => $message, 'icon' => $icon, 'compact' => true]);
+        // Every variable of the component is given: views share data within a request.
+        return theme_component('empty_state', ['title' => $message, 'message' => null, 'icon' => $icon, 'compact' => true, 'action' => null]);
     }
 }

@@ -22,7 +22,7 @@ use Kpcrudy\Crud;
  * ```
  *
  * `make()` gives a `Crud` (an `AuditedCrud`: every write goes to the activity log) with
- * `setResource($resource)` and the active theme's back-office layout;
+ * `setResource($resource)`, the active theme's back-office layout and the site's time zone;
  * nothing else is mapped by hand: `Config\Kpcrudy` selects `CrudPermissions` and
  * `denyByDefault`, so every operation is `<resource>.<operation>` in the catalogue.
  *
@@ -52,6 +52,12 @@ final class CrudFactory
 
         if (function_exists('theme_layout')) {
             $crud->setLayout(theme_layout('backend'), 'content');
+        }
+
+        // `datetime` fields are shown and edited in the site's time zone (`Core.timezone`) and
+        // stored in the application's (UTC), like `ui_date()` shows them (kpcrudy 1.2).
+        if (function_exists('site_timezone')) {
+            $crud->setTimezone(site_timezone());
         }
 
         if (self::$inspected !== null) {

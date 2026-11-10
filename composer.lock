@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c3c0c28c488e9962c9b5b4e8247c9a85",
+    "content-hash": "67715e3efedfcc92b241c1bf2c7e40a8",
     "packages": [
         {
             "name": "chillerlan/php-qrcode",
@@ -424,6 +424,67 @@
             "time": "2026-08-05T12:38:16+00:00"
         },
         {
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.19.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezyang/htmlpurifier.git",
+                "reference": "5e0539132d934f936fbae2c88b55d58f9438623f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/5e0539132d934f936fbae2c88b55d58f9438623f",
+                "reference": "5e0539132d934f936fbae2c88b55d58f9438623f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.6.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0 || ~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
+            },
+            "require-dev": {
+                "cerdic/css-tidy": "^1.7 || ^2.0",
+                "simpletest/simpletest": "dev-master"
+            },
+            "suggest": {
+                "cerdic/css-tidy": "If you want to use the filter 'Filter.ExtractStyleBlocks'.",
+                "ext-bcmath": "Used for unit conversion and imagecrash protection",
+                "ext-iconv": "Converts text to and from non-UTF-8 encodings",
+                "ext-tidy": "Used for pretty-printing HTML"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "library/HTMLPurifier.composer.php"
+                ],
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
+                "exclude-from-classmap": [
+                    "/library/HTMLPurifier/Language/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Edward Z. Yang",
+                    "email": "admin@htmlpurifier.org",
+                    "homepage": "http://ezyang.com"
+                }
+            ],
+            "description": "Standards compliant HTML filter written in PHP",
+            "homepage": "http://htmlpurifier.org/",
+            "keywords": [
+                "html"
+            ],
+            "support": {
+                "issues": "https://github.com/ezyang/htmlpurifier/issues",
+                "source": "https://github.com/ezyang/htmlpurifier/tree/v4.19.1"
+            },
+            "time": "2026-09-15T15:42:51+00:00"
+        },
+        {
             "name": "laminas/laminas-escaper",
             "version": "2.18.0",
             "source": {
@@ -841,16 +902,16 @@
         },
         {
             "name": "siensis/kpapy",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SIENSIS/kpapy.git",
-                "reference": "2349db624b22fad25e148d438d675f833300f8d8"
+                "reference": "7b6f78bf3677d1f9ca6ce85ac7620b2d3d67db87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SIENSIS/kpapy/zipball/2349db624b22fad25e148d438d675f833300f8d8",
-                "reference": "2349db624b22fad25e148d438d675f833300f8d8",
+                "url": "https://api.github.com/repos/SIENSIS/kpapy/zipball/7b6f78bf3677d1f9ca6ce85ac7620b2d3d67db87",
+                "reference": "7b6f78bf3677d1f9ca6ce85ac7620b2d3d67db87",
                 "shasum": ""
             },
             "require": {
@@ -883,22 +944,22 @@
             ],
             "support": {
                 "issues": "https://github.com/SIENSIS/kpapy/issues",
-                "source": "https://github.com/SIENSIS/kpapy/tree/v1.1.0"
+                "source": "https://github.com/SIENSIS/kpapy/tree/v1.2.0"
             },
-            "time": "2026-11-09T09:20:10+00:00"
+            "time": "2026-11-09T19:32:08+00:00"
         },
         {
             "name": "siensis/kpcrudy",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SIENSIS/kpcrudy.git",
-                "reference": "f8b4290f081c2ec06615e13b25c492d4ec319627"
+                "reference": "4764c7338dc0f5731e63a247c60c7b1c7a2717ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SIENSIS/kpcrudy/zipball/f8b4290f081c2ec06615e13b25c492d4ec319627",
-                "reference": "f8b4290f081c2ec06615e13b25c492d4ec319627",
+                "url": "https://api.github.com/repos/SIENSIS/kpcrudy/zipball/4764c7338dc0f5731e63a247c60c7b1c7a2717ae",
+                "reference": "4764c7338dc0f5731e63a247c60c7b1c7a2717ae",
                 "shasum": ""
             },
             "require": {
@@ -925,9 +986,9 @@
             ],
             "support": {
                 "issues": "https://github.com/SIENSIS/kpcrudy/issues",
-                "source": "https://github.com/SIENSIS/kpcrudy/tree/v1.1.0"
+                "source": "https://github.com/SIENSIS/kpcrudy/tree/v1.2.0"
             },
-            "time": "2026-11-09T09:25:47+00:00"
+            "time": "2026-11-09T19:29:44+00:00"
         },
         {
             "name": "spomky-labs/otphp",

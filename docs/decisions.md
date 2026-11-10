@@ -161,6 +161,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-16-04 | 16 | The back-office home in the menu and breadcrumbs | Accepted (proposal) |
 | D-16-05 | 16 | Dashboard is a core module | Applied (decided) |
 | D-16-06 | 16 | Quick links: free URLs and the order chosen by the administrator (decide) | Applied (decided) |
+| D-17-01 | 17 | News permission names, URLs, settings and the reader's API permissions (decide) | Applied (decided) |
+| D-17-02 | 17 | Sanitising a translated body before kpcrudy reads the form | Accepted (proposal) |
+| D-17-03 | 17 | Post statuses, publishing, scheduling and expiry | Accepted (proposal) |
+| D-17-04 | 17 | Who reads what: visibility rules and the notice audience | Accepted (proposal) |
+| D-17-05 | 17 | The menu link type before the Menus module | Accepted (proposal) |
+| D-17-06 | 17 | The cover through a kpcrudy upload handler on the Storage service | Accepted (proposal) |
+| D-17-07 | 17 | The API's visibility as a `where()` condition | Applied |
+| D-17-08 | 17 | Images inside the rich-text body (decide) | Applied (decided) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1684,3 +1692,76 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Applied
 - **Decision (2026-11-09):** «https + camins interns», «Tots els del grup», «Un sol text», «Llista única ordenable» (the four recommended options). Free links accept `https://` URLs and internal paths only, are shown to every user of the group, have one untranslated label, and are edited with menu entries in one list whose order the administrator sets.
 - **Applied in:** `modules/Core/Config/Module.php` (setting `Core.widgetMaxLinks`, group `dashboard`), `modules/Core/Widgets/WidgetOptions.php` (type `links`, `linkUrl()`, `maxLinks()`), `modules/Core/Widgets/QuickLinks.php`, `modules/Core/Views/widgets/quick_links.php`, `modules/Dashboard/Views/links_editor.php`, `modules/Dashboard/Assets/js/links-editor.js`, `modules/Dashboard/Views/groups.php`, language files (Core, Dashboard), `docs/specification.md`, `docs/widgets.md`; tests `GroupLayoutTest::testFreeLinksAndTheOrderChosenByTheAdministrator`, `GroupLayoutTest::testInvalidValuesAreRefused`, `WidgetsTest::testFreeLinkAddresses`, `WidgetsTest::testStoredMenuKeysStillWorkAsLinks`, `WidgetsTest::testTheMostLinksComeFromTheSetting`, `GroupLayoutTest::testTheLimitOfLinksIsASetting`; `SettingsScreensTest` posts the new field
+
+## D-17-01 — News permission names, URLs, settings and the reader's API permissions (decide)
+
+- **Where:** specification "Modules" › "News" (resources `posts` with extras `publish`, `author`, `readers`, and `categories`; "my posts"; public routes; "two settings"), D-00-42 (reader screen `news-read`, `type: page`, `news-read.view` for every group), plan session 17 (routes), "JSON API" (`setResource()` = the CRUD's resource)
+- **Problem:** The specification does not name the "my posts" resource, the reader's URLs, the two settings nor the permissions of the `news` API resource. The API lists and shows posts (kpapy operations `list` and `show`), but the reader resource is a page with only `view`: kpapy checks token scopes against `<resource>.<operation>`, so a token limited to `news-read.view` could not list anything, and `news-posts.list` (authors only) would hide the API from ordinary users.
+- **Proposal (built):**
+  - Resources: `news-posts` (crud − `import`, extras `publish`, `author`, `readers`), `news-categories` (crud − `import`/trash), `news-mine` ("My posts", crud − `import`/`export`/trash, extra `publish`), `news-read` (page: `view`, plus **`list` and `show` for the API**). Grants: admin everything; editor `news-posts.{list,show,add,edit,publish}`, `news-categories.{list,show}`, `news-mine.*`, `news-read.*`; user and superadmin `news-read.*`.
+  - Back office: `backend/news` (reader, route `news-read`), `backend/news/read/{masked id}`, `POST backend/news/read/{masked id}/mark`, `backend/news/posts` (+ operations `publish`, `unpublish`, `readers`), `backend/news/mine`, `backend/news/categories`. Public: `news`, `news/{slug}`, `news/category/{slug}`, `news/feed.xml`. API: `api/v1/news` (resource name `news-read`).
+  - Settings: `News.perPage` (public list, 10) and `News.feedItems` (RSS, 20), group "Public site".
+- **Alternatives:** A) The API uses `news-read.view` for both operations through a resource-level resolver (no new names; a token needs the scope `news-read.*` or `*`, a token scoped `news-read.view` gets 403). B) The API on `news-posts` (authors only; ordinary users get nothing). C) A separate API resource `news-api.{list,show}`. D) "My posts" without its own resource (a filter of `news-posts`; editors without `news-posts.list` lose it).
+- **Status:** Applied
+- **Decision (2026-11-09):** «Recurs API separat». The News API gets its own resource `news-api` with the operations `list` and `show` (granted to every group, like the reader screen), instead of extra `list`/`show` operations on `news-read`; `news-read` keeps only `view`. The other names, URLs and settings stay as built (`news-posts`, `news-mine`, `news-categories`, `news-read.view`; `backend/news…`, `news…`, `api/v1/news`; `News.perPage`, `News.feedItems`). **Must change:** `modules/News/Config/Module.php` (resources, grants), `modules/News/Controllers/Api/Posts.php` (`setResource('news-api')`), tests (`NewsApiTest` scopes, `NewsModuleTest`), counting tests of earlier sessions, `docs/news.md`, `modules/News/CLAUDE.md`, specification "News"
+- **Applied in:** `modules/News/Config/Module.php` (resource `api`, grants), `modules/News/Controllers/Api/Posts.php` (`setResource('news-api')`), `modules/News/Language/{ca,es,en}/News.php`, `docs/specification.md` ("News", manifest example), `docs/news.md`, `modules/News/CLAUDE.md`; tests `NewsApiTest::testScopesNarrowTheToken` (`news-read.view` alone is refused), `NewsModuleTest::testManifestIsValid`, `ShieldMatrixTest`. Existing development databases: `php spark modules:sync --prune` removes `news-read.list`/`news-read.show`; the new grants apply on a fresh install (grants are applied once per module).
+
+## D-17-02 — Sanitising a translated body before kpcrudy reads the form
+
+- **Where:** specification "News" ("HTML sanitised with HTMLPurifier in a `before*` hook"), "Translations" (`setTranslations()`), D-00-35
+- **Problem:** The body is a translated field (`news_translations`); kpcrudy's `before*` hooks receive only the main table's data, and `postedTranslations()` is read-only, so a hook cannot change the stored body.
+- **Proposal:** The controller cleans `kp_tr[<locale>][body]` with `BodySanitizer` (HTMLPurifier: paragraphs, headings, lists, emphasis, links `http`/`https`/`mailto` with `rel="noopener noreferrer"`, images, quotes, code, tables; no scripts, handlers, styles, iframes or forms) **before** kpcrudy reads the form (`IncomingRequest::setGlobal('post', …)`); the reader screen, the public page and the API (`transform()`) clean it again on output; the CSV import stays disabled on `news-posts` and `news-mine` (a test enforces it). Library request: let `before*` hooks change translated values.
+- **Alternatives:** A) Body not translated (one body in the main table). B) Clean only on output.
+- **Status:** Accepted (proposal)
+
+## D-17-03 — Post statuses, publishing, scheduling and expiry
+
+- **Where:** specification "News" (status draft / published / scheduled, `published_at`, `expires_at`, "a task that expires notices", "publishing a private notice sends a notification")
+- **Problem:** The specification does not say how a post becomes scheduled, what expiry changes, nor whether the form can publish.
+- **Proposal:** Statuses `draft`, `scheduled`, `published` and `expired`. The form never sets the status (new posts are drafts); the operation `publish` (and its bulk action, permission `publish`) makes a post `published`, or `scheduled` when `published_at` is in the future; `unpublish` (same permission) turns it back into a draft. Readers only see posts whose status is `published`/`scheduled`, whose date has passed and whose `expires_at` has not, so nothing waits for the task. The task `ExpireNotices` (every 5 minutes) turns due scheduled posts into `published` and notices past `expires_at` into `expired` (unpinned), and writes one activity entry when it changes something. A `private`/`groups` notice notifies its audience once (`notified_at`), when published or released.
+- **Alternatives:** A) Status editable in the form, guarded by a record rule. B) Expired notices deleted.
+- **Status:** Accepted (proposal)
+
+## D-17-04 — Who reads what: visibility rules and the notice audience
+
+- **Where:** specification "News" (visibility public/private/groups; notices in the widget "of the users who can see them"; "private news only in the back office and the dashboard"), D-00-36, D-00-42
+- **Problem:** The specification does not say whether superadmins read every group's posts, what the public site shows to a signed-in user, nor who is notified.
+- **Proposal:** One rule (`NewsVisibility`) for the reader screen, the widgets, the public site, the feed and the API: guests and the public site see only `public`; signed-in users see `public`, `private` and `groups` posts linked to one of their groups (superadmins too: authors see everything in `news-posts`). The public site and the feed show only public posts, whoever is signed in; anything else is a 404. Audience: `private` → every user with `news-read.view` (`notifyPermission()`), `groups` → the members of those groups (`notifyGroup()`).
+- **Alternatives:** A) Superadmins read every post on the reader screen. B) Signed-in users see private posts on the public site.
+- **Status:** Accepted (proposal)
+
+## D-17-05 — The menu link type before the Menus module
+
+- **Where:** specification "Menus" (public menu items: "the link types offered by modules (`$menuLinks`: a news category…)"), "News" ("the menu link type news category")
+- **Problem:** The Menus module and its link-type contract arrive in session 21; there is no Core interface yet.
+- **Proposal:** `Modules\News\Menu\CategoryLink` with `key()` (`news.category`), `label()`, `options()` (slug → name of the active categories) and `url($value)` (null when the category is gone), declared in `$menuLinks`; session 21 turns these methods into a Core interface (or adapts the class).
+- **Alternatives:** A) Add a Core interface now (a Core change for one module).
+- **Status:** Accepted (proposal)
+
+## D-17-06 — The cover through a kpcrudy upload handler on the Storage service
+
+- **Where:** session 17 scope ("cover through the storage service… a simple upload field and leave a TODO"), `docs/cruds.md` ("never use kpcrudy's `image`/`upload` field types"), `docs/library-requests.md` (kpcrudy 1.1 `UploadHandler`)
+- **Problem:** The file picker arrives in session 23; kpcrudy upload fields used to write files outside the Storage service, but kpcrudy 1.1 delegates storage to an upload handler.
+- **Proposal:** The cover is kpcrudy's `image` field with a module handler (`Modules\News\Storage\CoverUploads`): every file goes through `service('storage')->store()` (public disk, folder `modules/news`, JPG/PNG/WebP, at most 5 MB, re-encoded), the column keeps the file key, refusals become field errors; a TODO points at session 23 (file picker). `docs/cruds.md` now names this exception.
+- **Alternatives:** A) No cover until session 23. B) A custom upload screen.
+- **Status:** Accepted (proposal)
+
+## D-17-07 — The API's visibility as a `where()` condition
+
+- **Where:** "JSON API (kpapy)", `CLAUDE.md` ("No raw SQL with interpolated values"; Query Builder only)
+- **Problem:** kpapy's `where()` takes a column and a value (equality or an operator in the key); the visibility rule is an `OR` of conditions with a group subquery, which cannot be written that way, and the Query Builder prefixes table aliases inconsistently in subqueries.
+- **Proposal:** `NewsVisibility::condition()` returns `[<news>.id, RawSql('(SELECT v.id FROM news v WHERE v.id = <news>.id AND <readable>)')]`: a correlated subquery compiled by the Query Builder (every value escaped by it; only table names, with the connection prefix, are written by hand; the alias carries the prefix so it is never prefixed twice). List, details, search and filters are all limited; an unreadable post is a 404. Library request: a `where()` that takes a closure over the builder — done in kpapy `main` (`where(Closure)`, for 1.2.0); once released, the resource uses `where(fn ($builder) => NewsVisibility::apply($builder, $user))` and the `RawSql` goes away.
+- **Alternatives:** A) A per-record `setPermission('show')` rule (403 instead of 404; lists still need a query). B) A database view.
+- **Status:** Applied
+- **Applied in:** kpapy 1.2.0 (`where(Closure)`, requested and added after the session 17 review; `composer.json` requires `^1.2`): `modules/News/Controllers/Api/Posts.php` uses `where(fn (BaseBuilder $builder) => NewsVisibility::apply($builder, $user))`; the `RawSql` subquery (`NewsVisibility::condition()`) was removed. Tests: `NewsApiTest`.
+
+## D-17-08 — Images inside the rich-text body (decide)
+
+- **Where:** specification "News" (body sanitised with HTMLPurifier), "Files" (file picker), "Front-end assets" (vendored rich-text editor); `deploy/20-pages.md` (editor, News switches to it), `deploy/23-files-picker.md` (picker, News cover); `modules/News/Services/BodySanitizer.php` (allows `img[src|alt|width|height]` with any `http`/`https` source)
+- **Problem:** Session 20 brings a WYSIWYG editor and session 23 the file picker, but no session says that authors can **insert images inside the text** (only the cover is planned). Authors who do not know HTML cannot add an image to a post today, and the sanitiser accepts images from any `https` site (external images leak the readers' IP addresses to that site and may disappear).
+- **Proposal:** In session 23 (file picker), add an "Insert image" button to the editor of session 20 that opens the file picker (upload or choose; images only: JPG, PNG, WebP, GIF; the Storage service's rules, re-encoding and limits; public disk, folder `modules/<module>` of the content, e.g. `modules/news`), and inserts `<img src="/uploads/…" alt="…">` with an alt text field. HTMLPurifier then keeps only images of the site itself (`URI.Host`/a custom URI filter: relative `/uploads/…` URLs or the site's own host); external images are removed. Pages (session 20) use the same component. Paste or drop of images in the editor goes through the same upload.
+- **Alternatives:** A) Allow external `https` images as today (no upload; authors paste URLs). B) Images only as attachments/gallery under the text, never inside it. C) Do it already in session 20 with a simple upload dialog, before the file picker exists.
+- **Status:** Applied
+- **Decision (2026-11-09):** «Botó a la sessió 23 (recomanada)». As proposed: session 23 adds an "Insert image" button to the editor of session 20 that opens the file picker (upload or choose; JPG, PNG, WebP, GIF; the Storage service's rules and re-encoding; an alt text), for News and Pages, pasted or dropped images go through the same upload, and HTMLPurifier then keeps only images of the site itself. **Must change:** `deploy/23-files-picker.md` (scope and tests), specification "Files" (file picker) and "News", `modules/News/Services/BodySanitizer.php` in session 23
+- **Applied in:** `deploy/23-files-picker.md` (scope and tests), `docs/specification.md` ("Files" › file picker, "News"), `modules/News/CLAUDE.md` (open tasks); the code changes are session 23's.
+

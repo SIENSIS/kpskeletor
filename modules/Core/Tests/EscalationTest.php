@@ -36,13 +36,14 @@ final class EscalationTest extends RbacTestCase
     public function testOnlyCatalogueNamesAndMatchingWildcardsAreStored(): void
     {
         $grants = new GrantManager();
+        $before = (new PermissionCatalogue())->grants('editor');
 
         foreach (['news-posts.typo', 'other.*', '*', 'news-*.list', 'news-posts.*.x'] as $invalid) {
             try {
                 $grants->setGroupGrants(null, 'editor', ['news-posts.list', $invalid]);
                 $this->fail("{$invalid} was accepted.");
             } catch (EscalationException) {
-                $this->assertSame(['activity-mine.*', 'api.tokens', 'auth-profile.*', 'auth-sessions.*', 'core-notifications.*', 'dashboard.view'], (new PermissionCatalogue())->grants('editor'), 'Nothing changed.');
+                $this->assertSame($before, (new PermissionCatalogue())->grants('editor'), 'Nothing changed.');
             }
         }
 
@@ -131,7 +132,7 @@ final class EscalationTest extends RbacTestCase
         $this->assertFalse($guard->canRemoveFromGroup($admin, $super, 'editor'));
         $this->assertFalse($guard->canAddToGroup($admin, $admin, 'editor'), 'Not their own groups.');
 
-        (new GrantManager())->setGroupGrants(null, 'editor', ['news-posts.*']);
+        (new GrantManager())->setGroupGrants(null, 'editor', ['news-postsx.edit']);
         $this->assertFalse($guard->canAddToGroup($admin, $user, 'editor'), 'The editors hold permissions the admin lacks.');
         $this->assertTrue($guard->canAddToGroup($super, $user, 'editor'));
     }
