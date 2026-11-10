@@ -92,6 +92,13 @@ final class GroupsAndMatrixTest extends UsersTestCase
         $this->send('GET', 'backend/users/groups/add')->assertRedirectTo(site_url('auth/reauth'));
         $this->send('POST', 'backend/users/groups/add', ['name' => 'teachers', 'title' => 'Teachers', 'two_factor' => 'optional'])->assertRedirectTo(site_url('auth/reauth'));
         $this->assertNull((new GroupRegistry())->find('teachers'));
+
+        $editor = $this->code((new GroupRegistry())->find('editor')['id'] ?? 0, 'groups');
+        $this->send('GET', 'backend/users/groups/edit/' . $editor)->assertRedirectTo(site_url('auth/reauth'));
+        $this->send('POST', 'backend/users/groups/edit/' . $editor, ['title' => 'Changed', 'description' => '', 'two_factor' => 'required'])->assertRedirectTo(site_url('auth/reauth'));
+        $this->send('POST', 'backend/users/groups/delete/' . $editor)->assertRedirectTo(site_url('auth/reauth'));
+        $this->assertSame('optional', GroupRegistry::twoFactorPolicy()['editor'] ?? 'optional');
+        $this->assertNotNull((new GroupRegistry())->find('editor'));
     }
 
     public function testOnlyASuperadminEditsTheSuperadminGroup(): void

@@ -89,6 +89,15 @@ final class TwoFactorSettingsTest extends TwoFactorTestCase
         $this->login('ana@example.com')->assertRedirectTo(site_url('backend'));
         $this->send('GET', 'backend/profile')->assertRedirectTo(site_url('backend/profile/two-factor'));
         $this->send('GET', 'backend/profile/sessions')->assertRedirectTo(site_url('backend/profile/two-factor'));
+        $this->send('GET', 'backend')->assertRedirectTo(site_url('backend/profile/two-factor'));
+        $this->send('GET', 'backend/news')->assertRedirectTo(site_url('backend/profile/two-factor'));
+
+        // A JSON request (async widgets, the bell) gets a 403 instead of a redirect.
+        $json = $this->withHeaders(['Accept' => 'application/json'])->send('GET', 'backend/notifications/bell');
+        $json->assertStatus(403);
+        $this->assertSame(lang('Auth.twoFactor.required'), json_decode($json->getJSON() ?: '{}', true)['error'] ?? null);
+        $this->withHeaders([]);
+
         $page = $this->send('GET', 'backend/profile/two-factor');
         $page->assertOK();
         $page->assertSee(lang('Auth.twoFactor.required'));
