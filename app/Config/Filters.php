@@ -16,6 +16,7 @@ use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Shield\Filters\SessionAuth;
 use Modules\Auth\Filters\ForcePasswordReset;
 use Modules\Auth\Filters\ForceTwoFactor;
+use Modules\Core\Filters\InstallGuard;
 use Modules\Core\Filters\PoorMansCron;
 use Modules\Core\Filters\RateLimit;
 use Modules\Core\Filters\SecurityHeaders;
@@ -42,6 +43,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'installguard'  => InstallGuard::class,
 
         // The back-office chain (docs/specification.md, "RBAC"; decision D-07-01), in order:
         // login (Shield), a forced password change, the 2FA set-up a group policy requires.
@@ -76,8 +78,9 @@ class Filters extends BaseFilters
      */
     public array $required = [
         'before' => [
-            'forcehttps', // Force Global Secure Requests
-            'pagecache',  // Web Page Caching
+            'forcehttps',   // Force Global Secure Requests
+            'installguard', // Before installation, every page but the web installer redirects to it (Modules\Core\Filters\InstallGuard)
+            'pagecache',    // Web Page Caching
         ],
         'after' => [
             'pagecache',       // Web Page Caching
@@ -98,10 +101,11 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            'moduleenabled', // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
-            'cspmodules',    // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
+            // The web installer (`install`, only before installation) runs without a database.
+            'moduleenabled' => ['except' => ['install', 'install/*']], // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
+            'cspmodules' => ['except' => ['install', 'install/*']], // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
             'csrf' => ['except' => ['api/*']], // Every POST except the token-only API (CodeIgniter's CSRF, session based)
-            'authsession' => ['except' => ['api/*']], // Session hardening (never on the token-only API): lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
+            'authsession' => ['except' => ['api/*', 'install', 'install/*']], // Session hardening (never on the token-only API): lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
             // 'honeypot',
             // 'invalidchars',
         ],

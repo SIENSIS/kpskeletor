@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Modules\Settings\Controllers;
 
 use CodeIgniter\HTTP\RedirectResponse;
+use Modules\Core\Cache\CacheClearer;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Mail\MailQueue;
 use Modules\Core\Modules\CacheInvalidator;
-use Modules\Core\Theme\ThemeRegistry;
 use Modules\Settings\Services\SettingsTabs;
 use Throwable;
 
@@ -63,9 +63,7 @@ final class Actions extends BackendController
 
     public function clearCaches(): RedirectResponse
     {
-        (new CacheInvalidator())->invalidate();
-        ThemeRegistry::reset();
-        service('theme')->reset();
+        (new CacheClearer())->clear();
 
         activity_log('Settings', 'caches_cleared', ['resource' => 'settings', 'changes' => ['scopes' => CacheInvalidator::SCOPES]]);
 

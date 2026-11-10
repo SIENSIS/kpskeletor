@@ -47,7 +47,8 @@ final class AuthConfigTest extends CIUnitTestCase
         $filters = new Filters();
 
         $this->assertSame(['except' => ['api/*']], $filters->globals['before']['csrf'] ?? null);
-        $this->assertSame(['except' => ['api/*']], $filters->globals['before']['authsession'] ?? null, 'Everywhere except the token-only API.');
+        // The web installer only exists before installation, when there are no sessions to check (D-18-02).
+        $this->assertSame(['except' => ['api/*', 'install', 'install/*']], $filters->globals['before']['authsession'] ?? null, 'Everywhere except the token-only API and the web installer.');
         $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['backend']);
         $this->assertSame(
             [\CodeIgniter\Shield\Filters\SessionAuth::class, \Modules\Auth\Filters\ForcePasswordReset::class, \Modules\Auth\Filters\ForceTwoFactor::class, \Modules\Core\Filters\RateLimit::class, \Modules\Core\Filters\PoorMansCron::class],

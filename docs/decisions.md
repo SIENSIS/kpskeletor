@@ -169,6 +169,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-17-06 | 17 | The cover through a kpcrudy upload handler on the Storage service | Accepted (proposal) |
 | D-17-07 | 17 | The API's visibility as a `where()` condition | Applied |
 | D-17-08 | 17 | Images inside the rich-text body (decide) | Applied (decided) |
+| D-18-01 | 18 | HTTPS and the web installer | Accepted (proposal) |
+| D-18-02 | 18 | The site before installation: redirect, base URL and boot checks | Accepted (proposal) |
+| D-18-03 | 18 | Passwords and the non-interactive installer | Accepted (proposal) |
+| D-18-04 | 18 | Demo data while installing | Accepted (proposal) |
+| D-18-05 | 18 | 2FA for the first superadmin without a Core → Auth dependency | Accepted (proposal) |
+| D-18-06 | 18 | `app:install` with an existing `.env` | Accepted (proposal) |
+| D-18-07 | 18 | The `security:check` summary before session 30 | Accepted (proposal) |
+| D-18-08 | 18 | Order of the steps, `.env` permissions and the lock file | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1765,3 +1773,74 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Decision (2026-11-09):** «Botó a la sessió 23 (recomanada)». As proposed: session 23 adds an "Insert image" button to the editor of session 20 that opens the file picker (upload or choose; JPG, PNG, WebP, GIF; the Storage service's rules and re-encoding; an alt text), for News and Pages, pasted or dropped images go through the same upload, and HTMLPurifier then keeps only images of the site itself. **Must change:** `deploy/23-files-picker.md` (scope and tests), specification "Files" (file picker) and "News", `modules/News/Services/BodySanitizer.php` in session 23
 - **Applied in:** `deploy/23-files-picker.md` (scope and tests), `docs/specification.md` ("Files" › file picker, "News"), `modules/News/CLAUDE.md` (open tasks); the code changes are session 23's.
 
+## D-18-01 — HTTPS and the web installer
+
+- **Where:** spec "Installer and CLI" ("It warns when the page is not served over HTTPS"), "Security baseline" (`forceGlobalSecureRequests` in production)
+- **Problem:** Without `.env` the environment is production, so every HTTP request (the installer included) is redirected to HTTPS; the warning could never show there, and a server without TLS cannot reach the web installer.
+- **Proposal:** Keep the production default: the web installer is redirected to HTTPS like every page; the warning is shown when the page is served over HTTP (an environment set by the server, e.g. `CI_ENVIRONMENT=development`, or a proxy without the HTTPS header). A server without TLS installs from the console (`php spark app:install`), as the warning says.
+- **Alternatives:** A) Do not force HTTPS while unconfigured (passwords and the database credentials could travel in clear).
+- **Status:** Accepted (proposal)
+- **Applied in:** `app/Config/App.php`, `modules/Core/Views/install/form.php`, `docs/security.md` ("Installer"); test `WebInstallerTest::testFormIsShownBeforeInstallation`
+
+## D-18-02 — The site before installation: redirect, base URL and boot checks
+
+- **Where:** spec "Installer and CLI" (web installer "available only while the application has not been configured"); D-09-01 (production refuses web requests without `app.maskKey`)
+- **Problem:** Before installation there is no `.env`: the base URL is `http://localhost:8080/`, `app.maskKey` is empty (production refuses every web request), the database is not configured and global filters, settings and the debug toolbar's Shield collector query it.
+- **Proposal:** While neither `.env` nor `writable/install.lock` exists: a required before filter `installguard` (after `forcehttps`) redirects every page but `install` to it; `Config\App` takes the base URL from the request (well-formed host only); the `pre_system` mask-key check waits until the application is configured; `moduleenabled`, `cspmodules` and `authsession` skip `install`; the debug toolbar drops Shield's collector. The web installer is a standalone page (no theme or settings) with the tracked Bootstrap copy. Once configured, nothing of this applies and `install` answers 404 (also when the configured database has tables). `service('installstate')` counts the testing environment as configured.
+- **Alternatives:** A) A static HTML page outside CodeIgniter. B) No redirect: only `/install` works and other pages fail with database errors.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Filters/InstallGuard.php`, `modules/Core/Install/InstallState.php`, `modules/Core/Config/{Events,Services,Routes}.php`, `app/Config/{App,Filters}.php`; tests `WebInstallerTest`
+
+## D-18-03 — Passwords and the non-interactive installer
+
+- **Where:** spec "Installer and CLI" ("non-interactive with `--options`"), D-00-47 (passwords on the command line)
+- **Problem:** Options would put the database and superadmin passwords in the shell history and the process list.
+- **Proposal:** Every value is an option except the passwords: asked without echo, or read from `INSTALL_DB_PASSWORD` and `INSTALL_ADMIN_PASSWORD`. `--no-interaction` (or input that is not a terminal) never asks; a missing required value stops before anything is written. The superadmin password must pass Shield's password validators (length, composition, nothing personal, dictionary). Values with a line break or `${` are refused (DotEnv would change them); the others are written single-quoted and escaped.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Commands/AppInstall.php`, `modules/Core/Install/{InstallOptions,EnvWriter}.php`; tests `AppCommandsTest`, `EnvWriterTest`, `InstallerTest::testCommonPasswordsAreRefusedByShieldsRules`
+
+## D-18-04 — Demo data while installing
+
+- **Where:** spec "Demo data" ("Interactive install … `--demo` / `--demo=News,Events`", "refuse in production unless `Packages.allowDemoInProduction`"), session 17 note (News after Auth)
+- **Problem:** The installer writes production by default, where demo data is refused; and `--demo=News` alone would give News posts without the Auth demo users who write them.
+- **Proposal:** The installer validates demo data against the environment it installs (development, or production with `packages.allowDemoInProduction`); the interactive question is only asked then. `--demo` loads every module with demo data, `--demo=A,B` those modules plus the modules they require that have demo data, always in dependency order (`--demo=News` loads Auth, then News). The web form has one "load demo data" checkbox (every module).
+- **Alternatives:** A) Load only the listed modules.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Install/Installer.php`; tests `InstallerTest::testDemoDataIsRefusedInProduction`, `testDemoOfAModuleLoadsTheModulesItNeedsFirst`
+
+## D-18-05 — 2FA for the first superadmin without a Core → Auth dependency
+
+- **Where:** spec "Installer and CLI" ("creates the first superadmin (and offers to set up 2FA)"), `CLAUDE.md` ("Never hard-code a module in the Core")
+- **Problem:** The installer lives in the Core, 2FA in Auth.
+- **Proposal:** The installer fires `install.superadmin` with the user and an `InstallPrompt` (the console; none on the web). Auth listens (`InstallTwoFactor`): `--2fa=email|totp|none` or a question; `totp` shows the `otpauth://` URI and the secret and stores it only after a valid code (three tries); the recovery codes are shown once. The web installer's last page tells the superadmin to set up 2FA from the profile.
+- **Alternatives:** A) The Core calls Auth's `TwoFactor` directly. B) No 2FA offer (only the group policy).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Install/{Installer,InstallPrompt,CliPrompt}.php`, `modules/Auth/Services/InstallTwoFactor.php`, `modules/Auth/Config/Events.php`; test `InstallerTest::testTheSuperadminIsOfferedTwoFactor`
+
+## D-18-06 — `app:install` with an existing `.env`
+
+- **Where:** spec "Installer and CLI" (writes `.env`), plan risk (session 00 creates a local `.env`)
+- **Problem:** Developers already have a `.env`; overwriting it would lose their database settings and keys.
+- **Proposal:** Without a lock file and with a `.env`, the console asks to keep it (`--keep-env` without asking): its database settings are used, only a missing or empty `encryption.key` / `app.maskKey` is added, and the rest runs as usual. With `--no-interaction` and no `--keep-env` it stops. The web installer never runs with a `.env`.
+- **Alternatives:** A) Always refuse when `.env` exists.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Commands/AppInstall.php`, `modules/Core/Install/EnvWriter.php::complete()`; tests `AppCommandsTest::testAnExistingEnvIsNotOverwrittenWithoutKeepEnv`, `EnvWriterTest::testCompleteAddsOnlyMissingOrEmptyKeys`
+
+## D-18-07 — The `security:check` summary before session 30
+
+- **Where:** spec "Installer and CLI" ("at the end, runs `security:check` and prints its summary"); `deploy/18-installer.md` (out of scope: `security:check`)
+- **Problem:** `security:check` arrives in session 30.
+- **Proposal:** Until then the installer prints a reminder to run it; session 30 replaces the reminder with the call and its summary (noted in `docs/progress.md`).
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Commands/AppInstall.php` (`Install.cli.securityCheck`)
+
+## D-18-08 — Order of the steps, `.env` permissions and the lock file
+
+- **Where:** spec "Installer and CLI"
+- **Problem:** If `.env` were written first, a failed migration would leave the site "configured" (the web installer gone) and half installed.
+- **Proposal:** The installer validates, applies the new values to the running process (`RuntimeConfig`: environment variables, database, encryption key, mask key), checks the database is reachable and empty, runs `modules:sync`, creates the superadmin, loads demo data, logs `installed`/`superadmin_created`, and only then writes `.env` (atomically, `0640`) and `writable/install.lock` (JSON: date, Core version, environment; `0640`). A failure before the end leaves no `.env` and no lock: empty the database and run it again.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Install/{Installer,RuntimeConfig,InstallState,EnvWriter}.php`; tests `InstallerTest`

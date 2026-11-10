@@ -11,6 +11,11 @@ use Modules\Core\Crud\CrudFactory;
  * @var RouteCollection $routes
  */
 
+// Web installer: only before installation (404 once `.env` or writable/install.lock exists, or
+// when the database has tables). Every other page redirects here meanwhile (InstallGuard).
+$routes->get('install', '\Modules\Core\Controllers\WebInstaller::index');
+$routes->post('install', '\Modules\Core\Controllers\WebInstaller::install');
+
 // Theme preview (development only, Config\Theme::$preview; otherwise 404).
 $routes->get('theme-preview', '\Modules\Core\Controllers\ThemePreview::show/backend');
 $routes->get('theme-preview/ping', '\Modules\Core\Controllers\ThemePreview::ping');

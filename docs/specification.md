@@ -1660,6 +1660,11 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   page is not served over HTTPS. It uses the same service as the CLI. When the project root is
   not writable by the web server (the recommended setup), it shows the `.env` content for the
   operator to copy instead of writing it.
+  Before installation every other page redirects to it and production still forces HTTPS
+  (D-18-01, D-18-02). Passwords are never command-line options (hidden prompts or
+  `INSTALL_DB_PASSWORD` / `INSTALL_ADMIN_PASSWORD`, D-18-03); demo data follows the installed
+  environment and loads the modules it requires first (D-18-04); 2FA is offered through the
+  `install.superadmin` event (D-18-05); `.env` and the lock file are written last (D-18-08).
 * **Commands** (all documented in `docs/commands.md`):
   * modules and themes: `modules:sync|list|status|enable|disable|install|uninstall|demo`,
     `themes:install|uninstall`, `make:module`, `make:theme`, `assets:publish [--watch]`;

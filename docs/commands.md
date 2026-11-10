@@ -3,6 +3,16 @@
 Every `php spark` command added by the skeleton. CodeIgniter's own commands (`migrate`, `routes`,
 `serve`…) and the libraries' (`kpcrudy:*`, `kpapy:*`, `shield:*`) are documented by them.
 
+## Application
+
+| Command | What it does |
+|---|---|
+| `app:install [options]` | Installs a fresh clone (see "Installing" in `README.md`): refuses when `writable/install.lock` exists or the database has tables; generates `encryption.key` and `app.maskKey`; writes `.env` from the `env` template with `CI_ENVIRONMENT = production` unless `--env=development` (when the project root is not writable it prints the content to copy); runs `modules:sync`; creates the first superadmin and offers 2FA (`--2fa=none\|email\|totp`; Auth); loads demo data (`--demo` = every module, `--demo=News,Events` = those and the modules they require, in dependency order; development only unless `packages.allowDemoInProduction`); writes `writable/install.lock` and prints the cron line. Interactive by default; every value is also an option (`--url`, `--db=mysql\|sqlite`, `--db-host`, `--db-port`, `--db-name`, `--db-user`, `--db-prefix`, `--admin`, `--email`) and `--no-interaction` never asks. Passwords are never options: they are asked without echo, or read from `INSTALL_DB_PASSWORD` and `INSTALL_ADMIN_PASSWORD`. With an existing `.env` (development) it asks to keep it (`--keep-env`): only missing keys are added. |
+| `about` | Versions (Core, CodeIgniter, PHP), environment, base URL, installation date, whether `.env`, `encryption.key` and `app.maskKey` are set (never their values), time zone, languages, cache handler, the database (driver, version, tables) and the modules (code and installed version, enabled). |
+| `app:cache-clear` | Clears the Core's caches (every `CoreCache` scope, through `CacheInvalidator`, and the theme registry) and CodeIgniter's whole cache, then fires the `cache.cleared` event so modules can clear caches they keep elsewhere. CodeIgniter's own `cache:clear` cannot be replaced (D-00-43). Settings › Actions › "Clear caches" does the same. |
+
+The web installer (`/install`) is the same service with a form; see `README.md`.
+
 ## Modules
 
 | Command | What it does |

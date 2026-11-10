@@ -7,6 +7,7 @@ namespace Modules\Core\Config;
 use CodeIgniter\Config\BaseService;
 use Modules\Core\Activity\ActivityLogger;
 use Modules\Core\Frontend\AssetManifest;
+use Modules\Core\Install\InstallState;
 use Modules\Core\Notifications\Notifier;
 use Modules\Core\Storage\Storage;
 use Modules\Core\Theme\ThemeManager;
@@ -75,5 +76,19 @@ class Services extends BaseService
         }
 
         return new Storage(config(\Config\Storage::class));
+    }
+
+    /**
+     * Whether the application is configured (`.env` or `writable/install.lock`). In the testing
+     * environment the suite runs without either, so it counts as configured; tests of the
+     * installer inject an InstallState on a temporary folder.
+     */
+    public static function installstate(bool $getShared = true): InstallState
+    {
+        if ($getShared) {
+            return static::getSharedInstance('installstate');
+        }
+
+        return new InstallState(assumeConfigured: ENVIRONMENT === 'testing');
     }
 }

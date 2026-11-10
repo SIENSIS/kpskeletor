@@ -9,7 +9,26 @@ environment; never weaken a default to make something work. `php spark security:
 - `Config\App::$forceGlobalSecureRequests` is true in production (constructor): HTTP requests are
   redirected to HTTPS.
 - Cookies are `Secure` in production, `HttpOnly` and `SameSite=Lax` (`Config\Cookie`).
-- Set `app.allowedHostnames` to every host name the site answers on (the installer, session 18).
+- The installer writes `app.baseURL`; set `app.allowedHostnames` to any other host name the site
+  answers on.
+
+## Installer
+
+- `php spark app:install` (recommended) and the optional web installer `/install` share one
+  service (`Modules\Core\Install\Installer`). Both refuse to run once `.env` or
+  `writable/install.lock` exists (the web installer answers 404) or when the database already
+  has tables; the lock file is written last, so a failed installation can be repeated.
+- Before installation every web page redirects to `/install` (`installguard` filter) and the
+  base URL is taken from the request; nothing else runs without a database. In production the
+  page is still redirected to HTTPS; elsewhere it warns when it is served over HTTP.
+- The web server should not be able to write the project root (D-00-33): the web installer then
+  shows the `.env` content once, for the operator to save by hand (`chmod 640`, owned by the
+  deploy user, group of the web server). `.env` written by the installer is `0640`.
+- Passwords are never command-line options (shell history): hidden prompts or the
+  `INSTALL_DB_PASSWORD` / `INSTALL_ADMIN_PASSWORD` variables. The superadmin password follows
+  Shield's password rules; 2FA is offered at the end (console) or from the profile (web).
+- Installation and the first superadmin are written to the activity log (`installed`,
+  `superadmin_created`).
 
 ## Mask key (`app.maskKey`)
 

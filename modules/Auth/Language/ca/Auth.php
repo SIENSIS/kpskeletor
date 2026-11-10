@@ -312,4 +312,16 @@ return [
         'login' => 'Inici de sessió i enllaços per correu',
         'twoFactor' => 'Autenticació en dos passos',
     ],
+    // php spark app:install: 2FA for the first superadmin (Services/InstallTwoFactor.php).
+    'install' => [
+        'ask' => 'Voleu configurar l\'autenticació en dos passos per a aquest superadministrador? (none = no, totp = aplicació d\'autenticació, email = codis per correu)',
+        'emailOn' => 'L\'autenticació en dos passos per correu està activada: a cada inici de sessió s\'envia un codi (configureu el correu).',
+        'totpScan' => 'Afegiu aquest compte a l\'aplicació d\'autenticació (obriu l\'URI o escriviu el secret):',
+        'totpSecret' => 'Secret: {0}',
+        'totpCode' => 'Codi que mostra l\'aplicació',
+        'totpWrong' => 'Codi incorrecte.',
+        'totpOn' => 'L\'autenticació en dos passos amb l\'aplicació està activada.',
+        'totpLater' => 'No s\'ha configurat el 2FA: feu-ho des del perfil després del primer inici de sessió.',
+        'recovery' => 'Codis de recuperació (només es mostren ara; guardeu-los en un lloc segur):',
+    ],
 ];
