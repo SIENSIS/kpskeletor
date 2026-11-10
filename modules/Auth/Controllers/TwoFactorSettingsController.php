@@ -27,7 +27,7 @@ final class TwoFactorSettingsController extends BackendController
 
     public function index(): string
     {
-        $user      = $this->user();
+        $user      = $this->currentUser();
         $twoFactor = new TwoFactor();
         $newCodes  = session(self::NEW_CODES);
         session()->remove(self::NEW_CODES);
@@ -48,7 +48,7 @@ final class TwoFactorSettingsController extends BackendController
 
     public function enableEmail(): RedirectResponse
     {
-        $codes = (new TwoFactor())->enableEmail($this->user());
+        $codes = (new TwoFactor())->enableEmail($this->currentUser());
 
         return $this->done(lang('Auth.twoFactor.enabledEmail'), $codes);
     }
@@ -61,7 +61,7 @@ final class TwoFactorSettingsController extends BackendController
      */
     public function app()
     {
-        $user      = $this->user();
+        $user      = $this->currentUser();
         $twoFactor = new TwoFactor();
 
         if (! $twoFactor->totpAvailable()) {
@@ -98,7 +98,7 @@ final class TwoFactorSettingsController extends BackendController
             return redirect()->to(site_url('backend/profile/two-factor/app'));
         }
 
-        $codes = (new TwoFactor())->enableTotp($this->user(), $secret, is_string($code) ? mb_substr($code, 0, 20) : '');
+        $codes = (new TwoFactor())->enableTotp($this->currentUser(), $secret, is_string($code) ? mb_substr($code, 0, 20) : '');
 
         if ($codes === null) {
             return redirect()->to(site_url('backend/profile/two-factor/app'))->with('error', lang('Auth.twoFactor.wrongCode'));
@@ -111,7 +111,7 @@ final class TwoFactorSettingsController extends BackendController
 
     public function disable(): RedirectResponse
     {
-        $user = $this->user();
+        $user = $this->currentUser();
 
         if ((new AuthPolicy())->twoFactorRequiredFor($user->getGroups())) {
             return redirect()->to(site_url('backend/profile/two-factor'))->with('error', lang('Auth.twoFactor.cannotDisable'));
@@ -124,7 +124,7 @@ final class TwoFactorSettingsController extends BackendController
 
     public function regenerateCodes(): RedirectResponse
     {
-        $user = $this->user();
+        $user = $this->currentUser();
 
         if (! (new TwoFactor())->enabled((int) $user->id)) {
             return redirect()->to(site_url('backend/profile/two-factor'));
@@ -144,17 +144,5 @@ final class TwoFactorSettingsController extends BackendController
         session()->set(self::NEW_CODES, $codes);
 
         return redirect()->to(site_url('backend/profile/two-factor'))->with('success', $message);
-    }
-
-    private function user(): User
-    {
-        $user = auth('session')->user();
-
-        if (! $user instanceof User) {
-            // The `session` filter covers backend/*: unreachable without a user.
-            throw new \RuntimeException('No logged-in user.');
-        }
-
-        return $user;
     }
 }

@@ -34,7 +34,7 @@ final class Users extends BackendController
 
     public function index(): ResponseInterface|string
     {
-        $actor    = $this->actor();
+        $actor    = $this->currentUserOrNobody();
         $accounts = new UserAccounts();
         $targets  = [];
         $target   = static function (array $row) use ($accounts, &$targets): ?User {
@@ -230,17 +230,6 @@ final class Users extends BackendController
     private function posted(string $field): mixed
     {
         return $this->request instanceof IncomingRequest ? $this->request->getPost($field) : null;
-    }
-
-    /**
-     * The logged-in user. Without one (only `permissions:check` inspects the CRUD that way), a
-     * stand-in that holds nothing, so every record rule denies.
-     */
-    private function actor(): User
-    {
-        $user = auth()->user();
-
-        return $user instanceof User ? $user : new User(['id' => 0, 'username' => '']);
     }
 
     /**

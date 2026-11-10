@@ -20,7 +20,7 @@ final class Matrix extends BackendController
 {
     public function index(): string
     {
-        $actor  = $this->actor();
+        $actor  = $this->currentUser();
         $matrix = new PermissionMatrix();
         $groups = (new GroupRegistry())->all();
         $edit   = $this->can('users-matrix.edit');
@@ -50,7 +50,7 @@ final class Matrix extends BackendController
         $back   = site_url('backend/users/permissions');
 
         try {
-            $changed = (new PermissionMatrix())->save($this->actor(), is_array($posted) ? $posted : []);
+            $changed = (new PermissionMatrix())->save($this->currentUser(), is_array($posted) ? $posted : []);
         } catch (EscalationException $e) {
             return redirect()->to($back)->with('error', $e->getMessage());
         }
@@ -58,16 +58,5 @@ final class Matrix extends BackendController
         return redirect()->to($back)->with($changed === [] ? 'info' : 'success', $changed === []
             ? lang('Users.matrix.unchanged')
             : lang('Users.matrix.saved', [implode(', ', $changed)]));
-    }
-
-    private function actor(): User
-    {
-        $user = auth()->user();
-
-        if (! $user instanceof User) {
-            throw new \RuntimeException('No logged-in user.');
-        }
-
-        return $user;
     }
 }
