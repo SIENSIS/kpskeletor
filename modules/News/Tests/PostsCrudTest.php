@@ -6,7 +6,6 @@ namespace Modules\News\Tests;
 
 use CodeIgniter\Exceptions\PageNotFoundException;
 
-
 /**
  * The back office of the posts (acceptance criterion 4 on News): read-only users, forged POSTs,
  * the own-posts rule, `news-posts.author` hidden, "My posts" with `where()`, the sanitised body,

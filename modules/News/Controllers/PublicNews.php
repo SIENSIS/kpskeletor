@@ -7,7 +7,7 @@ namespace Modules\News\Controllers;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Core\Controllers\FrontendController;
-use Modules\News\Services\BodySanitizer;
+use Modules\Core\Security\HtmlSanitizer;
 use Modules\News\Services\FeedWriter;
 use Modules\News\Services\NewsRepository;
 use Modules\News\Storage\CoverUploads;
@@ -60,7 +60,7 @@ final class PublicNews extends FrontendController
         return $this->render('Modules\News\Views\public\show', [
             'title'       => (string) $post['title'],
             'post'        => $post,
-            'body'        => BodySanitizer::clean((string) $post['body']),
+            'body'        => HtmlSanitizer::clean((string) $post['body']),
             'cover'       => $cover,
             'breadcrumbs' => [['label' => lang('News.publicTitle'), 'url' => site_url('news')], ['label' => (string) $post['title']]],
         ]);

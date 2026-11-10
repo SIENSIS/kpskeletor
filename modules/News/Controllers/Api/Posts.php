@@ -11,8 +11,8 @@ use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
 use Kpapy\Auth\Context;
 use Kpapy\Resource;
+use Modules\Core\Security\HtmlSanitizer;
 use Modules\News\Controllers\Posts as PostsCrud;
-use Modules\News\Services\BodySanitizer;
 use Modules\News\Services\NewsVisibility;
 use Modules\News\Services\ReadReceipts;
 use Modules\News\Storage\CoverUploads;
@@ -47,9 +47,9 @@ final class Posts extends Controller
             // public pages, in case a row was written another way (one language, or all with ?lang=*).
             ->transform(static function (array $item): array {
                 if (is_string($item['body'] ?? null)) {
-                    $item['body'] = BodySanitizer::clean($item['body']);
+                    $item['body'] = HtmlSanitizer::clean($item['body']);
                 } elseif (is_array($item['body'] ?? null)) {
-                    $item['body'] = array_map(static fn ($text): ?string => is_string($text) ? BodySanitizer::clean($text) : null, $item['body']);
+                    $item['body'] = array_map(static fn ($text): ?string => is_string($text) ? HtmlSanitizer::clean($text) : null, $item['body']);
                 }
 
                 return $item;
