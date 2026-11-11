@@ -189,6 +189,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-20-05 | 20 | Slugs per language and the language of a page | Accepted (proposal) |
 | D-20-06 | 20 | What a revision keeps and what a restore writes back | Accepted (proposal) |
 | D-20-07 | 20 | Content helpers extracted from News into the Core | Accepted (proposal) |
+| D-21-01 | 21 | Menus permission names, URLs and the Core contracts for menus (decide) | Open |
+| D-21-02 | 21 | Menu items edited in a tree editor and a form of their own | Accepted (proposal) |
+| D-21-03 | 21 | The customisation layer: differences, field-by-field scopes, hidden subtrees | Accepted (proposal) |
+| D-21-04 | 21 | Custom links and menu items: addresses and the 403 rule | Accepted (proposal) |
+| D-21-05 | 21 | Public menus: visibility, depth, cache and the active item | Accepted (proposal) |
+| D-21-06 | 21 | Demo data that depends on another module's demo | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1970,3 +1976,58 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Copy the code into Pages (two copies of a security rule).
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Content/`, `modules/Core/Storage/CrudUploadHandler.php`, `modules/News/Services/{NewsVisibility,NewsRepository,Publisher}.php`, `modules/News/Storage/CoverUploads.php`, `modules/News/Controllers/Posts.php`
+
+## D-21-01 — Menus permission names, URLs and the Core contracts for menus (decide)
+
+- **Where:** specification "Modules" › "Menus" (`menus-public.*` list/add/edit/delete, `menus-backend.*` view/customise/links/reset), "Menus", `docs/plan.md` session 21 (routes `backend/menus/public`, `backend/menus/backend`, helper `menu('primary')`), D-17-05 (link type contract)
+- **Problem:** Permission names, URLs, manifest keys and the Core extension points are public conventions. The specification names the permissions and the helper but not the URLs of the items editor, the link type contract, nor how a module (not the Core) plugs into the generated back-office menu and the theme's menu locations.
+- **Proposal:** Resources `public` (crud − show, export, import, trash, restore, purge) and `backend` (page + extras `customise`, `links`, `reset`): exactly `menus-public.{list,add,edit,delete}` and `menus-backend.{view,customise,links,reset}`; admin gets both, editor `menus-public.{list,edit}`. URLs: `backend/menus/public` (kpcrudy CRUD of menus), `backend/menus/items/<menu>[/new|/edit/<item>|/save|/order|/delete/<item>]` (`menus-public.edit`), `backend/menus/backend[/order|/entry|/group/new|/link/new|/custom/<id>|/custom/save|/custom/<id>/delete|/reset|/orphans]`, scope `?group=<name>`. Core contracts: `Modules\Core\Menus\MenuLinkType` (`key()`, `label()`, `options()`, `url()`; `ManifestValidator` checks `$menuLinks` against it; Pages' `PageLink` and News' `CategoryLink` implement it); event `backendMenu` with `BackendMenuLayer` (definitions may add `kind` `group`/`link`, `href`, `target`, `permissions`, `anyPermissions`, `groups`, `labels`, `hidden`), applied by `MenuBuilder` before the permission filter; event `publicMenu` with `PublicMenu` and the helper `menu('<location>')` returning `PublicMenuItem`s, rendered by the theme partial `partials/public_menu` in the `primary` and `footer` locations; `DemoSeeder::AFTER` (D-21-06).
+- **Alternatives:** A) Items as a second kpcrudy CRUD (`backend/menus/public/items`, see D-21-02). B) `menus-backend.edit` instead of `customise` (the specification says `customise`). C) The Core reads the Menus tables directly (hard-codes a module in the Core).
+- **Status:** Open
+- **Applied in:** `modules/Menus/Config/{Module,Routes,Events}.php`, `modules/Core/Menus/{MenuLinkType,BackendMenuLayer,PublicMenuItem,MenuBuilder,MenuEntry}.php`, `modules/Core/Frontend/PublicMenu.php`, `modules/Core/Helpers/menu_helper.php`, `modules/Core/Modules/ManifestValidator.php`, `themes/default/Views/partials/public_menu.php`, `themes/default/Views/layouts/public.php`; tests `MenusModuleTest::testPermissionNamesAndGrants`, `testTheLinkTypesOfTheOtherModules`, `BackendMenuTest::testEveryRouteNeedsItsPermissionAndForgedPostsAreRefused`, `PublicMenusTest::testEveryRouteNeedsItsPermissionAndForgedPostsAreRefused`
+
+## D-21-02 — Menu items edited in a tree editor and a form of their own
+
+- **Where:** `CLAUDE.md` (every back-office CRUD screen with kpcrudy), specification "Modules" › "Menus" (tree editor: drag and drop, keyboard)
+- **Problem:** Items belong to one menu, nest, change their target field with their type (URL, route or one of a module's choices) and are ordered by dragging: kpcrudy has a tree list but no drag-and-drop ordering nor fields that depend on the type.
+- **Proposal:** The menus themselves are a kpcrudy CRUD (name, location; an "Items" operation). The items are edited in a screen of the module: a tree editor (`menus/tree-editor`: drag and drop with pointer events, arrow keys on the handle, up/down/indent/outdent buttons that also work without JavaScript, one move per request) and an item form (labels per language, type and target, parent, icon, window, CSS class, visibility, groups). Writes are logged with `activity_log()`. The same tree editor serves the back-office customisation.
+- **Alternatives:** A) A second kpcrudy CRUD with a `where(menu_id)` and order fields (no tree editing).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Menus/Controllers/{PublicMenus,MenuItems}.php`, `modules/Menus/Views/{items,items_tree,item_form,tree_buttons,target_fields}.php`, `modules/Menus/Assets/js/{tree-editor,link-form}.js`
+
+## D-21-03 — The customisation layer: differences, field-by-field scopes, hidden subtrees
+
+- **Where:** specification "Modules" › "Menus" (stable keys, permissions always win, new entries in their default place, orphans, cycles impossible, reset, per group "the most specific one wins")
+- **Problem:** The specification does not say what is stored when the tree is saved, how two scopes combine, which group wins for a user in several groups, nor what hiding a parent does.
+- **Proposal:** One row per entry key and scope (`group_name` null = everyone) with nullable `parent` (`''` = root), `zone`, `position`, `labels`, `icon`, `hidden`; the editor stores only differences from its base (the generated menu for everyone; the menu of everyone for a group), so untouched entries follow their module. Scopes merge field by field: everyone, then the user's groups from the last to the first in the order of Users › Groups (reserved groups first), so the group listed first wins. Only place, label, icon, order and hidden change — never the route or the permission, which `MenuBuilder` checks after the layer. Hiding hides the entry with its children (a group scope may show it again). A relocation under the entry's own descendants is refused by the editor and ignored if stored. Customisations of unknown keys are kept, inactive, listed as orphans and deleted only on request; reset per entry, per scope or everything (custom groups and links are kept). Custom groups and links are entries `custom.<id>`, created for everyone (their place can be customised per group).
+- **Alternatives:** A) Store the whole tree per scope (new modules would need to be placed by hand). B) Whole-row precedence (a group would have to repeat everyone's changes).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Menus/Services/{Customisations,CustomisationApplier,BackendLayout,TreeMoves}.php`, `modules/Menus/Controllers/{BackendMenu,CustomLinks}.php`; tests in `modules/Menus/Tests/BackendMenuTest.php`
+
+## D-21-04 — Custom links and menu items: addresses and the 403 rule
+
+- **Where:** specification "Modules" › "Menus" (only `https://`, `http://`, internal paths and routes; never `javascript:`, `data:` or `//`; "a link to an internal route takes that route's `can:` permission by default; the editor cannot make a link visible to users who would get a 403")
+- **Problem:** How to validate and how to enforce the 403 rule when a path or route changes after the link is saved.
+- **Proposal:** `UrlValidator`: `https://`/`http://` with a host and no credentials, or a path starting with one `/`; anything with spaces, control characters or backslashes is refused (browsers strip them, so `java\tscript:` would run). An internal path or a route name must be answered by a GET route (routes with parameters are refused). The `can:` filters of that route are read when the menu is built (not stored), so the link (back office) or item (public menus) is shown only to users who pass them; a custom link may add one permission from the catalogue and groups. Stored values are validated again when the menu is built: an invalid or gone target is never shown. External links opening in a new tab get `rel="noopener noreferrer"`. Public paths answered by the Pages catch-all are accepted (the page itself decides who reads it).
+- **Alternatives:** A) Store the route's permission when saving (stale after a route change). B) Also allow `mailto:`/`tel:` (not in the specification).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Menus/Services/{UrlValidator,RouteAccess,LinkTarget}.php`, `modules/Core/Menus/MenuBuilder.php` (`linkVisible()`); tests `UrlValidatorTest`, `BackendMenuTest::testCustomLinksFollowTheRouteThePermissionAndTheGroups`, `testCustomLinkAddressesAreValidated`, `PublicMenusTest::testItemAddressesAreValidated`
+
+## D-21-05 — Public menus: visibility, depth, cache and the active item
+
+- **Where:** specification "Modules" › "Menus" (visibility everyone/guests/logged-in/groups; `menu('primary')` cached per menu, language and group set, marks the active item)
+- **Problem:** Page link types depend on the pages' publication, which changes with time (scheduled pages); the nesting depth and the active rule are not specified.
+- **Proposal:** One menu per theme location (`menus.location` unique, empty = not placed). Items nest up to three levels (the default theme shows the third level indented in the dropdown). The tree for a visitor is cached in the `menus` scope per menu, language and group set for five minutes (invalidated on every change of the module's data); labels fall back to Catalan. An item whose target is gone is hidden, or kept as a heading when it has visible children. The active item is the one whose URL is the current URL, else the longest item URL that is a parent path of it; its ancestors are marked open.
+- **Alternatives:** A) Cache for a day and invalidate from Pages (the Pages module would need to know about Menus). B) Unlimited depth.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Menus/Services/{MenuRenderer,MenuRepository}.php`, `themes/default/Views/partials/public_menu.php`; tests `PublicMenusTest`
+
+## D-21-06 — Demo data that depends on another module's demo
+
+- **Where:** `CLAUDE.md` (demo data only in `<Name>DemoSeeder`), `app:install --demo` (loads every module's demo in name order)
+- **Problem:** The Menus demo links to the Pages and News demo data, but `Menus` comes before `Pages` in name order.
+- **Proposal:** `DemoSeeder::AFTER` (a constant, default `[]`) names the modules whose demo data a seeder uses; `DemoDataManager::modulesWithDemo()` orders the modules so those come first (name order otherwise; a cycle keeps the name order). The Menus seeder also falls back to addresses when the pages do not exist.
+- **Alternatives:** A) The Menus seeder loads the Pages demo itself (the installer would not list it). B) Only addresses in the demo menus.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Demo/{DemoSeeder,DemoDataManager}.php`, `modules/Menus/Database/Seeds/MenusDemoSeeder.php`; test `MenusModuleTest::testDemoDataLoadsAfterPagesAndIsRemovedCompletely`
+
