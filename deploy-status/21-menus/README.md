@@ -1,6 +1,6 @@
 # Session 21 — Menus module: public menus and back-office customisation
 
-Branch: `claude/deploy-next-md-rjmbga` · Pull request: "Session 21: Menus module: public menus and back-office customisation" · Date: 2026-11-11
+Branch: `claude/deploy-next-md-rjmbga` · Pull request: [SIENSIS/kpskeletor#29](https://github.com/SIENSIS/kpskeletor/pull/29) · Date: 2026-11-11
 
 ## What was built
 
