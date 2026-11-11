@@ -69,7 +69,8 @@ function registerFormats(Quill) {
     }
 
     registered = true;
-    const Parchment = Quill.import('parchment');
+    // Quill's own registry (Quill.import), not an ES module import.
+    const Parchment = Quill['import']('parchment');
     const Align = new Parchment.ClassAttributor('align', 'text', {
         scope: Parchment.Scope.BLOCK,
         whitelist: ['center', 'right', 'justify'],

@@ -132,3 +132,9 @@
 .kp-editor .ql-snow .ql-tooltip.ql-editing input[type="text"][data-link]::placeholder {
     color: var(--bs-secondary-color);
 }
+
+/* Translated heading names are longer than Quill's fixed width. */
+.kp-editor .ql-snow .ql-picker.ql-header {
+    width: auto;
+    min-width: 9rem;
+}
