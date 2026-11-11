@@ -1,7 +1,8 @@
 <?php
 /**
- * Public layout: header with the site logo and the `primary` menu location, content with an
- * optional sidebar region, footer with the `footer` menu location, SEO meta tags ($meta) and the
+ * Public layout: header with the site logo and the `primary` menu location (`menu('primary')`,
+ * partial `public_menu`), content with an optional sidebar region, footer with the `footer` menu
+ * location, SEO meta tags ($meta) and the
  * cookie notice (theme option), theme switch. Regions: header, sidebar, footer, home.
  *
  * @var string|null $title
@@ -23,6 +24,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="site-menu" data-menu-location="primary">
+            <?= theme_partial('public_menu', ['location' => 'primary']) ?>
             <?= theme_region('public', 'header') ?>
         </div>
         <?= theme_partial('theme_switch', ['switchClass' => 'site-theme-switch ms-md-2']) ?>
@@ -44,7 +46,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
 </main>
 <footer class="site-footer border-top py-4 mt-auto">
     <div class="container d-flex flex-wrap justify-content-between gap-3 small text-body-secondary">
-        <div data-menu-location="footer"><?= theme_region('public', 'footer') ?></div>
+        <div data-menu-location="footer"><?= theme_partial('public_menu', ['location' => 'footer']) ?><?= theme_region('public', 'footer') ?></div>
         <div>
             <?php if ((string) theme_option('footerText') !== ''): ?>
                 <?= esc((string) theme_option('footerText')) ?>

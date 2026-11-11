@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Modules\News\Menu;
 
+use Modules\Core\Menus\MenuLinkType;
 use Modules\News\Services\NewsRepository;
 
 /**
- * Menu link type "News category" offered to the public menu editor (`$menuLinks`; the Menus
- * module arrives in session 21 and formalises the contract, D-17-05): a label, the choices
+ * Menu link type "News category" offered to the public menu editor (`$menuLinks`, the Core's
+ * `MenuLinkType`): a label, the choices
  * (active categories, by slug) and the public URL of a choice.
  */
-final class CategoryLink
+final class CategoryLink implements MenuLinkType
 {
     /** Stable key stored in menu items. */
     public function key(): string

@@ -91,7 +91,43 @@ final class DemoDataManager
             }
         }
 
-        return $modules;
+        return self::ordered($modules);
+    }
+
+    /**
+     * Modules in name order, each after the modules its seeder names in `AFTER` (when they are
+     * in the list; a cycle keeps the name order).
+     *
+     * @param list<string> $modules
+     *
+     * @return list<string>
+     */
+    public static function ordered(array $modules): array
+    {
+        $ordered = [];
+        $pending = $modules;
+
+        while ($pending !== []) {
+            $progress = false;
+
+            foreach ($pending as $i => $module) {
+                $class = self::seederClass($module);
+                $after = class_exists($class) && defined($class . '::AFTER') ? (array) constant($class . '::AFTER') : [];
+                $wait  = array_diff(array_intersect($after, $modules), $ordered);
+
+                if ($wait === []) {
+                    $ordered[] = $module;
+                    unset($pending[$i]);
+                    $progress = true;
+                }
+            }
+
+            if (! $progress) {
+                return [...$ordered, ...array_values($pending)];
+            }
+        }
+
+        return $ordered;
     }
 
     /**

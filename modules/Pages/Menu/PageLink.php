@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Modules\Pages\Menu;
 
+use Modules\Core\Menus\MenuLinkType;
 use Modules\Pages\Services\HomePageResolver;
 use Modules\Pages\Services\PageTree;
 use Modules\Pages\Services\PageVisibility;
 
 /**
- * Menu link type "Page" offered to the public menu editor (`$menuLinks`; the Menus module
- * arrives in session 21 and formalises the contract, D-17-05): a label, the choices (every page,
+ * Menu link type "Page" offered to the public menu editor (`$menuLinks`, the Core's
+ * `MenuLinkType`): a label, the choices (every page,
  * in tree order, by id) and the public URL of a choice (null when the page is not published or
  * no longer exists; the item is then hidden). Who may read the page is still checked by the
  * page itself.
  */
-final class PageLink
+final class PageLink implements MenuLinkType
 {
     /** Stable key stored in menu items. */
     public function key(): string

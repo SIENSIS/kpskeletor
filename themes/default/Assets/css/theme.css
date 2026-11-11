@@ -379,3 +379,19 @@
     border-radius: var(--bs-border-radius);
     padding: 0.75rem 1rem;
 }
+
+/* Menus module: tree editor (modules/Menus/Assets/js/tree-editor.js) */
+.menu-tree-list { margin: 0 0 0 1.75rem; min-height: .25rem; }
+.menu-tree-row { padding: .4rem .5rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background: var(--bs-body-bg); margin-bottom: .35rem; }
+.menu-tree-handle { cursor: grab; touch-action: none; }
+.menu-tree-dragging > .menu-tree-row { opacity: .5; }
+.menu-tree-dragging .menu-tree-handle { cursor: grabbing; }
+.menu-tree-drop-before > .menu-tree-row { box-shadow: 0 -3px 0 var(--bs-primary); }
+.menu-tree-drop-after > .menu-tree-row { box-shadow: 0 3px 0 var(--bs-primary); }
+.menu-tree-drop-inside > .menu-tree-row, ul.menu-tree-drop-inside { outline: 2px dashed var(--bs-primary); outline-offset: 2px; }
+.menu-tree-hidden > .menu-tree-row .menu-tree-label { opacity: .6; text-decoration: line-through; }
+.menu-tree[data-tree-root]:empty { min-height: 2.5rem; border: 1px dashed var(--bs-border-color); border-radius: var(--bs-border-radius); }
+@media (max-width: 575.98px) {
+    .menu-tree-list { margin-left: .75rem; }
+    .menu-tree-moves .btn { padding: .25rem .4rem; }
+}
