@@ -1,6 +1,6 @@
 # Session 22 — Files module: file manager and folder ACL
 
-Branch: `claude/upbeat-brown-vq8taw` · Pull request: see `docs/progress.md` · Date: 2026-11-11
+Branch: `claude/upbeat-brown-vq8taw` · Pull request: [SIENSIS/kpskeletor#30](https://github.com/SIENSIS/kpskeletor/pull/30) · Date: 2026-11-11
 
 ## What was built
 
