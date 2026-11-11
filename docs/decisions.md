@@ -181,6 +181,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-19-02 | 19 | Routes under `api/` outside `api/v1/` | Accepted (proposal) |
 | D-19-03 | 19 | `make:module --api` | Accepted (proposal) |
 | D-19-04 | 19 | Shared Core helpers extracted from News | Accepted (proposal) |
+| D-19-05 | 19 | HTTP on `localhost` with `php spark serve` | Applied (decided) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1884,4 +1885,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Extract everything now (guessing the needs of Pages and Events).
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/{Text/Slugger,Security/HtmlSanitizer,Controllers/BackendController}.php`, `modules/Auth/Tests/AuthTestCase.php`, News, Users, Auth, Api, Dashboard controllers
+
+## D-19-05 — HTTP on `localhost` with `php spark serve`
+
+- **Where:** spec "Security baseline" (`forceGlobalSecureRequests` and `Secure` cookies in production), "Installer and CLI" (web installer); D-18-01
+- **Problem:** A fresh clone has no `.env`, so the environment is production: `php spark serve` and `http://localhost` redirect to `https://localhost`, which has no certificate, and the web installer cannot be opened on the developer's own computer (D-18-01 only offered the console installer or `CI_ENVIRONMENT=development` for that).
+- **Proposal:** Production keeps forcing HTTPS and `Secure` cookies except when PHP's built-in development server (`PHP_SAPI === 'cli-server'`: `php spark serve`, `php -S`) answers a client on a loopback address (`127.x`, `::1`) for a loopback host (`localhost`, `*.localhost`, `127.x`, `[::1]`): nothing crosses the network there. Checking the Host header alone is not enough (an nginx with the default `proxy_pass http://127.0.0.1:8080` sends `Host: 127.0.0.1` from a loopback address for every visitor), hence the server type. The installer still warns that the page is not served over HTTPS.
+- **Alternatives:** A) Exempt `localhost` hosts on any server (unsafe behind a local proxy). B) Keep D-18-01 as it was (console installer or `CI_ENVIRONMENT=development` only).
+- **Status:** Applied (decided)
+- **Decision (2026-11-11):** requested by the owner while testing a fresh clone locally ("si s'arrenca amb localhost no requereixi https"); applied with the narrow rule above.
+- **Applied in:** `app/Config/App.php` (`isLocalDevServer()`, constructor), `app/Config/Cookie.php`, `docs/security.md` ("Installer"), `README.md`; tests `tests/feature/Security/LocalDevServerTest.php`
 

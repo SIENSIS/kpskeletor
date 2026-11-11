@@ -226,8 +226,10 @@ class App extends BaseConfig
 
     public function __construct()
     {
-        // HTTPS for every request in production (docs/specification.md, "Security baseline").
-        $this->forceGlobalSecureRequests = ENVIRONMENT === 'production';
+        // HTTPS for every request in production (docs/specification.md, "Security baseline"),
+        // except a browser on this same computer talking to PHP's development server
+        // (`php spark serve`), where nothing crosses the network (decision D-19-05).
+        $this->forceGlobalSecureRequests = ENVIRONMENT === 'production' && ! self::isLocalDevServer();
 
         // Before installation (no .env, no writable/install.lock) the web installer answers on
         // whatever host the site is reached at: the base URL comes from the request
@@ -237,6 +239,41 @@ class App extends BaseConfig
         }
 
         parent::__construct();
+    }
+
+    /**
+     * Whether this request is served by PHP's built-in development server (`php spark serve`,
+     * `php -S`) to a browser on the same computer: the client address is a loopback address
+     * and the host is `localhost`, `*.localhost` or a loopback IP. Only then production does
+     * not force HTTPS nor `Secure` cookies (D-19-05). Web servers (Apache, nginx, PHP-FPM) never
+     * qualify, not even behind a proxy on the same machine that sends `Host: 127.0.0.1`.
+     *
+     * @param array<string, mixed>|null $server Default: $_SERVER
+     * @param string|null               $sapi   Default: PHP_SAPI
+     */
+    public static function isLocalDevServer(?array $server = null, ?string $sapi = null): bool
+    {
+        if (($sapi ?? PHP_SAPI) !== 'cli-server') {
+            return false;
+        }
+
+        $server ??= $_SERVER;
+        $client = (string) ($server['REMOTE_ADDR'] ?? '');
+        $host   = strtolower((string) ($server['HTTP_HOST'] ?? ''));
+        // Without the port: "localhost:8080", "[::1]:8080".
+        $host = preg_replace('/^(\[[0-9a-f:.]+\]|[^:]+)(?::\d{1,5})?$/', '$1', $host) ?? '';
+
+        return self::isLoopbackIp($client)
+            && ($host === 'localhost' || str_ends_with($host, '.localhost') || self::isLoopbackIp(trim($host, '[]')));
+    }
+
+    private static function isLoopbackIp(string $ip): bool
+    {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            return str_starts_with($ip, '127.');
+        }
+
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false && inet_pton($ip) === inet_pton('::1');
     }
 
     /**

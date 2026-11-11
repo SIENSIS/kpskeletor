@@ -21,6 +21,12 @@ environment; never weaken a default to make something work. `php spark security:
 - Before installation every web page redirects to `/install` (`installguard` filter) and the
   base URL is taken from the request; nothing else runs without a database. In production the
   page is still redirected to HTTPS; elsewhere it warns when it is served over HTTP.
+- Local exception (D-19-05): PHP's development server (`php spark serve`, `php -S`) answering a
+  browser on the same computer (client address `127.x`/`::1` **and** host `localhost`,
+  `*.localhost`, `127.x` or `[::1]`) is served over HTTP and its cookies are not `Secure`, even in
+  production, so a fresh clone opens the web installer at `http://localhost:8080`. A real web
+  server (Apache, nginx + PHP-FPM) never qualifies, not even behind a proxy on the same machine
+  (`Config\App::isLocalDevServer()`; `tests/feature/Security/LocalDevServerTest.php`).
 - The web server should not be able to write the project root (D-00-33): the web installer then
   shows the `.env` content once, for the operator to save by hand (`chmod 640`, owned by the
   deploy user, group of the web server). `.env` written by the installer is `0640`.
