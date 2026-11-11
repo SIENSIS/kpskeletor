@@ -17,6 +17,7 @@ return [
     'Modules\Core' => __DIR__ . '/../../modules/Core',
     'Modules\Dashboard' => __DIR__ . '/../../modules/Dashboard',
     'Modules\News' => __DIR__ . '/../../modules/News',
+    'Modules\Pages' => __DIR__ . '/../../modules/Pages',
     'Modules\Settings' => __DIR__ . '/../../modules/Settings',
     'Modules\Users' => __DIR__ . '/../../modules/Users',
 ];
