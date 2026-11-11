@@ -1,0 +1,134 @@
+/*
+ * Rich-text editor (core/forms/editor.js, Quill 2 "snow" theme) following the theme's colours in
+ * light and dark mode: every colour comes from Bootstrap's CSS variables.
+ */
+.kp-editor .ql-toolbar.ql-snow,
+.kp-editor .ql-container.ql-snow {
+    border-color: var(--bs-border-color);
+}
+
+.kp-editor .ql-toolbar.ql-snow {
+    border-top-left-radius: var(--bs-border-radius);
+    border-top-right-radius: var(--bs-border-radius);
+    background: var(--bs-tertiary-bg);
+}
+
+.kp-editor .ql-container.ql-snow {
+    border-bottom-left-radius: var(--bs-border-radius);
+    border-bottom-right-radius: var(--bs-border-radius);
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.kp-editor.is-invalid .ql-container.ql-snow,
+.kp-editor.is-invalid .ql-toolbar.ql-snow {
+    border-color: var(--bs-form-invalid-border-color);
+}
+
+.kp-editor .ql-editor {
+    min-height: 12rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.kp-editor .ql-editor.ql-blank::before {
+    color: var(--bs-secondary-color);
+}
+
+.kp-editor .ql-snow .ql-stroke {
+    stroke: var(--bs-body-color);
+}
+
+.kp-editor .ql-snow .ql-fill,
+.kp-editor .ql-snow .ql-stroke.ql-fill {
+    fill: var(--bs-body-color);
+}
+
+.kp-editor .ql-snow .ql-picker {
+    color: var(--bs-body-color);
+}
+
+.kp-editor .ql-snow.ql-toolbar button,
+.kp-editor .ql-snow .ql-toolbar button {
+    min-width: 2rem;
+    min-height: 2rem;
+}
+
+.kp-editor .ql-snow.ql-toolbar button:hover .ql-stroke,
+.kp-editor .ql-snow.ql-toolbar button:focus-visible .ql-stroke,
+.kp-editor .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
+    stroke: var(--bs-primary);
+}
+
+.kp-editor .ql-snow.ql-toolbar button:hover .ql-fill,
+.kp-editor .ql-snow.ql-toolbar button.ql-active .ql-fill,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill {
+    fill: var(--bs-primary);
+}
+
+.kp-editor .ql-snow.ql-toolbar button:hover,
+.kp-editor .ql-snow.ql-toolbar button.ql-active,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-label:hover,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-item:hover,
+.kp-editor .ql-snow.ql-toolbar .ql-picker-item.ql-selected {
+    color: var(--bs-primary);
+}
+
+.kp-editor .ql-snow .ql-picker-options,
+.kp-editor .ql-snow .ql-tooltip {
+    background: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+    box-shadow: var(--bs-box-shadow-sm);
+}
+
+.kp-editor .ql-snow .ql-tooltip input[type="text"] {
+    background: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+.kp-editor .ql-snow .ql-editor pre.ql-syntax,
+.kp-editor .ql-snow .ql-editor .ql-code-block-container {
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+}
+
+.kp-editor .ql-snow .ql-editor blockquote {
+    border-left-color: var(--bs-border-color);
+}
+
+.kp-editor .ql-snow a {
+    color: var(--bs-link-color);
+}
+
+/* Translated texts of the link tooltip (set by editor.js as data attributes). */
+.kp-editor .ql-snow .ql-tooltip[data-visit]::before {
+    content: attr(data-visit) " ";
+}
+
+.kp-editor .ql-snow .ql-tooltip[data-enter].ql-editing::before {
+    content: attr(data-enter);
+}
+
+.kp-editor .ql-snow .ql-tooltip[data-edit] a.ql-action::after {
+    content: attr(data-edit);
+}
+
+.kp-editor .ql-snow .ql-tooltip[data-save].ql-editing a.ql-action::after {
+    content: attr(data-save);
+}
+
+.kp-editor .ql-snow .ql-tooltip[data-remove] a.ql-remove::before {
+    content: attr(data-remove);
+}
+
+.kp-editor .ql-snow .ql-tooltip.ql-editing input[type="text"][data-link]::placeholder {
+    color: var(--bs-secondary-color);
+}

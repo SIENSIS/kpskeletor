@@ -344,3 +344,12 @@
 .dashboard-stat { font-size: 1.75rem; font-weight: 600; line-height: 1.1; }
 .dashboard-links-ref { min-width: 12rem; }
 .dashboard-links-position { width: 6rem; }
+
+/* Alignment of rich text (HTMLPurifier keeps it as these classes; Bootstrap has text-center). */
+.text-right {
+    text-align: right !important;
+}
+
+.text-justify {
+    text-align: justify !important;
+}
