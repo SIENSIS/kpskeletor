@@ -112,8 +112,9 @@ class Cookie extends BaseConfig
 
     public function __construct()
     {
-        // HTTPS-only cookies in production (docs/specification.md, "Session handling").
-        $this->secure = ENVIRONMENT === 'production';
+        // HTTPS-only cookies in production (docs/specification.md, "Session handling"), except
+        // for PHP's development server on this computer, served over HTTP (D-19-05).
+        $this->secure = ENVIRONMENT === 'production' && ! App::isLocalDevServer();
 
         parent::__construct();
     }
