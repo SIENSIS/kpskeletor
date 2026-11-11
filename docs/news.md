@@ -57,8 +57,9 @@ the file picker, session 23).
   `news-read.view`, a `groups` notice the members of its groups, once (`news.notified_at`), when
   it is published or released. Users choose the channels in their notification preferences.
 - **Body**: sanitised with HTMLPurifier (the Core's `Modules\Core\Security\HtmlSanitizer`, shared with later modules) before kpcrudy reads the
-  form (D-17-02) and again when a post is shown. The rich-text editor replaces the textarea in
-  session 20.
+  form (D-17-02) and again when a post is shown. It is written with the Core's rich-text editor
+  (`core/forms/editor`, D-20-03); alignment is kept as the classes `text-center`, `text-right`,
+  `text-justify`.
 - **Slugs** (the Core's `Modules\Core\Text\Slugger`): from the Catalan title (or the given slug), transliterated,
   unique (`-2`, `-3`…); kept when the title changes unless the slug field is edited.
 - **Cover**: kpcrudy `image` field with an upload handler on the Storage service
