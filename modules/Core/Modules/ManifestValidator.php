@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Modules;
 
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Menus\MenuLinkType;
 use Modules\Core\Settings\SettingOptionsProvider;
 use Modules\Core\Widgets\WidgetInterface;
 
@@ -73,7 +74,7 @@ final class ManifestValidator
         $this->checkResources();
         $this->checkDefaultGrants();
         $this->checkMenu();
-        $this->checkClassList('menuLinks');
+        $this->checkClassList('menuLinks', MenuLinkType::class);
         $this->checkSettings();
         $this->checkClassList('widgets', WidgetInterface::class);
         $this->checkClassList('tasks');

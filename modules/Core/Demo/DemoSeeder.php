@@ -13,6 +13,15 @@ use CodeIgniter\Database\Seeder;
 abstract class DemoSeeder extends Seeder
 {
     /**
+     * Modules whose demo data this one uses (e.g. the Menus demo links to the Pages demo): when
+     * several modules are loaded together (`app:install --demo`, `modules:demo` without a name),
+     * those load first.
+     *
+     * @var list<string>
+     */
+    public const AFTER = [];
+
+    /**
      * Creates the demo data of the module through `$demo`.
      */
     abstract public function load(DemoData $demo): void;

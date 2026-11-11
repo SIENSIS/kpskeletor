@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Menus;
 
 use Closure;
+use CodeIgniter\Events\Events;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Cache\CoreCache;
 use Modules\Core\Permissions\Authorization;
@@ -21,6 +22,10 @@ use Throwable;
  * only while it has visible children. The filtered tree is cached per group set (plus the user's
  * individual permissions) in the `menus` scope, which `modules:sync`, enabling or disabling a
  * module and every grant change invalidate.
+ *
+ * Before filtering, the event `backendMenu` lets a module customise the entries
+ * (`BackendMenuLayer`: the Menus module's retouches, relocations, custom groups and links);
+ * permissions are checked after it, so a customisation never grants anything.
  *
  * The active entry and the breadcrumbs depend on the request and are computed on each call.
  */
@@ -126,17 +131,43 @@ final class MenuBuilder
     }
 
     /**
-     * @return array<string, list<array<string, mixed>>>
+     * The generated entries of the enabled modules (key => definition), before any customisation
+     * and without filtering by permission (the Menus module's editor shows them all).
+     *
+     * @return array<string, array<string, mixed>>
      */
-    private function build(User $user): array
+    public function definitions(): array
     {
-        $auth        = Authorization::for($user);
         $definitions = [];
 
         foreach ($this->registry->all('menu') as $key => $declaration) {
             $definition = $declaration['definition'];
 
             if (! isset($definition['route'], $definition['permission'], $definition['label'])) {
+                continue;
+            }
+
+            $definitions[(string) $key] = $definition;
+        }
+
+        return $definitions;
+    }
+
+    /**
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function build(User $user): array
+    {
+        $auth  = Authorization::for($user);
+        $layer = new BackendMenuLayer($user, $this->definitions());
+        Events::trigger(BackendMenuLayer::EVENT, $layer);
+
+        $definitions = [];
+
+        foreach ($layer->definitions() as $key => $definition) {
+            $kind = $definition['kind'] ?? 'route';
+
+            if (! isset($definition['label']) || ($kind === 'route' && ! isset($definition['route'], $definition['permission'])) || ($kind === 'link' && ! isset($definition['href']))) {
                 continue;
             }
 
@@ -183,7 +214,12 @@ final class MenuBuilder
     private function node(string $key, array $definitions, array $children, Authorization $auth, array $seen): ?MenuEntry
     {
         $definition = $definitions[$key];
-        $visible    = [];
+
+        if (($definition['hidden'] ?? false) === true) {
+            return null; // hidden with its children
+        }
+
+        $visible = [];
 
         foreach ($children[$key] ?? [] as $childKey) {
             if (in_array($childKey, $seen, true)) {
@@ -197,11 +233,29 @@ final class MenuBuilder
             }
         }
 
-        $path = $auth->can((string) $definition['permission']) ? ($this->routes)((string) $definition['route']) : null;
+        $kind  = $definition['kind'] ?? 'route';
+        $path  = null;
+        $href  = null;
+        $route = null;
 
-        if ($path === null && $visible === []) {
+        if ($kind === 'route') {
+            $path  = $auth->can((string) $definition['permission']) ? ($this->routes)((string) $definition['route']) : null;
+            $route = $path === null ? null : (string) $definition['route'];
+        } elseif ($kind === 'link' && self::linkVisible($definition, $auth)) {
+            $target = (string) $definition['href'];
+
+            if (preg_match('#^https?://#i', $target) === 1) {
+                $href = $target;
+            } else {
+                $path = trim($target, '/');
+            }
+        }
+
+        if ($path === null && $href === null && $visible === []) {
             return null;
         }
+
+        $labels = is_array($definition['labels'] ?? null) ? array_filter(array_map('strval', $definition['labels']), static fn (string $t): bool => $t !== '') : [];
 
         return new MenuEntry(
             $key,
@@ -209,11 +263,43 @@ final class MenuBuilder
             (string) $definition['label'],
             (string) ($definition['icon'] ?? MenuDefinitions::DEFAULT_ICON),
             $path,
-            $path === null ? null : (string) $definition['route'],
+            $route,
             (int) ($definition['order'] ?? MenuDefinitions::DEFAULT_ORDER),
             (string) ($definition['zone'] ?? MenuDefinitions::DEFAULT_ZONE),
             self::sorted($visible),
+            false,
+            false,
+            $labels,
+            $href,
+            ($definition['target'] ?? '_self') === '_blank' ? '_blank' : '_self',
         );
+    }
+
+    /**
+     * A custom link is shown when the user holds every permission of `permissions`, one of
+     * `anyPermissions` (e.g. the `can:` filter of the route it points to) and, when it names
+     * groups, belongs to one of them.
+     *
+     * @param array<string, mixed> $definition
+     */
+    private static function linkVisible(array $definition, Authorization $auth): bool
+    {
+        $permissions = array_values(array_filter(array_map('strval', (array) ($definition['permissions'] ?? [])), static fn (string $p): bool => $p !== ''));
+
+        if ($permissions !== [] && ! $auth->canAll(...$permissions)) {
+            return false;
+        }
+
+        $any = array_values(array_filter(array_map('strval', (array) ($definition['anyPermissions'] ?? [])), static fn (string $p): bool => $p !== ''));
+
+        if ($any !== [] && ! $auth->can(...$any)) {
+            return false;
+        }
+
+        $groups = array_values(array_filter(array_map('strval', (array) ($definition['groups'] ?? [])), static fn (string $g): bool => $g !== ''));
+        $user   = $auth->user();
+
+        return $groups === [] || ($user !== null && $user->inGroup(...$groups));
     }
 
     /**

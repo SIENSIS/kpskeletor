@@ -1,9 +1,10 @@
 # Back-office menus
 
 The back-office menu is **generated** from the manifests of the enabled modules
-(docs/specification.md, "Menus"); nobody writes it by hand. The Menus module (session 21) will add
-a customisation layer on top (reorder, rename, relocate, custom links) without changing the
-manifests.
+(docs/specification.md, "Menus"); nobody writes it by hand. The Menus module adds a
+customisation layer on top (reorder, rename, relocate, hide, custom groups and links) without
+changing the manifests, and edits the **public menus** placed in the theme's locations (see
+"The Menus module" below).
 
 ## Declaring entries (`$menu` in `Config/Module.php`)
 
@@ -30,8 +31,7 @@ public array $menu = [
 | `parent` | none | nests the entry |
 
 Every entry has a **stable key**: `<Module>.<resource>` (e.g. `News.posts`) or the route name.
-The same resource in a second zone gets `<key>@<zone>`. Customisations (session 21) refer to
-these keys.
+The same resource in a second zone gets `<key>@<zone>`. Customisations refer to these keys.
 
 `modules:sync` stores the normalised entries in `module_declarations` (kind `menu`); regular
 requests never load the manifests.
@@ -69,3 +69,65 @@ disabling a module and every group grant change (`GrantManager`) invalidate it t
 - Theme partials: `partials/sidebar_menu` (zones `sidebar` and `settings`),
   `partials/sidebar_menu_items` (recursive, collapsible groups), `partials/user_menu` (zone
   `user` + logout). A theme overrides them like any partial (`docs/themes.md`).
+- Extension point: `MenuBuilder` triggers `backendMenu` with a `BackendMenuLayer` (the Menus
+  module's customisations) before filtering by permission; `MenuBuilder::definitions()` gives the
+  generated entries.
+
+## The Menus module
+
+Two screens (`modules/Menus`, decisions D-21-01 … D-21-06).
+
+### Public menus (`backend/menus/public`, `menus-public.*`)
+
+- A kpcrudy CRUD of menus (name and theme location; one menu per location; deleting a menu
+  deletes its items) and, per menu, the **tree editor** of its items
+  (`backend/menus/items/<menu>`, `menus-public.edit`): drag the handle (mouse, pen, touch), use
+  the arrow keys on it (up/down reorder, right nests under the previous item, left takes it out)
+  or the buttons, then "Save the order". Without JavaScript the buttons apply one move each.
+- Item: label per language (Catalan required), type and target — `url` (an `https://`/`http://`
+  URL or a path of the site starting with `/`), `route` (a GET route name without parameters) or
+  a module link type (`pages.page`, `news.category`…) — parent (three levels at most), icon,
+  window (new tab adds `rel="noopener noreferrer"`), CSS class and visibility (everyone,
+  visitors without a session, signed-in users, selected groups).
+- Rendering: `menu('primary')` returns the items (`Modules\Core\Menus\PublicMenuItem`) for the
+  visitor and language; the theme partial `partials/public_menu` shows `primary` as the navbar
+  (dropdowns for children) and any other location as a list. Items whose target is gone (a deleted
+  or unpublished page, a disabled module, an address no longer valid) are hidden; links to
+  routes with a `can:` filter only show to users who pass it. Cached per menu, language and group
+  set for five minutes; the active item is marked on each request.
+
+### Back-office menu (`backend/menus/backend`, `menus-backend.*`)
+
+- The editor shows every generated entry (with its module, permission, hidden/customised
+  badges) and the custom ones, per zone, for **everyone** or for **one group**
+  (`?group=<name>`). Moving and retouching need `customise`, custom links `links`, resets and
+  orphans `reset`; `view` opens the screen.
+- **Retouch:** label per language, icon, hidden (with its children), parent and zone. **Custom
+  groups** (`customise`) are headings hidden while empty. **Custom links** (`links`): an address,
+  route, public page or module link type, label, icon, window, place, and who sees it (a
+  permission from the catalogue and/or groups). A link to a path or route of the site also
+  requires the `can:` permissions of the route that answers it, read when the menu is built.
+- Stored as differences per entry key and scope (`backend_menu_customisations`); scopes merge
+  field by field (everyone, then the user's groups; the group listed first in Users › Groups
+  wins). Route and permission never change, so a relocated or renamed entry is still filtered by
+  its permission. Relocations under the entry's own descendants are refused (and ignored if
+  stored). Customisations of a disabled or removed module are kept, inactive, and listed as
+  **orphaned** with a delete option. **Reset** per entry, per scope or everything.
+- Every change invalidates the `menus` cache and is written to the activity log.
+
+### Link types for modules (`$menuLinks`)
+
+A module offers link types by listing classes that implement `Modules\Core\Menus\MenuLinkType`:
+
+```php
+final class CategoryLink implements MenuLinkType
+{
+    public function key(): string { return 'news.category'; }            // stored in items
+    public function label(): string { return lang('News.menuLink.category'); }
+    public function options(): array { /* value => label */ }
+    public function url(string $value): ?string { /* absolute URL, null when gone */ }
+}
+```
+
+`modules:sync` refuses a class that does not implement the interface.
+

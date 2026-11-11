@@ -18,7 +18,7 @@ $entries = $user !== null ? backend_menu('user') : [];
         <?php foreach ($entries as $entry): ?>
             <?php foreach ([$entry, ...$entry->children] as $item): ?>
                 <?php if ($item->url() !== null): ?>
-                    <li><a class="dropdown-item<?= $item->active ? ' active' : '' ?>" href="<?= esc($item->url()) ?>"<?= $item->active ? ' aria-current="page"' : '' ?>><i class="<?= esc($item->icon) ?> me-2" aria-hidden="true"></i><?= esc($item->text()) ?></a></li>
+                    <li><a class="dropdown-item<?= $item->active ? ' active' : '' ?>" href="<?= esc($item->url()) ?>"<?= $item->active ? ' aria-current="page"' : '' ?><?= $item->newTab() ? ' target="_blank" rel="noopener noreferrer"' : '' ?>><i class="<?= esc($item->icon) ?> me-2" aria-hidden="true"></i><?= esc($item->text()) ?></a></li>
                 <?php endif ?>
             <?php endforeach ?>
         <?php endforeach ?>
