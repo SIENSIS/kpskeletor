@@ -107,6 +107,19 @@ final class ThemeManagerTest extends CIUnitTestCase
         $this->assertArrayHasKey('primary', $manager->menuLocations('public'));
     }
 
+    public function testPageTemplatesAreInheritedAndExtendedByChildThemes(): void
+    {
+        $child = $this->uniqueSlug('pagetpl');
+        $this->makeDefaultChild($child, "public array \$pageTemplates = ['landing' => 'ThemeDefault.pageTemplates.wide', 'default' => 'ThemeDefault.pageTemplates.sidebar'];");
+
+        $manager = $this->manager(['Theme.public' => $child]);
+
+        $this->assertSame(['default', 'wide', 'sidebar'], array_keys($this->manager()->pageTemplates('public')));
+        $templates = $manager->pageTemplates('public');
+        $this->assertSame(['default', 'wide', 'sidebar', 'landing'], array_keys($templates), 'Inherited, default first, new ones added.');
+        $this->assertSame('ThemeDefault.pageTemplates.sidebar', $templates['default'], 'A child may relabel one.');
+    }
+
     public function testChildThemeOverridesOneViewAndOneColourAndInheritsTheRest(): void
     {
         $child = $this->uniqueSlug('corp');

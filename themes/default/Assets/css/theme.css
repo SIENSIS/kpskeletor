@@ -353,3 +353,29 @@
 .text-justify {
     text-align: justify !important;
 }
+
+/* Content pages (Pages module): a readable column for the default template. */
+.page-column {
+    max-width: 48rem;
+}
+
+.page-body img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Quotes and code blocks of rich text (pages, news). */
+.page-body blockquote,
+.news-body blockquote {
+    border-left: 0.25rem solid var(--bs-border-color);
+    padding-left: 1rem;
+    color: var(--bs-secondary-color);
+    font-style: italic;
+}
+
+.page-body pre,
+.news-body pre {
+    background: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius);
+    padding: 0.75rem 1rem;
+}

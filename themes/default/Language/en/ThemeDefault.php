@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 return [
     'name'    => 'Default',
+    'pageTemplates' => [
+        'default' => 'Default (reading column)',
+        'wide'    => 'Wide',
+        'sidebar' => 'With subpages beside',
+    ],
     'menu'    => [
         'primary' => 'Main menu',
         'footer'  => 'Footer menu',

@@ -64,6 +64,7 @@ final class ThemeValidator
         $this->checkLayouts($manifest, $chain);
         $this->checkRegions($manifest);
         $this->checkMenuLocations($manifest);
+        $this->checkPageTemplates($manifest);
         $this->checkAssets($manifest, $chain);
         $this->checkOptions($chain);
 
@@ -117,6 +118,15 @@ final class ThemeValidator
                 if (! is_string($region) || preg_match('/^[a-z][a-zA-Z0-9]*$/', $region) !== 1) {
                     $this->error("\$regions['{$layout}']", 'name', [is_scalar($region) ? (string) $region : '?']);
                 }
+            }
+        }
+    }
+
+    private function checkPageTemplates(ThemeManifest $manifest): void
+    {
+        foreach (self::entries($manifest->pageTemplates) as $template => $label) {
+            if (preg_match('/^[a-z][a-z0-9_-]*$/', (string) $template) !== 1 || ! is_string($label) || $label === '') {
+                $this->error("\$pageTemplates['{$template}']", 'name', [(string) $template]);
             }
         }
     }
