@@ -14,7 +14,7 @@
 .file-manager .fm-q { min-width: 10rem; flex: 1 1 12rem; }
 .file-manager .fm-tag { max-width: 9rem; }
 
-.fm-tree-item { border: 0; border-radius: var(--bs-border-radius); padding: .25rem .5rem; }
+.fm-tree-item { display: flex; align-items: center; justify-content: flex-start; text-align: start; border: 0; border-radius: var(--bs-border-radius); padding: .25rem .5rem; }
 .fm-tree-item:hover { background: var(--bs-tertiary-bg); }
 .fm-tree-item.active { background: var(--bs-primary-bg-subtle); color: var(--bs-primary-text-emphasis); font-weight: 600; }
 .fm-tree-children { padding-left: .9rem; border-left: 1px solid var(--bs-border-color); margin-left: .6rem; }

@@ -83,7 +83,7 @@ final class FileRepository
         $builder = $this->select()->where('files.disk', $disk)->where('files.folder', $folder)->where('files.deleted_at', null);
         $this->filter($builder, $filters);
 
-        return array_values($builder->get()->getResultArray());
+        return $builder->get()->getResultArray();
     }
 
     /**
@@ -154,6 +154,7 @@ final class FileRepository
     }
 
     /**
+     * @param BaseBuilder<BaseConnection<object|resource, object|resource>>                          $builder
      * @param array{q?: string, type?: string, from?: string, to?: string, tag?: string, sort?: string} $filters
      */
     private function filter(BaseBuilder $builder, array $filters): void
@@ -199,6 +200,9 @@ final class FileRepository
         };
     }
 
+    /**
+     * @return BaseBuilder<BaseConnection<object|resource, object|resource>>
+     */
     private function select(): BaseBuilder
     {
         return $this->db()->table('files')

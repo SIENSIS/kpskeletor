@@ -17,7 +17,6 @@ use Modules\Core\Storage\StorageException;
 use Modules\Core\Storage\UploadRefused;
 use Modules\Files\Services\Browser;
 use Modules\Files\Services\FileRepository;
-use Modules\Files\Services\FolderRepository;
 use Modules\Files\Services\QuotaService;
 use Modules\Files\Services\Rights;
 use Modules\Files\Services\Spaces;
@@ -348,7 +347,7 @@ final class FileApi extends BackendController
         $folders       = $this->browser()->acl()->folders();
         $folder        = $path === null ? null : $folders->find($disk, $path);
 
-        if ($folder === null || $path === null || ! $this->allowed($disk, $path, Rights::VIEW)) {
+        if ($folder === null || ! $this->allowed($disk, $path, Rights::VIEW)) {
             return $this->notFound();
         }
 
@@ -399,7 +398,7 @@ final class FileApi extends BackendController
     {
         $data          = $this->request->getJSON(true);
         $data          = is_array($data) ? $data : $this->request->getPost();
-        [$disk, $path] = $this->target(is_array($data) ? $data : []);
+        [$disk, $path] = $this->target($data);
         $acl           = $this->browser()->acl();
 
         if ($path === null || ! $this->allowed($disk, $path, Rights::VIEW)) {
@@ -445,7 +444,7 @@ final class FileApi extends BackendController
 
         $quota = null;
 
-        if (Authorization::current()->can('files.all') && isset($data['quota']) && $data['quota'] !== '' && $data['quota'] !== null) {
+        if (Authorization::current()->can('files.all') && isset($data['quota']) && $data['quota'] !== '') {
             if (! is_numeric($data['quota']) || (int) $data['quota'] < 0 || (int) $data['quota'] > 1048576) {
                 return $this->json(['message' => lang('Files.errors.quotaValue')], 422);
             }

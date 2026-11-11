@@ -17,8 +17,8 @@ final class FileApiTest extends FilesTestCase
     public function testTheFileManagerNeedsFilesList(): void
     {
         $this->loginWith();
-        $this->assertNotSame(200, $this->status('GET', 'backend/files'));
-        $this->assertNotSame(200, $this->status('GET', 'backend/files/api/tree'));
+        $this->assertNotSame(200, $this->statusOf('GET', 'backend/files'));
+        $this->assertNotSame(200, $this->statusOf('GET', 'backend/files/api/tree'));
 
         $this->loginAsEditor();
         $result = $this->send('GET', 'backend/files');
@@ -111,11 +111,11 @@ final class FileApiTest extends FilesTestCase
 
         $this->loginWith('files.list');
 
-        $this->assertSame(403, $this->status('POST', 'backend/files/api/file/' . $id . '/update', ['name' => 'x']));
-        $this->assertSame(403, $this->status('POST', 'backend/files/api/file/' . $id . '/delete'));
-        $this->assertSame(403, $this->status('POST', 'backend/files/api/folder', ['disk' => 'public', 'path' => 'shared/A', 'name' => 'X']));
-        $this->assertSame(403, $this->status('POST', 'backend/files/api/acl', ['disk' => 'public', 'path' => 'shared/A']));
-        $this->assertSame(403, $this->status('POST', 'backend/files/api/upload', ['disk' => 'public', 'path' => 'shared/A']));
+        $this->assertSame(403, $this->statusOf('POST', 'backend/files/api/file/' . $id . '/update', ['name' => 'x']));
+        $this->assertSame(403, $this->statusOf('POST', 'backend/files/api/file/' . $id . '/delete'));
+        $this->assertSame(403, $this->statusOf('POST', 'backend/files/api/folder', ['disk' => 'public', 'path' => 'shared/A', 'name' => 'X']));
+        $this->assertSame(403, $this->statusOf('POST', 'backend/files/api/acl', ['disk' => 'public', 'path' => 'shared/A']));
+        $this->assertSame(403, $this->statusOf('POST', 'backend/files/api/upload', ['disk' => 'public', 'path' => 'shared/A']));
         $this->seeInDatabase('files', ['id' => $id, 'name' => 'a.txt', 'deleted_at' => null]);
     }
 
@@ -162,7 +162,7 @@ final class FileApiTest extends FilesTestCase
         $this->apiJson('POST', 'folder', ['disk' => 'private', 'path' => $home, 'name' => '.git'], 422);
         $this->apiJson('POST', 'folder', ['disk' => 'private', 'path' => $home, 'name' => 'a/b'], 422);
 
-        $id = $this->upload($editor, 'private', $home . '/Fotos 2026', 'x', 'a.txt');
+        $id = $this->upload($editor, 'private', $home . '/Fotos 2026', 'Some plain text.', 'a.txt');
         $renamed = $this->apiJson('POST', 'folder/rename', ['disk' => 'private', 'path' => $home . '/Fotos 2026', 'name' => 'Fotos']);
         $this->assertSame($home . '/Fotos', $renamed['path']);
         $this->seeInDatabase('files', ['id' => $id, 'folder' => $home . '/Fotos']);

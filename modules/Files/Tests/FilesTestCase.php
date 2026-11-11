@@ -116,7 +116,7 @@ abstract class FilesTestCase extends AuthTestCase
     /**
      * @param array<string, mixed> $params
      */
-    protected function status(string $method, string $path, array $params = []): int
+    protected function statusOf(string $method, string $path, array $params = []): int
     {
         try {
             return $this->send($method, $path, $params)->response()->getStatusCode();

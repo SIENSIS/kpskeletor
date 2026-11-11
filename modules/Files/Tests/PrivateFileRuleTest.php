@@ -44,11 +44,11 @@ final class PrivateFileRuleTest extends FilesTestCase
 
         $this->createUser('ana@example.com', 'user');
         $this->login('ana@example.com');
-        $this->assertSame(404, $this->status('GET', $path), 'No view right: 404, not 403.');
+        $this->assertSame(404, $this->statusOf('GET', $path), 'No view right: 404, not 403.');
 
         $this->send('POST', 'logout');
         $_SESSION = [];
-        $this->assertSame(404, $this->status('GET', $path), 'Guests never see private files of a folder.');
+        $this->assertSame(404, $this->statusOf('GET', $path), 'Guests never see private files of a folder.');
     }
 
     public function testTrashedFilesAreOnlyForThoseWhoMayDeleteThem(): void
@@ -69,7 +69,7 @@ final class PrivateFileRuleTest extends FilesTestCase
     {
         $owner = $this->createUser('ed@example.com', 'editor');
         $this->actingAs($owner);
-        $file = service('storage')->storeContents('x', 'loose.txt', 'private', 'exports');
+        $file = service('storage')->storeContents('Some plain text.', 'loose.txt', 'private', 'exports');
         $rule = new FolderAccessRule();
 
         $this->assertTrue($rule->canView($owner, $file));
@@ -117,9 +117,9 @@ final class PrivateFileRuleTest extends FilesTestCase
             });
         });
 
-        $open   = service('storage')->storeContents('x', 'public-agenda.txt', 'private', 'modules/events/attachments/7');
-        $closed = service('storage')->storeContents('x', 'board.txt', 'private', 'modules/events/attachments/8');
-        $shared = service('storage')->storeContents('x', 'shared.txt', 'private', 'shared');
+        $open   = service('storage')->storeContents('Some plain text.', 'public-agenda.txt', 'private', 'modules/events/attachments/7');
+        $closed = service('storage')->storeContents('Some plain text.', 'board.txt', 'private', 'modules/events/attachments/8');
+        $shared = service('storage')->storeContents('Some plain text.', 'shared.txt', 'private', 'shared');
         $rule   = new FolderAccessRule();
 
         $this->assertTrue($rule->canView(null, $open), 'The policy may allow guests (a public event).');
