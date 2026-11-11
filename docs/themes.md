@@ -29,6 +29,7 @@ themes/corporate/
 | `$layouts` | Layouts the theme provides itself (`backend`, `public`, `auth`, `blank`, `print`); the chain must provide all five |
 | `$regions` | Regions per layout (`['public' => ['header', 'sidebar', 'footer', 'home']]`) |
 | `$menuLocations` | Menu locations the layouts print (`primary`, `footer`, `social` → label key) |
+| `$pageTemplates` | Templates of content pages (Pages module): key → label key; inherited and extended by child themes (`theme()->pageTemplates()`). The view of a template is `Modules\Pages\Views\templates\<key>`; override or add one in `Views/overrides/Pages/templates/<key>.php` (D-20-01, `docs/pages.md`). The default theme offers `default`, `wide`, `sidebar` |
 | `$styles`, `$scripts` | Assets loaded after the parent's: paths under `Assets/`, or `vendor:<path>` under `public/assets/vendor/` |
 | `$options` | Options declared like settings (type, default, label, help, options) plus `css` for colour options |
 

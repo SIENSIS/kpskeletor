@@ -112,9 +112,10 @@ class Routing extends BaseRouting
      * If TRUE, will enable the use of the 'prioritize' option
      * when defining routes.
      *
-     * Default: false
+     * Enabled for the Pages module's catch-all public route (`(:any)`, priority 1), which must be
+     * matched after every other route whatever the module discovery order (session 20).
      */
-    public bool $prioritize = false;
+    public bool $prioritize = true;
 
     /**
      * For Defined Routes.

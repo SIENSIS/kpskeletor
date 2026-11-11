@@ -511,6 +511,13 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
   audience (`NewsVisibility::groupIds()` + link table, for `page_groups`) and the publish
   workflow (draft/scheduled/published, `Publisher`). Feature tests extend `AuthTestCase`
   (`loginWith()`, `assertCrudRefused()`); controllers use `$this->currentUser()`.
+- **Done (session 20):** `deploy-status/20-pages/README.md`. For later sessions: the Core's
+  `Modules\Core\Content\{ContentTranslations,Audience,PublishWorkflow}` and
+  `Modules\Core\Storage\CrudUploadHandler` (Events: `Audience` for public/private, its own
+  `event_audience` for groups and users); rich text with `RichTextEditor::attrs()` +
+  `HtmlSanitizer`; menu link types `Menu/PageLink.php` and News' `CategoryLink.php` (session 21);
+  the public catch-all route has priority 1 (`Config\Routing::$prioritize = true`): new public
+  routes need no priority; the Core event `homePage` (`Modules\Core\Frontend\HomePage`).
 
 ## 21 — Menus module: public menus and back-office customisation (`deploy/21-menus.md`)
 

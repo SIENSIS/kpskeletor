@@ -277,6 +277,22 @@ final class ThemeManager
     }
 
     /**
+     * Page templates of the active theme and its ancestors (key => label key), `default` first.
+     *
+     * @return array<string, string>
+     */
+    public function pageTemplates(?string $area = null): array
+    {
+        $templates = [];
+
+        foreach (array_reverse($this->manifests($area)) as $manifest) {
+            $templates = array_merge($templates, $manifest->pageTemplates);
+        }
+
+        return isset($templates['default']) ? ['default' => $templates['default']] + $templates : $templates;
+    }
+
+    /**
      * URLs of the stylesheets to load: the root theme's first, the active theme's last.
      *
      * @return list<string>

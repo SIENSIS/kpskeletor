@@ -72,7 +72,8 @@ import { toast } from 'core/ui/toast.js';
 | `core/ui/cookie-notice.js` | Remembers the closed cookie notice (`kp_cookies`). |
 | `core/forms/dirty-guard.js` | `form[data-dirty-guard]` (or `form_layout` with `dirtyGuard`): warns before leaving with unsaved changes. |
 | `core/forms/date.js` | `data-component="core/forms/date"` with `{"min":"today","max":"+1y"}`; `formatDate()`. |
-| `core/forms/editor.js`, `core/forms/file-picker.js` | Stubs, completed in sessions 20 and 23. |
+| `core/forms/editor.js` | Rich-text editor on a `<textarea>` (Quill 2, loaded on demand; see "Rich-text editor"). |
+| `core/forms/file-picker.js` | Stub, completed in session 23. |
 | `core/theme-mode.js` | Classic script in `<head>`: resolves `auto` before the first paint. |
 | `core/pwa.js` | Registers (or removes) the service worker. |
 
@@ -89,6 +90,29 @@ demand and calls its `mount(element, options)`. Escape attributes with `esc()`; 
 `textContent`/`createElement` (no `innerHTML` with data, no `eval`). Elements added later are
 mounted automatically. The demo: `/theme-preview/components` (development, `theme.preview = true`),
 source `modules/Core/Assets/js/demo/showcase.js`.
+
+### Rich-text editor
+
+`Modules\Core\Frontend\RichTextEditor::attrs()` turns a textarea into the editor
+(`data-component="core/forms/editor"` with the URLs of the vendored Quill 2.0.3, BSD-3-Clause,
+`public/assets/vendor/quill/`, and of `core::css/editor.css`, which takes the colours from
+Bootstrap's variables in light and dark mode). With kpcrudy:
+
+```php
+$crud->fieldType('notes', 'textarea', ['attrs' => RichTextEditor::attrs()]);
+// A field of setTranslations(): keep kpcrudy's type of translated fields.
+$crud->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()]);
+```
+
+The textarea stays the form value (kept in sync and posted as usual) and is what users get
+without JavaScript or if the library cannot load. Toolbar: headings 2–4, bold, italic,
+underline, strike, lists, quote, code block, alignment, link, clear formatting; texts from
+`Core.js.editor.*`. Quill only uses the CSSOM, so it works under the enforced CSP; alignment is
+written as the classes `text-center`, `text-right`, `text-justify` (defined by the theme). The
+server always sanitises the HTML with `Modules\Core\Security\HtmlSanitizer` (HTMLPurifier: no
+`style`, scripts, handlers or iframes; alignment mapped to those classes, no other class) before
+storing it and again when showing it. Images inside the text arrive with the file picker
+(session 23, D-17-08).
 
 ## Content-Security-Policy
 

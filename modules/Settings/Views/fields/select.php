@@ -13,7 +13,7 @@
     <select class="form-select<?= $error !== null ? ' is-invalid' : '' ?>" id="<?= esc($id, 'attr') ?>" name="<?= esc($field->name, 'attr') ?>"
         aria-describedby="<?= esc($id, 'attr') ?>-help"<?= $field->readOnly ? ' disabled' : '' ?>>
         <?php foreach ($field->options as $option => $label): ?>
-            <option value="<?= esc($option, 'attr') ?>"<?= (string) $option === $value ? ' selected' : '' ?>><?= esc(lang($label)) ?></option>
+            <option value="<?= esc($option, 'attr') ?>"<?= (string) $option === $value ? ' selected' : '' ?>><?= esc($field->literalOptions ? $label : lang($label)) ?></option>
         <?php endforeach ?>
     </select>
     <?= $this->include('Modules\Settings\Views\fields\_meta') ?>

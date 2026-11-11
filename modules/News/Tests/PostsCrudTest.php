@@ -212,6 +212,27 @@ final class PostsCrudTest extends NewsTestCase
         $this->assertStringContainsString('<strong>bé</strong>', (string) $ca['body']);
     }
 
+    public function testTheBodyUsesTheRichTextEditorAndKeepsAlignmentAsClasses(): void
+    {
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+
+        $form = $this->body('GET', 'backend/news/posts/add');
+        $this->assertMatchesRegularExpression('/<textarea[^>]*name="kp_tr\[ca\]\[body\]"[^>]*data-component="core\/forms\/editor"/', $form, 'Each language\'s body is an editor.');
+        $this->assertStringContainsString('quill/quill.js', $form);
+        $this->assertStringNotContainsString('name="body"', $form, 'No main-table body field.');
+
+        $this->send('POST', 'backend/news/posts/add', [
+            'kp_tr' => ['ca' => ['title' => 'Alineada', 'summary' => '', 'body' => '<p class="text-center">Centre</p><p style="text-align: right; color: red">Dreta</p><p class="ql-align-justify evil">J</p>']],
+            'type'  => 'article', 'priority' => 'info', 'visibility' => 'public',
+        ])->assertRedirect();
+
+        $post = db_connect()->table('news')->where('slug', 'alineada')->get()->getRowArray();
+        $this->assertIsArray($post);
+        $body = (string) db_connect()->table('news_translations')->where('news_id', $post['id'])->get()->getRowArray()['body'];
+        $this->assertSame('<p class="text-center">Centre</p><p class="text-right">Dreta</p><p class="text-justify">J</p>', $body);
+    }
+
     public function testPublishingAPrivateNoticeNotifiesItsAudienceOnce(): void
     {
         $boss  = $this->createUser('boss@example.com', 'admin');

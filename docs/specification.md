@@ -714,7 +714,8 @@ granularity instead of collapsing it into read/create/update/delete.
 * **A theme** is a folder `themes/<name>/` with a manifest class `Themes\<Name>\Theme`:
   name, version, author, parent theme (optional), **layouts** (`backend`, `public`, `auth`,
   `blank`, `print`), **regions** (header, sidebar, footer, home blocks…), **menu locations**
-  (`primary`, `footer`, `social`…), the assets it loads, and its **options** (logo, colours,
+  (`primary`, `footer`, `social`…), **page templates** for the Pages module (`$pageTemplates`:
+  key → label; child themes inherit and add them), the assets it loads, and its **options** (logo, colours,
   fonts, dark mode, footer text) declared like settings and edited from the `Settings` UI. Their
   values are stored with codeigniter4/settings as `Theme.<option>` with the context
   `theme:<slug>` (e.g. `Theme.primaryColor` for `theme:corporate`); until a value is saved, the
@@ -847,6 +848,9 @@ granularity instead of collapsing it into read/create/update/delete.
   values.
 * **Runtime settings:** `codeigniter4/settings`, namespaced per module (`setting('News.perPage')`).
   * Definitions come from the manifests (type, default, validation rules, label, help, group).
+    A `select` setting has fixed `options` or an `optionsProvider` (a class implementing
+    `Modules\Core\Settings\SettingOptionsProvider`) whose choices are computed when the form is
+    shown and validated (e.g. the pages of the site); only one of them is accepted.
     The Core registers the manifest defaults so `setting('News.perPage')` returns the default
     before any value is saved (a test checks every declared key).
   * The `Settings` module **generates the forms** from those definitions, one tab per module
@@ -1167,7 +1171,11 @@ The generated forms described above (one tab per module and one for the theme), 
 * **Revisions:** every save keeps a revision (who, when, diff); restore a revision as a custom
   operation.
 * Back office with kpcrudy (list with tree indentation, filters by status and visibility,
-  preview operation, duplicate operation), and the home page chosen in settings.
+  preview operation, duplicate operation), and the home page chosen in settings
+  (`Pages.homePage`: chosen from a list of the pages, the page id is stored).
+* Names: one resource named `pages` (`pages.{list,show,add,edit,delete,export,trash,restore,
+  purge,publish}`; preview and revisions need `show`, restore a revision `edit`, duplicate
+  `add`), back office `backend/pages`, public pages at the root of the site and `sitemap.xml`.
 * Public routes: `/{slug}` and nested slugs, a 404 that uses the theme, XML sitemap, and
   `noindex` for non-public pages. Private pages require login and the right group.
 * Offers a menu link type "page" to the menu editor.

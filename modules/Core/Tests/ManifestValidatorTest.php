@@ -135,6 +135,13 @@ final class ManifestValidatorTest extends CIUnitTestCase
         yield 'setting default' => [static function (ModuleManifest $m): void {
             unset($m->settings['perPage']['default']);
         }, "\$settings['perPage']['default'] is required"];
+        yield 'setting select without options' => [static function (ModuleManifest $m): void {
+            $m->settings['perPage']['type'] = 'select';
+        }, "\$settings['perPage']['options'] is required"];
+        yield 'setting options provider' => [static function (ModuleManifest $m): void {
+            $m->settings['perPage']['type']            = 'select';
+            $m->settings['perPage']['optionsProvider'] = \stdClass::class;
+        }, "\$settings['perPage']['optionsProvider'] must be Modules\\Core\\Settings\\SettingOptionsProvider"];
         yield 'widget class' => [static function (ModuleManifest $m): void {
             $m->widgets = ['Modules\News\Widgets\Missing'];
         }, '$widgets refers to class Modules\News\Widgets\Missing'];

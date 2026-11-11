@@ -182,6 +182,13 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-19-03 | 19 | `make:module --api` | Accepted (proposal) |
 | D-19-04 | 19 | Shared Core helpers extracted from News | Accepted (proposal) |
 | D-19-05 | 19 | HTTP on `localhost` with `php spark serve` | Applied (decided) |
+| D-20-01 | 20 | Pages permission names, URLs, the home page setting and the theme's page templates (decide) | Applied (decided) |
+| D-20-02 | 20 | Private pages: login for guests, 404 for the wrong group | Accepted (proposal) |
+| D-20-03 | 20 | The rich-text editor: Quill 2 under the enforced CSP | Accepted (proposal) |
+| D-20-04 | 20 | The catch-all page route, reserved slugs and the home page hook | Accepted (proposal) |
+| D-20-05 | 20 | Slugs per language and the language of a page | Accepted (proposal) |
+| D-20-06 | 20 | What a revision keeps and what a restore writes back | Accepted (proposal) |
+| D-20-07 | 20 | Content helpers extracted from News into the Core | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1896,3 +1903,70 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Decision (2026-11-11):** requested by the owner while testing a fresh clone locally ("si s'arrenca amb localhost no requereixi https"); applied with the narrow rule above.
 - **Applied in:** `app/Config/App.php` (`isLocalDevServer()`, constructor), `app/Config/Cookie.php`, `docs/security.md` ("Installer"), `README.md`; tests `tests/feature/Security/LocalDevServerTest.php`
 
+## D-20-01 — Pages permission names, URLs, the home page setting and the theme's page templates (decide)
+
+- **Where:** specification "Modules" › "Pages" (resource names and settings are not given; "the home page chosen in settings"; "template (from the theme's page templates)"), "Themes" (the theme manifest lists no page templates), D-00-18 (single-resource modules may name their resource)
+- **Problem:** The specification names no permission, URL or setting of the Pages module, and a theme has no way to declare page templates. The settings forms only offer fixed choices (`select` options are static), so the home page cannot be a list of pages without a Core change.
+- **Proposal (built):**
+  - One resource named `pages` (single-resource module): `pages.{list,show,add,edit,delete,export,trash,restore,purge}` + `pages.publish` (no `import`). The custom operations reuse CRUD permissions: preview and revisions `show`, restore a revision `edit`, duplicate `add`. Grants: admin `pages.*`; editor `pages.{list,show,add,edit,publish}`.
+  - URLs: back office `backend/pages` (kpcrudy; `preview/{id}`, `revisions/{id}`, `POST restorerevision/{id}`, `POST duplicate/{id}`, `POST publish|unpublish/{id}`); public `/{slug}` and nested `/{slug}/{slug}…` at the root of the site; `sitemap.xml`.
+  - Setting `Pages.homePage` (group "Public site"): the **path** of the home page (e.g. `inici`, `qui-som/equip`), empty = the theme's home.
+  - Theme manifest key `public array $pageTemplates = [key => label key]` (inherited and extended by child themes; `ThemeManager::pageTemplates()`); a template is the view `Modules\Pages\Views\templates\<key>`, overridden by themes in `Views/overrides/Pages/templates/<key>.php`. The default theme offers `default`, `wide` and `sidebar`.
+- **Alternatives:** A) `pages-pages.*` (the generated prefix, no `name`). B) Extra permissions `pages.revisions` (view and restore revisions) and `pages.preview`. C) `Pages.homePage` as a page id chosen from a list, which needs a Core extension for dynamic `select` options in manifests (e.g. `'options' => [Class::class, 'method']`). D) Page templates as files only (any `Views/pages/*.php` of the theme), without a manifest key and without translated labels.
+- **Status:** Applied
+- **Decision (2026-11-11):** «Inici triat d'una llista». Everything stays as built (permissions `pages.*` with `pages.publish`, operations on `show`/`edit`/`add`; `backend/pages`; pages at the site root and `sitemap.xml`; the theme key `$pageTemplates`), except the home page setting: `Pages.homePage` is chosen from a list of the pages and stores the page **id**, so renaming a slug does not break the home page. This needs a Core extension: dynamic options for `select` settings declared in manifests (a new manifest setting key). **Must change:** the Core settings registry/definition and the Settings form generator and validation (dynamic options, the value must be one of them), `docs/settings.md`, `modules/Pages/Config/Module.php` (setting type and options provider), `modules/Pages/Services/HomePageResolver.php`, Pages tests and docs, the specification ("Configuration and settings", "Pages").
+- **Applied in:** `modules/Core/Settings/{SettingOptionsProvider,SettingDefinition}.php` (manifest setting key `optionsProvider`), `modules/Core/Modules/ManifestValidator.php`, `modules/Settings/Forms/Field.php` and `Views/fields/select.php` (choices shown as they are, validated with `in_list`), `modules/Pages/Settings/HomePageOptions.php`, `modules/Pages/Config/Module.php` (`Pages.homePage` is a `select`), `modules/Pages/Services/HomePageResolver.php` (reads the id), `modules/Pages/Language/*/Pages.php`, `docs/specification.md` ("Configuration and settings", "Themes", "Pages"), `docs/settings.md`, `docs/pages.md`, `modules/Pages/CLAUDE.md`; tests `HomePageSettingTest`, `PublicPagesTest::testTheHomePageFromTheSettings` (renaming the slug keeps the home page), `ManifestValidatorTest` (`optionsProvider`). As built and kept: `modules/Pages/Config/{Module,Routes}.php`, `modules/Core/Theme/{ThemeManifest,ThemeManager,ThemeValidator}.php`, `themes/default/Theme.php`, `docs/themes.md`. Existing development databases: a stored path in `Pages.homePage` no longer matches (the theme's home is shown) until a page is chosen again.
+
+## D-20-02 — Private pages: login for guests, 404 for the wrong group
+
+- **Where:** specification "Pages" ("Private pages require login and the right group", "`noindex` for non-public pages")
+- **Problem:** The specification does not say what a guest or a signed-in user without the group sees.
+- **Proposal:** A guest who opens a `private` or `groups` page is sent to the login and comes back after it (Shield's `beforeLoginUrl`); a signed-in user who may not read it gets the theme's 404, like a page that does not exist (its existence is not revealed beyond the login prompt). Non-public pages are sent with `<meta name="robots" content="noindex, nofollow">` and `Cache-Control: private, no-store`, and never appear in the sitemap; superadmins follow the same rule (authors use the back office's preview, `noindex` and `X-Robots-Tag`). Drafts, future scheduled pages and trashed pages (and their children) are a 404 for everybody.
+- **Alternatives:** A) 404 for guests too (no login prompt; the specification asks for login). B) 403 for the wrong group (reveals that the page exists).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Pages/Controllers/PublicPages.php`, `modules/Pages/Services/{PageVisibility,PageRenderer}.php`; tests `PublicPagesTest::testPrivatePagesRequireLoginAndTheRightGroup`, `testDraftsTrashedAndFuturePagesAreNotFound`
+
+## D-20-03 — The rich-text editor: Quill 2 under the enforced CSP
+
+- **Where:** specification "Front-end assets" (vendored MIT editor that works without `unsafe-inline`), "Pages" (HTMLPurifier drops `style`, alignment mapped to classes), contradiction 25 of `docs/plan.md`, D-00-35 (News switches to the editor)
+- **Problem:** Most editors write `style` attributes (blocked by the CSP) or are GPL (TinyMCE 7); kpcrudy has no rich-text field and puts translated fields in tabs with its own template.
+- **Proposal:** Quill 2.0.3 (BSD-3-Clause, pre-approved as "MIT/BSD"), vendored in `public/assets/vendor/quill/` with `vendor.json`, loaded on demand by `core/forms/editor.js` (a `data-component` on the textarea; the textarea stays the form value and the fallback without JavaScript). Quill only uses the CSSOM (allowed); alignment is registered as the classes `text-center`/`text-right`/`text-justify` instead of `ql-align-*`. The Core's `HtmlSanitizer` maps any alignment (`style`, `align`, `ql-align-*`) to those classes, allows no other class and drops `style`. Toolbar: headings 2–4, bold, italic, underline, strike, lists, quote, code block, alignment, link, clear; UI texts from `Core.js.editor.*`; colours from Bootstrap variables (light and dark). kpcrudy: `fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()])` (the type of translated fields; another type would take the field out of the tabs; library request). Images inside the text: session 23 (D-17-08).
+- **Alternatives:** A) Trix (MIT; injects a `<style>` element, needs a nonce meta). B) A home-made `contenteditable` editor (`execCommand` is deprecated and writes `style`). C) Tiptap (MIT; needs a bundler).
+- **Status:** Accepted (proposal)
+- **Applied in:** `public/assets/vendor/quill/`, `public/assets/vendor/vendor.json`, `modules/Core/Assets/js/forms/editor.js`, `modules/Core/Assets/css/editor.css`, `modules/Core/Frontend/RichTextEditor.php`, `modules/Core/Security/{HtmlSanitizer,AlignmentToClass}.php`, `modules/Core/Language/*/Core.php` (`js.editor`), `themes/default/Assets/css/theme.css`, `modules/News/Controllers/Posts.php`; tests `HtmlSanitizerTest`, `PostsCrudTest::testTheBodyUsesTheRichTextEditorAndKeepsAlignmentAsClasses`, `PagesCrudTest::testTheBodyIsAnEditorInEveryLanguage`
+
+## D-20-04 — The catch-all page route, reserved slugs and the home page hook
+
+- **Where:** specification "Pages" (public routes `/{slug}` and nested slugs; the home page chosen in settings), `docs/plan.md` session 20 risks (a catch-all route shadows routes of modules loaded later), `CLAUDE.md` ("Never hard-code a module in the Core")
+- **Problem:** Module routes are discovered in namespace order, so a catch-all of Pages could hide the routes of later modules (Settings, Users…); a page slug could hide a route (`news`); `/` belongs to `app/Config/Routes.php` and discovered routes cannot replace it.
+- **Proposal:** `Config\Routing::$prioritize = true` and the page route `(:pagepath)` with `priority => 1` (matched after every other route); the placeholder only accepts valid slugs and never `backend/…` or `api/…` (those keep the router's 404 and their filters). A root page cannot take a reserved slug: the first static segment of every route plus `api`, `assets`, `backend`, `themes`, `uploads`, `vendor`, `writable` (a typed slug is refused, a generated one gets a suffix). `/`: `App\Controllers\Home` triggers the Core event `homePage` with a `Modules\Core\Frontend\HomePage`; Pages' listener (only while the module is enabled) answers with the page of `Pages.homePage` when the visitor may read it, otherwise the theme's home is shown; the page's own path redirects to `/`, its canonical URL is `/`.
+- **Alternatives:** A) Pages under a prefix (`/p/{slug}`; the specification asks for `/{slug}`). B) A list of reserved slugs only (forgets routes added later). C) The home page decided in the Core's `Home` controller (hard-codes a module).
+- **Status:** Accepted (proposal)
+- **Applied in:** `app/Config/Routing.php`, `app/Controllers/Home.php`, `modules/Core/Frontend/HomePage.php`, `modules/Pages/Config/{Routes,Events}.php`, `modules/Pages/Services/{PageSlugs,HomePageResolver}.php`; tests `PublicPagesTest::testOtherRoutesWinOverPages`, `testTheHomePageFromTheSettings`, `PagesCrudTest::testSlugsAreUniquePerParentAndLanguage`, `PagesModuleTest::testTheHomePageEventIsIgnoredWhileTheModuleIsDisabled`
+
+## D-20-05 — Slugs per language and the language of a page
+
+- **Where:** specification "Pages" (slug unique per parent and language; title, slug… translated with `setTranslations()`), "Languages" (Catalan default; guests see `en` until session 31)
+- **Problem:** With a slug per language, the specification does not say which language a URL shows, which URLs go into the sitemap, nor how slugs are made unique (kpcrudy's hooks cannot change translated values, D-17-02).
+- **Proposal:** Before kpcrudy reads the form, empty slugs are filled from each language's title (unique among the siblings in that language); a typed slug that clashes with a sibling in the same language (trashed pages included, they can be restored) is refused by `beforeInsert`/`beforeUpdate`. A path resolves segment by segment with the slugs of any language (current language first, then Catalan); the texts follow the visitor's language with the Catalan fallback, and the canonical URL is the path in that language (session 31 may make the path's language select the content language). The sitemap lists each distinct path of each public, published, indexable page (a language with its own canonical URL is left out) and `/`.
+- **Alternatives:** A) One slug per page (not translated; the specification translates it). B) A language prefix in URLs (`/es/…`; language negotiation is session 31's).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Pages/Services/{PageSlugs,PageResolver,PageTree,SitemapBuilder}.php`, `modules/Pages/Controllers/Pages.php` (`prepareForm()`, `beforeSave()`); tests `PagesCrudTest::testSlugsAreUniquePerParentAndLanguage`, `PublicPagesTest::testPublishedPublicPagesAtTheirNestedSlugs`, `testTheSitemapListsOnlyPublicIndexablePages`
+
+## D-20-06 — What a revision keeps and what a restore writes back
+
+- **Where:** specification "Pages" ("every save keeps a revision (who, when, diff); restore a revision as a custom operation")
+- **Problem:** The specification does not say what a revision contains, how the diff is shown nor what a restore changes (restoring the status would publish without `pages.publish`; restoring the parent could break the tree or clash with a sibling's slug).
+- **Proposal:** `page_revisions` keeps a JSON snapshot (the page's columns, its texts in every language and its groups), the user, the date, the action (`create`, `save`, `restore`, `duplicate`) and the list of changed fields; a save that changes nothing adds no revision. The revisions page lists them and shows the selected revision's changes field by field (before / after, rich text without tags). A restore (POST, `pages.edit`, a revision of that page only) writes back the texts, groups (still existing), template, visibility, `noindex` and featured image (if the file still exists), sanitises the body again, suffixes a slug taken meanwhile, and records a new revision; the parent, the order, the status and the publication date are kept. Revisions are deleted with the page (purge).
+- **Alternatives:** A) Restore everything (could publish a draft or move the page). B) Line-by-line text diff (heavier; the field view is enough for pages).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Pages/Services/Revisions.php`, `modules/Pages/Views/revisions.php`, `modules/Pages/Database/Migrations/2026-11-11-100004_CreatePageRevisions.php`; tests `PagesCrudTest::testEverySaveKeepsARevisionAndARevisionCanBeRestored`, `PagesModuleTest::testRevisionsSkipUnchangedSaves`
+
+## D-20-07 — Content helpers extracted from News into the Core
+
+- **Where:** D-19-04, `docs/plan.md` session 20 ("extract to the Core what Pages shares with News")
+- **Problem:** Pages needs News' translation lookup, audience rule, publish workflow and upload handler.
+- **Proposal:** `Modules\Core\Content\ContentTranslations` (languages, Catalan fallback, `texts()`, `pick()`), `Modules\Core\Content\Audience` (public / private / groups with a junction table, `groupIds()`), `Modules\Core\Content\PublishWorkflow` (`statusFor()`, `applyPublished()`, `releaseScheduled()`) and `Modules\Core\Storage\CrudUploadHandler` (kpcrudy upload handler on the Storage service, `fieldOptions()`). News keeps its public names (`NewsVisibility`, `NewsRepository::FALLBACK_LOCALE`, `Posts::LOCALES`, `CoverUploads`) on top of them. No public convention changes.
+- **Alternatives:** A) Copy the code into Pages (two copies of a security rule).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Content/`, `modules/Core/Storage/CrudUploadHandler.php`, `modules/News/Services/{NewsVisibility,NewsRepository,Publisher}.php`, `modules/News/Storage/CoverUploads.php`, `modules/News/Controllers/Posts.php`

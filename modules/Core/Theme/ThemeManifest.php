@@ -51,6 +51,15 @@ abstract class ThemeManifest
     public array $menuLocations = [];
 
     /**
+     * Templates of content pages (Pages module): key => language key of its label. The page is
+     * rendered with the view `Modules\Pages\Views\templates\<key>`, which a theme overrides in
+     * `Views/overrides/Pages/templates/<key>.php`; a child theme inherits and adds templates.
+     *
+     * @var array<string, string>
+     */
+    public array $pageTemplates = [];
+
+    /**
      * Stylesheets loaded by the layouts, after the parent's: paths relative to `Assets/`, or
      * `vendor:<path>` for files under `public/assets/vendor/`.
      *

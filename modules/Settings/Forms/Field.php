@@ -16,7 +16,8 @@ final class Field
 {
     /**
      * @param string                $name    form field name (letters, digits, '-' and '_')
-     * @param array<string, string> $options value => language key of a 'select'
+     * @param array<string, string> $options        value => language key of a 'select' (or the label itself with $literalOptions)
+     * @param bool                  $literalOptions the labels are shown as they are (options computed by a provider)
      */
     public function __construct(
         public readonly string $name,
@@ -30,11 +31,14 @@ final class Field
         public readonly array $options = [],
         public readonly bool $readOnly = false,
         public readonly ?string $group = null,
+        public readonly bool $literalOptions = false,
     ) {
     }
 
     public static function fromDefinition(SettingDefinition $definition, mixed $value, mixed $default, bool $readOnly = false): self
     {
+        $provided = $definition->providedOptions();
+
         return new self(
             $definition->module . '-' . $definition->key,
             $definition->name(),
@@ -44,9 +48,10 @@ final class Field
             $default,
             $definition->rules,
             $definition->help,
-            self::options($definition->options),
+            $provided ?? self::options($definition->options),
             $readOnly,
             $definition->group,
+            $provided !== null,
         );
     }
 

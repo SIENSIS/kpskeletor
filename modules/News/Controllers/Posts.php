@@ -6,8 +6,10 @@ namespace Modules\News\Controllers;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use Kpcrudy\Crud;
+use Modules\Core\Content\ContentTranslations;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Crud\AuditedCrud;
+use Modules\Core\Frontend\RichTextEditor;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\Core\Text\Slugger;
 use Modules\News\Services\NewsRepository;
@@ -34,7 +36,7 @@ use Modules\News\Storage\CoverUploads;
 final class Posts extends BackendController
 {
     /** Languages of the content: Catalan (required, the default), Spanish, English. */
-    public const LOCALES = ['ca' => 'Català', 'es' => 'Español', 'en' => 'English'];
+    public const LOCALES = ContentTranslations::LOCALES;
 
     public function index(): ResponseInterface|string
     {
@@ -124,10 +126,11 @@ final class Posts extends BackendController
             ->fieldType('visibility', 'select', ['options' => $this->options('visibilities', NewsVisibility::VISIBILITIES)])
             ->fieldType('status', 'readonly')
             ->fieldType('category_id', 'select', ['options' => self::categoryOptions()])
+            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()])
             ->fieldType('pinned', 'boolean')
             ->fieldType('published_at', 'datetime')
             ->fieldType('expires_at', 'datetime')
-            ->fieldType('cover', 'image', ['handler' => new CoverUploads(), 'allowed' => CoverUploads::TYPES, 'maxSize' => CoverUploads::MAX_SIZE / 1024])
+            ->fieldType('cover', 'image', CoverUploads::fieldOptions())
             ->columns(['title', 'type', 'category_id', 'visibility', 'status', 'published_at', 'author_id'])
             ->fields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id'])
             ->showFields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id', 'created_at', 'updated_at'])

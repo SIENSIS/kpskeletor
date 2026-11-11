@@ -23,5 +23,19 @@
             "font/fonts/bootstrap-icons.woff": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15",
             "font/fonts/bootstrap-icons.woff2": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61"
         }
+    },
+    "quill": {
+        "version": "2.0.3",
+        "licence": "BSD-3-Clause",
+        "source": "https://registry.npmjs.org/quill/-/quill-2.0.3.tgz",
+        "homepage": "https://quilljs.com/",
+        "files": {
+            "LICENSE": "395c12b616d6f58238b4be39284d4d9221b58dd6e1f1e34d9ab537e34abbb022",
+            "quill.js": "f6157c72ac9b3f51cdead426335688a027b12405d9d6a4daadd38a676b2d7ff2",
+            "quill.js.LICENSE.txt": "7b1938804d68d96764233d0a148a7501f39e547e6ae2dead4b16836e9b8d123c",
+            "quill.js.map": "a508052334c1c1171d529da80b19948f0521c5cc1db341833908a25a10a2722f",
+            "quill.snow.css": "1c7948cd13aa92fac6390319bc1e5e461823da171519d3a768db56164f871636",
+            "quill.snow.css.map": "aac83b00c50d7396614bb8b37c0a32a549242322c558ba95e6b1a51ee3fb6935"
+        }
     }
 }

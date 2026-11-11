@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 return [
     'name'    => 'Per defecte',
+    'pageTemplates' => [
+        'default' => 'Per defecte (columna de lectura)',
+        'wide'    => 'Ampla',
+        'sidebar' => 'Amb les subpàgines al costat',
+    ],
     'menu'    => [
         'primary' => 'Menú principal',
         'footer'  => 'Menú del peu',

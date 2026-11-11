@@ -30,6 +30,13 @@ final class Theme extends ThemeManifest
         'social'  => 'ThemeDefault.menu.social',
     ];
 
+    /** Templates of content pages (Pages module); views in modules/Pages/Views/templates. */
+    public array $pageTemplates = [
+        'default' => 'ThemeDefault.pageTemplates.default',
+        'wide'    => 'ThemeDefault.pageTemplates.wide',
+        'sidebar' => 'ThemeDefault.pageTemplates.sidebar',
+    ];
+
     public array $styles = [
         'vendor:bootstrap/css/bootstrap.min.css',
         'vendor:bootstrap-icons/font/bootstrap-icons.min.css',

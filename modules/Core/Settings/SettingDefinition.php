@@ -10,7 +10,8 @@ namespace Modules\Core\Settings;
 final class SettingDefinition
 {
     /**
-     * @param array<array-key, mixed> $options Choices of a 'select' setting
+     * @param array<array-key, mixed> $options         Fixed choices of a 'select' setting (value => language key)
+     * @param string|null             $optionsProvider A SettingOptionsProvider class computing the choices at run time
      */
     public function __construct(
         public readonly string $module,
@@ -22,6 +23,7 @@ final class SettingDefinition
         public readonly ?string $help = null,
         public readonly ?string $group = null,
         public readonly array $options = [],
+        public readonly ?string $optionsProvider = null,
     ) {
     }
 
@@ -42,7 +44,31 @@ final class SettingDefinition
             is_string($definition['help'] ?? null) ? $definition['help'] : null,
             is_string($definition['group'] ?? null) ? $definition['group'] : null,
             is_array($definition['options'] ?? null) ? $definition['options'] : [],
+            is_string($definition['optionsProvider'] ?? null) && $definition['optionsProvider'] !== '' ? $definition['optionsProvider'] : null,
         );
+    }
+
+    /**
+     * The choices computed by the options provider (value => translated label), or null when the
+     * setting has fixed options (or the provider is not a SettingOptionsProvider).
+     *
+     * @return array<string, string>|null
+     */
+    public function providedOptions(): ?array
+    {
+        $class = $this->optionsProvider;
+
+        if ($class === null || ! class_exists($class) || ! is_subclass_of($class, SettingOptionsProvider::class)) {
+            return null;
+        }
+
+        $options = [];
+
+        foreach ((new $class())->options() as $value => $label) {
+            $options[(string) $value] = (string) $label;
+        }
+
+        return $options;
     }
 
     /** "<Module>.<key>", the name used with setting(). */
