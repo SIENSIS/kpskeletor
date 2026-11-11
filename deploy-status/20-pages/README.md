@@ -109,7 +109,13 @@ draft, scheduled or `noindex` page.)
 
 ## Tests and checks
 
-TESTS_PLACEHOLDER
+- `vendor/bin/phpunit`: **OK (864 tests, 4638 assertions)** (833 before the session).
+- `vendor/bin/phpstan analyse`: **[OK] No errors**.
+- `vendor/bin/php-cs-fixer fix --dry-run --diff`: **Found 0 of 601 files that can be fixed**.
+- `php spark csp:check`: *No inline scripts, handlers or styles in the project views.*
+- `php spark assets:publish --check`: *The published assets are up to date.*
+- `php spark modules:sync`: *Nothing to do: every module is up to date.*
+- `php spark permissions:check` (development install with demo data): *Permissions OK: 91 permission(s) in the catalogue, 162 route(s) checked.*
 
 New tests: `modules/Pages/Tests/PagesCrudTest.php` (permission, forged POSTs on every write
 route with a snapshot, slug generation and sanitised body, slugs per parent and language and
