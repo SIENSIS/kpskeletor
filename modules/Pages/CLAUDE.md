@@ -12,7 +12,7 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
   export,trash,restore,purge,publish}`. Operations: preview and revisions `show`, restore a
   revision `edit`, duplicate `add`, publish/unpublish `publish`.
 - Grants: admin `pages.*`; editor `pages.{list,show,add,edit,publish}`.
-- Setting `Pages.homePage` (path). Menu "Pages" (sidebar, order 25). Link type
+- Setting `Pages.homePage` (page id, a `select` with `optionsProvider` `Settings/HomePageOptions.php`). Menu "Pages" (sidebar, order 25). Link type
   `Menu/PageLink.php`. Events `Config/Events.php` (`homePage`). No API, widgets, tasks or
   notifications yet.
 - Tables: `pages`, `page_translations`, `page_groups`, `page_revisions` (one migration each).
@@ -29,12 +29,11 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
 
 ## Decisions
 
-D-20-01 (names, URLs, setting, theme `$pageTemplates`: **open**, decide), D-20-02 … D-20-07
-accepted (`docs/decisions.md`).
+D-20-01 decided by the owner (names and URLs as built; the home page chosen from a list of pages,
+stored as the id), D-20-02 … D-20-07 accepted (`docs/decisions.md`).
 
 ## Open tasks
 
-- D-20-01: apply the owner's decision.
 - Session 21: the Menus module consumes `Menu/PageLink.php`.
 - Session 23: featured image with the file picker; "Insert image" in the editor (D-17-08).
 - Session 26: pages in the API (if wanted). Session 31: the path's language could select the

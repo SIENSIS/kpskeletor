@@ -11,7 +11,8 @@ return [
     'menuLink'        => ['page' => 'Pàgina'],
     'settings'        => [
         'homePage'     => 'Pàgina d\'inici',
-        'homePageHelp' => 'Camí de la pàgina que es mostra a l\'adreça del lloc (p. ex. "inici" o "qui-som/equip"). Deixeu-ho buit per mostrar l\'inici del tema. Només es mostra una pàgina publicada que el visitant pugui llegir.',
+        'homePageNone' => 'L\'inici del tema',
+        'homePageHelp' => 'Pàgina que es mostra a l\'adreça del lloc. Només es mostra si està publicada i el visitant la pot llegir; si no, es mostra l\'inici del tema.',
     ],
     'fields' => [
         'title'            => 'Títol',

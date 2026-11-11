@@ -83,22 +83,29 @@ final class PublicPagesTest extends PagesTestCase
 
     public function testTheHomePageFromTheSettings(): void
     {
-        $this->page('Inici', [], ['en' => ['title' => 'Home', 'slug' => 'home']]);
-        $this->page('Privada', ['visibility' => 'private']);
+        $home    = $this->page('Inici', [], ['en' => ['title' => 'Home', 'slug' => 'home']]);
+        $private = $this->page('Privada', ['visibility' => 'private']);
+        $trashed = $this->page('Paperera', ['deleted_at' => Time::now()->toDateTimeString()]);
 
         $this->assertStringNotContainsString('Text de Inici', $this->body('GET', '/'), 'No setting: the theme\'s home.');
 
-        service('settings')->set('Pages.homePage', 'inici');
-        $home = $this->body('GET', '/');
-        $this->assertStringContainsString('Home', $home, 'In the visitor\'s language (en).');
-        $this->assertStringContainsString('<link rel="canonical" href="' . site_url('/') . '">', $home);
+        service('settings')->set('Pages.homePage', (string) $home);
+        $page = $this->body('GET', '/');
+        $this->assertStringContainsString('Home', $page, 'In the visitor\'s language (en).');
+        $this->assertStringContainsString('<link rel="canonical" href="' . site_url('/') . '">', $page);
         $this->send('GET', 'inici')->assertRedirectTo(site_url('/'));
 
-        service('settings')->set('Pages.homePage', 'privada');
+        // The setting stores the id: renaming the slug keeps the home page (D-20-01).
+        db_connect()->table('page_translations')->where('page_id', $home)->where('locale', 'ca')->update(['slug' => 'portada']);
+        $this->assertStringContainsString('Home', $this->body('GET', '/'));
+
+        service('settings')->set('Pages.homePage', (string) $private);
         $this->assertStringNotContainsString('Text de Privada', $this->body('GET', '/'), 'Guests do not see a private home page.');
 
-        service('settings')->set('Pages.homePage', 'no-existeix');
-        $this->send('GET', '/')->assertOK();
+        foreach ([(string) $trashed, '999', 'inici'] as $value) {
+            service('settings')->set('Pages.homePage', $value);
+            $this->assertStringNotContainsString('Text de', $this->body('GET', '/'), "{$value}: the theme's home.");
+        }
     }
 
     public function testTemplates(): void

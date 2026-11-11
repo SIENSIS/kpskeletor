@@ -15,8 +15,8 @@ use Modules\Pages\Services\Revisions;
  * Catalan, Spanish and English), "Qui som" with two subpages (template "sidebar"), "Contacte", a
  * legal notice hidden from search engines, an intranet page for signed-in users with a subpage
  * for the `editor` group, a draft and a scheduled page. Each page gets its first revision. Every
- * row goes through `$demo`. To show "Inici" at the site's address, set Settings › Pages ›
- * Home page to `inici`.
+ * row goes through `$demo`. To show "Inici" at the site's address, choose it in Settings › Pages ›
+ * Home page.
  */
 final class PagesDemoSeeder extends DemoSeeder
 {

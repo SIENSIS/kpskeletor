@@ -26,7 +26,7 @@ The form has one tab per language (Catalan required): **title**, **slug**, **sum
 New pages are drafts by the user who creates them. Writes and POST operations are written to the
 activity log by the Core (`AuditedCrud`; labels `Pages.activity.*`).
 
-## Permissions (D-20-01, open)
+## Permissions (D-20-01)
 
 One resource named `pages`: `pages.{list,show,add,edit,delete,export,trash,restore,purge}` and
 `pages.publish`. Default grants: admin `pages.*`; editor `pages.{list,show,add,edit,publish}`.
@@ -88,8 +88,9 @@ back to `default`. All templates include `Modules\Pages\Views\partials\article`.
 
 ## Home page
 
-Settings › Pages › **Home page** (`Pages.homePage`): the path of the page to show at `/` (e.g.
-`inici`). Empty, missing, unpublished or not readable by the visitor: the theme's home. The page's
+Settings › Pages › **Home page** (`Pages.homePage`): the page to show at `/`, chosen from a list
+of the pages (the id is stored, so renaming a slug keeps it; D-20-01). "The theme's home", a
+missing, trashed or unpublished page, or one the visitor may not read: the theme's home. The page's
 own path redirects to `/`. Implemented through the Core's `homePage` event (D-20-04).
 
 ## Revisions
@@ -127,4 +128,4 @@ php spark serve
 
 `backend/pages` as `admin@example.com` or `editor@example.com`; then `/qui-som`,
 `/qui-som/equip`, `/intranet` (login), `/intranet/guia-estil` (group `editor`), `/sitemap.xml`;
-set Settings › Pages › Home page to `inici` and open `/`.
+choose "Inici" in Settings › Pages › Home page and open `/`.

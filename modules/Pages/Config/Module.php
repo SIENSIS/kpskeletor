@@ -51,12 +51,12 @@ final class Module extends ModuleManifest
 
     public array $settings = [
         'homePage' => [
-            'type'    => 'string',
-            'default' => '',
-            'rules'   => 'permit_empty|max_length[500]|regex_match[/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/]',
-            'label'   => 'Pages.settings.homePage',
-            'help'    => 'Pages.settings.homePageHelp',
-            'group'   => 'public',
+            'type'            => 'select',
+            'default'         => '',
+            'optionsProvider' => \Modules\Pages\Settings\HomePageOptions::class,
+            'label'           => 'Pages.settings.homePage',
+            'help'            => 'Pages.settings.homePageHelp',
+            'group'           => 'public',
         ],
     ];
 

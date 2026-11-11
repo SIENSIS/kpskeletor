@@ -11,7 +11,8 @@ return [
     'menuLink'        => ['page' => 'Page'],
     'settings'        => [
         'homePage'     => 'Home page',
-        'homePageHelp' => 'Path of the page shown at the address of the site (e.g. "home" or "about/team"). Leave it empty to show the theme\'s home. Only a published page the visitor may read is shown.',
+        'homePageNone' => 'The theme\'s home',
+        'homePageHelp' => 'Page shown at the address of the site. It is only shown when it is published and the visitor may read it; otherwise the theme\'s home is shown.',
     ],
     'fields' => [
         'title'            => 'Title',

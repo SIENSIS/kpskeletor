@@ -28,7 +28,7 @@ Branch: `claude/eager-brahmagupta-2odzxu` · Pull request: [SIENSIS/kpskeletor#2
 
 | Piece | Where |
 |---|---|
-| Manifest (resource `pages` named `pages`, extra `publish`, grants, menu, setting `Pages.homePage`, `$menuLinks`, `$backup`) | `modules/Pages/Config/Module.php` |
+| Manifest (resource `pages` named `pages`, extra `publish`, grants, menu, setting `Pages.homePage` with `optionsProvider`, `$menuLinks`, `$backup`) | `modules/Pages/Config/Module.php` |
 | Routes: CRUD, `sitemap.xml` (`ratelimit:feeds`), catch-all `(:pagepath)` with `priority => 1` | `modules/Pages/Config/Routes.php`, `app/Config/Routing.php` (`$prioritize = true`) |
 | Home page hook | `app/Controllers/Home.php` triggers `homePage` with `Modules\Core\Frontend\HomePage`; `modules/Pages/Config/Events.php` → `Services/HomePageResolver.php` |
 | Back office (kpcrudy, `tree()`, `setTranslations()`, `setRelationNN()`, operations) | `modules/Pages/Controllers/Pages.php` |
@@ -52,16 +52,16 @@ Branch: `claude/eager-brahmagupta-2odzxu` · Pull request: [SIENSIS/kpskeletor#2
 - **Routes:** `backend/pages` (+ `preview/{id}`, `revisions/{id}`, `POST restorerevision/{id}`,
   `POST duplicate/{id}`, `POST publish|unpublish/{id}`, `POST bulk`), `/{slug}[/{slug}…]`,
   `sitemap.xml`, `/` through the `homePage` event. No new spark commands.
-- **Setting:** `Pages.homePage` (path; Settings › Pages, group "Public site").
+- **Setting:** `Pages.homePage` (the page id, chosen from a list of pages in Settings › Pages, group "Public site"; choices from `Settings/HomePageOptions.php`, the Core's new `optionsProvider`).
 - **Activity:** CRUD writes and POST operations through `AuditedCrud` (labels
   `Pages.activity.{publish,unpublish,restorerevision,duplicate}`).
 
 ## Decisions and deviations
 
-- **D-20-01 (decide, Open):** permission names (`pages.*`), URLs (pages at the site root,
-  `sitemap.xml`), the setting `Pages.homePage` as a path, the theme manifest key
-  `$pageTemplates`. Built so it can still change (names in the manifest; the setting is one
-  string).
+- **D-20-01 (decided by the owner, applied):** permission names (`pages.*`), URLs (pages at the
+  site root, `sitemap.xml`) and the theme manifest key `$pageTemplates` as built; the home page
+  is **chosen from a list of the pages** and stored as the id, which needed a Core extension:
+  `select` settings may name an `optionsProvider` (`Modules\Core\Settings\SettingOptionsProvider`).
 - D-20-02 private pages: login for guests, 404 for the wrong group, `noindex` + `no-store`.
 - D-20-03 Quill 2 (BSD-3) as the editor; alignment as classes; `fieldType(…, 'translation', …)`.
 - D-20-04 lowest-priority catch-all, reserved root slugs from the routes, the `homePage` event.
@@ -84,13 +84,13 @@ php spark serve
 - `http://localhost:8080/backend/pages` as the installer's admin or `editor@example.com`
   (password printed once by the installer): tree, edit "Qui som" (editor), Revisions, Preview of
   "Pàgina en preparació", Duplicate.
-- Settings › Pages › Home page = `inici`, then `http://localhost:8080/`.
+- Settings › Pages › Home page: choose "Inici", then `http://localhost:8080/`.
 - `/qui-som` (template with subpages), `/qui-som/equip`, `/quienes-somos` (Spanish slug),
   `/avis-legal` (`noindex`), `/intranet` (asks for login), `/intranet/guia-estil` (group
   `editor` only), `/en-preparacio` and `/jornades` (404: draft, scheduled), `/sitemap.xml`.
 - Screenshots: `KP_ADMIN_PASSWORD=… KP_EDITOR_PASSWORD=… node deploy-status/20-pages/screenshots.mjs`.
 
-`/sitemap.xml` with the demo data and `Pages.homePage = inici` (first entries):
+`/sitemap.xml` with the demo data and "Inici" as the home page (first entries):
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -109,9 +109,9 @@ draft, scheduled or `noindex` page.)
 
 ## Tests and checks
 
-- `vendor/bin/phpunit`: **OK (864 tests, 4638 assertions)** (833 before the session).
+- `vendor/bin/phpunit`: **OK (867 tests, 4653 assertions)** (833 before the session; after applying D-20-01).
 - `vendor/bin/phpstan analyse`: **[OK] No errors**.
-- `vendor/bin/php-cs-fixer fix --dry-run --diff`: **Found 0 of 601 files that can be fixed**.
+- `vendor/bin/php-cs-fixer fix --dry-run --diff`: **Found 0 of 604 files that can be fixed**.
 - `php spark csp:check`: *No inline scripts, handlers or styles in the project views.*
 - `php spark assets:publish --check`: *The published assets are up to date.*
 - `php spark modules:sync`: *Nothing to do: every module is up to date.*
@@ -141,7 +141,7 @@ has them (guests see `en` until session 31).
 | `screenshots/01-pages-list.png` | The tree of pages with addresses, statuses, visibility and the Home badge |
 | `screenshots/02-page-form-editor.png` | Editing "Qui som": language tabs, the rich-text editor, SEO fields, template, visibility |
 | `screenshots/03-revisions.png` | Revisions of "Qui som": history, changes before/after, Restore |
-| `screenshots/04-settings-home-page.png` | Settings › Pages: the home page path |
+| `screenshots/04-settings-home-page.png` | Settings › Pages: the home page chosen from the list of pages (D-20-01) |
 | `screenshots/05-preview-draft.png` | Preview of a draft (notice, `noindex`) |
 | `screenshots/06-news-editor.png` | News' post form with the same editor |
 | `screenshots/07-page-form-dark.png` | The editor in dark mode |
@@ -170,7 +170,8 @@ has them (guests see `en` until session 31).
 
 ## What the next session must know
 
-- Run `deploy/decide.md` for **D-20-01** before session 21 (names, URLs, setting, theme key).
+- D-20-01 is decided: `Pages.homePage` stores a page id; any module can offer computed choices
+  in a `select` setting with `optionsProvider`.
 - Menus (21): consume `Modules\Pages\Menu\PageLink` (`pages.page`) and News' `CategoryLink`;
   public routes need no priority (the page catch-all has priority 1, never `backend/`/`api/`).
 - Rich text anywhere: `RichTextEditor::attrs()` + `HtmlSanitizer`; shared content helpers in

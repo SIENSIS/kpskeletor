@@ -68,7 +68,7 @@ async function shot(page, name, fullPage = true) {
 
     // Settings › Pages: the home page.
     await page.goto(base + '/backend/settings/pages');
-    await page.fill('input[name$="homePage"]', 'inici');
+    await page.selectOption('select[name$="homePage"]', { index: 1 }); // "Inici" ("Home" in English), the first page of the tree
     await shot(page, '04-settings-home-page');
     await Promise.all([page.waitForNavigation(), page.locator('main form button[type="submit"]').first().click()]);
 

@@ -74,7 +74,7 @@ final class PagesModuleTest extends PagesTestCase
         $this->assertNull($link->url('999'));
         $this->assertNull($link->url('x'));
 
-        service('settings')->set('Pages.homePage', 'qui-som');
+        service('settings')->set('Pages.homePage', (string) $about);
         $this->assertSame(site_url('/'), $link->url((string) $about));
     }
 
@@ -93,8 +93,7 @@ final class PagesModuleTest extends PagesTestCase
 
     public function testTheHomePageEventIsIgnoredWhileTheModuleIsDisabled(): void
     {
-        $this->page('Inici');
-        service('settings')->set('Pages.homePage', 'inici');
+        service('settings')->set('Pages.homePage', (string) $this->page('Inici'));
         db_connect()->table('modules')->where('name', 'Pages')->update(['enabled' => 0]);
         (new \Modules\Core\Cache\CoreCache())->invalidate('modules');
 

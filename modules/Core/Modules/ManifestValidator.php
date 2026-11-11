@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Modules;
 
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Settings\SettingOptionsProvider;
 use Modules\Core\Widgets\WidgetInterface;
 
 /**
@@ -335,7 +336,13 @@ final class ManifestValidator
 
             $this->requireString($definition, 'label', "{$key}['label']");
 
-            if ($type === 'select' && (! isset($definition['options']) || ! is_array($definition['options']) || $definition['options'] === [])) {
+            $provider = $definition['optionsProvider'] ?? null;
+
+            if ($provider !== null && (! is_string($provider) || ! class_exists($provider) || ! is_subclass_of($provider, SettingOptionsProvider::class))) {
+                $this->error("{$key}['optionsProvider']", 'mustBe', [SettingOptionsProvider::class]);
+            }
+
+            if ($type === 'select' && $provider === null && (! isset($definition['options']) || ! is_array($definition['options']) || $definition['options'] === [])) {
                 $this->error("{$key}['options']", 'required');
             }
         }

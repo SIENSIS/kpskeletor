@@ -20,6 +20,20 @@ public array $settings = [
 ];
 ```
 
+- A `select` setting lists fixed `options` (value → language key), or names an
+  `optionsProvider`: a class implementing `Modules\Core\Settings\SettingOptionsProvider`
+  whose `options()` returns value → **translated** label, computed each time the form is shown
+  and validated (`in_list` of those values). Example: `Pages.homePage` lists the pages
+  (`Modules\Pages\Settings\HomePageOptions`) and stores the page id.
+
+  ```php
+  'homePage' => [
+      'type'            => 'select',
+      'default'         => '',
+      'optionsProvider' => \Modules\Pages\Settings\HomePageOptions::class,
+      'label'           => 'Pages.settings.homePage',
+  ],
+  ```
 - `setting('News.perPage')` returns the manifest default until a value is saved (or the property
   of `Config\News` when that class has one, `.env` included).
 - `list` is a list of strings, edited one per line (`SettingCaster::cast('list', …)`); `json`

@@ -27,7 +27,7 @@ final class PagesCrudTest extends PagesTestCase
     {
         $about = $this->page('Qui som');
         $this->page('Equip', ['parent_id' => $about]);
-        service('settings')->set('Pages.homePage', 'qui-som');
+        service('settings')->set('Pages.homePage', (string) $about);
         $this->editor();
 
         $list = $this->body('GET', 'backend/pages');

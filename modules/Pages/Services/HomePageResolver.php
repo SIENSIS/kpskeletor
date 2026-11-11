@@ -7,8 +7,9 @@ namespace Modules\Pages\Services;
 use Modules\Core\Frontend\HomePage;
 
 /**
- * The page chosen as the public home page (`Pages.homePage`: the page's path, e.g. `inici`).
- * Shown at `/` when it exists and the visitor may read it; otherwise the theme's default home.
+ * The page chosen as the public home page (`Pages.homePage`: the page id, chosen from a list in
+ * Settings › Pages, D-20-01). Shown at `/` when it exists, is not trashed and the visitor may read
+ * it; otherwise the theme's default home.
  */
 final class HomePageResolver
 {
@@ -17,9 +18,14 @@ final class HomePageResolver
      */
     public function id(): ?int
     {
-        $path = trim((string) setting('Pages.homePage'));
+        $value = setting('Pages.homePage');
+        $value = is_scalar($value) ? trim((string) $value) : '';
 
-        return $path === '' ? null : (new PageResolver())->resolve($path, service('request')->getLocale());
+        if ($value === '' || ! ctype_digit($value)) {
+            return null;
+        }
+
+        return db_connect()->table('pages')->where('id', (int) $value)->where('deleted_at', null)->countAllResults() === 1 ? (int) $value : null;
     }
 
     public function answer(HomePage $home): void

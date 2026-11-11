@@ -11,7 +11,8 @@ return [
     'menuLink'        => ['page' => 'Página'],
     'settings'        => [
         'homePage'     => 'Página de inicio',
-        'homePageHelp' => 'Ruta de la página que se muestra en la dirección del sitio (p. ej. "inicio" o "quienes-somos/equipo"). Déjelo vacío para mostrar el inicio del tema. Solo se muestra una página publicada que el visitante pueda leer.',
+        'homePageNone' => 'El inicio del tema',
+        'homePageHelp' => 'Página que se muestra en la dirección del sitio. Solo se muestra si está publicada y el visitante puede leerla; si no, se muestra el inicio del tema.',
     ],
     'fields' => [
         'title'            => 'Título',
