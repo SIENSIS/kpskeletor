@@ -7,6 +7,7 @@ namespace Modules\News\Services;
 use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Shield\Entities\User;
+use Modules\Core\Content\ContentTranslations;
 
 /**
  * Read queries of the reader screen, the widgets, the public site and the feed. Every query
@@ -19,7 +20,7 @@ use CodeIgniter\Shield\Entities\User;
 final class NewsRepository
 {
     /** Language used when a post has no text in the current one (the default content language). */
-    public const FALLBACK_LOCALE = 'ca';
+    public const FALLBACK_LOCALE = ContentTranslations::FALLBACK_LOCALE;
 
     /**
      * A page of readable posts, pinned notices first, newest first.
@@ -185,37 +186,6 @@ final class NewsRepository
      */
     private function texts(string $table, string $key, array $ids, array $fields): array
     {
-        $ids = array_values(array_unique(array_map('intval', $ids)));
-
-        if ($ids === []) {
-            return [];
-        }
-
-        $locale = service('request')->getLocale();
-        $rows   = db_connect()->table($table)->select($key . ', locale, ' . implode(', ', $fields))->whereIn($key, $ids)->get()->getResultArray();
-        $byId   = [];
-
-        foreach ($rows as $row) {
-            $byId[(int) $row[$key]][(string) $row['locale']] = $row;
-        }
-
-        $texts = [];
-
-        foreach ($byId as $id => $locales) {
-            $chosen = $locales[$locale] ?? $locales[self::FALLBACK_LOCALE] ?? reset($locales);
-
-            foreach ($fields as $field) {
-                $value = (string) ($chosen[$field] ?? '');
-
-                // A missing optional field falls back too (e.g. a summary written only in Catalan).
-                if ($value === '' && isset($locales[self::FALLBACK_LOCALE])) {
-                    $value = (string) ($locales[self::FALLBACK_LOCALE][$field] ?? '');
-                }
-
-                $texts[$id][$field] = $value;
-            }
-        }
-
-        return $texts;
+        return ContentTranslations::texts($table, $key, $ids, $fields);
     }
 }

@@ -8,6 +8,8 @@ use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\I18n\Time;
 use CodeIgniter\Shield\Entities\User;
+use Modules\Core\Content\Audience;
+use Modules\Core\Content\PublishWorkflow;
 
 /**
  * Who may read a post, as Query Builder conditions shared by the reader screen, the widgets, the
@@ -26,7 +28,7 @@ final class NewsVisibility
 {
     public const TYPES        = ['article', 'notice'];
     public const PRIORITIES   = ['info', 'warning', 'critical'];
-    public const VISIBILITIES = ['public', 'private', 'groups'];
+    public const VISIBILITIES = Audience::VISIBILITIES;
     public const STATUSES     = ['draft', 'scheduled', 'published', 'expired'];
 
     /**
@@ -39,34 +41,15 @@ final class NewsVisibility
      */
     public static function apply(BaseBuilder $builder, ?User $user, string $alias = 'news', bool $publicOnly = false, ?Time $now = null): BaseBuilder
     {
-        $now = ($now ?? Time::now())->toDateTimeString();
+        $now ??= Time::now();
 
-        $builder->where($alias . '.deleted_at', null)
-            ->whereIn($alias . '.status', ['published', 'scheduled'])
-            ->where($alias . '.published_at IS NOT NULL')
-            ->where($alias . '.published_at <=', $now)
+        PublishWorkflow::applyPublished($builder, $alias, 'published_at', $now)
             ->groupStart()
             ->where($alias . '.expires_at', null)
-            ->orWhere($alias . '.expires_at >', $now)
+            ->orWhere($alias . '.expires_at >', $now->toDateTimeString())
             ->groupEnd();
 
-        if ($publicOnly || $user === null) {
-            return $builder->where($alias . '.visibility', 'public');
-        }
-
-        $groups = self::groupIds($user);
-
-        $builder->groupStart()
-            ->whereIn($alias . '.visibility', ['public', 'private']);
-
-        if ($groups !== []) {
-            $builder->orGroupStart()
-                ->where($alias . '.visibility', 'groups')
-                ->whereIn($alias . '.id', static fn (BaseBuilder $sub): BaseBuilder => $sub->select('news_id')->from('news_groups')->whereIn('group_id', $groups))
-                ->groupEnd();
-        }
-
-        return $builder->groupEnd();
+        return Audience::apply($builder, $user, $alias, 'news_groups', 'news_id', $publicOnly);
     }
 
     /**
@@ -90,14 +73,6 @@ final class NewsVisibility
      */
     public static function groupIds(User $user): array
     {
-        $names = $user->getGroups() ?? [];
-
-        if ($names === []) {
-            return [];
-        }
-
-        $rows = db_connect()->table('groups')->select('id')->whereIn('name', $names)->get()->getResultArray();
-
-        return array_map(static fn (array $row): int => (int) $row['id'], $rows);
+        return Audience::groupIds($user);
     }
 }

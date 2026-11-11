@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\News\Services;
 
 use CodeIgniter\I18n\Time;
+use Modules\Core\Content\PublishWorkflow;
 use Modules\News\Notifications\NewNotice;
 
 /**
@@ -29,11 +30,8 @@ final class Publisher
      */
     public function publish(array $row): string
     {
-        $now  = Time::now();
-        $date = (string) ($row['published_at'] ?? '');
-        $at   = $date !== '' ? Time::parse($date) : $now;
-
-        $status = $at->isAfter($now) ? 'scheduled' : 'published';
+        $now = Time::now();
+        ['status' => $status, 'at' => $at] = PublishWorkflow::statusFor(is_string($row['published_at'] ?? null) ? $row['published_at'] : null, $now);
 
         db_connect()->table('news')->where('id', (int) $row['id'])->update([
             'status'       => $status,
@@ -99,13 +97,9 @@ final class Publisher
      */
     public function releaseScheduled(): int
     {
-        $now = Time::now()->toDateTimeString();
-        $ids = array_map(static fn (array $row): int => (int) $row['id'], db_connect()->table('news')->select('id')
-            ->where('status', 'scheduled')->where('deleted_at', null)->where('published_at <=', $now)
-            ->get()->getResultArray());
+        $ids = PublishWorkflow::releaseScheduled('news', 'published_at');
 
         foreach ($ids as $id) {
-            db_connect()->table('news')->where('id', $id)->update(['status' => 'published', 'updated_at' => $now]);
             $this->notifyAudience($id);
         }
 
