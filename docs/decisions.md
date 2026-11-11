@@ -189,7 +189,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-20-05 | 20 | Slugs per language and the language of a page | Accepted (proposal) |
 | D-20-06 | 20 | What a revision keeps and what a restore writes back | Accepted (proposal) |
 | D-20-07 | 20 | Content helpers extracted from News into the Core | Accepted (proposal) |
-| D-21-01 | 21 | Menus permission names, URLs and the Core contracts for menus (decide) | Open |
+| D-21-01 | 21 | Menus permission names, URLs and the Core contracts for menus (decide) | Applied (decided) |
 | D-21-02 | 21 | Menu items edited in a tree editor and a form of their own | Accepted (proposal) |
 | D-21-03 | 21 | The customisation layer: differences, field-by-field scopes, hidden subtrees | Accepted (proposal) |
 | D-21-04 | 21 | Custom links and menu items: addresses and the 403 rule | Accepted (proposal) |
@@ -1983,7 +1983,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Permission names, URLs, manifest keys and the Core extension points are public conventions. The specification names the permissions and the helper but not the URLs of the items editor, the link type contract, nor how a module (not the Core) plugs into the generated back-office menu and the theme's menu locations.
 - **Proposal:** Resources `public` (crud − show, export, import, trash, restore, purge) and `backend` (page + extras `customise`, `links`, `reset`): exactly `menus-public.{list,add,edit,delete}` and `menus-backend.{view,customise,links,reset}`; admin gets both, editor `menus-public.{list,edit}`. URLs: `backend/menus/public` (kpcrudy CRUD of menus), `backend/menus/items/<menu>[/new|/edit/<item>|/save|/order|/delete/<item>]` (`menus-public.edit`), `backend/menus/backend[/order|/entry|/group/new|/link/new|/custom/<id>|/custom/save|/custom/<id>/delete|/reset|/orphans]`, scope `?group=<name>`. Core contracts: `Modules\Core\Menus\MenuLinkType` (`key()`, `label()`, `options()`, `url()`; `ManifestValidator` checks `$menuLinks` against it; Pages' `PageLink` and News' `CategoryLink` implement it); event `backendMenu` with `BackendMenuLayer` (definitions may add `kind` `group`/`link`, `href`, `target`, `permissions`, `anyPermissions`, `groups`, `labels`, `hidden`), applied by `MenuBuilder` before the permission filter; event `publicMenu` with `PublicMenu` and the helper `menu('<location>')` returning `PublicMenuItem`s, rendered by the theme partial `partials/public_menu` in the `primary` and `footer` locations; `DemoSeeder::AFTER` (D-21-06).
 - **Alternatives:** A) Items as a second kpcrudy CRUD (`backend/menus/public/items`, see D-21-02). B) `menus-backend.edit` instead of `customise` (the specification says `customise`). C) The Core reads the Menus tables directly (hard-codes a module in the Core).
-- **Status:** Open
+- **Status:** Applied (decided)
+- **Decision (2026-11-11):** «Tal com està» — the permission names, URLs and Core contracts stay as built and proposed (the recommended option).
+- **Specification updated:** built by session 21 as proposed (no code change); `docs/specification.md` ("Modules" › "Menus": the link type interface, the events, the partial, `DemoSeeder::AFTER`, the URLs)
 - **Applied in:** `modules/Menus/Config/{Module,Routes,Events}.php`, `modules/Core/Menus/{MenuLinkType,BackendMenuLayer,PublicMenuItem,MenuBuilder,MenuEntry}.php`, `modules/Core/Frontend/PublicMenu.php`, `modules/Core/Helpers/menu_helper.php`, `modules/Core/Modules/ManifestValidator.php`, `themes/default/Views/partials/public_menu.php`, `themes/default/Views/layouts/public.php`; tests `MenusModuleTest::testPermissionNamesAndGrants`, `testTheLinkTypesOfTheOtherModules`, `BackendMenuTest::testEveryRouteNeedsItsPermissionAndForgedPostsAreRefused`, `PublicMenusTest::testEveryRouteNeedsItsPermissionAndForgedPostsAreRefused`
 
 ## D-21-02 — Menu items edited in a tree editor and a form of their own

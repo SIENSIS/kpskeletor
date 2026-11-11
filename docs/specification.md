@@ -1189,10 +1189,14 @@ The module manages two different things, in two separate screens.
 * Create menus, assign them to the theme's menu locations (`primary`, `footer`…), and edit their
   items in a **tree editor** (drag and drop to reorder and nest, keyboard accessible).
 * Item types: page, URL, route, and the link types offered by modules (`$menuLinks`: a news
-  category, the events calendar…). Each item: label (translatable), icon, target, CSS class,
+  category, the events calendar…; each class implements `Modules\Core\Menus\MenuLinkType`:
+  `key()`, `label()`, `options()`, `url()`). Each item: label (translatable), icon, target, CSS class,
   visibility (everyone, guests only, logged-in users, groups).
 * Rendering: `menu('primary')` returns the tree for the current user and language, marks the
-  active item, and is cached per menu, language and group set.
+  active item, and is cached per menu, language and group set (Core event `publicMenu`, theme
+  partial `partials/public_menu`). The back-office layer is applied through the Core event
+  `backendMenu` before the permission filter. A demo seeder that uses another module's demo data
+  names it in `DemoSeeder::AFTER`.
 
 **2. Back-office menu: customisation on top of the generated menu.**
 
@@ -1232,6 +1236,9 @@ shows the generated entries (marked with their module) and the custom ones.
 
 **Permissions:** `menus-public.*` (list, add, edit, delete) and `menus-backend.*` (view,
 customise, links, reset), as atomic operations.
+URLs: `backend/menus/public` (the menus, kpcrudy), `backend/menus/items/<menu>` (the items'
+tree editor and form, `menus-public.edit`), `backend/menus/backend` (customisation; scope
+`?group=<name>`).
 
 ### Files
 

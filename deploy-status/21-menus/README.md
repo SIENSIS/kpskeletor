@@ -57,9 +57,8 @@ Branch: `claude/deploy-next-md-rjmbga` · Pull request: [SIENSIS/kpskeletor#29](
 
 ## Decisions and deviations
 
-- **D-21-01 (decide, Open):** permission names, URLs and the Core contracts (`MenuLinkType`,
-  events `backendMenu`/`publicMenu`, `menu()`, `DemoSeeder::AFTER`), built as proposed so they
-  can still be changed.
+- **D-21-01 (decided by the owner, applied):** permission names, URLs and the Core contracts
+  (`MenuLinkType`, events `backendMenu`/`publicMenu`, `menu()`, `DemoSeeder::AFTER`) as built.
 - D-21-02 items in a tree editor and a form of the module (menus themselves are kpcrudy).
 - D-21-03 customisations stored as differences, merged field by field (everyone, then groups;
   the group listed first in Users › Groups wins); hiding hides the subtree.
@@ -150,7 +149,7 @@ interface is in English, the editor's in Catalan; guests see `en` until session 
 
 ## What the next session must know
 
-- D-21-01 is open (decide): run `deploy/decide.md` before relying on the names.
+- D-21-01 decided as built: the names, URLs and contracts are stable.
 - Modules offer menu link types by implementing `Modules\Core\Menus\MenuLinkType` in a
   `$menuLinks` class (Events: the calendar link type).
 - Demo seeders that use another module's demo data declare `public const AFTER = ['<Module>']`.

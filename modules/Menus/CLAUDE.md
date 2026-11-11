@@ -33,7 +33,7 @@ icons, hide, relocate, custom groups and links, per group). Full description: `d
 
 ## Decisions
 
-D-21-01 (names, URLs, Core contracts) open (decide); D-21-02 … D-21-06 accepted
+D-21-01 (names, URLs, Core contracts) decided by the owner as built (Decisions 21); D-21-02 … D-21-06 accepted
 (`docs/decisions.md`).
 
 ## Open tasks
