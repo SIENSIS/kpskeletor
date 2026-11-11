@@ -1,6 +1,6 @@
 # Session 20 — Pages module
 
-Branch: `claude/eager-brahmagupta-2odzxu` · Pull request: (pending) · Date: 2026-11-11
+Branch: `claude/eager-brahmagupta-2odzxu` · Pull request: [SIENSIS/kpskeletor#25](https://github.com/SIENSIS/kpskeletor/pull/25) · Date: 2026-11-11
 
 ## What was built
 

@@ -27,7 +27,7 @@ pull request open), *merged* (in `main`).
 | 17 | News module (reference module) | merged | `claude/wonderful-pascal-rn7hdc` | [SIENSIS/kpskeletor#21](https://github.com/SIENSIS/kpskeletor/pull/21) | [`deploy-status/17-news/`](../deploy-status/17-news/README.md) |
 | 18 | Installer and CLI completion | merged | `session-18-installer` | [SIENSIS/kpskeletor#22](https://github.com/SIENSIS/kpskeletor/pull/22) | [`deploy-status/18-installer/`](../deploy-status/18-installer/README.md) |
 | 19 | Checkpoint: MVP review | merged | `claude/wizardly-bell-3a9yne` | [SIENSIS/kpskeletor#23](https://github.com/SIENSIS/kpskeletor/pull/23) | [`deploy-status/19-mvp-review/`](../deploy-status/19-mvp-review/README.md) |
-| 20 | Pages module | done | `claude/eager-brahmagupta-2odzxu` | (pending) | [`deploy-status/20-pages/`](../deploy-status/20-pages/README.md) |
+| 20 | Pages module | done | `claude/eager-brahmagupta-2odzxu` | [SIENSIS/kpskeletor#25](https://github.com/SIENSIS/kpskeletor/pull/25) | [`deploy-status/20-pages/`](../deploy-status/20-pages/README.md) |
 
 ## MVP review (session 19)
 
