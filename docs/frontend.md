@@ -73,7 +73,7 @@ import { toast } from 'core/ui/toast.js';
 | `core/forms/dirty-guard.js` | `form[data-dirty-guard]` (or `form_layout` with `dirtyGuard`): warns before leaving with unsaved changes. |
 | `core/forms/date.js` | `data-component="core/forms/date"` with `{"min":"today","max":"+1y"}`; `formatDate()`. |
 | `core/forms/editor.js` | Rich-text editor on a `<textarea>` (Quill 2, loaded on demand; see "Rich-text editor"). |
-| `core/forms/file-picker.js` | Stub, completed in session 23. |
+| `core/forms/file-picker.js` | File picker of module fields (`PickerField::render()`; docs/files.md "File picker"); exports `uploadFile()` and `pickDialog()` for the editor. |
 | `core/theme-mode.js` | Classic script in `<head>`: resolves `auto` before the first paint. |
 | `core/pwa.js` | Registers (or removes) the service worker. |
 
@@ -111,8 +111,13 @@ underline, strike, lists, quote, code block, alignment, link, clear formatting; 
 written as the classes `text-center`, `text-right`, `text-justify` (defined by the theme). The
 server always sanitises the HTML with `Modules\Core\Security\HtmlSanitizer` (HTMLPurifier: no
 `style`, scripts, handlers or iframes; alignment mapped to those classes, no other class) before
-storing it and again when showing it. Images inside the text arrive with the file picker
-(session 23, D-17-08).
+storing it and again when showing it.
+
+**Images** (session 23, D-17-08): `RichTextEditor::attrs(RichTextEditor::images('<module>'))`
+adds "Insert image" to the toolbar: the file picker's dialog uploads (signed token, the Storage
+service's rules and re-encoding) or chooses a JPG, PNG, WebP or GIF of `modules/<module>` on the
+public disk and asks for its alt text; pasted or dropped images go through the same upload (no
+`data:` URLs). The sanitiser keeps only images of the site itself (`SiteImagesOnly`).
 
 ## Content-Security-Policy
 

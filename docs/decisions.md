@@ -201,6 +201,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-22-04 | 22 | Who reads a private file, and the folder ACL details (decide) | Applied (decided) |
 | D-22-05 | 22 | Quotas, trash and thumbnails | Accepted (proposal) |
 | D-22-06 | 22 | Upload progress without inline styles | Accepted (proposal) |
+| D-23-01 | 23 | File picker URLs, the avatar URL and the picker contract (decide) | Open |
+| D-23-02 | 23 | The file picker lives in the Core with a pluggable backend | Accepted (proposal) |
+| D-23-03 | 23 | What a picker field may browse and choose | Accepted (proposal) |
+| D-23-04 | 23 | Avatars: saving, replacing and serving | Accepted (proposal) |
+| D-23-05 | 23 | "Images of the site itself" in rich text | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2094,3 +2099,48 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) CSS classes per 5 % step (`.w-pct-35`). B) A single request for every file (one progress bar).
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Files/Assets/js/file-manager.js`, `modules/Files/Assets/css/file-manager.css`
+
+## D-23-01 — File picker URLs, the avatar URL and the picker contract (decide)
+
+- **Where:** specification "Files" (file picker: "signed upload token for each field"; avatars "versioned URL"), "Auth" (avatar), `docs/plan.md` session 23 ("routes `files/picker/*`, `files/avatar/(:segment)`"), D-13-01 (`files/private/{key}`)
+- **Problem:** The plan names the route prefixes but not the URLs, their parameters, who may call them or what the avatar's segment is; these are public conventions (URLs) and security (who uploads where).
+- **Proposal:** `POST files/picker/upload` (`token`, `file`; CSRF, `ratelimit:uploads`; 201 with the file as JSON, 401 for guests, 403 for a missing/tampered/expired/foreign token with a `security` entry `upload_token_refused`, 422 for a refused file) and `GET files/picker/browse?token=…&path=…` (404 outside the token's roots), both outside `backend/` and with **no permission**: the signed token is the authorisation ("the field grants the upload"). Avatars at `GET files/avatar/{key}` (the file key; signed-in users, or `?expires=…&signature=…` signed URLs valid one hour for API clients; only keys that are a current avatar; `Cache-Control: private, max-age=31536000, immutable`, versioned by the key). Field API: `PickerField::make()->mode()->disk()->folder('…{user_id}…')->types()->maxSize()->maxFiles()->browseRoot()`, `render()`, `accepts()`; value = comma-separated file keys; `Config\Storage::$pickerBackend` and `$pickerTokenTtl` (4 hours).
+- **Alternatives:** A) Put the endpoints under `backend/files/picker/*` with a new permission granted to every group (e.g. `files.picker`): one more permission for nothing the token does not already decide, and Auth (avatars) would depend on the Files module. B) Avatars at `files/avatar/{user_id}?v=<version>` (exposes user ids and needs a version column). C) No signed avatar URLs: `me.avatar_url` would need the API token on an image request.
+- **Status:** Open
+- **Applied in:** `modules/Core/Config/Routes.php`, `modules/Core/Controllers/FilePicker.php`, `modules/Core/Storage/Picker/*`, `app/Config/Storage.php`, `modules/Auth/Config/Routes.php`, `modules/Auth/Controllers/AvatarController.php`, `modules/Auth/Services/Avatars.php`, `docs/files.md` ("File picker"); built so that the URLs can still be renamed (one route and one `site_url()` each).
+
+## D-23-02 — The file picker lives in the Core with a pluggable backend
+
+- **Where:** specification "Files" (file picker component `core/forms/file-picker`, "used by any module field"), "Auth" (avatar with the picker), `docs/plan.md` session 23 (`modules/Files/Services/UploadToken.php`, `Controllers/PickerController.php`), `CLAUDE.md` ("Never hard-code a module in the Core")
+- **Problem:** The Files module requires Auth, so Auth's avatar cannot require Files; News and Pages would stop working with Files disabled; the component is the Core's.
+- **Proposal:** Token, field, endpoints and component in the Core (`Modules\Core\Storage\Picker`); what an upload or a browse does is a `PickerBackend` chosen by `Config\Storage::$pickerBackend` (like `$accessRule`). The Core's `StorageBackend` stores into the token's folder and lets users choose only their own uploads there; the Files module's registrar sets its `PickerBackend` (folders on demand with the space's rights, quotas, `files` rows and thumbnails, browsing through the folder ACL), which falls back to the Core's while Files is disabled. `CrudUploadHandler` gains `pickerField()` / `renderPicker()` / `accepts()` for kpcrudy fields (`callbackField()` + hooks); keys are checked on save.
+- **Alternatives:** A) Everything in Files as the plan says (Auth → Files cycle; fields break with Files disabled).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Storage/Picker/*`, `modules/Core/Storage/CrudUploadHandler.php`, `modules/Files/Services/PickerBackend.php`, `modules/Files/Config/Registrar.php`; tests `FilePickerTest`, `PickerBackendTest`
+
+## D-23-03 — What a picker field may browse and choose
+
+- **Where:** specification "Files" ("In browse / both mode, what the user can see and upload is limited by `browseRoot` **and** the folder ACL (e.g. editors choose a news cover from `news/` and their personal space)")
+- **Problem:** The example mixes disks (covers are public, the personal space is private: a private file as a public cover would break or leak it); module folders are hidden by the ACL, so nobody could choose the images already uploaded to `modules/news`; the file manager's RBAC ceiling (`files.list`) would exclude users who only use fields.
+- **Proposal:** Only the field's disk; only inside the token's roots; the field's own folder is always browsable (the module chose it), any other folder needs the folder ACL's `view` right (ACL alone, no `files.*` permission); trashed files never. News covers, Pages featured images and rich-text images browse their `modules/<module>` folder and the public `shared/` folders the user may view. A posted key is accepted when unchanged, or when the backend says the user may choose it (Core backend: their own upload in the field's folder).
+- **Alternatives:** A) Copy a private file to the public disk when chosen (a private document could become public by mistake). B) Require `files.list` to browse.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Files/Services/PickerBackend.php`, `modules/Core/Storage/Picker/{PickerField,StorageBackend}.php`, `modules/Core/Frontend/RichTextEditor.php`; tests `PickerBackendTest::testBrowsingAndChoosingFollowTheRootsAndTheAcl`, `FilePickerTest::testTheValueMustComeThroughTheField`
+
+## D-23-04 — Avatars: saving, replacing and serving
+
+- **Where:** specification "Auth" (avatar on the private disk in the personal space), "Files" (avatars: logged-in users only, long cache headers, versioned URL), "API" (`me`: avatar URL, signed, private)
+- **Problem:** When the avatar is saved, what happens to the old file, and how a private file can be cached.
+- **Proposal:** The picker uploads the image (upload only, `users/{user_id}/avatar`, JPG/PNG/WebP, 2 MB, re-encoded); the profile form saves the key (refused unless it came through the field), the replaced avatar is deleted, an empty value removes it; changes are in the `profile_updated` entry. The avatar folder is created with its own ACL (`view` for every signed-in user). `files/avatar/{key}` serves only current avatars, to signed-in users or with a signed URL, with `private, max-age=31536000, immutable`: a new avatar is a new key and a new URL. The theme's user menu keeps the initials for now.
+- **Alternatives:** A) Upload saves the avatar immediately (no form submit). B) Serve avatars through `files/private/{key}` (no caching).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Auth/{Services/Avatars.php,Controllers/AvatarController.php,Controllers/ProfileController.php,Views/profile.php}`, `modules/Api/Controllers/Me.php`; tests `AvatarTest`
+
+## D-23-05 — "Images of the site itself" in rich text
+
+- **Where:** D-17-08 ("HTMLPurifier then keeps only images of the site itself"), specification "Files" (internal `/uploads/…` URLs or the site's hosts)
+- **Problem:** Whether only `/uploads/…` or any URL of the site counts, and how the hosts are known.
+- **Proposal:** An HTMLPurifier URI filter (`SiteImagesOnly`) for embedded URIs: relative URLs (no scheme, no host) or `http`/`https` URLs whose host is `app.baseURL`'s or one of `app.allowedHostnames`; scheme-relative, external and `data:` images are removed (the `img` loses its required `src`). Links are not affected. It applies to every rich text (News, Pages, later Events); existing bodies lose external images when shown.
+- **Alternatives:** A) Only paths under `/uploads/` (would refuse the site's own private images and theme images).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Security/{SiteImagesOnly,HtmlSanitizer}.php`; tests `HtmlSanitizerTest::testOnlyImagesOfTheSiteItselfAreKept`, `NewsPickerTest::testAnImageInsertedInTheBodyIsStoredThroughTheStorageService`

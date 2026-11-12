@@ -14,6 +14,10 @@ Disks, permissions, forbidden extensions, image limits and the access rule are c
 
 ## Storing an upload
 
+A **form field** that takes a file uses the Core's file picker (`PickerField`, signed upload
+tokens, `files/picker/upload`; docs/files.md, "File picker"), which calls the Storage service
+for you. The API below is for module code that stores files itself.
+
 ```php
 use Modules\Core\Storage\UploadRefused;
 use Modules\Core\Storage\UploadRules;

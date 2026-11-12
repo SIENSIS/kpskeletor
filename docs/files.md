@@ -1,8 +1,8 @@
 # Files: file manager and folder permissions
 
 The **Files** module (`modules/Files`, session 22) is a file manager over the Core's Storage
-service (`docs/storage.md`) with folder permissions inherited by subfolders. The file picker,
-signed upload tokens and avatars come in session 23.
+service (`docs/storage.md`) with folder permissions inherited by subfolders (session 22), and the
+backend of the Core's **file picker** with signed upload tokens and avatars (session 23, below).
 
 ## Spaces and the virtual folder tree
 
@@ -88,6 +88,75 @@ WebP thumbnail (JPEG without WebP) on the private disk in `modules/files/thumbna
 - In the file manager, `download` and `preview` (`backend/files/api/file/{id}/…`) check the same
   rights plus the RBAC ceiling, with the Core's private-file headers (`nosniff`, sandboxing CSP;
   text files previewed as `text/plain`).
+
+## File picker (session 23)
+
+Any module field that needs a file uses the Core's picker (`Modules\Core\Storage\Picker`), not
+kpcrudy's upload types and not the file manager:
+
+```php
+use Modules\Core\Storage\Picker\PickerField;
+
+$field = PickerField::make('cover')
+    ->mode('both')                       // upload | browse | both
+    ->disk('public')                     // public | private
+    ->folder('modules/news')             // variables: {user_id}
+    ->types('jpg,png,webp')->maxSize(5 * 1024 * 1024)->maxFiles(1)
+    ->browseRoot(['modules/news', 'shared']);
+
+echo $field->render($user, $currentKey, ['label' => …, 'help' => …, 'error' => …]);
+// Before saving: the posted key must come through the field.
+if (! $field->accepts($user, $postedKey, $currentKey)) { /* refuse */ }
+```
+
+For a kpcrudy field, `CrudUploadHandler` (Core) gives the same thing from a module's handler class
+(folder, disk, `TYPES`, `MAX_SIZE`): `->callbackField('cover', fn ($v, $row, $field) =>
+CoverUploads::renderPicker('cover', $v, $field))` and `CoverUploads::accepts('cover', $data['cover'],
+$old['cover'])` in `beforeInsert` / `beforeUpdate` (News cover, Pages featured image).
+
+- **The field grants the upload, not the file manager.** Rendering the field issues a **signed
+  upload token** (`UploadToken`: user, mode, disk, folder with its variables resolved, types,
+  size, number of files, browse roots, re-encoding, expiry `Config\Storage::$pickerTokenTtl`, 4 h;
+  HMAC-SHA256 with a key derived from `encryption.key`/`app.maskKey`). The endpoints accept nothing
+  else: the user cannot change the folder, the disk, the types or the size, and needs no `files.*`
+  permission. A missing, tampered, expired or someone else's token is a **403** and a `security`
+  entry `Core` / `upload_token_refused`.
+- **Endpoints** (Core, `Controllers/FilePicker.php`; signed-in users only, else 401):
+  `POST files/picker/upload` (`token`, `file`; CSRF; `ratelimit:uploads`) → `201 {"file": {key,
+  name, url, thumbnail, size, mime, image, width, height}}` or `422 {"message"}`;
+  `GET files/picker/browse?token=…&path=…` → `{path, parent, roots, folders, files}` (404 outside
+  the roots).
+- **Backend** (`Config\Storage::$pickerBackend`, interface `PickerBackend`). The Core's
+  `StorageBackend` (Files disabled) stores into the token's folder and lets users choose only
+  their own uploads of it. The Files module's `Services/PickerBackend.php` (registrar):
+  - creates the target folder and its parents **on demand** with the space's default rights
+    (`users/{id}` belongs to its owner; `users/{id}/avatar` gets its own ACL: `view` for every
+    signed-in user; other folders inherit);
+  - checks the **quotas** of the chain (before and after re-encoding), stores through the Storage
+    service with the field's rules, adds a `files` row (thumbnail) and logs `file_uploaded`
+    (`via: picker`);
+  - **browse / choose:** only inside the token's roots, and only the field's own folder or a
+    folder whose **ACL** gives `view` (the ACL alone: the picker is not the file manager, so no
+    `files.list` is needed); trashed files never; only the field's disk. Files a module stored
+    before the picker (no `files` row) are listed in the field's own folder.
+- **Component** `core/forms/file-picker` (`Modules/Core/Assets/js/forms/file-picker.js`, theme
+  component `components/file_picker.php`, styles `core::css/file-picker.css`): a hidden input
+  with the key(s) (comma separated), the current file(s) with a remove button, "Upload" (one
+  request per file, native `<progress>`, types and size checked first) and "Choose" (a dialog
+  listing the roots' folders and files). Without JavaScript the current value is kept.
+- **Images in rich text** (D-17-08): `RichTextEditor::attrs(RichTextEditor::images('news'))` adds
+  "Insert image" to the editor: the picker dialog (upload or choose JPG, PNG, WebP, GIF; public
+  disk, `modules/<module>`, also the public shared folders the user may view) asks for the alt
+  text and inserts `<img src alt>`; pasted or dropped images use the same signed upload.
+  `HtmlSanitizer` then keeps only images of the site itself (`SiteImagesOnly`: relative URLs or
+  the hosts of `app.baseURL` / `app.allowedHostnames`); external and `data:` images are removed.
+- **Avatars** (Auth, `Services/Avatars.php`): upload only, private disk,
+  `users/{user_id}/avatar`, JPG/PNG/WebP up to 2 MB, re-encoded; `user_profiles.avatar` = the key,
+  saved with the profile form (a key that did not come through the field is refused; the
+  replaced avatar is deleted). Served at **`files/avatar/{key}`** only to signed-in users (or with
+  a signed URL `?expires&signature`, valid one hour, given to API clients in `me.avatar_url`) and
+  only for keys that are someone's current avatar; `Cache-Control: private, max-age=31536000,
+  immutable` (the key changes with each new avatar, so the URL is versioned). Guests get a 404.
 
 ## FileAccessPolicy
 
