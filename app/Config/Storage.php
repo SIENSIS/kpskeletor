@@ -6,6 +6,7 @@ namespace Config;
 
 use CodeIgniter\Config\BaseConfig;
 use Modules\Core\Storage\OwnerAccess;
+use Modules\Core\Storage\Picker\StorageBackend;
 
 /**
  * File storage (docs/specification.md, "Storage"; docs/storage.md). Modules never use these
@@ -91,4 +92,15 @@ class Storage extends BaseConfig
      * A class implementing Modules\Core\Storage\FileAccessRule; anything else denies every file.
      */
     public string $accessRule = OwnerAccess::class;
+
+    /**
+     * What the file picker's endpoints (`files/picker/upload`, `files/picker/browse`) do with a
+     * valid upload token (`Modules\Core\Storage\Picker\PickerBackend`). The Core's backend
+     * stores into the field's folder; the Files module replaces it through its registrar (folders
+     * on demand, quotas, folder ACL). Anything else falls back to the Core's backend.
+     */
+    public string $pickerBackend = StorageBackend::class;
+
+    /** Lifetime of a file-picker upload token, in seconds (a form may stay open a while). */
+    public int $pickerTokenTtl = 4 * HOUR;
 }

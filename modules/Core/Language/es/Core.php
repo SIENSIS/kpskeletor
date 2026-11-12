@@ -354,6 +354,7 @@ return [
             'crossOrigin' => 'No se permiten peticiones a otros sitios.',
         ],
         'editor' => [
+            'image'     => 'Insertar una imagen',
             'heading'   => 'Encabezado',
             'normal'    => 'Texto normal',
             'heading2'  => 'Encabezado 2',
@@ -375,6 +376,23 @@ return [
             'save'      => 'Guardar',
             'edit'      => 'Editar',
             'remove'    => 'Eliminar',
+        ],
+        'picker' => [
+            'title'     => 'Elige un archivo',
+            'choose'    => 'Elige',
+            'cancel'    => 'Cancelar',
+            'up'        => 'Carpeta superior',
+            'empty'     => 'Esta carpeta no tiene archivos que se puedan elegir.',
+            'loading'   => 'Cargando…',
+            'uploading' => 'Subiendo {name}…',
+            'tooLarge'  => '{name} es demasiado grande (máximo {max} MB).',
+            'type'      => '{name} no es de un tipo permitido.',
+            'tooMany'   => 'Puede elegir como máximo {max} archivos.',
+            'remove'    => 'Quita {name}',
+            'alt'       => 'Texto alternativo (describe la imagen)',
+            'altHelp'   => 'Déjelo vacío solo si la imagen es decorativa.',
+            'insert'    => 'Insertar',
+            'upload'    => 'Sube una imagen',
         ],
         'demo' => ['reset' => 'Se ha reiniciado el contador.'],
         'widget' => [
@@ -539,10 +557,24 @@ return [
         'preferences_saved' => 'Preferencias de notificaciones guardadas',
         'purge' => 'Entradas antiguas borradas',
         'upload_refused' => 'Subida rechazada',
+        'upload_token_refused' => 'Token de subida rechazado',
         'installed' => 'Aplicación instalada',
         'superadmin_created' => 'Primer superadministrador creado',
     ],
     // Upload rules of the Storage service.
+    // File picker of module fields (core/forms/file-picker).
+    'picker' => [
+        'upload'   => 'Sube un archivo',
+        'browse'   => 'Elige un archivo',
+        'remove'   => 'Quita {0}',
+        'noScript' => 'Se necesita JavaScript para cambiar este archivo.',
+        'errors'   => [
+            'login'  => 'Hay que iniciar sesión.',
+            'token'  => 'El formulario ha caducado o no es válido. Vuelva a cargar la página.',
+            'folder' => 'No se puede abrir esta carpeta.',
+            'value'  => 'El archivo elegido no es válido para este campo.',
+        ],
+    ],
     'storage' => [
         'refused' => [
             'invalid' => 'No se ha podido subir el archivo. Vuelve a intentarlo.',

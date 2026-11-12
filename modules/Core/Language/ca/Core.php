@@ -354,6 +354,7 @@ return [
             'crossOrigin' => 'No es permeten peticions a altres llocs.',
         ],
         'editor' => [
+            'image'     => 'Insereix una imatge',
             'heading'   => 'Encapçalament',
             'normal'    => 'Text normal',
             'heading2'  => 'Encapçalament 2',
@@ -375,6 +376,23 @@ return [
             'save'      => 'Desa',
             'edit'      => 'Edita',
             'remove'    => 'Elimina',
+        ],
+        'picker' => [
+            'title'     => 'Tria un fitxer',
+            'choose'    => 'Tria',
+            'cancel'    => 'Cancel·la',
+            'up'        => 'Carpeta superior',
+            'empty'     => 'Aquesta carpeta no té fitxers que es puguin triar.',
+            'loading'   => 'S\'està carregant…',
+            'uploading' => 'S\'està pujant {name}…',
+            'tooLarge'  => '{name} és massa gran (màxim {max} MB).',
+            'type'      => '{name} no és d\'un tipus permès.',
+            'tooMany'   => 'Podeu triar com a màxim {max} fitxers.',
+            'remove'    => 'Treu {name}',
+            'alt'       => 'Text alternatiu (descriu la imatge)',
+            'altHelp'   => 'Deixeu-lo buit només si la imatge és decorativa.',
+            'insert'    => 'Insereix',
+            'upload'    => 'Puja una imatge',
         ],
         'demo' => ['reset' => 'S\'ha reiniciat el comptador.'],
         'widget' => [
@@ -539,10 +557,24 @@ return [
         'preferences_saved' => 'Preferències de notificacions desades',
         'purge' => 'Entrades antigues esborrades',
         'upload_refused' => 'Pujada rebutjada',
+        'upload_token_refused' => 'Testimoni de pujada rebutjat',
         'installed' => 'Aplicació instal·lada',
         'superadmin_created' => 'Primer superadministrador creat',
     ],
     // Upload rules of the Storage service.
+    // File picker of module fields (core/forms/file-picker).
+    'picker' => [
+        'upload'   => 'Puja un fitxer',
+        'browse'   => 'Tria un fitxer',
+        'remove'   => 'Treu {0}',
+        'noScript' => 'Cal JavaScript per canviar aquest fitxer.',
+        'errors'   => [
+            'login'  => 'Cal iniciar la sessió.',
+            'token'  => 'El formulari ha caducat o no és vàlid. Torneu a carregar la pàgina.',
+            'folder' => 'No es pot obrir aquesta carpeta.',
+            'value'  => 'El fitxer triat no és vàlid per a aquest camp.',
+        ],
+    ],
     'storage' => [
         'refused' => [
             'invalid' => 'No s\'ha pogut pujar el fitxer. Torna-ho a provar.',

@@ -8,8 +8,15 @@
  * editor fails to load) the textarea is used as is. The server sanitises the HTML with
  * HTMLPurifier in any case (Modules\Core\Security\HtmlSanitizer), which keeps alignment as the
  * classes text-center / text-right / text-justify this editor writes.
+ *
+ * With the `images` option (a file-picker field, RichTextEditor::attrs($images)) the toolbar has
+ * "Insert image": the picker dialog uploads (signed token, Storage service rules and re-encoding)
+ * or chooses an image and asks for its alt text; pasted or dropped images go through the same
+ * upload. The server keeps only images of the site itself.
  */
 import { t } from 'core/config.js';
+import { toast } from 'core/ui/toast.js';
+import { pickDialog, uploadFile } from 'core/forms/file-picker.js';
 
 const FORMATS = ['header', 'bold', 'italic', 'underline', 'strike', 'link', 'list', 'blockquote', 'code-block', 'align'];
 const TOOLBAR = [
@@ -31,6 +38,7 @@ const LABELS = {
     'ql-code-block': 'editor.code',
     'ql-align': 'editor.align',
     'ql-link': 'editor.link',
+    'ql-image': 'editor.image',
     'ql-clean': 'editor.clean',
 };
 
@@ -132,10 +140,55 @@ export async function mount(textarea, options = {}) {
     textarea.classList.add('d-none');
     textarea.dataset.editor = 'quill';
 
-    const quill = new Quill(area, {
+    const images = options.images && options.images.token ? options.images : null;
+    const toolbar = images ? TOOLBAR.map((group) => (group.includes('link') ? ['link', 'image', 'clean'] : group)) : TOOLBAR;
+    const modules = { toolbar };
+    let quill = null;
+
+    function insertImage(item, alt, index = null) {
+        const range = index !== null ? { index } : quill.getSelection(true) || { index: quill.getLength() };
+        quill.updateContents([{ retain: range.index }, { insert: { image: item.url }, attributes: alt ? { alt } : {} }], 'user');
+        quill.setSelection(range.index + 1, 0, 'silent');
+    }
+
+    if (images) {
+        modules.toolbar = {
+            container: toolbar,
+            handlers: {
+                image: async () => {
+                    const range = quill.getSelection(true);
+                    const result = await pickDialog(images, { alt: true });
+
+                    if (result !== null) {
+                        insertImage(result.item, result.alt, range ? range.index : null);
+                    }
+                },
+            },
+        };
+        // Pasted or dropped images: the same signed upload as the dialog (no data: URLs).
+        modules.uploader = {
+            mimetypes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'],
+            handler: async (range, files) => {
+                let index = range.index;
+
+                for (const file of files) {
+                    try {
+                        insertImage(await uploadFile(images, file), '', index);
+                        index += 1;
+                    } catch (error) {
+                        toast(error.message, { type: 'danger' });
+                    }
+                }
+            },
+        };
+    } else {
+        modules.uploader = { handler: () => {} };
+    }
+
+    quill = new Quill(area, {
         theme: 'snow',
-        formats: FORMATS,
-        modules: { toolbar: TOOLBAR },
+        formats: images ? [...FORMATS, 'image'] : FORMATS,
+        modules,
         placeholder: textarea.getAttribute('placeholder') || '',
     });
 
@@ -153,13 +206,13 @@ export async function mount(textarea, options = {}) {
         labelElement.addEventListener('click', () => quill.focus());
     }
 
-    const toolbar = wrapper.querySelector('.ql-toolbar');
+    const toolbarElement = wrapper.querySelector('.ql-toolbar');
 
-    if (toolbar !== null) {
-        label(toolbar);
+    if (toolbarElement !== null) {
+        label(toolbarElement);
 
         // Heading picker texts (Quill prints data-label from CSS).
-        for (const item of toolbar.querySelectorAll('.ql-header .ql-picker-item, .ql-header .ql-picker-label')) {
+        for (const item of toolbarElement.querySelectorAll('.ql-header .ql-picker-item, .ql-header .ql-picker-label')) {
             const level = item.getAttribute('data-value');
             item.setAttribute('data-label', level ? t('editor.heading' + level) : t('editor.normal'));
         }

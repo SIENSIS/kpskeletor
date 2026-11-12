@@ -31,6 +31,11 @@ $routes->get('pwa/icon-(:num).png', '\Modules\Core\Controllers\Pwa::icon/$1');
 // (otherwise 404), with the stored MIME type, nosniff and `attachment` unless image or PDF.
 $routes->get('files/private/(:segment)', '\Modules\Core\Controllers\PrivateFiles::show/$1');
 
+// File picker of module fields: a signed upload token issued with the field grants the upload
+// (no files.* permission); signed-in users only (checked by the controller), uploads rate limited.
+$routes->post('files/picker/upload', '\Modules\Core\Controllers\FilePicker::upload', ['filter' => 'ratelimit:uploads']);
+$routes->get('files/picker/browse', '\Modules\Core\Controllers\FilePicker::browse');
+
 // Notifications of the logged-in user (resource core-notifications, granted to every group).
 // The bell's endpoints come before the CRUD's catch-all route.
 $routes->group('backend', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {

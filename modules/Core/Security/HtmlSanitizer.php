@@ -12,7 +12,8 @@ use HTMLPurifier_Config;
  * stored and again when it is shown (specification "Security baseline": rich text through
  * HTMLPurifier). Allowed: paragraphs, headings, lists,
  * emphasis, links (`http`, `https`, `mailto`; external ones open with `rel="noopener noreferrer"`),
- * images over `https`, quotes, code, tables. Scripts, event handlers, styles, iframes, forms and
+ * images of the site itself only (relative URLs or the site's hosts: SiteImagesOnly, D-17-08), quotes,
+ * code, tables. Scripts, event handlers, styles, iframes, forms and
  * `javascript:`/`data:` URLs are removed.
  *
  * Alignment (`style="text-align: …"`, `align`, the editor's `ql-align-*`) is kept as one of the
@@ -61,6 +62,14 @@ final class HtmlSanitizer
         $config->set('HTML.TargetNoopener', true);
         $config->set('HTML.TargetNoreferrer', true);
         $config->set('AutoFormat.RemoveEmpty', true);
+
+        $config->set('URI.DefinitionID', 'kpskeletor-site-images');
+        $config->set('URI.DefinitionRev', 1);
+        $uri = $config->maybeGetRawURIDefinition();
+
+        if ($uri !== null) {
+            $uri->addFilter(new SiteImagesOnly(), $config);
+        }
 
         $definition = $config->maybeGetRawHTMLDefinition();
 
