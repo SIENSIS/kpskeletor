@@ -110,6 +110,7 @@ class Filters extends BaseFilters
             // 'invalidchars',
         ],
         'after' => [
+            'csrftoken' => ['except' => ['api/*']], // A script's POST gets the regenerated CSRF token back (Modules\Core\Filters\CsrfTokenHeader; core/http.js refreshCsrf())
             // 'honeypot',
             // Never 'secureheaders' (replaced by the required `securityheaders`, D-00-28).
         ],

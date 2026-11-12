@@ -24,6 +24,26 @@ function csrf() {
     return header && token ? { header: header.content, token: token.content, element: token } : null;
 }
 
+/**
+ * Takes a regenerated CSRF token: the meta tag and every form field that still holds the old
+ * token (forms on the page would otherwise post a stale token after a script's request).
+ */
+export function refreshCsrf(fresh) {
+    const token = csrf();
+
+    if (token === null || !fresh || fresh === token.token) {
+        return;
+    }
+
+    for (const input of document.querySelectorAll('input[type="hidden"]')) {
+        if (input.value === token.token) {
+            input.value = fresh;
+        }
+    }
+
+    token.element.content = fresh;
+}
+
 function errorMessage(data, status) {
     if (data && typeof data === 'object') {
         if (typeof data.message === 'string' && data.message !== '') {
@@ -87,11 +107,7 @@ export async function request(url, settings = {}) {
     }
 
     if (token !== null) {
-        const fresh = response.headers.get(token.header);
-
-        if (fresh) {
-            token.element.content = fresh;
-        }
+        refreshCsrf(response.headers.get(token.header));
     }
 
     const type = response.headers.get('Content-Type') || '';

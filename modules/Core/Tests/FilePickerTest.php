@@ -183,4 +183,18 @@ final class FilePickerTest extends AuthTestCase
         $this->assertStringNotContainsString('users/' . $user->id, $html, 'The folder is only inside the signed token.');
         $this->assertStringNotContainsString('data-component', $this->field()->render($user, null, ['disabled' => true]));
     }
+
+    public function testAScriptsPostGetsTheRegeneratedCsrfTokenBack(): void
+    {
+        $user = $this->createUser('ana@example.com');
+        $this->login('ana@example.com');
+        $token = $this->field()->scope($user)->encode();
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])->send('POST', 'files/picker/upload', ['token' => $token])->response();
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertNotSame('', $response->getHeaderLine(csrf_header()), 'The page can update its forms (core/http.js refreshCsrf()).');
+
+        $plain = $this->withHeaders([])->send('POST', 'files/picker/upload', ['token' => $token])->response();
+        $this->assertSame('', $plain->getHeaderLine(csrf_header()), 'Only for script requests.');
+    }
 }

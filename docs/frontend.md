@@ -61,7 +61,7 @@ import { toast } from 'core/ui/toast.js';
 | `core/app.js` | Entry point: starts the UI behaviours and mounts the components. |
 | `core/components.js` | `data-component` registry: `mountAll(root)`, `register(name, fn)`, `observe()`. |
 | `core/config.js` | `config()`, `t('confirm.ok')`, `baseUrl(path)`, `jsonData(id)`. |
-| `core/http.js` | `request/get/post/put/patch/del(url, { json, body, headers, silent })`: same origin only, CSRF header on unsafe methods (token refreshed from the response header), JSON parsed, errors (`message`, `messages`, `error`) shown as toasts and thrown as `HttpError`. |
+| `core/http.js` | `request/get/post/put/patch/del(url, { json, body, headers, silent })`: same origin only, CSRF header on unsafe methods (the regenerated token comes back in the CSRF header from the global `csrftoken` after filter, `Modules\\Core\\Filters\\CsrfTokenHeader`; `refreshCsrf()` updates the meta tag and the forms' hidden token fields, so a form submitted after a script's request still passes), JSON parsed, errors (`message`, `messages`, `error`) shown as toasts and thrown as `HttpError`. |
 | `core/ui/toast.js` | `toast(text, { type: 'success'\|'danger'\|'warning'\|'info', delay })`. Text only. |
 | `core/ui/modal.js` | `openModal({ title, body, buttons, size })` → value of the button pressed; full-screen on phones. |
 | `core/ui/confirm.js` | `confirm(message, { title, okLabel, variant })` → boolean; `data-confirm="…"` on links, buttons and forms. |

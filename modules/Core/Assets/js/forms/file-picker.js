@@ -12,7 +12,7 @@
  *   pickDialog(options, { alt: true }) → Promise<{ item, alt } | null>
  */
 import { t } from 'core/config.js';
-import { get } from 'core/http.js';
+import { get, refreshCsrf } from 'core/http.js';
 import { openModal } from 'core/ui/modal.js';
 
 function el(tag, attributes = {}, ...children) {
@@ -121,11 +121,7 @@ export function uploadFile(options, file, progress = null) {
 
         request.addEventListener('load', () => {
             if (token) {
-                const fresh = request.getResponseHeader(token.header);
-
-                if (fresh) {
-                    token.element.content = fresh;
-                }
+                refreshCsrf(request.getResponseHeader(token.header));
             }
 
             if (progress) {
