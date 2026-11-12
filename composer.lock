@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67715e3efedfcc92b241c1bf2c7e40a8",
+    "content-hash": "774a110642b1016808eb2581aee335ab",
     "packages": [
         {
             "name": "chillerlan/php-qrcode",
@@ -950,16 +950,16 @@
         },
         {
             "name": "siensis/kpcrudy",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SIENSIS/kpcrudy.git",
-                "reference": "4764c7338dc0f5731e63a247c60c7b1c7a2717ae"
+                "reference": "decdc0b7057c35228bdeb2fa6653681e140e0399"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SIENSIS/kpcrudy/zipball/4764c7338dc0f5731e63a247c60c7b1c7a2717ae",
-                "reference": "4764c7338dc0f5731e63a247c60c7b1c7a2717ae",
+                "url": "https://api.github.com/repos/SIENSIS/kpcrudy/zipball/decdc0b7057c35228bdeb2fa6653681e140e0399",
+                "reference": "decdc0b7057c35228bdeb2fa6653681e140e0399",
                 "shasum": ""
             },
             "require": {
@@ -986,9 +986,9 @@
             ],
             "support": {
                 "issues": "https://github.com/SIENSIS/kpcrudy/issues",
-                "source": "https://github.com/SIENSIS/kpcrudy/tree/v1.2.0"
+                "source": "https://github.com/SIENSIS/kpcrudy/tree/v1.3.0"
             },
-            "time": "2026-11-09T19:29:44+00:00"
+            "time": "2026-11-12T10:37:37+00:00"
         },
         {
             "name": "spomky-labs/otphp",
