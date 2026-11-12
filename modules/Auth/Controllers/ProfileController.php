@@ -10,6 +10,7 @@ use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
 use DateTimeZone;
 use Modules\Auth\Models\UserProfileModel;
+use Modules\Auth\Services\Avatars;
 use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\LoginListener;
 use Modules\Auth\Services\LoginThrottle;
@@ -18,9 +19,11 @@ use Modules\Auth\Services\SessionTracker;
 use Modules\Core\Activity\ActivityLogger;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Frontend\ThemeMode;
+use Modules\Core\Storage\Picker\PickerField;
 
 /**
- * The user's own profile (resource `auth-profile`, granted to every group): name, email,
+ * The user's own profile (resource `auth-profile`, granted to every group): name, email, avatar
+ * (file picker, upload only: no `files.*` permission needed; Services/Avatars.php),
  * language, time zone, colour mode, birth date and the password (the email and the password
  * cannot be changed while impersonating). Changing the email asks for
  * the current password; changing the password ends the other sessions.
@@ -29,7 +32,9 @@ final class ProfileController extends BackendController
 {
     public function index(): string
     {
-        $user = $this->currentUser();
+        $user    = $this->currentUser();
+        $profile = model(UserProfileModel::class)->forUser((int) $user->id);
+        $errors  = session()->getFlashdata('errors') ?? [];
 
         $this->breadcrumb(lang('Auth.profile.title'));
 
@@ -37,12 +42,19 @@ final class ProfileController extends BackendController
             'title'     => lang('Auth.profile.title'),
             'icon'      => 'bi bi-person-circle',
             'user'      => $user,
-            'profile'   => model(UserProfileModel::class)->forUser((int) $user->id),
+            'profile'   => $profile,
+            'avatarUrl' => Avatars::url(is_string($profile['avatar'] ?? null) ? $profile['avatar'] : null),
+            'avatar'    => Avatars::field()->render($user, is_string($profile['avatar'] ?? null) ? $profile['avatar'] : null, [
+                'label'    => lang('Auth.profile.avatar'),
+                'help'     => lang('Auth.profile.avatarHelp'),
+                'error'    => is_array($errors) && isset($errors['avatar']) ? (string) $errors['avatar'] : null,
+                'disabled' => ! $this->can('auth-profile.edit'),
+            ]),
             'locales'   => config('App')->supportedLocales,
             'timezones' => DateTimeZone::listIdentifiers(),
             'modes'     => ThemeMode::MODES,
             'canEdit'   => $this->can('auth-profile.edit'),
-            'errors'    => session()->getFlashdata('errors') ?? [],
+            'errors'    => $errors,
         ]);
     }
 
@@ -80,15 +92,33 @@ final class ProfileController extends BackendController
             }
         }
 
+        $old     = model(UserProfileModel::class)->forUser((int) $user->id);
+        $current = is_string($old['avatar'] ?? null) ? $old['avatar'] : null;
+        $avatar  = $this->request->getPost('avatar');
+        $avatar  = is_string($avatar) ? trim($avatar) : $current;
+
+        // The field grants the upload; the value must be a file uploaded through it (or unchanged).
+        if (! Avatars::field()->accepts($user, $avatar, $current)) {
+            return redirect()->back()->withInput()->with('errors', ['avatar' => lang('Core.picker.errors.value')]);
+        }
+
         $profile = [
+            'avatar'     => $avatar === '' ? null : $avatar,
             'name'       => $data['name'] === '' ? null : $data['name'],
             'locale'     => $data['locale'],
             'timezone'   => $data['timezone'],
             'theme_mode' => $data['theme_mode'],
             'birth_date' => $data['birth_date'] === '' ? null : $data['birth_date'],
         ];
-        $old = model(UserProfileModel::class)->forUser((int) $user->id);
         model(UserProfileModel::class)->saveFor((int) $user->id, $profile);
+
+        if ($current !== null && $current !== $profile['avatar']) {
+            $previous = service('storage')->find($current);
+
+            if ($previous !== null) {
+                PickerField::backend()->discard($previous);
+            }
+        }
 
         [$before, $after] = ActivityLogger::diff($old, $profile);
 

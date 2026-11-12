@@ -95,6 +95,8 @@ return [
         'timezone'             => 'Time zone',
         'themeMode'            => 'Colour mode',
         'birthDate'            => 'Date of birth',
+        'avatar'               => 'Avatar',
+        'avatarHelp'           => 'JPG, PNG or WebP, up to 2 MB. The image is re-encoded (no metadata) and only signed-in users see it. Save the profile to apply the change.',
         'groups'               => 'Groups',
         'saved'                => 'Profile saved.',
         'currentPassword'      => 'Current password',

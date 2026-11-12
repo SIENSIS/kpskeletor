@@ -5,6 +5,8 @@
  * @var string                            $layout
  * @var \CodeIgniter\Shield\Entities\User $user
  * @var array<string, mixed>              $profile
+ * @var string                            $avatar    the avatar field (file picker)
+ * @var string|null                       $avatarUrl
  * @var list<string>                      $locales
  * @var list<string>                      $timezones
  * @var list<string>                      $modes
@@ -24,6 +26,9 @@ $mode = $value('theme_mode', $profile['theme_mode'] ?? 'auto');
     <div class="col-lg-8">
         <?php ob_start() ?>
         <div class="row g-3">
+            <div class="col-12">
+                <?= $avatar ?>
+            </div>
             <div class="col-md-6">
                 <label for="name" class="form-label"><?= esc(lang('Auth.profile.name')) ?></label>
                 <input type="text" class="form-control<?= $invalid('name') ?>" id="name" name="name" value="<?= esc($value('name', $profile['name'])) ?>" maxlength="150" autocomplete="name">
@@ -83,7 +88,7 @@ $mode = $value('theme_mode', $profile['theme_mode'] ?? 'auto');
     <div class="col-lg-4">
         <?php ob_start() ?>
         <div class="d-flex align-items-center gap-3 mb-3">
-            <?= ui_avatar((string) ($profile['name'] ?? $user->email ?? '?'), null, 'lg') ?>
+            <?= ui_avatar((string) ($profile['name'] ?? $user->email ?? '?'), $avatarUrl, 'lg') ?>
             <div>
                 <div class="fw-semibold"><?= esc((string) ($profile['name'] ?? $user->username ?? '')) ?></div>
                 <div class="small text-body-secondary"><?= esc((string) $user->email) ?></div>
