@@ -98,9 +98,12 @@ final class Events extends BackendController
                 'visibility', 'groups', 'users', 'recur_freq', 'recur_interval', 'recur_days', 'recur_until', 'recur_count', 'recur_exceptions',
             ])
             ->exportTranslations()
+            // No `description` in the import: kpcrudy stores imported translations as they come,
+            // and rich text must be sanitised before it is stored (the form's clean-up only sees
+            // the posted form; library request in docs/library-requests.md).
             ->enableImport([
                 'fields' => [
-                    'title', 'description', 'starts_at', 'ends_at', 'all_day', 'location', 'organiser', 'category_id', 'color', 'url', 'status',
+                    'title', 'starts_at', 'ends_at', 'all_day', 'location', 'organiser', 'category_id', 'color', 'url', 'status',
                     'visibility', 'groups', 'users', 'recur_freq', 'recur_interval', 'recur_days', 'recur_until', 'recur_count', 'recur_exceptions',
                 ],
             ])

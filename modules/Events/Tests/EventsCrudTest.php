@@ -266,6 +266,20 @@ final class EventsCrudTest extends EventsTestCase
         $this->assertSame(0, db_connect()->table('event_translations')->where('title', 'Al revés')->countAllResults());
     }
 
+    public function testTheCsvImportNeverWritesTheRichTextDescription(): void
+    {
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+
+        // The import template lists the importable columns: the title per language, never the
+        // description (kpcrudy stores imported translations unsanitised).
+        $template = $this->body('GET', 'backend/events/import?template=1');
+
+        $this->assertStringContainsString('(Català)', $template);
+        $this->assertStringNotContainsString(lang('Events.fields.description'), $template);
+        $this->assertStringNotContainsString('description:', $template);
+    }
+
     public function testCategoriesGetASlugAndASafeColour(): void
     {
         $this->createUser('boss@example.com', 'admin');

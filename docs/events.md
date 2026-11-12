@@ -58,7 +58,9 @@ Names and URLs: decision **D-24-01** (decided as built).
   kpcrudy reads the form and again when shown; edited with the Core's rich-text editor (kpcrudy
   1.3 `setTranslations(..., ['attrs' => …])`).
 - **CSV:** export with one column per language (`exportTranslations()`); import reads the same
-  columns (`title:ca`, …; D-24-06), groups and users by id or name (only assignable groups).
+  columns (`title:ca`, …; D-24-06) **except the description** (kpcrudy stores imported
+  translations unsanitised, so rich text is never imported), groups and users by id or name
+  (only assignable groups).
 - **Duplicate** copies the event, its texts (title "… (copy)") and its audience and opens the
   copy's form; it needs `events-events.duplicate` and `events-events.add`.
 - **Dates:** an event without an end lasts one hour (or the whole day); all-day events cover

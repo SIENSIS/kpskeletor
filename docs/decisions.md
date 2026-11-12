@@ -2207,7 +2207,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 
 - **Where:** D-00-40 ("for Events import, `callbackImport()` writes the Catalan translation"), `deploy/24-events-core.md`, kpcrudy ≥ 1.1 (translated columns in CSV import and `exportTranslations()`)
 - **Problem:** D-00-40 was written for kpcrudy 1.0; since 1.1 the import reads one column per language (`title:ca`, `Títol (Català)`) and validates the required language like the form.
-- **Proposal:** Use kpcrudy's translated import and export (`exportTranslations()`, so an exported file imports back unchanged); no `callbackImport()` for the title. Groups and users import by id or name and only offered (assignable) groups are accepted.
+- **Proposal:** Use kpcrudy's translated import and export (`exportTranslations()`); no `callbackImport()` for the title. The rich-text description is **not** importable: kpcrudy writes imported translations as they come (neither `callbackImport()` nor the form's request clean-up reaches them), and rich text must be sanitised before it is stored (fixed after session 24's review; test `EventsCrudTest::testTheCsvImportNeverWritesTheRichTextDescription`). Groups and users import by id or name and only offered (assignable) groups are accepted.
 - **Alternatives:** A) A `callbackImport()` writing the Catalan row by hand (duplicates the library).
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Events/Controllers/Events.php`
