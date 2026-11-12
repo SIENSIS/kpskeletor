@@ -67,9 +67,9 @@ Branch: `claude/gallant-curie-rmfn7k` · Pull request: [SIENSIS/kpskeletor#32](h
 
 ## Decisions and deviations
 
-- **D-24-01 (decide, open):** permission names, URLs and the configuration class, built as
+- **D-24-01 (decided as built, Decisions 24):** permission names, URLs and the configuration class, built as
   proposed so they can still be renamed.
-- **D-24-02 (decide, open):** assignable groups = superadmins all; others never `superadmin`,
+- **D-24-02 (decided as built, Decisions 24):** assignable groups = superadmins all; others never `superadmin`,
   their own groups or groups whose every permission they hold (the Core's escalation rule).
 - **D-24-03:** `event_audience` has `group_id` and `user_id` instead of `type` + `id` (kpcrudy's
   N-N rewrite would otherwise delete user rows; foreign keys).
@@ -179,4 +179,4 @@ the browser and ignored by the script.
   `EventVisibility::apply()`; reminders can become `VALARM` (`event_reminders`).
 - Session 26 (`events` API): use `EventVisibility::audience()` with kpapy's `where(Closure)` and
   `EventRepository::occurrences()` for ranges.
-- D-24-01 and D-24-02 are open (decide): run `deploy/decide.md`.
+- D-24-01 and D-24-02 were decided by the owner as built (Decisions 24).

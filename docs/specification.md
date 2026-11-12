@@ -1358,8 +1358,10 @@ field declares how it works:
 
 * Tables `events` (title, description, start, end, all day, location, category, colour, URL,
   visibility, status, organiser, `calendar`, `source_module`, `source_key`, `source_url`,
-  timestamps, soft deletes), `event_categories` and `event_audience` (event, type group|user,
-  id); multilingual with `setTranslations()`.
+  timestamps, soft deletes, plus `sequence`, `created_by` and the recurrence columns),
+  `event_categories` (with a colour), `event_audience` (event and **either** a group **or** a
+  user: columns `group_id` / `user_id`, the other one null) and `event_reminders`; multilingual
+  with `setTranslations()`.
 * **Visibility:** `public` (everyone, also the public site and public feeds), `private` (any
   logged-in user) or `restricted` (only its **audience**: any combination of groups **and**
   users, e.g. group `admin` + user John; a user sees the event if they are in any of the groups
@@ -1368,19 +1370,32 @@ field declares how it works:
   number of occurrences, and exceptions (skipped dates). Occurrences are expanded when queried
   for a date range, not stored.
 * **Administration** with kpcrudy (list, filters by category, date range and visibility,
-  duplicate operation, CSV import/export; kpcrudy does not import translated fields, so a
-  `callbackImport()` writes the Catalan translation).
-* Configuration in `Config/Calendar.php` (a `Config/Events.php` would be loaded by CodeIgniter as
-  an event-listener file).
+  duplicate operation, CSV import/export with one column per language, e.g. `title:ca`, read
+  and written by kpcrudy itself).
+* **Permissions and URLs:** `events-events.*` (CRUD with import, extras `all` and `duplicate`),
+  `events-categories.*` (CRUD without import or trash), `events-calendar.view` (every group:
+  calendar, details and reminders). Back office `backend/events`, `backend/events/categories`,
+  `backend/calendar`, `backend/calendar/feed?start=&end=`, `backend/calendar/event/{code}`,
+  `POST backend/calendar/event/{code}/reminder`; public `calendar`, `calendar/feed` (rate-limited,
+  public events only) and `calendar/event/{code}` (`{code}` = masked id).
+* Configuration in `Modules\Events\Config\Calendar` (`Config/Calendar.php`; a `Config/Events.php`
+  would be loaded by CodeIgniter as an event-listener file): public calendar on/off, first view,
+  longest feed range, reminder offsets, days of the widget, occurrence cap. No manifest settings
+  (`setting('Events.*')` would load CodeIgniter's `app/Config/Events.php`).
   * **Form:** a visibility selector; when `restricted`, a groups field (multiselect) and a users
-    field (searchable, AJAX), saved to `event_audience`. The groups offered are only those the
-    user may assign (an editor cannot create an event only for superadmins), validated
-    server-side too.
+    field (a multiple select of active users until kpcrudy offers AJAX search for N-N
+    relations), saved to `event_audience`. The groups offered are only those the user may
+    assign (an editor cannot create an event only for superadmins): superadmins any group;
+    anybody else never `superadmin`, and another group only if they belong to it or hold every
+    permission it grants (the Core's escalation rule). Validated server-side too: a forged or
+    forbidden group is refused with an error and a `security` log entry; groups set by someone
+    who could assign them are kept when another user edits the event; users may be added freely.
   * **What administrators see:** in the **calendar view, widgets and iCal feeds** everyone,
     administrators included, only sees the events whose audience includes them (an event "only
     for John" does not appear in every admin's agenda). In the **administration list**, users
     with `events-events.all` see and manage every event, with a filter "visible to me / all";
-    without it, the list is limited to their audience with kpcrudy's `where()`.
+    without it, the list is limited to their audience (or the events they created) with
+    kpcrudy's `where(Closure)`.
 * **Calendar view** (back office and public site): month, week, day and list views, filtered by
   category, using a vendored MIT-licensed calendar library through a `data-component` (JSON
   feed endpoint by date range, respecting visibility and permissions); click to open the event.

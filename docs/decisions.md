@@ -206,8 +206,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-23-03 | 23 | What a picker field may browse and choose | Accepted (proposal) |
 | D-23-04 | 23 | Avatars: saving, replacing and serving | Accepted (proposal) |
 | D-23-05 | 23 | "Images of the site itself" in rich text | Accepted (proposal) |
-| D-24-01 | 24 | Events permission names, URLs and configuration (decide) | Open |
-| D-24-02 | 24 | Groups a user may target with a restricted event (decide) | Open |
+| D-24-01 | 24 | Events permission names, URLs and configuration (decide) | Applied (decided) |
+| D-24-02 | 24 | Groups a user may target with a restricted event (decide) | Applied (decided) |
 | D-24-03 | 24 | `event_audience` with a `group_id` and a `user_id` column | Accepted (proposal) |
 | D-24-04 | 24 | The audience's users field is a multiple select (no AJAX search) | Accepted (proposal) |
 | D-24-05 | 24 | No manifest settings for Events: configuration in `Config\Calendar` | Accepted (proposal) |
@@ -2162,8 +2162,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The specification only names `events-events.all`; the other permission names, the URLs of the event details, feeds and reminders, and where the configuration lives are public conventions.
 - **Proposal:** Resources `events` (crud with every operation, CSV import included, and the extras `all` and `duplicate`), `categories` (crud without import or trash) and `calendar` (page: `events-calendar.view`, every group). Grants: admin `events-events.*`, `events-categories.*`; editor events list/show/add/edit/delete/duplicate/export/import and categories list/show; every group `events-calendar.*`. URLs: `backend/events` (kpcrudy, with `duplicate/{code}`), `backend/events/categories`, `backend/calendar`, `backend/calendar/feed?start=&end=[&category=]`, `backend/calendar/event/{code}[?date=]`, `POST backend/calendar/event/{code}/reminder`; public `calendar[?category=<slug>]`, `calendar/feed` (`ratelimit:feeds`, public events only) and `calendar/event/{code}`; `{code}` is the masked id (context `events`, the same as the CRUD). Configuration `Modules\Events\Config\Calendar` (`publicCalendar`, `defaultView`, `maxRangeDays` 400, `reminderOptions` 60/15/1440/10080 minutes, `upcomingDays` 30, `maxOccurrences` 1000); widget `events.upcoming`, task `SendReminders`, notification `EventReminder`, menu link `events.calendar`. Built so names and URLs can still be renamed.
 - **Alternatives:** A) The calendar under `backend/events/calendar` (one prefix for the module; the plan says `backend/calendar`). B) Reminders as a separate resource with its own permission (`events-reminders.*`): one more permission that every group would get anyway.
-- **Status:** Open
-- **Applied in:** `modules/Events/Config/{Module,Routes,Calendar}.php` (session 24, as proposed)
+- **Status:** Applied (decided)
+- **Decision (2026-11-12):** «Com està fet (recomanada)». As proposed and built: resources `events-events` (crud with import, extras `all` and `duplicate`), `events-categories` (crud without import or trash) and `events-calendar.view` (every group); URLs `backend/events`, `backend/events/categories`, `backend/calendar` (+ `feed`, `event/{code}`, `POST event/{code}/reminder`), public `calendar`, `calendar/feed`, `calendar/event/{code}`; configuration in `Modules\Events\Config\Calendar`, no manifest settings. **Must change:** specification "Events" (names, URLs, configuration); no code change.
+- **Applied in:** `modules/Events/Config/{Module,Routes,Calendar}.php` (session 24, as built); `docs/specification.md` ("Events": permissions and URLs, configuration)
 
 ## D-24-02 — Groups a user may target with a restricted event (decide)
 
@@ -2171,8 +2172,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** "The groups the user may assign" is not defined for events (nobody is added to a group here), and it is a security rule.
 - **Proposal:** Superadmins may target any group; nobody else may target `superadmin`; any other group is allowed when the user belongs to it **or** holds every permission the group grants (the Core's `EscalationGuard` rule for adding someone to a group). With the default grants an editor may target `editor` and `user` (not `admin` nor `superadmin`). The form only offers those groups; a forged or forbidden group id is refused with an error and a `security` entry `forbidden_audience` (not silently dropped); links to groups the user cannot assign that someone else set are kept when they edit the event. Users may be added to the audience freely (any active user).
 - **Alternatives:** A) Only the groups the user belongs to (an editor could not make an event for the `user` group). B) A permission per group (`events-audience.<group>`), managed in the permission matrix.
-- **Status:** Open
-- **Applied in:** `modules/Events/Services/AssignableGroups.php`, `modules/Events/Controllers/Events.php`; tests `EventsCrudTest::testAnEditorCannotTargetGroupsTheyMayNotAssign`, `testAGroupSetByAnAdminIsKeptWhenAnEditorEditsTheEvent` (session 24, as proposed)
+- **Status:** Applied (decided)
+- **Decision (2026-11-12):** «Com està fet (recomanada)». As proposed and built: superadmins may target any group; nobody else may target `superadmin`; any other group when the user belongs to it or holds every permission it grants (the Core's escalation rule); forged or forbidden groups are refused with an error and a `security` entry; groups set by someone else are kept; individual users may be added freely. **Must change:** specification "Events" (the assignable-groups rule); no code change.
+- **Applied in:** `modules/Events/Services/AssignableGroups.php`, `modules/Events/Controllers/Events.php`; tests `EventsCrudTest::testAnEditorCannotTargetGroupsTheyMayNotAssign`, `testAGroupSetByAnAdminIsKeptWhenAnEditorEditsTheEvent` (session 24, as built); `docs/specification.md` ("Events" › form)
 
 ## D-24-03 — `event_audience` with a `group_id` and a `user_id` column
 

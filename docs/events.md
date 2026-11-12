@@ -35,7 +35,7 @@ calendar API for other modules.
 | `calendar[?category=<slug>]`, `calendar/event/{code}` | public | Public events only |
 | `calendar/feed?start=&end=[&category=]` | public, `ratelimit:feeds` | JSON of public events |
 
-Names and URLs: decision **D-24-01** (open).
+Names and URLs: decision **D-24-01** (decided as built).
 
 ## Rules
 
@@ -47,7 +47,7 @@ Names and URLs: decision **D-24-01** (open).
 - **Administration list:** with `events-events.all`, every event, with a filter "visible to me /
   all"; without it, kpcrudy's `where(Closure)` limits every operation (list, details, edit,
   delete, duplicate, export, bulk actions) to the events the user sees or created (D-24-07).
-- **Audience groups** (`Services/AssignableGroups.php`, D-24-02, open): the groups field offers
+- **Audience groups** (`Services/AssignableGroups.php`, D-24-02, decided as built): the groups field offers
   only the groups the user may target (superadmins: all; others: never `superadmin`, a group
   they belong to or whose every permission they hold). A forged group is refused with an error
   and a `security` entry `forbidden_audience`; groups someone else set and the user cannot

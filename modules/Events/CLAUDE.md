@@ -31,7 +31,7 @@ events* widget and the "Calendar" menu link type. Full description: `docs/events
 
 ## Decisions
 
-D-24-01 (names, URLs, configuration) and D-24-02 (assignable groups) open (decide); D-24-03 …
+D-24-01 (names, URLs, configuration) and D-24-02 (assignable groups) decided by the owner as built; D-24-03 …
 D-24-10 accepted (`docs/decisions.md`); D-00-04, D-00-40, D-00-41.
 
 ## Open tasks
