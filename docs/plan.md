@@ -596,6 +596,12 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
   extracted in session 20 (`event_audience` also targets users); the `feeds` limit already
   covers the News RSS.
 
+- **Done (session 24):** `deploy-status/24-events-core/README.md`, `docs/events.md`. For later
+  sessions: `Modules\Events\Services\EventVisibility` (the only visibility rule),
+  `EventRepository::occurrences()`, `Recurrence`; `events.sequence` and the `source_*` columns
+  exist; tables `event_audience` (`group_id` or `user_id`) and `event_reminders`; no
+  `event_exceptions` table (`recur_exceptions` text column, D-24-09).
+
 ## 25 — Events module: iCal feeds and calendar API (`deploy/25-events-ical-api.md`)
 
 - **Goal:** subscribable feeds and push/pull calendar API.
