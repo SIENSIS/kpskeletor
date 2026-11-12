@@ -30,7 +30,7 @@ pull request open), *merged* (in `main`).
 | 20 | Pages module | merged | `claude/eager-brahmagupta-2odzxu` | [SIENSIS/kpskeletor#25](https://github.com/SIENSIS/kpskeletor/pull/25) | [`deploy-status/20-pages/`](../deploy-status/20-pages/README.md) |
 | 21 | Menus module: public menus and back-office customisation | merged | `claude/deploy-next-md-rjmbga` | [SIENSIS/kpskeletor#29](https://github.com/SIENSIS/kpskeletor/pull/29) | [`deploy-status/21-menus/`](../deploy-status/21-menus/README.md) |
 | 22 | Files module: file manager and folder ACL | merged | `claude/upbeat-brown-vq8taw` | [SIENSIS/kpskeletor#30](https://github.com/SIENSIS/kpskeletor/pull/30) | [`deploy-status/22-files-manager/`](../deploy-status/22-files-manager/README.md) |
-| 23 | Files module: file picker, upload tokens and avatars | done | `claude/wizardly-meitner-t9fp4s` | (pull request "Session 23: …") | [`deploy-status/23-files-picker/`](../deploy-status/23-files-picker/README.md) |
+| 23 | Files module: file picker, upload tokens and avatars | done | `claude/wizardly-meitner-t9fp4s` | [SIENSIS/kpskeletor#31](https://github.com/SIENSIS/kpskeletor/pull/31) | [`deploy-status/23-files-picker/`](../deploy-status/23-files-picker/README.md) |
 
 ## MVP review (session 19)
 

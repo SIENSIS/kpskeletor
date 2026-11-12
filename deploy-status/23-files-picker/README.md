@@ -1,6 +1,6 @@
 # Session 23 — Files module: file picker, upload tokens and avatars
 
-Branch: `claude/wizardly-meitner-t9fp4s` · Pull request: "Session 23: Files module: file picker, upload tokens and avatars" · Date: 2026-11-12
+Branch: `claude/wizardly-meitner-t9fp4s` · Pull request: [SIENSIS/kpskeletor#31](https://github.com/SIENSIS/kpskeletor/pull/31) · Date: 2026-11-12
 
 ## What was built
 
