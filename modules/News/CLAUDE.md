@@ -34,8 +34,9 @@ description: `docs/news.md`.
   `Modules\Core\Storage\CrudUploadHandler` (extracted in session 20, D-20-07). The body is edited
   with the Core's rich-text editor (`RichTextEditor::attrs()`, D-20-03).
 - `Controllers/Posts.php` (`index` = `news-posts`, `mine` = `news-mine`), `Categories.php`,
-  `Reader.php`, `PublicNews.php`, `Api/Posts.php`; `Storage/CoverUploads.php` (kpcrudy upload
-  handler on the Storage service).
+  `Reader.php`, `PublicNews.php`, `Api/Posts.php`; `Storage/CoverUploads.php` (the cover's file
+  picker: `callbackField()` + `CoverUploads::accepts()` in `beforeSave()`, session 23). The body's
+  editor has "Insert image" (`RichTextEditor::images('news')`, folder `modules/news`).
 
 ## Decisions
 
@@ -44,7 +45,6 @@ D-17-01 (separate API resource `news-api`) and D-17-08 ("Insert image" with the 
 
 ## Open tasks
 
-- Session 23: the cover uses the file picker (TODO in `Storage/CoverUploads.php`); "Insert image" in the body and only the site's own images in the Core's `HtmlSanitizer` (D-17-08; it was News' `BodySanitizer` until session 19).
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
 - Session 25: the `news.notices` calendar (`groups` → `restricted`, D-00-41).
 - Session 26: read receipts and notices in the API.

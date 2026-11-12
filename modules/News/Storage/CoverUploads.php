@@ -7,11 +7,9 @@ namespace Modules\News\Storage;
 use Modules\Core\Storage\CrudUploadHandler;
 
 /**
- * kpcrudy upload handler of the post cover: the Storage service's public disk, folder
- * `modules/news` (Core `CrudUploadHandler`).
- *
- * TODO(session 23): replace this field with the Core file picker (`callbackField()`), which
- * also lets authors reuse files of the Files module.
+ * The post cover: a file picker (upload or choose; JPG, PNG, WebP up to 5 MB) on the Storage
+ * service's public disk, folder `modules/news`, also choosing from the public shared folders the
+ * author may view (Core `CrudUploadHandler::pickerField()`; session 23).
  */
 final class CoverUploads extends CrudUploadHandler
 {

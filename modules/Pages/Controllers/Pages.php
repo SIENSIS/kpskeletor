@@ -21,6 +21,7 @@ use Modules\Pages\Services\PageSlugs;
 use Modules\Pages\Services\PageTree;
 use Modules\Pages\Services\PageVisibility;
 use Modules\Pages\Services\Revisions;
+use Modules\Pages\Storage\FeaturedImages;
 use RuntimeException;
 
 /**
@@ -68,7 +69,7 @@ final class Pages extends BackendController
                 ],
                 'fallbacks' => ['*' => ['ca']],
             ])
-            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()])
+            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs(RichTextEditor::images('pages'))])
             ->setRelationNN('groups', 'page_groups', 'groups', 'page_id', 'group_id', 'title', ['order' => 'title'])
             ->setRelation('author_id', 'users', 'username')
             ->fieldType('parent_id', 'select', ['options' => $tree->options($this->editedId(), $locale)])
@@ -78,7 +79,12 @@ final class Pages extends BackendController
             ->fieldType('publish_at', 'datetime')
             ->fieldType('noindex', 'boolean')
             ->fieldType('position', 'number', ['attrs' => ['min' => 0, 'max' => 9999]])
-            ->fieldType('featured_image', 'image', \Modules\Pages\Storage\FeaturedImages::fieldOptions())
+            ->callbackField('featured_image', static fn ($value, ?array $row, array $field): string => FeaturedImages::renderPicker('featured_image', $value, $field))
+            ->callbackColumn('featured_image', static function ($value): string {
+                $url = FeaturedImages::urlOf(is_string($value) ? $value : null);
+
+                return $url === null ? '' : '<img src="' . esc($url, 'attr') . '" alt="" class="img-thumbnail" loading="lazy">';
+            })
             ->tree('parent_id', ['order' => 'position', 'label' => 'title'])
             ->columns(['title', 'path', 'status', 'visibility', 'publish_at', 'updated_at'])
             ->addFields(['title', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'template', 'visibility', 'groups', 'publish_at', 'noindex', 'featured_image'])
@@ -90,7 +96,8 @@ final class Pages extends BackendController
             ->searchFields(['title', 'slug'])
             ->filters(['status', 'visibility'])
             ->setRules([
-                'publish_at' => 'permit_empty|valid_date',
+                'publish_at'     => 'permit_empty|valid_date',
+                'featured_image' => 'permit_empty|max_length[32]',
                 'position'   => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[9999]',
                 'template'   => 'required|in_list[' . implode(',', array_keys($this->templates())) . ']',
                 'visibility' => 'required|in_list[' . implode(',', PageVisibility::VISIBILITIES) . ']',
@@ -335,6 +342,16 @@ final class Pages extends BackendController
         if ($id === null) {
             $data['status']    = 'draft';
             $data['author_id'] = (int) auth()->id();
+        }
+
+        // The featured image: kept, uploaded through the picker or chosen inside its folders.
+        if (array_key_exists('featured_image', $data)) {
+            $current                = is_string($old['featured_image'] ?? null) ? $old['featured_image'] : null;
+            $data['featured_image'] = is_string($data['featured_image']) && trim($data['featured_image']) !== '' ? trim($data['featured_image']) : null;
+
+            if (! FeaturedImages::accepts('featured_image', $data['featured_image'], $current)) {
+                return lang('Core.picker.errors.value');
+            }
         }
 
         if (array_key_exists('publish_at', $data) && $data['publish_at'] === '') {

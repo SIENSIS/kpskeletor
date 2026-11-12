@@ -126,11 +126,12 @@ final class Posts extends BackendController
             ->fieldType('visibility', 'select', ['options' => $this->options('visibilities', NewsVisibility::VISIBILITIES)])
             ->fieldType('status', 'readonly')
             ->fieldType('category_id', 'select', ['options' => self::categoryOptions()])
-            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()])
+            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs(RichTextEditor::images('news'))])
             ->fieldType('pinned', 'boolean')
             ->fieldType('published_at', 'datetime')
             ->fieldType('expires_at', 'datetime')
-            ->fieldType('cover', 'image', CoverUploads::fieldOptions())
+            ->callbackField('cover', static fn ($value, ?array $row, array $field): string => CoverUploads::renderPicker('cover', $value, $field))
+            ->callbackColumn('cover', static fn ($value): string => self::coverPreview($value))
             ->columns(['title', 'type', 'category_id', 'visibility', 'status', 'published_at', 'author_id'])
             ->fields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id'])
             ->showFields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id', 'created_at', 'updated_at'])
@@ -141,6 +142,7 @@ final class Posts extends BackendController
                 'slug'         => Slugger::rules(),
                 'published_at' => 'permit_empty|valid_date',
                 'expires_at'   => 'permit_empty|valid_date',
+                'cover'        => 'permit_empty|max_length[32]',
             ])
             ->setDefault('type', 'article')
             ->setDefault('priority', 'info')
@@ -163,7 +165,7 @@ final class Posts extends BackendController
             ->callbackExport('visibility', static fn ($value): string => (string) $value)
             ->callbackExport('published_at', static fn ($value): string => (string) $value)
             ->beforeInsert(fn (array $data): array|string => $this->beforeSave($data, $crud, null, $mine ? $me : null))
-            ->beforeUpdate(fn (array $data, string $id, array $old): array|string => $this->beforeSave($data, $crud, (int) $id, null))
+            ->beforeUpdate(fn (array $data, string $id, array $old): array|string => $this->beforeSave($data, $crud, (int) $id, null, $old))
             ->defaultOrder('id', 'desc');
 
         $crud->addOperation('publish', static function (string $id, array $row): string {
@@ -210,11 +212,22 @@ final class Posts extends BackendController
      * new posts start as drafts. `$author`: forced author ("My posts").
      *
      * @param array<string, mixed> $data
+     * @param array<string, mixed> $old
      *
      * @return array<string, mixed>|string
      */
-    private function beforeSave(array $data, Crud $crud, ?int $id, ?int $author): array|string
+    private function beforeSave(array $data, Crud $crud, ?int $id, ?int $author, array $old = []): array|string
     {
+        // The cover: kept, uploaded through the picker or chosen inside its folders (forged keys refused).
+        if (array_key_exists('cover', $data)) {
+            $current       = is_string($old['cover'] ?? null) ? $old['cover'] : null;
+            $data['cover'] = is_string($data['cover']) && trim($data['cover']) !== '' ? trim($data['cover']) : null;
+
+            if (! CoverUploads::accepts('cover', $data['cover'], $current)) {
+                return lang('Core.picker.errors.value');
+            }
+        }
+
         $title = (string) ($crud->postedTranslations()['ca']['title'] ?? '');
         $slug  = trim((string) ($data['slug'] ?? ''));
 
@@ -314,6 +327,16 @@ final class Posts extends BackendController
         }
 
         return $labels;
+    }
+
+    /**
+     * The cover in the list and the detail view: its thumbnail.
+     */
+    public static function coverPreview(mixed $key): string
+    {
+        $url = CoverUploads::urlOf(is_string($key) ? $key : null);
+
+        return $url === null ? '' : '<img src="' . esc($url, 'attr') . '" alt="" class="img-thumbnail news-cover-preview" loading="lazy">';
     }
 
     public static function statusBadge(string $status): string

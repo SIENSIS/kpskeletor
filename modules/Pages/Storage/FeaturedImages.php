@@ -7,10 +7,9 @@ namespace Modules\Pages\Storage;
 use Modules\Core\Storage\CrudUploadHandler;
 
 /**
- * kpcrudy upload handler of the featured image of a page: the Storage service's public disk,
- * folder `modules/pages` (Core `CrudUploadHandler`).
- *
- * TODO(session 23): replace this field with the Core file picker (`callbackField()`).
+ * The featured image of a page: a file picker (upload or choose) on the Storage service's public
+ * disk, folder `modules/pages`, also choosing from the public shared folders the editor may view
+ * (Core `CrudUploadHandler::pickerField()`; session 23).
  */
 final class FeaturedImages extends CrudUploadHandler
 {
