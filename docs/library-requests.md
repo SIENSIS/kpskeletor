@@ -61,3 +61,8 @@ Found in session 20 (Pages module):
 | kpcrudy | HTML attributes for a translated field without changing its type (e.g. a `setTranslations()` option `'attrs' => [field => [...]]`) | The body of News and Pages is a translated field turned into the rich-text editor (`data-component`); `fieldType('body', 'textarea', …)` takes it out of the language tabs and adds a main-table field | `fieldType('body', 'translation', ['attrs' => …])` (kpcrudy's internal type of translated fields, undocumented) (the most fragile workaround: `PostsCrudTest` and `PagesCrudTest` check every language's body carries the editor) | **Done in kpcrudy 1.3.0** (2026-11-12): `setTranslations(..., ['attrs' => [field => array|fn (string $locale, string $field): array]])`, editor-agnostic, documented with examples (a bundled WYSIWYG field type was not wanted: the Core has its own editor and sanitiser). After installing 1.3, News and Pages switch from `fieldType('body', 'translation', …)` to the option, and `RichTextEditor`'s docblock follows |
 | kpcrudy | Tree lists with translated labels and a virtual path column checked under search and filters | `tree('parent_id', ['label' => 'title'])` works with a translated title; documenting it would make it a contract | Used as is (`modules/Pages/Controllers/Pages.php`) | Open (documentation) — on hold (owner, 2026-11-12) |
 
+Found in session 24 (Events module):
+
+| Library | Missing feature | Why it is needed | Workaround | Status |
+|---|---|---|---|---|
+| kpcrudy | `ajax` option for `setRelationNN()` (search box with suggestions, like `setRelation(..., ['ajax' => true])`) | Events audience: "a users field (searchable, AJAX)"; a multiple select of every user does not scale (D-24-04) | Standard multiple select of active users | Open |

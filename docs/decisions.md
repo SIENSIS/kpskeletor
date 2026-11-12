@@ -206,6 +206,16 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-23-03 | 23 | What a picker field may browse and choose | Accepted (proposal) |
 | D-23-04 | 23 | Avatars: saving, replacing and serving | Accepted (proposal) |
 | D-23-05 | 23 | "Images of the site itself" in rich text | Accepted (proposal) |
+| D-24-01 | 24 | Events permission names, URLs and configuration (decide) | Open |
+| D-24-02 | 24 | Groups a user may target with a restricted event (decide) | Open |
+| D-24-03 | 24 | `event_audience` with a `group_id` and a `user_id` column | Accepted (proposal) |
+| D-24-04 | 24 | The audience's users field is a multiple select (no AJAX search) | Accepted (proposal) |
+| D-24-05 | 24 | No manifest settings for Events: configuration in `Config\Calendar` | Accepted (proposal) |
+| D-24-06 | 24 | CSV import of translated fields with kpcrudy's own columns | Accepted (proposal) |
+| D-24-07 | 24 | Administration scope without `events-events.all` | Accepted (proposal) |
+| D-24-08 | 24 | Calendar library and time zones in the calendar view | Accepted (proposal) |
+| D-24-09 | 24 | Recurrence storage, exceptions and counts | Accepted (proposal) |
+| D-24-10 | 24 | Reminders: offsets, occurrences and access | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2145,3 +2155,93 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Only paths under `/uploads/` (would refuse the site's own private images and theme images).
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Security/{SiteImagesOnly,HtmlSanitizer}.php`; tests `HtmlSanitizerTest::testOnlyImagesOfTheSiteItselfAreKept`, `NewsPickerTest::testAnImageInsertedInTheBodyIsStoredThroughTheStorageService`
+
+## D-24-01 — Events permission names, URLs and configuration (decide)
+
+- **Where:** specification "Modules" › "Events (calendar)" (`events-events.all`), `docs/plan.md` session 24 (routes `backend/events`, `backend/events/categories`, `backend/calendar`, public `calendar`, JSON feed `calendar/feed`), D-00-04
+- **Problem:** The specification only names `events-events.all`; the other permission names, the URLs of the event details, feeds and reminders, and where the configuration lives are public conventions.
+- **Proposal:** Resources `events` (crud with every operation, CSV import included, and the extras `all` and `duplicate`), `categories` (crud without import or trash) and `calendar` (page: `events-calendar.view`, every group). Grants: admin `events-events.*`, `events-categories.*`; editor events list/show/add/edit/delete/duplicate/export/import and categories list/show; every group `events-calendar.*`. URLs: `backend/events` (kpcrudy, with `duplicate/{code}`), `backend/events/categories`, `backend/calendar`, `backend/calendar/feed?start=&end=[&category=]`, `backend/calendar/event/{code}[?date=]`, `POST backend/calendar/event/{code}/reminder`; public `calendar[?category=<slug>]`, `calendar/feed` (`ratelimit:feeds`, public events only) and `calendar/event/{code}`; `{code}` is the masked id (context `events`, the same as the CRUD). Configuration `Modules\Events\Config\Calendar` (`publicCalendar`, `defaultView`, `maxRangeDays` 400, `reminderOptions` 60/15/1440/10080 minutes, `upcomingDays` 30, `maxOccurrences` 1000); widget `events.upcoming`, task `SendReminders`, notification `EventReminder`, menu link `events.calendar`. Built so names and URLs can still be renamed.
+- **Alternatives:** A) The calendar under `backend/events/calendar` (one prefix for the module; the plan says `backend/calendar`). B) Reminders as a separate resource with its own permission (`events-reminders.*`): one more permission that every group would get anyway.
+- **Status:** Open
+- **Applied in:** `modules/Events/Config/{Module,Routes,Calendar}.php` (session 24, as proposed)
+
+## D-24-02 — Groups a user may target with a restricted event (decide)
+
+- **Where:** specification "Events" ("The groups offered are only those the user may assign (an editor cannot create an event only for superadmins), validated server-side too"), acceptance tests ("an editor cannot target groups they may not assign")
+- **Problem:** "The groups the user may assign" is not defined for events (nobody is added to a group here), and it is a security rule.
+- **Proposal:** Superadmins may target any group; nobody else may target `superadmin`; any other group is allowed when the user belongs to it **or** holds every permission the group grants (the Core's `EscalationGuard` rule for adding someone to a group). With the default grants an editor may target `editor` and `user` (not `admin` nor `superadmin`). The form only offers those groups; a forged or forbidden group id is refused with an error and a `security` entry `forbidden_audience` (not silently dropped); links to groups the user cannot assign that someone else set are kept when they edit the event. Users may be added to the audience freely (any active user).
+- **Alternatives:** A) Only the groups the user belongs to (an editor could not make an event for the `user` group). B) A permission per group (`events-audience.<group>`), managed in the permission matrix.
+- **Status:** Open
+- **Applied in:** `modules/Events/Services/AssignableGroups.php`, `modules/Events/Controllers/Events.php`; tests `EventsCrudTest::testAnEditorCannotTargetGroupsTheyMayNotAssign`, `testAGroupSetByAnAdminIsKeptWhenAnEditorEditsTheEvent` (session 24, as proposed)
+
+## D-24-03 — `event_audience` with a `group_id` and a `user_id` column
+
+- **Where:** specification "Events" (`event_audience` (event, type group|user, id)), kpcrudy `setRelationNN()`
+- **Problem:** With one `type` + `id` pair, kpcrudy's N-N relation (which rewrites the junction rows `WHERE event_id = ? AND <otherKey> IN (offered options)`) would delete the user rows whose id equals an offered group id, and could not have foreign keys.
+- **Proposal:** Each row has either `group_id` (`groups.id`) or `user_id` (`users.id`), the other column null, both with `ON DELETE CASCADE`; two `setRelationNN()` fields (`groups`, `users`) on the same table never touch each other's rows. The rows of an event that is not `restricted` are deleted after saving.
+- **Alternatives:** A) Two junction tables (`event_groups`, `event_users`). B) The `type`/`id` pair with a custom field instead of kpcrudy's N-N.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Database/Migrations/2026-11-12-100005_CreateEventAudience.php`, `modules/Events/Controllers/Events.php`
+
+## D-24-04 — The audience's users field is a multiple select (no AJAX search)
+
+- **Where:** specification "Events" ("a users field (searchable, AJAX)"), kpcrudy 1.3 (`ajax` exists only for `setRelation()`, not `setRelationNN()`)
+- **Problem:** The searchable AJAX users field needs a feature kpcrudy does not have for N-N relations.
+- **Proposal:** Use kpcrudy's standard multiple select of active users (`setRelationNN('users', …)`) for now and record the library request "`ajax` for `setRelationNN()`" in `docs/library-requests.md`; switch to it when kpcrudy has it. No custom component in the module.
+- **Alternatives:** A) A `callbackField()` with a Core component and a permission-checked lookup endpoint (code that the library request would make obsolete).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Controllers/Events.php`, `docs/library-requests.md`
+
+## D-24-05 — No manifest settings for Events: configuration in `Config\Calendar`
+
+- **Where:** D-00-04, specification "Events" (configuration in `Config/Calendar.php`), Core settings (manifest settings are named `<Module>.<key>`)
+- **Problem:** A manifest setting of the Events module would be read as `setting('Events.x')`; codeigniter4/settings resolves `Events` with `config('Events')`, which autoloads `app/Config/Events.php` (CodeIgniter's event-listener script) a second time.
+- **Proposal:** The module declares no `$settings`; its options live in `Modules\Events\Config\Calendar` (`config(Calendar::class)`), overridable from `.env` (`calendar.maxRangeDays = 200`). If administrators must edit them from Settings later, the Core gains a settings namespace per module (a future decision).
+- **Alternatives:** A) Rename the settings namespace in the Core for this module now (a Core change outside this session).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Config/{Module,Calendar}.php`
+
+## D-24-06 — CSV import of translated fields with kpcrudy's own columns
+
+- **Where:** D-00-40 ("for Events import, `callbackImport()` writes the Catalan translation"), `deploy/24-events-core.md`, kpcrudy ≥ 1.1 (translated columns in CSV import and `exportTranslations()`)
+- **Problem:** D-00-40 was written for kpcrudy 1.0; since 1.1 the import reads one column per language (`title:ca`, `Títol (Català)`) and validates the required language like the form.
+- **Proposal:** Use kpcrudy's translated import and export (`exportTranslations()`, so an exported file imports back unchanged); no `callbackImport()` for the title. Groups and users import by id or name and only offered (assignable) groups are accepted.
+- **Alternatives:** A) A `callbackImport()` writing the Catalan row by hand (duplicates the library).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Controllers/Events.php`
+
+## D-24-07 — Administration scope without `events-events.all`
+
+- **Where:** specification "Events" ("without it, the list is limited to their audience with kpcrudy's `where()`")
+- **Problem:** An editor who creates a restricted event for a group they are not in (e.g. `user`) could not see it afterwards, and kpcrudy rolls back a save that leaves the record outside the scope.
+- **Proposal:** The scope is the calendar's visibility rule (`EventVisibility`) **or** `created_by` = the user (`where(Closure)`, kpcrudy 1.3). An edit that would leave the event outside the scope (e.g. the editor removes their only group) is refused by kpcrudy. With `events-events.all`, every event, with a filter "visible to me / all". The calendar, the widget and the details always follow the audience only, administrators included.
+- **Alternatives:** A) Audience only (editors lose sight of their own events).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/EventVisibility.php`, `modules/Events/Controllers/Events.php`; tests `EventsCrudTest::testTheListIsLimitedToTheUsersAudienceWithoutTheAllPermission`, `testTheAllPermissionShowsEveryEventWithAVisibleToMeFilter`
+
+## D-24-08 — Calendar library and time zones in the calendar view
+
+- **Where:** specification "Events" (vendored MIT calendar library, `data-component`), D-00-25 (no inline styles), `docs/frontend.md`
+- **Problem:** Which library works under the strict CSP, and which time zone the views use.
+- **Proposal:** FullCalendar 7.1.3 (MIT), vendored in `public/assets/vendor/fullcalendar/` (global build, classic theme, `ca`/`es` locales; checksums in `vendor.json`): version 7 ships its CSS as files and only uses the CSSOM (v6 injected a `<style>` element). `events/calendar` loads it on demand; colours come from Bootstrap's variables (light and dark). The feed sends the site's wall-clock times without an offset and the calendar runs in UTC mode, so every browser shows the site's times; the feed's range is read as dates in the site's time zone (at most `maxRangeDays`). Phones start with the list view.
+- **Alternatives:** A) FullCalendar 6 with a nonce meta tag (the style nonce would have to be exposed to scripts). B) A calendar written in the module.
+- **Status:** Accepted (proposal)
+- **Applied in:** `public/assets/vendor/fullcalendar/`, `modules/Events/Assets/{js/calendar.js,css/calendar.css}`, `modules/Events/Services/{CalendarComponent,EventRepository}.php`
+
+## D-24-09 — Recurrence storage, exceptions and counts
+
+- **Where:** specification "Events" (recurrence "expanded when queried, not stored"; exceptions), `docs/plan.md` (`event_exceptions` or a JSON column)
+- **Problem:** Where exceptions live and how counts, missing month days and daylight saving behave.
+- **Proposal:** Columns `recur_freq`, `recur_interval`, `recur_days` (`mo,tu,…`), `recur_until` (inclusive local date) or `recur_count`, and `recur_exceptions` (text, one `YYYY-MM-DD` per line, normalised on save). Expansion in the site's time zone (the local time is kept across daylight saving); the count includes skipped dates (iCal `COUNT` + `EXDATE`, so session 25 can write `RRULE`/`EXDATE` as stored); monthly series skip months without the day, yearly 29 February only in leap years; a safety cap of `maxOccurrences`.
+- **Alternatives:** A) An `event_exceptions` table (one more table and CRUD for a list of dates).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/Recurrence.php`; tests `RecurrenceTest`
+
+## D-24-10 — Reminders: offsets, occurrences and access
+
+- **Where:** specification "Events" ("users can ask for a reminder; a scheduled task sends the notifications")
+- **Problem:** When reminders are sent, how often, and what happens when the user loses access.
+- **Proposal:** One reminder per user and event (`event_reminders`), chosen in the event's details among `Config\Calendar::$reminderOptions`; the `SendReminders` task (every 5 minutes) sends the `EventReminder` notification for each occurrence starting within the offset, once (`last_sent_for`), never for cancelled events, and only if the user can still see the event (checked when sending).
+- **Alternatives:** A) Reminders set by the event's author for its whole audience.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/Reminders.php`, `modules/Events/Tasks/SendReminders.php`; tests `RemindersAndWidgetTest`

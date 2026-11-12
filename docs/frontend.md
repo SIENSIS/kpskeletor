@@ -119,6 +119,13 @@ service's rules and re-encoding) or chooses a JPG, PNG, WebP or GIF of `modules/
 public disk and asks for its alt text; pasted or dropped images go through the same upload (no
 `data:` URLs). The sanitiser keeps only images of the site itself (`SiteImagesOnly`).
 
+### Calendar
+
+The Events module's `events/calendar` component loads the vendored FullCalendar 7.1.3 (MIT,
+`public/assets/vendor/fullcalendar/`) on demand, like the editor: version 7 ships its CSS as
+files and only uses the CSSOM, so it needs no CSP exception. Its colours come from Bootstrap's
+variables (`events::css/calendar.css`). See `docs/events.md`.
+
 ## Content-Security-Policy
 
 On by default (`Config\App::$CSPEnabled = true`), strict, with nonces, on every response:
