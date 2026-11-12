@@ -195,6 +195,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-21-04 | 21 | Custom links and menu items: addresses and the 403 rule | Accepted (proposal) |
 | D-21-05 | 21 | Public menus: visibility, depth, cache and the active item | Accepted (proposal) |
 | D-21-06 | 21 | Demo data that depends on another module's demo | Accepted (proposal) |
+| D-22-01 | 22 | Files permission names, URLs, settings and space paths (decide) | Applied (decided) |
+| D-22-02 | 22 | The file manager is a screen of its own over JSON endpoints | Accepted (proposal) |
+| D-22-03 | 22 | Virtual folders: `files.folder`, files referencing `stored_files` | Accepted (proposal) |
+| D-22-04 | 22 | Who reads a private file, and the folder ACL details (decide) | Applied (decided) |
+| D-22-05 | 22 | Quotas, trash and thumbnails | Accepted (proposal) |
+| D-22-06 | 22 | Upload progress without inline styles | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2033,3 +2039,58 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Demo/{DemoSeeder,DemoDataManager}.php`, `modules/Menus/Database/Seeds/MenusDemoSeeder.php`; test `MenusModuleTest::testDemoDataLoadsAfterPagesAndIsRemovedCompletely`
 
+## D-22-01 — Files permission names, URLs, settings and space paths (decide)
+
+- **Where:** specification "Modules" › "Files" (permissions `files.list`, `files.upload`, `files.edit`, `files.delete`, `files.folders`, `files.acl`, `files.all`, `files.private`; setting `Files.personalSpaceGroups`; spaces "personal", "modules", "shared"; quotas per user); `docs/plan.md` session 22 (routes `backend/files`, `backend/files/api/*`)
+- **Problem:** The specification names the permissions but does not say what `files.private` allows, how the shared space is laid out, how the personal quota is set, the setting's type or the default grants.
+- **Proposal:** One resource named `files` (D-00-18) of type `crud` without `show`, `add`, `export`, `import`, `trash`, `restore`, `purge` plus the extras `upload`, `folders`, `acl`, `all`, `private`: exactly the eight names of the specification. `files.private` = using the **shared folders of the private disk** in the file manager (public shared folders and the personal space do not need it; serving a private file by URL never needs it). Spaces by path prefix: `users/{user_id}` (private disk), `modules/<module>`, and **`shared/…`** on each disk (two roots, created on first use with an empty ACL: only `files.all` until an administrator shares them); other paths are refused. Settings: `Files.personalSpaceGroups` (`list` of group names, default `admin`, `editor`) and **`Files.personalQuota`** (int, MB, default 100, 0 = none), group `files` of the Files tab. Grants: `admin` `files.*`; `editor` `files.list`, `files.upload`, `files.edit`, `files.delete`, `files.folders`, `files.private` (not `files.acl`, `files.all`). URLs: `backend/files` (page) and `backend/files/api/{tree,list,trash,upload,file/{id}[/download|preview|thumbnail|update|move|delete|restore|purge],folder[/rename|/delete],acl}`.
+- **Alternatives:** A) `files.private` = also needed to read private files in the manager (personal spaces included): a user of `Files.personalSpaceGroups` without it could not open their own space. B) Shared folders anywhere at the disk root (no `shared/` prefix): more freedom, but module and personal paths could be shadowed. C) The personal quota per group instead of one setting. D) `editor` without `files.folders`.
+- **Status:** Applied (decided)
+- **Decision (2026-11-12):** «Com està fet (recomanada)». As proposed and built: the eight names of the specification on the resource `files`; `files.private` = the shared folders of the private disk in the file manager; shared space under `shared/` on each disk; settings `Files.personalSpaceGroups` and `Files.personalQuota` (MB, default 100); editor grants `files.list`, `files.upload`, `files.edit`, `files.delete`, `files.folders`, `files.private`; URLs `backend/files` and `backend/files/api/*`. **Must change:** specification "Files" (what `files.private` means, the `shared/` space, `Files.personalQuota`).
+- **Applied in:** `modules/Files/Config/{Module,Routes}.php`, `modules/Files/Services/{Spaces,FolderAcl,QuotaService}.php`, `modules/Files/Language/*/Files.php`, `docs/files.md`, `docs/specification.md` ("Files": `files.private`, `shared/…`, `Files.personalQuota`); tests `FilesModuleTest`, `FolderAclTest`
+
+## D-22-02 — The file manager is a screen of its own over JSON endpoints
+
+- **Where:** `CLAUDE.md` (every back-office CRUD screen with kpcrudy), specification "Files" (browse folders, drag and drop with progress, list and grid views, preview, move, trash, folder permissions)
+- **Problem:** A file manager is a folder tree with uploads, previews and per-folder rights, not a table CRUD; kpcrudy has no tree browsing, drag-and-drop uploads with progress or ACL editing.
+- **Proposal:** `backend/files` renders a shell (`Views/manager.php`); the ES module `files/file-manager` talks to JSON endpoints (`Controllers/FileApi.php`) that check the RBAC permission (route filters) and the folder ACL (every request). No kpcrudy CRUD in this module; the manifest resource is still `crud`-typed so the catalogue has `files.list`/`edit`/`delete` with the specification's names. Writes are logged with `activity_log()` (ACL changes with `security_log()`).
+- **Alternatives:** A) kpcrudy CRUDs for `files` and `folders` (flat lists filtered by folder; no tree, no uploads with progress).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Files/Controllers/{FileManager,FileApi}.php`, `modules/Files/Views/manager.php`, `modules/Files/Assets/js/file-manager.js`, `modules/Files/Assets/css/file-manager.css`
+
+## D-22-03 — Virtual folders: `files.folder`, files referencing `stored_files`
+
+- **Where:** specification "Files" ("the folder tree is virtual (paths)", `files` metadata), D-13-03 (`stored_files` written only by the Storage service; `files` references it)
+- **Problem:** Moving a file or renaming a folder would have to move files on disk and rewrite `stored_files.path`, which only the Storage service writes.
+- **Proposal:** `files` has `stored_file_id` (unique, cascade), `disk`, `folder` (virtual), `name` (display/download name, keeps the stored extension), `visibility`, `alt`, `tags`, `thumbnail`, `deleted_at`/`deleted_by`. Uploads are stored physically under the folder's path, but moving a file or renaming a folder only changes `files.folder` (and `folders.path`). Folders are rows of `folders`; there is no implicit folder. Files that other modules store (no `files` row) are not listed, except read-only in a module folder whose policy says `readonly`.
+- **Alternatives:** A) Physical moves through a new Core `Storage::move()` (Core change; renaming a folder moves every file).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Files/Database/Migrations/*`, `modules/Files/Services/{FileRepository,FolderRepository}.php`
+
+## D-22-04 — Who reads a private file, and the folder ACL details (decide)
+
+- **Where:** specification "Files" ("Serving private files", "RBAC is the ceiling, the ACL decides where", predefined spaces, `FileAccessPolicy`), D-13-01 (`Config\Storage::$accessRule`)
+- **Problem:** The specification does not say what happens to private files outside the managed folders (stored by other modules), to trashed files, who edits a personal space's ACL, how a module registers its policy or what `files.all` means for module folders.
+- **Proposal:** The Files module sets `Config\Storage::$accessRule` to `FolderAccessRule` through its registrar (no Core change; the rule behaves like `OwnerAccess` while Files is disabled). Order: a module policy for the file's folder decides (superadmins always pass; guests possible: the record's visibility); guests otherwise get nothing; a trashed file only for users with `delete` in its folder; a folder governed by the ACL → its `view` right; anything else → `OwnerAccess` (uploader and superadmins). Always a 404 when refused. ACL: an own ACL with no entries hides the folder; entries add up; `files.all` and superadmins have every right everywhere **except module folders** (only `view`, and only when the policy says `readonly`); the owner of a personal space always has every right in it; only `files.all` edits the ACL of a personal space (its owner cannot share it in this session). Policies register through the event `filesAccessPolicies` (`PolicyRegistry`), only for folders inside `modules/` and only for enabled modules; the longest folder wins.
+- **Alternatives:** A) Files outside managed folders are denied to everyone but superadmins (breaks private uploads of modules without a policy). B) `files.all` overrides module policies. C) Owners may share their personal space with other users.
+- **Status:** Applied (decided)
+- **Decision (2026-11-12):** «Només superadmin + registre (recomanada)». The rule order stays as proposed, but `files.all` no longer reaches other users' personal spaces: it gives every right in the shared folders only. Only superadmins enter another user's personal space (and set its quota and its subfolders' permissions); every time a superadmin reads (downloads, previews, opens through `files/private/{key}`) a file of someone else's personal space, a `security` entry is written to the activity log. For anything else administrators use impersonation (already re-authenticated and logged). Reason (owner): private files belong to their owner; in case of need an administrator can impersonate the user; superadmins keep access to ease the management of the platform. **Must change:** `FolderAcl`, `Browser` ("Personal spaces" node for superadmins), `FolderAccessRule` and the file manager's download/preview (security log), `PrivateFilesTest` (an admin is "another user" again), Files tests, `docs/files.md`, specification "Files" (personal space: "nobody else except superadmins").
+- **Applied in:** `modules/Files/Services/{FolderAcl,Browser,FolderAccessRule,Spaces}.php` (`files.all` stops at other users' personal spaces; `FolderAcl::logForeignRead()`), `modules/Files/Controllers/FileApi.php` (download/preview logged), `modules/Files/Language/*/Files.php` (`activity.personal_file_read`), `modules/Core/Tests/PrivateFilesTest.php` (admin as "another user" again), `docs/files.md`, `docs/specification.md` ("Files"), `modules/Files/CLAUDE.md`, `deploy-status/22-files-manager/`; tests `FolderAclTest::testFilesAllGetsEveryRightInSharedFoldersButNotInOtherPersonalSpaces`, `PrivateFileRuleTest::testPersonalSpacesAreTheOwnersAndSuperadminReadsAreLogged`, `FileApiTest::testOnlySuperadminsSeeOtherPersonalSpacesInTheTree`
+
+## D-22-05 — Quotas, trash and thumbnails
+
+- **Where:** specification "Files" (quotas per user and per shared folder, trash with restore, thumbnails generated on upload)
+- **Problem:** Whether trashed files count, which quota applies to nested folders, where thumbnails live and how they are served.
+- **Proposal:** Every quota of the folder's chain must hold (the nearest is shown); the trash counts until files are deleted for good; the quota is checked before storing and again with the stored (re-encoded) size. Only `files.all` sets a folder quota (in the permissions dialog). No automatic purge of the trash in this session. Thumbnails: 320 px WebP (JPEG without WebP support), private disk `modules/files/thumbnails/<key>.webp`, served by the file manager after the `view` right, deleted with the file. Only empty folders (trash included) can be deleted.
+- **Alternatives:** A) The trash does not count. B) A scheduled task purging old trash (could come with session 27 or 35).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Files/Services/{QuotaService,ThumbnailService,Trash,Uploader}.php`; tests `QuotaTrashTest`
+
+## D-22-06 — Upload progress without inline styles
+
+- **Where:** `docs/plan.md` session 22 risks ("upload progress bars without `style=""`", contradiction 25), strict CSP (`CLAUDE.md`)
+- **Problem:** Bootstrap progress bars set their width with an inline style, which the CSP forbids.
+- **Proposal:** Each file is uploaded in its own request (`XMLHttpRequest`, `upload.onprogress`) and shown with a native `<progress>` element (its `value` attribute is not a style), styled from `Assets/css/file-manager.css` (`accent-color`). The CSRF header and its regenerated token are handled like `core/http.js`. One request per file also means each file counts against `ratelimit:uploads`.
+- **Alternatives:** A) CSS classes per 5 % step (`.w-pct-35`). B) A single request for every file (one progress bar).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Files/Assets/js/file-manager.js`, `modules/Files/Assets/css/file-manager.css`

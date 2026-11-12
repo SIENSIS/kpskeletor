@@ -93,9 +93,12 @@ Checks of every upload:
 `GET files/private/{key}` (`Modules\Core\Controllers\PrivateFiles`) is the only way to read a file
 of the private disk:
 
-- the access rule (`Config\Storage::$accessRule`, interface `FileAccessRule`) decides; until the
-  Files module's folder permissions (session 22) it is `OwnerAccess`: the user who uploaded the
-  file and superadmins;
+- the access rule (`Config\Storage::$accessRule`, interface `FileAccessRule`) decides. The Core's
+  default is `OwnerAccess` (the user who uploaded the file and superadmins); the Files module
+  replaces it through its registrar with `Modules\Files\Services\FolderAccessRule`: the `view`
+  right of the file's folder (folder ACL), a module's `FileAccessPolicy` for its folder, and
+  `OwnerAccess` for files outside every managed folder or while Files is disabled
+  (`docs/files.md`);
 - anything not allowed, an unknown or malformed key, a public-disk file or a file missing on disk
   is a **404** (the existence of a file is not revealed);
 - headers: the stored `Content-Type`, `X-Content-Type-Options: nosniff`,
