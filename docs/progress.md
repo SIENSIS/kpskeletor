@@ -29,7 +29,7 @@ pull request open), *merged* (in `main`).
 | 19 | Checkpoint: MVP review | merged | `claude/wizardly-bell-3a9yne` | [SIENSIS/kpskeletor#23](https://github.com/SIENSIS/kpskeletor/pull/23) | [`deploy-status/19-mvp-review/`](../deploy-status/19-mvp-review/README.md) |
 | 20 | Pages module | merged | `claude/eager-brahmagupta-2odzxu` | [SIENSIS/kpskeletor#25](https://github.com/SIENSIS/kpskeletor/pull/25) | [`deploy-status/20-pages/`](../deploy-status/20-pages/README.md) |
 | 21 | Menus module: public menus and back-office customisation | merged | `claude/deploy-next-md-rjmbga` | [SIENSIS/kpskeletor#29](https://github.com/SIENSIS/kpskeletor/pull/29) | [`deploy-status/21-menus/`](../deploy-status/21-menus/README.md) |
-| 22 | Files module: file manager and folder ACL | done | `claude/upbeat-brown-vq8taw` | [SIENSIS/kpskeletor#30](https://github.com/SIENSIS/kpskeletor/pull/30) | [`deploy-status/22-files-manager/`](../deploy-status/22-files-manager/README.md) |
+| 22 | Files module: file manager and folder ACL | merged | `claude/upbeat-brown-vq8taw` | [SIENSIS/kpskeletor#30](https://github.com/SIENSIS/kpskeletor/pull/30) | [`deploy-status/22-files-manager/`](../deploy-status/22-files-manager/README.md) |
 
 ## MVP review (session 19)
 
