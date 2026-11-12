@@ -1,0 +1,36 @@
+/*
+ * Events calendar: FullCalendar's classic theme coloured with Bootstrap's variables, so it follows
+ * the active theme and light/dark mode (data-bs-theme) without extra rules.
+ */
+.events-calendar {
+    --fc-classic-button: var(--bs-secondary-bg);
+    --fc-classic-button-border: var(--bs-border-color);
+    --fc-classic-button-strong: var(--bs-primary);
+    --fc-classic-button-strong-border: var(--bs-primary);
+    --fc-classic-button-outline: rgba(var(--bs-primary-rgb), 0.5);
+    --fc-classic-button-foreground: var(--bs-body-color);
+    --fc-classic-primary: var(--bs-primary);
+    --fc-classic-primary-foreground: #fff;
+    --fc-classic-highlight: rgba(var(--bs-primary-rgb), 0.12);
+    --fc-classic-today: rgba(var(--bs-warning-rgb), 0.15);
+    --fc-classic-now: var(--bs-danger);
+    --fc-classic-background: var(--bs-body-bg);
+    --fc-classic-faint: rgba(var(--bs-emphasis-color-rgb), 0.04);
+    --fc-classic-muted: rgba(var(--bs-emphasis-color-rgb), 0.08);
+    --fc-classic-strong: rgba(var(--bs-emphasis-color-rgb), 0.14);
+    --fc-classic-foreground: var(--bs-body-color);
+    --fc-classic-faint-foreground: var(--bs-tertiary-color);
+    --fc-classic-muted-foreground: var(--bs-secondary-color);
+    --fc-classic-border: var(--bs-border-color);
+    --fc-classic-strong-border: var(--bs-border-color-translucent);
+}
+
+.events-calendar a {
+    text-decoration: none;
+}
+
+.events-calendar .event-cancelled {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
