@@ -59,7 +59,7 @@ No new table (the avatar key lives in `user_profiles.avatar`), permission, setti
 
 ## Decisions and deviations
 
-- **D-23-01 (decide, Open):** URLs `POST files/picker/upload`, `GET files/picker/browse`,
+- **D-23-01 (decided by the owner as built, Decisions 23):** URLs `POST files/picker/upload`, `GET files/picker/browse`,
   `GET files/avatar/{key}` (signed URLs for the API), outside `backend/` and without a permission
   (the token is the authorisation); the field API and `Config\Storage::$pickerBackend`. Built so
   the URLs can still be renamed.
@@ -159,4 +159,4 @@ against `php spark serve` after a fresh `app:install --demo`, with two generated
 - Rich text with images: `RichTextEditor::attrs(RichTextEditor::images('<module>'))`.
 - Events (session 24): attachments on the private disk under `modules/events/…` need a
   `FileAccessPolicy` so they follow the event's audience.
-- D-23-01 is Open (decide): run `deploy/decide.md`.
+- D-23-01 was decided as built (Decisions 23): the URLs stay.

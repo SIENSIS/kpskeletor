@@ -39,7 +39,7 @@ session 23): folders on demand, quotas, `files` rows and browsing through the fo
 D-22-01 (names, URLs, settings, space paths) decided by the owner as built; D-22-04 decided: other
 users' personal spaces only for superadmins (not `files.all`), each read logged
 (`personal_file_read`); D-22-02, D-22-03, D-22-05, D-22-06 accepted (`docs/decisions.md`). Session 23: D-23-01 (picker and
-avatar URLs, decide), D-23-02 (picker in the Core, this module's backend), D-23-03 (browse/choose
+avatar URLs, decided as built), D-23-02 (picker in the Core, this module's backend), D-23-03 (browse/choose
 rules).
 
 ## Open tasks

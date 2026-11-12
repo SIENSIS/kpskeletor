@@ -201,7 +201,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-22-04 | 22 | Who reads a private file, and the folder ACL details (decide) | Applied (decided) |
 | D-22-05 | 22 | Quotas, trash and thumbnails | Accepted (proposal) |
 | D-22-06 | 22 | Upload progress without inline styles | Accepted (proposal) |
-| D-23-01 | 23 | File picker URLs, the avatar URL and the picker contract (decide) | Open |
+| D-23-01 | 23 | File picker URLs, the avatar URL and the picker contract (decide) | Applied (decided) |
 | D-23-02 | 23 | The file picker lives in the Core with a pluggable backend | Accepted (proposal) |
 | D-23-03 | 23 | What a picker field may browse and choose | Accepted (proposal) |
 | D-23-04 | 23 | Avatars: saving, replacing and serving | Accepted (proposal) |
@@ -2106,8 +2106,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The plan names the route prefixes but not the URLs, their parameters, who may call them or what the avatar's segment is; these are public conventions (URLs) and security (who uploads where).
 - **Proposal:** `POST files/picker/upload` (`token`, `file`; CSRF, `ratelimit:uploads`; 201 with the file as JSON, 401 for guests, 403 for a missing/tampered/expired/foreign token with a `security` entry `upload_token_refused`, 422 for a refused file) and `GET files/picker/browse?token=…&path=…` (404 outside the token's roots), both outside `backend/` and with **no permission**: the signed token is the authorisation ("the field grants the upload"). Avatars at `GET files/avatar/{key}` (the file key; signed-in users, or `?expires=…&signature=…` signed URLs valid one hour for API clients; only keys that are a current avatar; `Cache-Control: private, max-age=31536000, immutable`, versioned by the key). Field API: `PickerField::make()->mode()->disk()->folder('…{user_id}…')->types()->maxSize()->maxFiles()->browseRoot()`, `render()`, `accepts()`; value = comma-separated file keys; `Config\Storage::$pickerBackend` and `$pickerTokenTtl` (4 hours).
 - **Alternatives:** A) Put the endpoints under `backend/files/picker/*` with a new permission granted to every group (e.g. `files.picker`): one more permission for nothing the token does not already decide, and Auth (avatars) would depend on the Files module. B) Avatars at `files/avatar/{user_id}?v=<version>` (exposes user ids and needs a version column). C) No signed avatar URLs: `me.avatar_url` would need the API token on an image request.
-- **Status:** Open
-- **Applied in:** `modules/Core/Config/Routes.php`, `modules/Core/Controllers/FilePicker.php`, `modules/Core/Storage/Picker/*`, `app/Config/Storage.php`, `modules/Auth/Config/Routes.php`, `modules/Auth/Controllers/AvatarController.php`, `modules/Auth/Services/Avatars.php`, `docs/files.md` ("File picker"); built so that the URLs can still be renamed (one route and one `site_url()` each).
+- **Status:** Applied (decided)
+- **Decision (2026-11-12):** «Com està fet (recomanada)». As proposed and built: `POST files/picker/upload` and `GET files/picker/browse` outside `backend/` and without a permission (the field's signed upload token is the authorisation), avatars at `GET files/avatar/{key}` for signed-in users or with a signed URL (API), cached for a year and versioned by the file key; the `PickerField` API and `Config\Storage::$pickerBackend` / `$pickerTokenTtl`. **Must change:** specification "Files" (file picker endpoints, avatar URL) and "API" (`me.avatar_url` signed for an hour); no code change.
+- **Applied in:** `modules/Core/Config/Routes.php`, `modules/Core/Controllers/FilePicker.php`, `modules/Core/Storage/Picker/*`, `app/Config/Storage.php`, `modules/Auth/Config/Routes.php`, `modules/Auth/Controllers/AvatarController.php`, `modules/Auth/Services/Avatars.php`, `modules/Api/Controllers/Me.php`, `docs/files.md` (session 23, as built); `docs/specification.md` ("Files" › file picker and avatars, "API" › `me`); tests `FilePickerTest`, `PickerBackendTest`, `AvatarTest`
 
 ## D-23-02 — The file picker lives in the Core with a pluggable backend
 
