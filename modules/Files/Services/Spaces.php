@@ -11,7 +11,8 @@ use Modules\Core\Permissions\Authorization;
  * The predefined spaces of the file manager (docs/files.md):
  *
  * - personal: `users/{user_id}` on the private disk; the owner has every right, nobody else
- *   (except `files.all`) unless the folder ACL of a subfolder says so; shown in the file
+ *   (except superadmins, whose reads are logged; D-22-04) unless the folder ACL of a subfolder
+ *   says so; shown in the file
  *   manager to members of the groups in `Files.personalSpaceGroups`;
  * - modules: `modules/<module>` on either disk; only the module's code writes there; hidden in
  *   the file manager, or read-only for `files.all` when the module's `FileAccessPolicy` says so;

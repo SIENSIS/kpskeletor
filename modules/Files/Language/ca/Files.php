@@ -169,6 +169,7 @@ return [
         'folder_created' => 'Carpeta creada',
         'folder_renamed' => 'Carpeta reanomenada',
         'folder_deleted' => 'Carpeta eliminada',
+        'personal_file_read' => 'Fitxer de l’espai personal d’un altre usuari llegit per un superadmin',
         'acl_changed'    => 'Permisos de carpeta modificats',
     ],
 ];

@@ -5,7 +5,8 @@ Branch: `claude/upbeat-brown-vq8taw` · Pull request: [SIENSIS/kpskeletor#30](ht
 ## What was built
 
 - **File manager** (`backend/files`, `files.list`): folder tree by space (my files, shared
-  public, shared private; other users' spaces and module folders for `files.all`), breadcrumbs,
+  public, shared private; module folders for `files.all`; other users' spaces only for
+  superadmins, D-22-04), breadcrumbs,
   **list and grid** views (remembered in the browser), **search** (name, alt text, tags),
   **filters** by type, date range and tag, sort by name/date/size; **upload** by button or **drag
   and drop**, several files, one `<progress>` bar per file; details panel with **preview**
@@ -54,23 +55,26 @@ Activity log: `file_uploaded`, `file_updated`, `file_moved`, `file_trashed`, `fi
 
 ## Decisions and deviations
 
-- **D-22-01 (decide, Open):** the eight permission names of the specification on one resource
+- **D-22-01 (decided by the owner as built, Decisions 22):** the eight permission names of the specification on one resource
   `files`; `files.private` = the shared folders of the private disk in the file manager; shared
   space under `shared/`; settings `Files.personalSpaceGroups` (list) and `Files.personalQuota`
   (new, MB); editor grants `files.list/upload/edit/delete/folders/private`; URLs above.
 - **D-22-02:** the file manager is a screen of its own over JSON endpoints, not kpcrudy.
 - **D-22-03:** virtual folders: `files.folder`; moves and folder renames never touch the disk;
   `files` references `stored_files` (D-13-03).
-- **D-22-04 (decide, Open):** the private-file rule order (policy → guests → trash → ACL `view` →
-  `OwnerAccess`), `files.all` everywhere except module folders, the owner always keeps every right
-  in their space, only `files.all` edits a personal space's ACL, policies only inside `modules/`.
+- **D-22-04 (decided by the owner, Decisions 22):** the private-file rule order (policy → guests →
+  trash → ACL `view` → `OwnerAccess`), policies only inside `modules/`, the owner always keeps every
+  right in their space; **other users' personal spaces only for superadmins** (`files.all` covers
+  shared folders), who also edit their ACL and quota; every superadmin read of someone else's
+  personal file (private URL, download, preview) is a `security` entry `personal_file_read`;
+  administrators impersonate the user when needed.
 - **D-22-05:** quotas along the chain, trash counts, checked before and after storing;
   thumbnails on the private disk `modules/files/thumbnails/`; no automatic trash purge yet.
 - **D-22-06:** upload progress with native `<progress>` and one request per file (no inline
   styles).
-- Core tests adjusted (no Core code changed): `PrivateFilesTest` uses an editor as "another user"
-  (admins now read personal spaces through `files.all`, as the specification says);
-  `PermissionsCommandsTest` (108 permissions) and `ShieldMatrixTest` (`files.*` in admin's grants).
+- Core tests adjusted (no Core code changed): `PermissionsCommandsTest` (108 permissions) and
+  `ShieldMatrixTest` (`files.*` in admin's grants). `PrivateFilesTest` is unchanged after D-22-04
+  (an admin is still "another user" who gets a 404).
 
 ## How to try it
 
@@ -82,14 +86,15 @@ php spark serve
 - `http://localhost:8080/backend/files` as **editor@example.com** (password printed once by the
   command that loaded the demo): "Els meus fitxers", "Imatges web" (public), "Documents comuns"
   and "Secretaria" › "Circulars" (inherited), not "Actes" (own permissions: admins only).
-- As **admin@example.com**: every folder, the permissions dialog ("Permisos") and quotas, other
-  users' spaces under "Espais personals".
+- As **admin@example.com**: every shared folder, the permissions dialog ("Permisos") and quotas;
+  not other users' personal spaces (only superadmins see "Espais personals", and their reads of
+  those files appear in the activity log as security entries).
 - A private file's address (`files/private/{key}`, "Copia l'URL") answers 404 to users without
   `view` on its folder and to guests.
 
 ## Tests and checks
 
-New tests (`modules/Files/Tests`, 34 tests, 254 assertions):
+New tests (`modules/Files/Tests`, 36 tests):
 
 - `FolderAclTest`: inheritance and override (and inheriting again), empty own ACL hides, the three
   subjects add up, no folder = no rights, `files.all` and superadmins, personal space (owner,
@@ -113,7 +118,7 @@ New tests (`modules/Files/Tests`, 34 tests, 254 assertions):
 
 Results (full run on this branch):
 
-- `vendor/bin/phpunit`: **OK (942 tests, 5245 assertions)**, 7 min 58 s on SQLite (the first run had
+- `vendor/bin/phpunit`: **OK (944 tests, 5272 assertions)** after Decisions 22, 7 min 28 s on SQLite (the first run had
   3 failures in Core counting/rule tests, fixed as described above).
 - `vendor/bin/phpstan analyse` (level 6): **No errors**.
 - `vendor/bin/php-cs-fixer fix --dry-run --diff`: **0 of 672 files** to fix.
@@ -171,4 +176,5 @@ against `php spark serve` after a fresh `app:install --demo`.
 - Tests needing files extend `Modules\Files\Tests\FilesTestCase` (`folder()`, `upload()`,
   `apiJson()`, `statusOf()`); counting tests (`PermissionsCommandsTest`, `ShieldMatrixTest`) list
   every module's permissions.
-- D-22-01 and D-22-04 are **Open (decide)**: run `deploy/decide.md` before session 23.
+- D-22-01 and D-22-04 were decided (Decisions 22): personal spaces are their owner's; only
+  superadmins enter other users' spaces and their reads are logged (`FolderAcl::logForeignRead()`).

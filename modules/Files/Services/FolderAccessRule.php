@@ -23,7 +23,8 @@ use Throwable;
  *    visibility of the module's record). Superadmins always pass.
  * 3. Guests: nothing.
  * 4. A trashed file: only users who may delete in its folder (to restore it) see it.
- * 5. The folder is governed by the folder ACL: its `view` right decides.
+ * 5. The folder is governed by the folder ACL: its `view` right decides (a superadmin reading a
+ *    file of someone else's personal space is written to the security log, D-22-04).
  * 6. Anything else (a file outside every managed folder): OwnerAccess.
  */
 final class FolderAccessRule implements FileAccessRule
@@ -54,7 +55,13 @@ final class FolderAccessRule implements FileAccessRule
             }
 
             if ($acl->governs($file->disk, $folder)) {
-                return $acl->can($user, $file->disk, $folder, Rights::VIEW);
+                $allowed = $acl->can($user, $file->disk, $folder, Rights::VIEW);
+
+                if ($allowed) {
+                    FolderAcl::logForeignRead($user, $file->disk, $folder, is_array($row) ? (string) $row['name'] : $file->originalName, 'private_url');
+                }
+
+                return $allowed;
             }
 
             return (new OwnerAccess())->canView($user, $file);

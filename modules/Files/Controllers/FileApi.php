@@ -17,6 +17,7 @@ use Modules\Core\Storage\StorageException;
 use Modules\Core\Storage\UploadRefused;
 use Modules\Files\Services\Browser;
 use Modules\Files\Services\FileRepository;
+use Modules\Files\Services\FolderAcl;
 use Modules\Files\Services\QuotaService;
 use Modules\Files\Services\Rights;
 use Modules\Files\Services\Spaces;
@@ -593,6 +594,8 @@ final class FileApi extends BackendController
         if ($stored === null || $disk === null || ! $disk->exists($stored->path)) {
             return $this->notFound();
         }
+
+        FolderAcl::logForeignRead($this->currentUser(), (string) $row['disk'], (string) $row['folder'], (string) $row['name'], $download ? 'download' : 'preview');
 
         $text     = in_array($stored->extension, ['txt', 'csv', 'md'], true);
         $response = new DownloadResponse((string) $row['name'], false);

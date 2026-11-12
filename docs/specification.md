@@ -1262,20 +1262,23 @@ its own (`folder_permissions`: folder, subject, rights):
   (edit the folder's permissions).
 * **RBAC is the ceiling, the ACL decides where:** `files.list` is needed to open the file
   manager at all; inside it, each folder's ACL decides what the user can do. `files.acl` allows
-  editing folder permissions, `files.all` gives access to every folder (administrators);
-  superadmins bypass everything.
+  editing folder permissions, `files.all` gives access to every shared folder (administrators)
+  but not to other users' personal spaces; superadmins bypass everything (their reads of another
+  user's personal files are written to the security log). `files.private` allows using the
+  shared folders of the private disk in the file manager.
 * **Predefined spaces:**
 
   | Space | Path | Default rights |
   |---|---|---|
-  | **Personal** | `users/{user_id}/` (private disk) | The owner has every right; nobody else (except `files.all`) |
+  | **Personal** | `users/{user_id}/` (private disk) | The owner has every right; nobody else (except superadmins, logged; administrators impersonate the user when needed) |
   | **Modules** | `modules/<module>/` | Only the module's code writes there (Storage service); read-only or hidden in the file manager, as the module declares |
-  | **Shared** | created by administrators | The rights assigned to groups or users |
+  | **Shared** | `shared/…` on either disk, created by administrators | The rights assigned to groups or users |
 
 * **Personal space in the file manager:** users can see and use their personal folder as a small
   personal drive. It is enabled per group with a setting (`Files.personalSpaceGroups`); users of
   other groups only upload through fields (avatar, attachments) and never open the file manager.
-* **Quotas** per user (personal space) and per shared folder.
+* **Quotas** per user (personal space, setting `Files.personalQuota` in MB; a superadmin may set
+  one space's own) and per shared folder.
 * **Serving private files:** the controller checks the folder's `view` right before sending a
   file. Exception: a file attached to a record (e.g. the attachment of a private event) follows
   the visibility of that record; the owning module decides, through a `FileAccessPolicy` it

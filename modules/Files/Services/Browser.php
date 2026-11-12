@@ -70,7 +70,8 @@ final class Browser
             }
         }
 
-        if ($auth->can('files.all')) {
+        // Other users' personal spaces: superadmins only (D-22-04).
+        if (Authorization::isSuperadmin($user)) {
             $others = [];
 
             foreach ($this->acl->folders()->below('private', 'users') as $path => $folder) {
@@ -86,7 +87,9 @@ final class Browser
             if ($others !== []) {
                 $roots[] = ['disk' => 'private', 'path' => 'users', 'name' => lang('Files.spaces.users'), 'icon' => 'bi bi-people', 'rights' => [], 'children' => $others];
             }
+        }
 
+        if ($auth->can('files.all')) {
             $modules = [];
 
             foreach (PolicyRegistry::instance()->all() as $folder => $policy) {

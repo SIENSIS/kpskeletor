@@ -12,7 +12,7 @@ keeps its random name and path; see `stored_files`, D-13-03). Three spaces, by p
 
 | Space | Path | Who |
 |---|---|---|
-| Personal | `users/{user_id}` (private disk) | the owner has every right; nobody else except `files.all`, unless a subfolder's ACL shares it (e.g. the avatar folder of session 23). Shown in the file manager to members of the groups in `Files.personalSpaceGroups` (default `admin`, `editor`); created on first use |
+| Personal | `users/{user_id}` (private disk) | the owner has every right; nobody else except superadmins (each read of a file written to the security log as `personal_file_read`; administrators impersonate the user when needed, D-22-04), unless a subfolder's ACL shares it (e.g. the avatar folder of session 23). Shown in the file manager to members of the groups in `Files.personalSpaceGroups` (default `admin`, `editor`); created on first use |
 | Shared | `shared/…` (public or private disk) | the rights of the folder ACL. The two roots (`shared` on each disk) are created on first use with an empty ACL: only `files.all` until an administrator shares them |
 | Modules | `modules/<module>/…` | written only by the module's code (Storage service). Hidden in the file manager, or listed read-only for `files.all` when the module's `FileAccessPolicy` says `readonly` |
 
@@ -23,7 +23,8 @@ Anything outside these prefixes is refused by the file manager (404).
 Permissions of the single resource `files` (D-00-18, D-22-01): `files.list` (open the file
 manager), `files.upload`, `files.edit` (rename, metadata, move), `files.delete` (trash, restore,
 delete for good), `files.folders` (create, rename and delete folders), `files.acl` (edit folder
-permissions), `files.all` (every folder, every right: administrators), `files.private` (the
+permissions), `files.all` (every shared folder, every right: administrators; not other users' personal
+spaces), `files.private` (the
 shared folders of the private disk). Default grants: `admin` `files.*`; `editor` `files.list`,
 `upload`, `edit`, `delete`, `folders`, `private`.
 
@@ -36,13 +37,14 @@ entries that match the user (their id, their groups, "all logged-in") add up.
 `Modules\Files\Services\FolderAcl`:
 
 - `rights($user, $disk, $path)` — the ACL alone (what serving a private file checks):
-  superadmins and `files.all` get every right except in module folders; the owner of a personal
-  space gets every right inside it; otherwise the inherited entries;
+  superadmins get every right except in module folders; the owner of a personal space gets every
+  right inside it; `files.all` gets every right except in module folders and in other users'
+  personal spaces; otherwise the inherited entries;
 - `managerRights()` — what the file manager allows: `rights()` capped by the RBAC permission of
   each right (`view`→`files.list`, `upload`→`files.upload`, `edit`→`files.edit`,
   `delete`→`files.delete`, `manage`→`files.acl`), personal spaces only for the groups of the
-  setting, private shared folders only with `files.private`, and the ACL of a personal space only
-  edited by `files.all`.
+  setting, private shared folders only with `files.private`, and the ACL (and quota) of a personal
+  space only edited by superadmins.
 
 Folder operations need `files.folders` and `manage` in the folder (in one's own personal space,
 `upload`). Space roots cannot be renamed or deleted; only empty folders (no files, no files in
@@ -78,7 +80,9 @@ WebP thumbnail (JPEG without WebP) on the private disk in `modules/files/thumbna
      (superadmins always pass): the file follows the visibility of the module's record;
   3. guests → 404;
   4. a trashed file → only users with `delete` in its folder;
-  5. a folder governed by the ACL → its `view` right;
+  5. a folder governed by the ACL → its `view` right (a superadmin reading a file of someone
+     else's personal space is logged, also through the file manager's download and preview;
+     thumbnails in listings are not);
   6. otherwise (files of other modules outside the managed folders) → `OwnerAccess`.
   Anything refused is a 404.
 - In the file manager, `download` and `preview` (`backend/files/api/file/{id}/…`) check the same
@@ -117,7 +121,8 @@ enabled modules count; the longest matching folder wins.
 
 A folder or file the user cannot view answers 404; a missing right 403; a path with traversal,
 hidden segments or outside the spaces 404. Every change is in the activity log
-(`Files.activity.*`); permission changes are `security` entries (`acl_changed`).
+(`Files.activity.*`); permission changes (`acl_changed`) and superadmin reads of other users'
+personal files (`personal_file_read`) are `security` entries.
 
 The page (`Views/manager.php`, `Assets/js/file-manager.js`, `Assets/css/file-manager.css`): tree,
 breadcrumbs, list and grid views (remembered in the browser), search by name/alt/tags, filters by

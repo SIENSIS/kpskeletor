@@ -9,7 +9,8 @@ thumbnails, and the rule that serves private files (`files/private/{key}`). Full
 
 - `files` (single resource, `'name' => 'files'`, crud − show/add/export/import/trash/restore/
   purge + extras): `files.list`, `upload`, `edit`, `delete`, `folders`, `acl`, `all`, `private`.
-  RBAC is the ceiling; the folder ACL decides where (`Services/FolderAcl.php`).
+  RBAC is the ceiling; the folder ACL decides where (`Services/FolderAcl.php`). `files.all` covers
+  shared folders, not other users' personal spaces (superadmins only, logged).
 - Grants: admin `files.*`; editor `files.list`, `upload`, `edit`, `delete`, `folders`, `private`.
 - Menu: "Files" (sidebar, 30). Settings: `Files.personalSpaceGroups` (list, default
   admin/editor), `Files.personalQuota` (MB, default 100).
@@ -32,8 +33,9 @@ thumbnails, and the rule that serves private files (`files/private/{key}`). Full
 
 ## Decisions
 
-D-22-01 (names, URLs, settings, space paths) and D-22-04 (private file rule, ACL details) are
-**Open (decide)**; D-22-02, D-22-03, D-22-05, D-22-06 accepted (`docs/decisions.md`).
+D-22-01 (names, URLs, settings, space paths) decided by the owner as built; D-22-04 decided: other
+users' personal spaces only for superadmins (not `files.all`), each read logged
+(`personal_file_read`); D-22-02, D-22-03, D-22-05, D-22-06 accepted (`docs/decisions.md`).
 
 ## Open tasks
 
@@ -50,4 +52,4 @@ D-22-01 (names, URLs, settings, space paths) and D-22-04 (private file rule, ACL
 temporary Storage disks, `folder()`, `upload()`, `apiJson()`, `status()`). By hand:
 `php spark modules:demo Auth` and `php spark modules:demo Files`, then `backend/files` as
 editor@ (personal space, Secretaria and Circulars but not Actes, Documents comuns, Imatges web)
-and as admin@ (everything, permissions dialog, quotas).
+and as admin@ (every shared folder, permissions dialog, quotas; no other personal spaces).

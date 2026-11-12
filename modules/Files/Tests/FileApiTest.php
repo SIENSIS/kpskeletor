@@ -219,6 +219,24 @@ final class FileApiTest extends FilesTestCase
         $this->assertSame([], $this->folders()->permissions($folder['id']));
     }
 
+    public function testOnlySuperadminsSeeOtherPersonalSpacesInTheTree(): void
+    {
+        $owner = $this->createUser('ed@example.com', 'editor');
+        $home  = Spaces::personalPath((int) $owner->id);
+        $this->folder('private', $home, []);
+
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+        $this->assertNotContains('private:' . $home, self::paths($this->apiJson('GET', 'tree')['tree']));
+        $this->apiJson('GET', 'list', ['disk' => 'private', 'path' => $home], 404);
+
+        $this->createUser('root@example.com', 'superadmin');
+        $this->login('root@example.com');
+        $this->assertContains('private:' . $home, self::paths($this->apiJson('GET', 'tree')['tree']));
+        $this->apiJson('GET', 'list', ['disk' => 'private', 'path' => $home]);
+        $this->apiJson('GET', 'acl', ['disk' => 'private', 'path' => $home]);
+    }
+
     private function loginAsEditor(string $email = 'ed@example.com'): \CodeIgniter\Shield\Entities\User
     {
         $user = $this->createUser($email, 'editor');

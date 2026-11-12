@@ -11,6 +11,7 @@ use Modules\Core\Storage\StoredFile;
 use Modules\Files\Policies\FileAccessPolicy;
 use Modules\Files\Policies\PolicyRegistry;
 use Modules\Files\Services\FolderAccessRule;
+use Modules\Files\Services\Spaces;
 use Modules\Files\Services\Trash;
 
 /**
@@ -49,6 +50,30 @@ final class PrivateFileRuleTest extends FilesTestCase
         $this->send('POST', 'logout');
         $_SESSION = [];
         $this->assertSame(404, $this->statusOf('GET', $path), 'Guests never see private files of a folder.');
+    }
+
+    public function testPersonalSpacesAreTheOwnersAndSuperadminReadsAreLogged(): void
+    {
+        $owner = $this->createUser('ed@example.com', 'editor');
+        $this->folder('private', Spaces::personalPath((int) $owner->id), []);
+        $id   = $this->upload($owner, 'private', Spaces::personalPath((int) $owner->id), 'My own notes.', 'notes.txt');
+        $path = 'files/private/' . $this->keyOf($id);
+
+        $this->login('ed@example.com');
+        $this->send('GET', $path)->assertStatus(200);
+        $this->dontSeeInDatabase('activity_log', ['action' => 'personal_file_read']);
+
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+        $this->assertSame(404, $this->statusOf('GET', $path), 'files.all does not open other users\' personal files (D-22-04).');
+        $this->assertSame(404, $this->statusOf('GET', 'backend/files/api/file/' . $id . '/download'));
+
+        $this->createUser('root@example.com', 'superadmin');
+        $this->login('root@example.com');
+        $this->send('GET', $path)->assertStatus(200);
+        $this->seeInDatabase('activity_log', ['module' => 'Files', 'action' => 'personal_file_read', 'type' => 'security']);
+        $this->send('GET', 'backend/files/api/file/' . $id . '/preview')->assertStatus(200);
+        $this->assertSame(2, db_connect()->table('activity_log')->where('action', 'personal_file_read')->countAllResults());
     }
 
     public function testTrashedFilesAreOnlyForThoseWhoMayDeleteThem(): void

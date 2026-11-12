@@ -11,9 +11,10 @@ use Modules\Files\Policies\PolicyRegistry;
 /**
  * The folder ACL (docs/files.md, "Folder permissions").
  *
- * `rights()` is the ACL alone (what serving a private file checks): superadmins and `files.all`
- * get every right everywhere except in module folders; the owner of a personal space gets every
- * right in it; otherwise the nearest folder of the chain (the folder, then its parents) that
+ * `rights()` is the ACL alone (what serving a private file checks): superadmins get every right
+ * everywhere except in module folders; the owner of a personal space gets every right in it;
+ * `files.all` gets every right everywhere except in module folders and in other users' personal
+ * spaces (D-22-04: only superadmins enter those, and their reads are logged); otherwise the nearest folder of the chain (the folder, then its parents) that
  * defines its own permissions decides, and its entries for the user, the user's groups and
  * "all logged-in users" add up. No such folder: no rights (default deny). Module folders are
  * written only by their module's code: `files.all` may view the ones whose policy is `readonly`.
@@ -70,8 +71,9 @@ final class FolderAcl
 
         $space = Spaces::of($disk, $path);
         $all   = $auth->can('files.all');
+        $super = Authorization::isSuperadmin($user);
 
-        if ($space === Spaces::PERSONAL && ! $all && ! Spaces::personalEnabled($user)) {
+        if ($space === Spaces::PERSONAL && ! $super && ! Spaces::personalEnabled($user)) {
             return [];
         }
 
@@ -87,12 +89,39 @@ final class FolderAcl
             }
         }
 
-        // The ACL of a personal space is only edited by `files.all` (its owner cannot share it).
-        if ($space === Spaces::PERSONAL && ! $all) {
+        // The ACL of a personal space is only edited by superadmins (its owner cannot share it).
+        if ($space === Spaces::PERSONAL && ! $super) {
             $rights = array_values(array_diff($rights, [Rights::MANAGE]));
         }
 
         return $rights;
+    }
+
+    /**
+     * Whether reading a file of this folder is a superadmin entering someone else's personal
+     * space (logged as a `security` entry, D-22-04).
+     */
+    public static function isForeignPersonal(?User $user, string $disk, string $path): bool
+    {
+        $owner = Spaces::personalOwner($disk, $path);
+
+        return $owner !== null && $user !== null && $owner !== (int) $user->id && Authorization::isSuperadmin($user);
+    }
+
+    /**
+     * Writes the `security` entry of a superadmin reading a file of someone else's personal space.
+     */
+    public static function logForeignRead(?User $user, string $disk, string $path, string $name, string $how): void
+    {
+        if (! self::isForeignPersonal($user, $disk, $path)) {
+            return;
+        }
+
+        security_log('Files', 'personal_file_read', [
+            'resource' => 'files',
+            'summary'  => $disk . ':' . $path . '/' . $name,
+            'after'    => ['owner' => Spaces::personalOwner($disk, $path), 'how' => $how],
+        ]);
     }
 
     public function managerCan(User $user, string $disk, string $path, string $right): bool
@@ -150,11 +179,18 @@ final class FolderAcl
             return $policy !== null && $policy->browse() === 'readonly' && $auth->can('files.all') ? [Rights::VIEW] : [];
         }
 
-        if (Authorization::isSuperadmin($user) || $auth->can('files.all')) {
+        if (Authorization::isSuperadmin($user)) {
             return Rights::ALL;
         }
 
-        if (Spaces::personalOwner($disk, $path) === (int) $user->id) {
+        $owner = Spaces::personalOwner($disk, $path);
+
+        if ($owner === (int) $user->id) {
+            return Rights::ALL;
+        }
+
+        // Other users' personal spaces: never through `files.all` (D-22-04), only their ACL.
+        if ($owner === null && $auth->can('files.all')) {
             return Rights::ALL;
         }
 

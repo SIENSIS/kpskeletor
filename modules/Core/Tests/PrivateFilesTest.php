@@ -12,9 +12,9 @@ use Modules\Core\Storage\Storage;
 use Modules\Core\Storage\StoredFile;
 
 /**
- * GET files/private/{key}: only the user the access rule allows (the uploader, superadmins and, with
- * the Files module, the folder ACL of `users/{id}`: its owner and `files.all`) gets the file, with
- * its stored MIME type, nosniff, a sandboxing CSP, no caching and `attachment` unless it is a raster image or a PDF; everybody else, unknown keys,
+ * GET files/private/{key}: only the user the access rule allows (the uploader and superadmins; with
+ * the Files module, the folder ACL, where personal spaces stay their owner's and superadmins') gets
+ * the file, with its stored MIME type, nosniff, a sandboxing CSP, no caching and `attachment` unless it is a raster image or a PDF; everybody else, unknown keys,
  * public-disk files and files missing on disk get a 404.
  *
  * @internal
@@ -124,8 +124,7 @@ final class PrivateFilesTest extends RbacTestCase
     public function testOtherUsersAndGuestsGetNotFound(): void
     {
         $file  = $this->storeAs(self::png(), 'photo.png');
-        // Not an admin: with the Files module, `files.all` reads personal spaces (FolderAccessRule, D-22-04).
-        $other = $this->createUser('other@example.com', 'editor');
+        $other = $this->createUser('other@example.com', 'admin');
 
         $this->assertNotFound((int) $other->id, 'files/private/' . $file->key);
         $this->assertNotFound(null, 'files/private/' . $file->key);

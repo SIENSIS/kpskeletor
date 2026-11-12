@@ -77,7 +77,7 @@ final class FolderAclTest extends FilesTestCase
         $this->assertFalse((new FolderAcl())->governs('private', 'shared/Nowhere'));
     }
 
-    public function testFilesAllAndSuperadminsGetEveryRight(): void
+    public function testFilesAllGetsEveryRightInSharedFoldersButNotInOtherPersonalSpaces(): void
     {
         $this->folder('private', 'shared/Secret', []);
         $admin = $this->createUser('boss@example.com', 'admin');
@@ -86,7 +86,16 @@ final class FolderAclTest extends FilesTestCase
 
         $this->assertSame(Rights::ALL, (new FolderAcl())->rights($admin, 'private', 'shared/Secret'));
         $this->assertSame(Rights::ALL, (new FolderAcl())->rights($super, 'private', 'shared/Secret'));
-        $this->assertSame(Rights::ALL, (new FolderAcl())->rights($admin, 'private', Spaces::personalPath((int) $other->id)), 'files.all reaches personal spaces too.');
+        $home = Spaces::personalPath((int) $other->id);
+        $this->assertSame([], (new FolderAcl())->rights($admin, 'private', $home), 'files.all does not reach other users\' personal spaces (D-22-04).');
+        $this->assertSame([], (new FolderAcl())->rights($admin, 'private', $home . '/Docs'));
+        $this->assertSame([], (new FolderAcl())->managerRights($admin, 'private', $home));
+        $this->assertSame(Rights::ALL, (new FolderAcl())->rights($super, 'private', $home), 'Only superadmins enter them.');
+        $this->assertSame(Rights::ALL, (new FolderAcl())->managerRights($super, 'private', $home));
+
+        // A subfolder the owner's space shares still applies to administrators like to anyone.
+        $this->folder('private', $home . '/avatar', [['authenticated', '', 'view']]);
+        $this->assertSame(['view'], (new FolderAcl())->rights($admin, 'private', $home . '/avatar'));
     }
 
     public function testThePersonalSpaceBelongsToItsOwner(): void

@@ -169,6 +169,7 @@ return [
         'folder_created' => 'Folder created',
         'folder_renamed' => 'Folder renamed',
         'folder_deleted' => 'Folder deleted',
+        'personal_file_read' => 'File of another user\'s personal space read by a superadmin',
         'acl_changed'    => 'Folder permissions changed',
     ],
 ];
