@@ -776,6 +776,12 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** all.
 - **Risks:** CI time (matrix × MariaDB × Playwright); flaky screenshots.
 
+- **Owner's request (2026-11-12, after session 24):** News and Pages switch their rich-text body from
+  the undocumented `fieldType('body', 'translation', ['attrs' => …])` to kpcrudy's documented
+  `setTranslations(..., ['attrs' => ['body' => RichTextEditor::attrs(…)]])` (kpcrudy ≥ 1.3); update
+  `RichTextEditor`'s docblock, `CLAUDE.md` ("Rich text") and `docs/frontend.md`; the existing tests
+  (`PostsCrudTest`, `PagesCrudTest`: every language's body carries the editor) must keep passing.
+
 ## 36 — Final acceptance and release (`deploy/36-release.md`)
 
 - **Goal:** verify acceptance criteria 1–13 and publish version 1.0.0.
