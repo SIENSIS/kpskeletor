@@ -13,13 +13,14 @@ use Kpapy\Http\ApiException;
 use Kpapy\Http\Responder;
 use Kpapy\Resource;
 use Modules\Auth\Models\UserProfileModel;
+use Modules\Auth\Services\Avatars;
 use Modules\Auth\Services\TwoFactor;
 use Throwable;
 
 /**
  * `GET api/v1/me`: the profile of the token's user (any valid token; it never returns secrets):
  * masked id (the same code as in the back office, context `users`), name, email, language,
- * time zone, colour mode, avatar URL (session 23), groups, 2FA method and the token's own name,
+ * time zone, colour mode, avatar URL (signed, valid for an hour; null without an avatar), groups, 2FA method and the token's own name,
  * scopes and expiry.
  */
 final class Me extends Controller
@@ -47,7 +48,7 @@ final class Me extends Controller
                 'locale'     => $profile['locale'] ?? null,
                 'timezone'   => $profile['timezone'] ?? null,
                 'theme_mode' => $profile['theme_mode'] ?? null,
-                'avatar_url' => null,
+                'avatar_url' => Avatars::signedUrl(is_string($profile['avatar'] ?? null) ? $profile['avatar'] : null),
                 'groups'     => array_values($user->getGroups() ?? []),
                 'two_factor' => (new TwoFactor())->method((int) $user->id),
                 'token'      => $token === null ? null : [

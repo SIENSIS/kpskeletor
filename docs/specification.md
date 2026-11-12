@@ -1058,7 +1058,7 @@ and kpapy do not depend on each other: the skeleton is what makes them share per
     in the web profile) is **not** used. Logout revokes the token; tokens from app logins expire
     (setting) and can be refreshed.
 * **Core endpoints** (each one a kpapy resource with the same visibility rules as the web):
-  * `me`: profile, preferences, language, avatar URL (signed, private);
+  * `me`: profile, preferences, language, avatar URL (signed, valid for one hour, private);
   * `news`: list and details (public, private and group news the user can see), `POST
     news/{id}/read` (mark as read), notices for the user;
   * `events`: events by date range and calendars (published and provider events), with
@@ -1296,12 +1296,17 @@ field declares how it works:
 | `browseRoot` | where the user may choose from (`browse` / `both`) | — |
 
 * **The field grants the upload, not the file manager:** a user needs no `files.*` permission to
-  upload their avatar. The server issues a **signed upload token** for each field (target
-  folder, disk, types, size, expiry); an upload is only accepted with a valid token, so the user
-  cannot change the folder or the type. The target folder is created on demand with the
-  space's default rights.
+  upload their avatar. The server issues a **signed upload token** for each field (user,
+  target folder, disk, types, size, number of files, browse roots, expiry); an upload is only
+  accepted with a valid token, so the user cannot change the folder or the type. The endpoints
+  are `POST files/picker/upload` (rate limited by `uploads`) and `GET files/picker/browse`,
+  outside `backend/` and without a permission: the token is the authorisation (a tampered,
+  expired or another user's token is refused and written to the security log). The value saved
+  with the form (the file key) is checked again on the server. The target folder is created on
+  demand with the space's default rights.
 * In `browse` / `both` mode, what the user can see and upload is limited by `browseRoot` **and**
-  the folder ACL (e.g. editors choose a news cover from `news/` and their personal space).
+  the folder ACL, on the field's disk only (e.g. editors choose a news cover from
+  `modules/news` and the public shared folders they may view).
 * **Images inside rich text:** the rich-text editor has an "Insert image" button that opens the
   picker (`mode` `both`, images only: JPG, PNG, WebP, GIF; public disk, folder
   `modules/<module>` of the content, e.g. `modules/news`; the Storage service's rules and
@@ -1309,8 +1314,9 @@ field declares how it works:
   same signed upload. HTMLPurifier then keeps only images of the site itself (internal
   `/uploads/…` URLs or the site's hosts); external images are removed. Used by News and Pages.
 * **Avatars** are stored on the **private** disk: they are only served to logged-in users (the
-  personal folder's `avatar` subfolder grants `view` to "all logged-in users"), with long cache
-  headers and a versioned URL so they stay fast.
+  personal folder's `avatar` subfolder grants `view` to "all logged-in users"), at
+  `files/avatar/{key}` (the file key: a new avatar is a new URL) with long cache headers, so they
+  stay fast; API clients get a signed URL that works without a session for one hour.
 
 **Permissions:** `files.list`, `files.upload`, `files.edit` (rename/move), `files.delete`,
 `files.folders`, `files.acl`, `files.all`, `files.private`.

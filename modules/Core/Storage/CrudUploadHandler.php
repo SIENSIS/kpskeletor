@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Modules\Core\Storage;
 
 use CodeIgniter\HTTP\Files\UploadedFile;
+use CodeIgniter\Shield\Entities\User;
 use Kpcrudy\Storage\UploadHandler;
 use Kpcrudy\Storage\UploadRejectedException;
+use Modules\Core\Storage\Picker\PickerField;
 
 /**
  * Base of the kpcrudy upload handlers of module fields (News cover, Pages featured image…): the
@@ -14,7 +16,11 @@ use Kpcrudy\Storage\UploadRejectedException;
  * `stored_files`) into one folder of one disk; the column keeps the file key. kpcrudy never
  * writes the file itself. Extracted from News in session 20.
  *
- * TODO(session 23): fields move to the Core file picker (`callbackField()`).
+ * Since session 23 the same class describes the field as a **file picker** (upload or choose, in
+ * the module's folder and the shared folders the user may view): `pickerField()`,
+ * `renderPicker()` for kpcrudy's `callbackField()`, `accepts()` in the `beforeInsert` /
+ * `beforeUpdate` hooks (News cover, Pages featured image). The kpcrudy upload handler stays for
+ * modules that still use an `image` field.
  */
 abstract class CrudUploadHandler implements UploadHandler
 {
@@ -67,6 +73,54 @@ abstract class CrudUploadHandler implements UploadHandler
         $file = $key !== null && $key !== '' ? service('storage')->find($key) : null;
 
         return $file !== null ? service('storage')->url($file) : null;
+    }
+
+    /**
+     * The file-picker field: upload or choose, the class's types and size, the module's folder;
+     * on the public disk the user may also choose from the public shared folders the folder ACL
+     * lets them view.
+     */
+    public static function pickerField(string $name): PickerField
+    {
+        $handler = new static();
+        $folder  = $handler->folder();
+        $roots   = $handler->disk() === 'public' ? [$folder, 'shared'] : [$folder];
+
+        return PickerField::make($name)->mode('both')->disk($handler->disk())->folder($folder)
+            ->types(static::TYPES)->maxSize(static::MAX_SIZE)->maxFiles(1)->browseRoot($roots);
+    }
+
+    /**
+     * The picker's HTML for kpcrudy's `callbackField()`:
+     * `->callbackField('cover', static fn ($value, ?array $row, array $field): string => CoverUploads::renderPicker('cover', $value, $field))`.
+     *
+     * @param array<string, mixed> $field
+     */
+    public static function renderPicker(string $name, mixed $value, array $field = []): string
+    {
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            return '';
+        }
+
+        $error = $field['error'] ?? null;
+
+        return static::pickerField($name)->render($user, is_string($value) ? $value : null, [
+            'id'    => 'field-' . $name,
+            'error' => is_string($error) && $error !== '' ? $error : null,
+        ]);
+    }
+
+    /**
+     * Whether the posted key can be saved (kept, uploaded through the field or chosen in its
+     * roots): call it in the `beforeInsert` / `beforeUpdate` hooks.
+     */
+    public static function accepts(string $name, mixed $value, ?string $current = null): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User && static::pickerField($name)->accepts($user, is_string($value) ? $value : null, $current);
     }
 
     /**

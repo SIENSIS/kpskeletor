@@ -354,6 +354,7 @@ return [
             'crossOrigin' => 'Requests to other sites are not allowed.',
         ],
         'editor' => [
+            'image'     => 'Insert an image',
             'heading'   => 'Heading',
             'normal'    => 'Normal text',
             'heading2'  => 'Heading 2',
@@ -375,6 +376,23 @@ return [
             'save'      => 'Save',
             'edit'      => 'Edit',
             'remove'    => 'Remove',
+        ],
+        'picker' => [
+            'title'     => 'Choose a file',
+            'choose'    => 'Choose',
+            'cancel'    => 'Cancel',
+            'up'        => 'Parent folder',
+            'empty'     => 'This folder has no files that can be chosen.',
+            'loading'   => 'Loading…',
+            'uploading' => 'Uploading {name}…',
+            'tooLarge'  => '{name} is too large (maximum {max} MB).',
+            'type'      => '{name} is not of an allowed type.',
+            'tooMany'   => 'You can choose at most {max} files.',
+            'remove'    => 'Remove {name}',
+            'alt'       => 'Alternative text (describe the image)',
+            'altHelp'   => 'Leave it empty only if the image is decorative.',
+            'insert'    => 'Insert',
+            'upload'    => 'Upload an image',
         ],
         'demo' => ['reset' => 'The counter was reset.'],
         'widget' => [
@@ -539,10 +557,24 @@ return [
         'preferences_saved' => 'Notification preferences saved',
         'purge' => 'Old entries deleted',
         'upload_refused' => 'Upload refused',
+        'upload_token_refused' => 'Upload token refused',
         'installed' => 'Application installed',
         'superadmin_created' => 'First superadmin created',
     ],
     // Upload rules of the Storage service.
+    // File picker of module fields (core/forms/file-picker).
+    'picker' => [
+        'upload'   => 'Upload a file',
+        'browse'   => 'Choose a file',
+        'remove'   => 'Remove {0}',
+        'noScript' => 'JavaScript is needed to change this file.',
+        'errors'   => [
+            'login'  => 'Please sign in.',
+            'token'  => 'The form has expired or is not valid. Reload the page.',
+            'folder' => 'This folder cannot be opened.',
+            'value'  => 'The chosen file is not valid for this field.',
+        ],
+    ],
     'storage' => [
         'refused' => [
             'invalid' => 'The file could not be uploaded. Try again.',

@@ -34,4 +34,16 @@ final class HtmlSanitizerTest extends CIUnitTestCase
 
         $this->assertSame('<p>t<a>l</a></p>', $clean);
     }
+
+    public function testOnlyImagesOfTheSiteItselfAreKept(): void
+    {
+        $base = rtrim(config('App')->baseURL, '/');
+
+        $this->assertSame('<p><img src="/uploads/modules/news/a.jpg" alt="A cat"></p>', HtmlSanitizer::clean('<p><img src="/uploads/modules/news/a.jpg" alt="A cat"></p>'));
+        $this->assertSame('<p><img src="' . $base . '/uploads/x.png" alt=""></p>', HtmlSanitizer::clean('<p><img src="' . $base . '/uploads/x.png" alt=""></p>'));
+        $this->assertSame('<p>t</p>', HtmlSanitizer::clean('<p>t<img src="https://tracker.example/pixel.gif" alt="x"></p>'), 'External image removed');
+        $this->assertSame('<p>t</p>', HtmlSanitizer::clean('<p>t<img src="//tracker.example/p.gif"></p>'), 'Scheme-relative external image removed');
+        $this->assertSame('<p>t</p>', HtmlSanitizer::clean('<p>t<img src="data:image/png;base64,iVBORw0KGgo="></p>'), 'data: images removed');
+        $this->assertSame('<p><a href="https://example.org/">link</a></p>', HtmlSanitizer::clean('<p><a href="https://example.org/">link</a></p>'), 'Links to other sites are kept');
+    }
 }

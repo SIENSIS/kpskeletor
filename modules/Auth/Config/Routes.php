@@ -49,6 +49,10 @@ $routes->group('', ['namespace' => 'Modules\Auth\Controllers'], static function 
 
     // The way back of an impersonation (the controller requires one; CSRF).
     $routes->post('auth/impersonation/stop', 'ImpersonationController::stop', ['as' => 'auth-impersonation-stop']);
+
+    // Avatars (private disk): signed-in users or a signed URL only (404 otherwise); the URL
+    // changes with each new avatar (the file key), so it is cached for a long time.
+    $routes->get('files/avatar/(:segment)', 'AvatarController::show/$1', ['as' => 'auth-avatar']);
 });
 
 $routes->group('backend/profile', ['namespace' => 'Modules\Auth\Controllers'], static function (RouteCollection $routes): void {

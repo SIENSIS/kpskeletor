@@ -95,6 +95,8 @@ return [
         'timezone'             => 'Zona horaria',
         'themeMode'            => 'Modo de color',
         'birthDate'            => 'Fecha de nacimiento',
+        'avatar'               => 'Avatar',
+        'avatarHelp'           => 'JPG, PNG o WebP, hasta 2 MB. La imagen se vuelve a codificar (sin metadatos) y solo la ven los usuarios que han iniciado sesión. Guarde el perfil para aplicar el cambio.',
         'groups'               => 'Grupos',
         'saved'                => 'Perfil guardado.',
         'currentPassword'      => 'Contraseña actual',

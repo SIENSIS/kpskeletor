@@ -32,6 +32,10 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
   module, ended by `ImpersonationController`, logout or the `authsession` filter on expiry).
 - Tables: `user_profiles`, `user_sessions`, `known_devices`, `user_two_factor`,
   `user_recovery_codes`.
+- Avatars (session 23, D-23-01, D-23-04): `Services/Avatars.php` (the profile's file-picker field,
+  upload only, `users/{user_id}/avatar` on the private disk; signed URLs), served by
+  `Controllers/AvatarController.php` at `files/avatar/{key}` (signed-in users or a signed URL,
+  current avatars only, cached for a year: the key versions the URL). Tests `Tests/AvatarTest.php`.
 - Demo users (`php spark modules:demo Auth`): superadmin@, admin@, editor@, usuari@example.com,
   each with a random password printed once by the command that loaded them (`DemoData::randomPassword()`
   + `$demo->secret()`; never a fixed password).
@@ -55,7 +59,7 @@ as re-authentication, decided by the owner).
   table (`AuthPolicy::twoFactorPolicy()` reads `AuthGroups.groups`), impersonation
   (`Services/Impersonation.php`, banner `Views/impersonation_banner.php`, `POST
   auth/impersonation/stop`; `reauth`, password and email changes refused meanwhile).
-- Session 23: avatar with the file picker.
+- The theme's user menu still shows initials (the avatar is shown on the profile and in `me`).
 
 ## How to test
 

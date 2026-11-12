@@ -25,7 +25,8 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
   meta), `Revisions.php`, `PageCopier.php`, `SitemapBuilder.php`, `HomePageResolver.php`.
 - `Controllers/Pages.php` (kpcrudy), `PublicPages.php` (catch-all, lowest priority),
   `Sitemap.php`; views `templates/{default,wide,sidebar}.php`, `partials/article.php`,
-  `revisions.php`; `Storage/FeaturedImages.php` (Core `CrudUploadHandler`).
+  `revisions.php`; `Storage/FeaturedImages.php` (the featured image's file picker, Core `CrudUploadHandler`,
+  session 23); "Insert image" in the body (`RichTextEditor::images('pages')`).
 
 ## Decisions
 
@@ -35,7 +36,6 @@ stored as the id), D-20-02 … D-20-07 accepted (`docs/decisions.md`).
 ## Open tasks
 
 - Session 21: the Menus module consumes `Menu/PageLink.php`.
-- Session 23: featured image with the file picker; "Insert image" in the editor (D-17-08).
 - Session 26: pages in the API (if wanted). Session 31: the path's language could select the
   content language (D-20-05).
 

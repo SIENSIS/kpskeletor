@@ -124,6 +124,14 @@ re-encoded, private files served only through `files/private/{key}` with `nosnif
 CSP and `attachment` unless image or PDF. Nothing is executed in `public/uploads` and `writable/`
 is never served. See `docs/storage.md` and `docs/web-server.md` (Apache and Nginx snippets).
 
+Module fields upload through the file picker (`files/picker/upload`): only with a **signed upload
+token** issued with the field (user, folder, disk, types, size, expiry; HMAC with a key derived
+from `encryption.key`/`app.maskKey`, `Modules\Core\Security\SigningKey`); a tampered or foreign
+token is a 403 and a `security` entry `upload_token_refused`. The saved value is checked again
+(`PickerField::accepts()`): a key that did not come through the field is refused. Avatars are
+served at `files/avatar/{key}` only to signed-in users or with a signed, expiring URL. Rich text
+keeps only images of the site itself (docs/files.md, "File picker").
+
 ## Redirects
 
 Redirect targets that come from the request (`return`, `next`…) go through `safe_redirect()`:
