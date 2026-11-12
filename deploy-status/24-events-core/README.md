@@ -1,6 +1,6 @@
 # Session 24 — Events module: calendar, administration and audiences
 
-Branch: `claude/gallant-curie-rmfn7k` · Pull request: (see `docs/progress.md`) · Date: 2026-11-12
+Branch: `claude/gallant-curie-rmfn7k` · Pull request: [SIENSIS/kpskeletor#32](https://github.com/SIENSIS/kpskeletor/pull/32) · Date: 2026-11-12
 
 ## What was built
 
@@ -130,7 +130,7 @@ New tests (38, in `modules/Events/Tests/`):
 Results:
 
 - `vendor/bin/phpunit modules/Events`: **OK (38 tests, 341 assertions)**.
-- `vendor/bin/phpunit` (whole suite): see the summary at the end of this report.
+- `vendor/bin/phpunit` (whole suite): **OK (1005 tests, 5801 assertions)** (five cross-module counting tests updated for the new module: catalogue size, CRUD count, Shield matrix, widget/task registry, menu link types).
 - `vendor/bin/phpstan analyse`: **[OK] No errors**.
 - `vendor/bin/php-cs-fixer fix --dry-run --diff`: **0 files** to fix.
 - `php spark permissions:check`: **Permissions OK: 127 permission(s) in the catalogue, 220 route(s) checked.**

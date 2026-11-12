@@ -31,7 +31,7 @@ pull request open), *merged* (in `main`).
 | 21 | Menus module: public menus and back-office customisation | merged | `claude/deploy-next-md-rjmbga` | [SIENSIS/kpskeletor#29](https://github.com/SIENSIS/kpskeletor/pull/29) | [`deploy-status/21-menus/`](../deploy-status/21-menus/README.md) |
 | 22 | Files module: file manager and folder ACL | merged | `claude/upbeat-brown-vq8taw` | [SIENSIS/kpskeletor#30](https://github.com/SIENSIS/kpskeletor/pull/30) | [`deploy-status/22-files-manager/`](../deploy-status/22-files-manager/README.md) |
 | 23 | Files module: file picker, upload tokens and avatars | merged | `claude/wizardly-meitner-t9fp4s` | [SIENSIS/kpskeletor#31](https://github.com/SIENSIS/kpskeletor/pull/31) | [`deploy-status/23-files-picker/`](../deploy-status/23-files-picker/README.md) |
-| 24 | Events module: calendar, administration and audiences | done | `claude/gallant-curie-rmfn7k` | (pull request "Session 24: …") | [`deploy-status/24-events-core/`](../deploy-status/24-events-core/README.md) |
+| 24 | Events module: calendar, administration and audiences | done | `claude/gallant-curie-rmfn7k` | [SIENSIS/kpskeletor#32](https://github.com/SIENSIS/kpskeletor/pull/32) | [`deploy-status/24-events-core/`](../deploy-status/24-events-core/README.md) |
 
 ## MVP review (session 19)
 
