@@ -88,6 +88,18 @@ widgets (`docs/widgets.md`).
 - Backup: the tables and the files of `modules/news` (Backup, session 27). The `news.notices`
   calendar arrives in session 25; read receipts and notices in the API in session 26.
 
+## Calendar
+
+A **notice** may have an event date (`event_starts_at`, optional `event_ends_at`,
+`event_all_day`; the end may not be before the start). While the notice is published and readable
+(not scheduled, not expired, not in the trash) and has a date, it is published to the calendar
+`news.notices` ("Notices", red) through the calendar API (`Services/NoticeCalendar.php`,
+`docs/calendar-api.md`) with the notice's audience: `public` → public, `private` → private,
+`groups` → restricted to its groups (D-00-41; the calendar declares no permission). The event
+links back to the reader page (`backend/news/read/{code}`) and allows reminders. Every write of
+the CRUDs, publish/unpublish (single and bulk), the release of scheduled notices and the expiry
+task call `NoticeCalendar::sync()`; `php spark calendar:resync News` repairs drift. D-25-06.
+
 ## Activity log
 
 CRUD writes, `publish`/`unpublish`, bulk actions and exports are logged by the Core

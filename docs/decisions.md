@@ -216,6 +216,13 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-24-08 | 24 | Calendar library and time zones in the calendar view | Accepted (proposal) |
 | D-24-09 | 24 | Recurrence storage, exceptions and counts | Accepted (proposal) |
 | D-24-10 | 24 | Reminders: offsets, occurrences and access | Accepted (proposal) |
+| D-25-01 | 25 | iCal URLs, the calendar API names and the subscription screen (decide) | Open |
+| D-25-02 | 25 | The personal feed's secret: shown once, hashed, re-authentication | Accepted (proposal) |
+| D-25-03 | 25 | Deterministic feeds: DTSTAMP, ETag and the cache | Accepted (proposal) |
+| D-25-04 | 25 | Calendars of disabled modules, permissions and access policies | Accepted (proposal) |
+| D-25-05 | 25 | Publishing contract: idempotency, unpublish as soft delete, purge on uninstall | Accepted (proposal) |
+| D-25-06 | 25 | New columns `events.allow_reminders` and the notice's event date | Accepted (proposal) |
+| D-25-07 | 25 | The birthdays calendar: off by default, day and month only | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2247,3 +2254,59 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Reminders set by the event's author for its whole audience.
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Events/Services/Reminders.php`, `modules/Events/Tasks/SendReminders.php`; tests `RemindersAndWidgetTest`
+
+## D-25-01 — iCal URLs, the calendar API names and the subscription screen (decide)
+
+- **Where:** specification "Events" › "iCal", "Calendar API for other modules"; `docs/plan.md` session 25 (routes `ical/public/(:segment).ics`, `ical/user/(:segment).ics`, `events/(:segment)/export.ics`)
+- **Problem:** URLs, manifest keys and class names are public conventions; the plan's export URL `events/{code}/export.ics` does not match the URLs decided in D-24-01, and the specification does not say where the subscription screen lives nor how a module declares an access policy or a calendar source.
+- **Proposal:** Feeds `ical/user/<secret>.ics` (personal) and `ical/public/all.ics` / `ical/public/<category slug>.ics` (public; `ratelimit:feeds` per IP, and per secret for the personal one); one-off exports next to the details pages: `backend/calendar/event/{code}/export.ics` and `calendar/event/{code}/export.ics`; screen "Calendar subscription" at `backend/calendar/subscription` (user menu, `events-calendar.view`) with `POST …/generate` (`reauth`), `…/revoke`, `…/filters`; calendar toggles `POST backend/calendar/calendars`. API: `service('calendar')` returns a `Modules\Core\Calendar\CalendarPublisher` (`publish()`/`unpublish()`; `NullCalendar` without Events, set by Events' registrar on `Config\Calendars::$publisher`); contracts `CalendarEvent`, `CalendarProvider`, `EventAccessPolicy`, `CalendarSource` in `Modules\Core\Calendar`; manifest `$calendars[key] = [label, color, permission?, policy?, source?]` (id `<module lower case>.<key>`; events created by hand form the calendar `events`); `$calendarProviders` must implement `CalendarProvider`; command `calendar:resync <Module>`; CodeIgniter events `calendar.created|updated|deleted` (`['id', 'module', 'key']`). Configuration in `Config\Calendar`: `icalPastDays` 90, `icalFutureDays` 365, `icalGraceDays` 30, `icalRefresh` `PT1H`, `icalCacheSeconds` 300, `providerCacheSeconds` 300, `publicFeeds` true. Built so all of it can still be renamed.
+- **Alternatives:** A) The export at `events/{code}/export.ics` as in the plan (a third URL prefix for the module). B) The subscription inside Auth's profile page (Auth would depend on Events). C) The secret in the query string (`ical/user.ics?token=…`): ends up in more logs and some clients drop query strings.
+- **Status:** Open
+
+## D-25-02 — The personal feed's secret: shown once, hashed, re-authentication
+
+- **Where:** specification "Events" › "iCal" ("random secret token (stored hashed), which the user can copy, regenerate or revoke"; "Copy URL" in the profile)
+- **Problem:** A hashed secret cannot be shown again, so "Copy URL" cannot be offered at any time.
+- **Proposal:** 32 random bytes (base64url, 43 characters), SHA-256 in `ical_tokens.token_hash`; the URL (with "Copy" and a `webcal://` link) is shown only in the response that creates or regenerates it, like API personal tokens; afterwards the screen shows the state, creation date and last access, and "Regenerate". Creating or regenerating needs re-authentication (`reauth`, like personal API tokens); revoking does not. Wrong, revoked or old secrets, banned or inactive users and users without `events-calendar.view` get the same 404. Accesses update `last_access_at`/`last_access_ip` and are logged (`ical_accessed`) on the first access, a new IP address or once a day; creation, regeneration, revocation and filter changes are logged.
+- **Alternatives:** A) Store the secret encrypted so it can be shown again (contradicts "stored hashed"). B) No re-authentication (a stolen session could mint a long-lived read credential silently).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/IcalFeeds.php`, `Controllers/{Subscription,IcalFeed}.php`; tests `IcalTest`
+
+## D-25-03 — Deterministic feeds: DTSTAMP, ETag and the cache
+
+- **Where:** specification "Events" › "iCal" (ETag/Last-Modified/304, a short cache per feed)
+- **Problem:** With `DTSTAMP` = now every document differs and the ETag would never match.
+- **Proposal:** `DTSTAMP` and `LAST-MODIFIED` = the event's `updated_at` (provided events: their start), so the same data gives the same bytes; ETag = SHA-1 of the document, Last-Modified = the newest change; `If-None-Match` (or `If-Modified-Since`) answers 304. Documents are cached in the `calendar` scope for `icalCacheSeconds` and every change through the CRUD or the API clears the scope; permission changes reach a cached feed within that time. Deleting or restoring an event in the administration bumps `sequence`, so clients accept the cancellation.
+- **Alternatives:** A) ETag from the newest `updated_at` only (misses permission and audience changes).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Ical/IcalWriter.php`, `Services/IcalFeeds.php`, `Controllers/IcalFeed.php`; `IcalTest::testEtagAndLastModifiedAnswerNotModified`
+
+## D-25-04 — Calendars of disabled modules, permissions and access policies
+
+- **Where:** specification "Calendar API" ("events and providers of a disabled module are hidden", calendar `permission` optional, `EventAccessPolicy`), D-00-41
+- **Proposal:** `EventVisibility::apply()` also keeps only events without a calendar or of calendars declared by enabled modules whose `permission` (if any) the user holds; an `EventAccessPolicy` (`canSee(User, key)`) is applied after the query on the calendar view, details, widget, reminders and feeds; it only narrows and guests never pass it. Providers run only for signed-in users (never the public site or public feeds), only for their own module's calendars, results cached per user and range. The administration list keeps showing every event to users with `events-events.all`.
+- **Alternatives:** A) Delete the events of a disabled module (they could not come back on enabling it).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/{EventVisibility,EventRepository,Calendars,ProvidedEvents}.php`; `CalendarApiTest`
+
+## D-25-05 — Publishing contract: idempotency, unpublish as soft delete, purge on uninstall
+
+- **Where:** specification "Calendar API" (idempotent per module + key, locked events, uninstall deletes, `calendar:resync`)
+- **Proposal:** `publish()` compares every stored column, the texts and the audience: equal data returns false and keeps `sequence`; otherwise it updates, bumps `sequence` and revives an unpublished event. `unpublish()` soft-deletes (feeds publish it as cancelled for `icalGraceDays`). A module may only publish to its own calendars (`<module>.*`); unknown group names are an error, unknown user ids are dropped; descriptions are sanitised with HTMLPurifier. `CalendarService::purgeModule()` deletes a module's events for good; the uninstaller of session 29 must call it. `calendar:resync` publishes what the module's `CalendarSource`s return and unpublishes the rest of those calendars.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/CalendarService.php`, `Commands/CalendarResync.php`; `CalendarApiTest`
+
+## D-25-06 — New columns `events.allow_reminders` and the notice's event date
+
+- **Where:** specification "Calendar API" (`reminders: true`), "News (push)" ("a notice may have an optional event date")
+- **Proposal:** Migration `AddAllowRemindersToEvents` (`allow_reminders`, default 1; the API's `reminders` flag) and News' `AddEventDateToNews` (`event_starts_at`, `event_ends_at`, `event_all_day`); released migrations are not edited. A notice is in the `news.notices` calendar only while it is published, readable (not scheduled nor expired) and has a date; its audience maps `public`/`private`/`groups` → `public`/`private`/`restricted` (D-00-41) and links back to the reader page.
+- **Status:** Accepted (proposal)
+- **Applied in:** the two migrations, `modules/News/Services/NoticeCalendar.php`, `Controllers/Posts.php`, `Services/Publisher.php`; `NoticeCalendarTest`
+
+## D-25-07 — The birthdays calendar: off by default, day and month only
+
+- **Where:** specification "Users (pull)" ("enabled by a setting, only the day and month, only to logged-in users")
+- **Proposal:** Setting `Users.birthdaysCalendar` (bool, default **off**: birthdays are personal data), group "Calendar"; calendar `users.birthdays` without a permission; active, non-banned users with `user_profiles.birth_date`; title "<name>'s birthday" (never the year or age); 29 February shown on 28 February in common years.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Users/Calendar/BirthdaysProvider.php`, `modules/Users/Config/Module.php`; `BirthdaysProviderTest`
+

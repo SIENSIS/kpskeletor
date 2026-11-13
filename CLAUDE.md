@@ -76,6 +76,11 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email inline), scheduled
   tasks in `Tasks/` (`TaskInterface`), both declared in the manifest; one cron line runs
   `php spark schedule:run` (`docs/notifications.md`, `docs/scheduler.md`).
+- **Calendar:** put a module's dates in the calendar through the Core's contracts
+  (`modules/Core/Calendar`): declare `$calendars` (`<module>.<key>`, optional `permission`,
+  `policy`, `source`) and publish with `service('calendar')->publish()` / `unpublish()` on every
+  change, or declare a `CalendarProvider` in `$calendarProviders`; never write to `events`
+  directly (`docs/calendar-api.md`).
 - **Dashboard widgets:** classes in `Widgets/` extending `Modules\Core\Widgets\Widget` (or
   `AsyncWidget`), declared in the manifest `$widgets`, id `<module>.<name>`, a `permission()`;
   shown only with the permission **and** enabled for one of the user's groups (`docs/widgets.md`).

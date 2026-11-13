@@ -36,6 +36,7 @@ The web installer (`/install`) is the same service with a form; see `README.md`.
 
 | Command | What it does |
 |---|---|
+| `calendar:resync <Module>` | Asks the module's calendar sources (`CalendarSource::all()`, declared as `'source'` in its `$calendars`) for every event again: publishes them (unchanged ones stay untouched) and unpublishes the published events of those calendars they no longer return. Prints the counts and writes `calendar_resync` to the activity log. See `docs/calendar-api.md`. |
 | `schedule:run [--task=<name>] [--force]` | The single cron entry (`* * * * * php /path/spark schedule:run`): runs the scheduled tasks that are due, records each run and exits with 1 if one failed. `--task` limits it to one task (class or short class name) if it is due; with `--force` it runs now, due or not (the `withoutOverlapping()` lock still applies). See `docs/scheduler.md`. |
 | `schedule:list` | Every scheduled task of the enabled modules with its schedule, next run, last run and result, and notes (inactive, other environment). |
 

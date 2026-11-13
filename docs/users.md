@@ -94,6 +94,15 @@ See `docs/auth.md` › "Impersonation": superadmins only, never another superadm
 re-authentication, limited by `Users.impersonationMinutes` (30), with a banner and "Back to my
 account", sensitive actions refused meanwhile, start and end in the activity log.
 
+## Birthdays calendar
+
+`Calendar/BirthdaysProvider.php` (calendar API, pull; `docs/calendar-api.md`) adds an all-day
+event on the birthday of every active, non-banned user who entered a date of birth in their profile
+(`user_profiles.birth_date`, Auth): day and month only, "<name>'s birthday", 29 February shown on 28
+February in common years. Nothing is stored. Calendar `users.birthdays` (no permission: every
+signed-in user, never the public site). **Off by default**: setting `Users.birthdaysCalendar`
+(Settings › Users › Calendar). D-25-07.
+
 ## Activity log
 
 CRUD writes are logged by `AuditedCrud`. The module adds `user_created`, `email_changed`,

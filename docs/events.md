@@ -2,17 +2,18 @@
 
 `modules/Events` is the calendar of the skeleton (specification "Modules" › "Events (calendar)").
 Session 24 built the events, their audiences, the administration, the calendar views, reminders,
-the *Upcoming events* widget and the "Calendar" menu link type; session 25 adds iCal and the
-calendar API for other modules.
+the *Upcoming events* widget and the "Calendar" menu link type; session 25 added iCal (exports,
+subscribable feeds) and the calendar API for other modules (`docs/calendar-api.md`).
 
 ## What it does
 
 - **Events** (`events`, texts in `event_translations`: title and rich-text description; Catalan
   required, Spanish and English optional): start and optional end (stored in UTC, edited and
   shown in the site's time zone), all day, location, organiser, category, colour, link, status
-  (`confirmed`, `tentative`, `cancelled`), visibility, recurrence. Columns for session 25:
-  `calendar`, `source_module`, `source_key`, `source_url` (events published by other modules,
-  never editable here) and `sequence` (grows on every change, for iCal).
+  (`confirmed`, `tentative`, `cancelled`), visibility, recurrence. Events published by
+  other modules (`docs/calendar-api.md`) have `calendar`, `source_module`, `source_key`,
+  `source_url` and are never editable here; `sequence` grows on every change (iCal);
+  `allow_reminders` (session 25) says whether users may ask for a reminder.
 - **Categories** (`event_categories` + `event_category_translations`): name, description, colour,
   slug (public calendar filter), order, active.
 - **Visibility:** `public` (everyone, the public site), `private` (any signed-in user) or
@@ -34,8 +35,13 @@ calendar API for other modules.
 | `backend/events/categories` | `events-categories.*` | Categories (kpcrudy) |
 | `calendar[?category=<slug>]`, `calendar/event/{code}` | public | Public events only |
 | `calendar/feed?start=&end=[&category=]` | public, `ratelimit:feeds` | JSON of public events |
+| `backend/calendar/event/{code}/export.ics`, `calendar/event/{code}/export.ics` | as the details | One-off iCal export (a static copy) |
+| `POST backend/calendar/calendars` | `events-calendar.view` | `calendars[]`: the calendars shown in the calendar view (saved per user) |
+| `backend/calendar/subscription` (+ `POST generate` with `reauth`, `revoke`, `filters`) | `events-calendar.view` (user menu) | "Calendar subscription": the personal iCal feed |
+| `ical/user/<secret>.ics` | the secret; `ratelimit:feeds` per IP and per secret | Personal feed |
+| `ical/public/all.ics`, `ical/public/<category slug>.ics` | public, `ratelimit:feeds` | Public events only |
 
-Names and URLs: decision **D-24-01** (decided as built).
+Names and URLs: decision **D-24-01** (decided as built); the session 25 URLs: **D-25-01** (open, built so they can be renamed).
 
 ## Rules
 
@@ -77,6 +83,52 @@ to their details page. The feed sends the site's wall-clock times and the calend
 mode, so every browser shows the site's times. Options come from
 `Services/CalendarComponent::options()`.
 
+## iCal (RFC 5545)
+
+Two different features (D-25-01 … D-25-03):
+
+- **One-off export** (`…/export.ics`, button "Add to my calendar" in the details): a static copy;
+  later changes do not reach it.
+- **Subscribable feeds** (read-only): clients poll the URL and show changes, new events and
+  deletions on their next refresh. Two-way sync (CalDAV) is out of scope.
+  - **Personal feed:** every event the user can see **now** (public, private, their audiences,
+    other modules' calendars and providers), evaluated with the user's current permissions on
+    every request (a user who loses access stops seeing the event; a banned or inactive user, a
+    user without `events-calendar.view`, a revoked or regenerated secret: 404). Filters by
+    calendars and categories. The user's reminders are included as `VALARM`.
+  - **Public feeds:** public events of every category or one (`ical/public/<slug>.ics`), while
+    `publicCalendar` and `publicFeeds` are on.
+  - **The secret** (D-25-02): 32 random bytes in the URL, stored as SHA-256 in `ical_tokens`,
+    shown **once** when created or regenerated (with "Copy" and a `webcal://` link); creating or
+    regenerating needs re-authentication; revoking disables it. Last access (time and IP) shown
+    on the screen; accesses logged once a day or on a new IP (`ical_accessed`).
+- **Format** (`Ical/IcalWriter.php`, `Folding.php`, `VTimezone.php`): `UID` stable per event
+  (`event-<code>@host`, `<module>-<key>@host`, `<calendar>-<key>@host` for provided events),
+  `SEQUENCE`, `DTSTAMP`/`LAST-MODIFIED` from the last change, local times with `TZID` and the
+  site's `VTIMEZONE` (built from PHP's time zone database), all-day events as dates, recurrences
+  as `RRULE`/`EXDATE` (not expanded), `STATUS:CANCELLED` for cancelled events and for events
+  deleted in the last `icalGraceDays`, plain-text descriptions, escaping and folding at 75
+  octets, CRLF. Refresh hints `REFRESH-INTERVAL;VALUE=DURATION:PT1H` and `X-PUBLISHED-TTL:PT1H`
+  (`icalRefresh`); the client decides the real delay.
+- **Performance:** range `icalPastDays` (90) before and `icalFutureDays` (365) after today;
+  documents cached `icalCacheSeconds` (300; any change clears the cache); `ETag` (hash of the
+  document) and `Last-Modified` with `304 Not Modified`.
+- **Manual check with a real client:** install with demo data on a host reachable from the client
+  (or a tunnel), sign in as usuari@example.com, open the user menu › "Calendar subscription",
+  "Create my feed address" (asks for the password again), then in Thunderbird: New calendar ›
+  On the network › iCalendar (ICS) › paste the URL; or Google Calendar › Other calendars › From
+  URL (Google needs a public HTTPS host). Check that the demo events appear in the site's times,
+  that the weekly meeting repeats without the skipped date, then change an event's title and
+  refresh the calendar in the client.
+
+## Calendars and other modules
+
+The calendar view shows the calendars the user can see (the own `events` calendar and those
+declared by enabled modules, e.g. *Notices* of News and *Birthdays* of Users) as checkboxes; each
+user's choice is saved (`event_calendar_preferences`). Events published by another module show
+"Managed by <module>" and "Edit in <module>" in the administration and the details. How modules
+use it: `docs/calendar-api.md`.
+
 ## Configuration
 
 `Modules\Events\Config\Calendar` (not `Config/Events.php`, D-00-04; no manifest settings,
@@ -90,6 +142,12 @@ D-24-05), overridable from `.env` (`calendar.maxRangeDays = 200`):
 | `reminderOptions` | `[60, 15, 1440, 10080]` | Minutes before the start offered for reminders |
 | `upcomingDays` | `30` | Days ahead of the widget |
 | `maxOccurrences` | `1000` | Safety cap of the recurrence expansion |
+| `providerCacheSeconds` | `300` | Cache of calendar providers per user and range (0: none) |
+| `icalPastDays` / `icalFutureDays` | `90` / `365` | Range of the iCal feeds |
+| `icalGraceDays` | `30` | Days a deleted event stays in feeds as cancelled |
+| `icalRefresh` | `PT1H` | Refresh hint of the feeds |
+| `icalCacheSeconds` | `300` | Cache of a feed (0: none) |
+| `publicFeeds` | `true` | The public iCal feeds |
 
 ## Declarations
 
@@ -101,6 +159,11 @@ D-24-05), overridable from `.env` (`calendar.maxRangeDays = 200`):
   one (`calendar?category=<slug>`).
 - **Activity log:** writes and `duplicate` through the Core (`AuditedCrud`); `forbidden_audience`
   (security) when a forbidden group is posted.
+- **Command** `calendar:resync <Module>` (`Commands/CalendarResync.php`).
+- **Calendar service** `service('calendar')` = `Services/CalendarService.php` (registrar
+  `Config/Registrar.php`); menu entry "Calendar subscription" (user menu).
+- **Activity log:** `ical_created`, `ical_regenerated`, `ical_revoked`, `ical_filters`,
+  `ical_accessed`, `calendar_resync`.
 - No backup files, CSP sources, outbound hosts or API resources (the `events` API is session 26).
 
 ## Demo data
@@ -119,4 +182,8 @@ site, range validation, the component), `EventsCrudTest` (assignable groups and 
 kept groups, empty audience, list scope with and without `all`, forged posts, duplicate,
 sanitised description, recurrence normalised, categories), `RecurrenceTest`,
 `RemindersAndWidgetTest`, `EventsModuleTest` (manifest, grants, menu link, migrations down/up,
-demo data, disabled module).
+demo data, disabled module), `IcalTest` (RFC 5545 output checked by `Tests/Support/IcalValidator.php`,
+the secret, regeneration and revocation, re-authentication, permission changes, ETag/304, public
+feeds, exports, cancelled events, VALARM) and `CalendarApiTest` (publish/unpublish, audiences,
+locked events, calendar permissions and policies, disabled modules, providers, toggles, resync,
+purge, CodeIgniter events).
