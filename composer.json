@@ -21,7 +21,7 @@
         "ext-openssl": "*",
         "ext-sodium": "*",
         "ext-zip": "*",
-        "chillerlan/php-qrcode": "^5.0",
+        "chillerlan/php-qrcode": "^6.0",
         "codeigniter4/framework": "^4.7",
         "codeigniter4/settings": "^2.4",
         "codeigniter4/shield": "^1.4",
