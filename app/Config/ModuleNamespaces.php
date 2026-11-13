@@ -16,6 +16,7 @@ return [
     'Modules\Auth' => __DIR__ . '/../../modules/Auth',
     'Modules\Core' => __DIR__ . '/../../modules/Core',
     'Modules\Dashboard' => __DIR__ . '/../../modules/Dashboard',
+    'Modules\Events' => __DIR__ . '/../../modules/Events',
     'Modules\Files' => __DIR__ . '/../../modules/Files',
     'Modules\Menus' => __DIR__ . '/../../modules/Menus',
     'Modules\News' => __DIR__ . '/../../modules/News',

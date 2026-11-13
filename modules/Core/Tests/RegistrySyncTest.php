@@ -89,8 +89,8 @@ final class RegistrySyncTest extends CIUnitTestCase
 
         $registry = new DeclarationRegistry();
         $notNews  = static fn (array $classes): array => array_values(array_filter($classes, static fn (string $class): bool => ! str_starts_with($class, 'Modules\\News\\')));
-        $this->assertSame(['Modules\\Core\\Widgets\\ScheduledTasks', 'Modules\\Core\\Widgets\\QuickLinks', "Modules\\{$name}\\Widgets\\{$name}Widget", 'Modules\\Users\\Widgets\\UsersSummary'], $notNews($registry->widgets()), 'Other installed modules (News) add their own.');
-        $this->assertSame(['Modules\\Core\\Tasks\\SendQueuedEmails', 'Modules\\Core\\Tasks\\PurgeActivityLog', "Modules\\{$name}\\Tasks\\{$name}Task"], $notNews($registry->tasks()));
+        $this->assertSame(['Modules\\Core\\Widgets\\ScheduledTasks', 'Modules\\Core\\Widgets\\QuickLinks', 'Modules\\Events\\Widgets\\UpcomingEvents', "Modules\\{$name}\\Widgets\\{$name}Widget", 'Modules\\Users\\Widgets\\UsersSummary'], $notNews($registry->widgets()), 'Other installed modules (News, Events) add their own.');
+        $this->assertSame(['Modules\\Core\\Tasks\\SendQueuedEmails', 'Modules\\Core\\Tasks\\PurgeActivityLog', 'Modules\\Events\\Tasks\\SendReminders', "Modules\\{$name}\\Tasks\\{$name}Task"], $notNews($registry->tasks()));
         $this->assertSame('#dc3545', $registry->calendars()["{$name}.notices"]['definition']['color']);
         $this->assertTrue($report->declarationsChanged);
 

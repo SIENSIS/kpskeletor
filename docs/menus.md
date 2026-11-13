@@ -131,3 +131,6 @@ final class CategoryLink implements MenuLinkType
 
 `modules:sync` refuses a class that does not implement the interface.
 
+Types in the skeleton: `pages.page` (Pages), `news.category` (News) and `events.calendar`
+(Events: the public calendar, all categories or one, hidden while the public calendar is off).
+

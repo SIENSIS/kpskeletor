@@ -596,6 +596,12 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
   extracted in session 20 (`event_audience` also targets users); the `feeds` limit already
   covers the News RSS.
 
+- **Done (session 24):** `deploy-status/24-events-core/README.md`, `docs/events.md`. For later
+  sessions: `Modules\Events\Services\EventVisibility` (the only visibility rule),
+  `EventRepository::occurrences()`, `Recurrence`; `events.sequence` and the `source_*` columns
+  exist; tables `event_audience` (`group_id` or `user_id`) and `event_reminders`; no
+  `event_exceptions` table (`recur_exceptions` text column, D-24-09).
+
 ## 25 — Events module: iCal feeds and calendar API (`deploy/25-events-ical-api.md`)
 
 - **Goal:** subscribable feeds and push/pull calendar API.
@@ -769,6 +775,12 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Tests:** the spec's missing unit/feature/security tests, e2e, accessibility.
 - **Depends on:** all.
 - **Risks:** CI time (matrix × MariaDB × Playwright); flaky screenshots.
+
+- **Owner's request (2026-11-12, after session 24):** News and Pages switch their rich-text body from
+  the undocumented `fieldType('body', 'translation', ['attrs' => …])` to kpcrudy's documented
+  `setTranslations(..., ['attrs' => ['body' => RichTextEditor::attrs(…)]])` (kpcrudy ≥ 1.3); update
+  `RichTextEditor`'s docblock, `CLAUDE.md` ("Rich text") and `docs/frontend.md`; the existing tests
+  (`PostsCrudTest`, `PagesCrudTest`: every language's body carries the editor) must keep passing.
 
 ## 36 — Final acceptance and release (`deploy/36-release.md`)
 

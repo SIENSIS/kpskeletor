@@ -49,7 +49,7 @@ final class MenusModuleTest extends MenusTestCase
 
         $keys = array_keys($types);
         sort($keys);
-        $this->assertSame(['news.category', 'pages.page'], $keys);
+        $this->assertSame(['events.calendar', 'news.category', 'pages.page'], $keys);
         $this->assertInstanceOf(MenuLinkType::class, $types['pages.page']);
 
         $validator = new ManifestValidator();
