@@ -85,7 +85,23 @@ final class Module extends ModuleManifest
             'help'    => 'Users.settings.impersonationMinutesHelp',
             'group'   => 'security.impersonation',
         ],
+        // The "Birthdays" calendar (calendar API, pull: Calendar/BirthdaysProvider.php).
+        'birthdaysCalendar' => [
+            'type'    => 'bool',
+            'default' => false,
+            'label'   => 'Users.settings.birthdaysCalendar',
+            'help'    => 'Users.settings.birthdaysCalendarHelp',
+            'group'   => 'calendar',
+        ],
     ];
+
+    /** Calendar of the birthdays provider; no permission: every signed-in user sees it when enabled. */
+    public array $calendars = [
+        'birthdays' => ['label' => 'Users.birthdays.calendar', 'color' => '#d63384'],
+    ];
+
+    /** Events computed on the fly, never stored (docs/calendar-api.md, "Providers"). */
+    public array $calendarProviders = [\Modules\Users\Calendar\BirthdaysProvider::class];
 
     /** No tables of its own (Shield's tables and the Core `groups` table are backed up by the Core). */
     public array $backup = [];

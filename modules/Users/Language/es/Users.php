@@ -36,9 +36,12 @@ return [
     'settings' => [
         'impersonationMinutes' => 'Tiempo máximo de suplantación (minutos)',
         'impersonationMinutesHelp' => 'Pasado este tiempo el superadministrador vuelve a su cuenta.',
+        'birthdaysCalendar' => 'Mostrar el calendario de cumpleaños',
+        'birthdaysCalendarHelp' => 'Los usuarios identificados ven un evento de todo el día en el cumpleaños (solo día y mes) de cada usuario activo que ha indicado la fecha de nacimiento en su perfil.',
     ],
     'settingGroups' => [
         'impersonation' => 'Suplantación',
+        'calendar' => 'Calendario',
     ],
     'users' => [
         'user' => 'Usuario',
@@ -135,5 +138,9 @@ return [
         'reset_forced' => 'Cambio de contraseña obligado',
         'logged_out_everywhere' => 'Todas las sesiones de un usuario cerradas',
         'access_refused' => 'Acceso a una cuenta más fuerte denegado',
+    ],
+    'birthdays' => [
+        'calendar' => 'Cumpleaños',
+        'title' => 'Cumpleaños de {0}',
     ],
 ];

@@ -32,6 +32,12 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 
 D-15-01 (names and URLs) decided by the owner as proposed; D-15-02 … D-15-05 accepted (`docs/decisions.md`).
 
+## Calendar (session 25)
+
+`Calendar/BirthdaysProvider.php` (calendar `users.birthdays`, pull): off by default, setting
+`Users.birthdaysCalendar` (group `calendar`); day and month only. Tests
+`Tests/BirthdaysProviderTest.php`. D-25-07.
+
 ## Open tasks
 
 - Search by email and filters by group or 2FA in the users list: they live in other tables and

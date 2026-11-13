@@ -36,9 +36,12 @@ return [
     'settings' => [
         'impersonationMinutes' => 'Temps màxim de suplantació (minuts)',
         'impersonationMinutesHelp' => 'Passat aquest temps el superadministrador torna al seu compte.',
+        'birthdaysCalendar' => 'Mostra el calendari d\'aniversaris',
+        'birthdaysCalendarHelp' => 'Els usuaris identificats veuen un esdeveniment de tot el dia en l\'aniversari (només dia i mes) de cada usuari actiu que ha indicat la data de naixement al seu perfil.',
     ],
     'settingGroups' => [
         'impersonation' => 'Suplantació',
+        'calendar' => 'Calendari',
     ],
     'users' => [
         'user' => 'Usuari',
@@ -135,5 +138,9 @@ return [
         'reset_forced' => 'Canvi de contrasenya obligat',
         'logged_out_everywhere' => 'Totes les sessions d\'un usuari tancades',
         'access_refused' => 'Accés a un compte més fort denegat',
+    ],
+    'birthdays' => [
+        'calendar' => 'Aniversaris',
+        'title' => 'Aniversari de {0}',
     ],
 ];

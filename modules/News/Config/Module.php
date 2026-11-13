@@ -120,8 +120,10 @@ final class Module extends ModuleManifest
     /** No outbound requests (the RSS feed is generated, not fetched). */
     public array $outboundHosts = [];
 
-    /** Calendar `news.notices` arrives in session 25. */
-    public array $calendars = [];
+    /** Calendar `news.notices`: published notices with an event date (calendar API, push; D-00-41: no permission, each notice's audience decides). */
+    public array $calendars = [
+        'notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545', 'source' => \Modules\News\Services\NoticeCalendar::class],
+    ];
 
     public array $api = [
         'news' => ['path' => 'news', 'handler' => '\Modules\News\Controllers\Api\Posts::index'],

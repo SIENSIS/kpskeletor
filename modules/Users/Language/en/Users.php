@@ -36,9 +36,12 @@ return [
     'settings' => [
         'impersonationMinutes' => 'Impersonation time limit (minutes)',
         'impersonationMinutesHelp' => 'After this time the superadmin gets their own account back.',
+        'birthdaysCalendar' => 'Show the birthdays calendar',
+        'birthdaysCalendarHelp' => 'Signed-in users see an all-day event on the birthday (day and month only) of every active user who entered a date of birth in their profile.',
     ],
     'settingGroups' => [
         'impersonation' => 'Impersonation',
+        'calendar' => 'Calendar',
     ],
     'users' => [
         'user' => 'User',
@@ -135,5 +138,9 @@ return [
         'reset_forced' => 'Password change forced',
         'logged_out_everywhere' => 'User logged out everywhere',
         'access_refused' => 'Access to a stronger account refused',
+    ],
+    'birthdays' => [
+        'calendar' => 'Birthdays',
+        'title' => '{0}\'s birthday',
     ],
 ];

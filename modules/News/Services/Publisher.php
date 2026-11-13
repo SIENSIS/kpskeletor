@@ -43,6 +43,8 @@ final class Publisher
             $this->notifyAudience((int) $row['id']);
         }
 
+        NoticeCalendar::sync((int) $row['id']);
+
         return $status;
     }
 
@@ -101,6 +103,7 @@ final class Publisher
 
         foreach ($ids as $id) {
             $this->notifyAudience($id);
+            NoticeCalendar::sync($id);
         }
 
         return count($ids);
@@ -112,15 +115,22 @@ final class Publisher
     public function expireNotices(): int
     {
         $now = Time::now()->toDateTimeString();
-
-        db_connect()->table('news')
+        $ids = array_column(db_connect()->table('news')->select('id')
             ->where('type', 'notice')
             ->whereIn('status', ['published', 'scheduled'])
             ->where('expires_at IS NOT NULL')
             ->where('expires_at <=', $now)
-            ->update(['status' => 'expired', 'pinned' => 0, 'updated_at' => $now]);
+            ->get()->getResultArray(), 'id');
 
-        return db_connect()->affectedRows();
+        if ($ids === []) {
+            return 0;
+        }
+
+        db_connect()->table('news')->whereIn('id', $ids)->update(['status' => 'expired', 'pinned' => 0, 'updated_at' => $now]);
+        $count = db_connect()->affectedRows();
+        NoticeCalendar::syncMany($ids);
+
+        return $count;
     }
 
     /**
