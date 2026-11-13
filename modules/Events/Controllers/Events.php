@@ -16,6 +16,7 @@ use Modules\Core\Crud\AuditedCrud;
 use Modules\Core\Frontend\RichTextEditor;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\Events\Services\AssignableGroups;
+use Modules\Events\Services\CalendarService;
 use Modules\Events\Services\EventRepository;
 use Modules\Events\Services\EventVisibility;
 use Modules\Events\Services\Recurrence;
@@ -81,7 +82,7 @@ final class Events extends BackendController
             ->fieldType('recur_count', 'number', ['attrs' => ['min' => 1, 'max' => 999]])
             ->fieldType('recur_until', 'date')
             ->fieldType('recur_exceptions', 'textarea', ['attrs' => ['rows' => 3, 'placeholder' => 'AAAA-MM-DD']])
-            ->columns(['title', 'starts_at', 'category_id', 'visibility', 'status', 'recur_freq'])
+            ->columns(['title', 'starts_at', 'category_id', 'visibility', 'status', 'recur_freq', 'source_module'])
             ->fields([
                 'title', 'description', 'starts_at', 'ends_at', 'all_day', 'location', 'organiser', 'category_id', 'color', 'url', 'status',
                 'visibility', 'groups', 'users',
@@ -136,7 +137,7 @@ final class Events extends BackendController
             ->callbackColumn('visibility', static fn ($value): string => self::visibilityBadge((string) $value))
             ->callbackColumn('status', static fn ($value): string => self::statusBadge((string) $value))
             ->callbackColumn('recur_freq', static fn ($value): string => $value === null || $value === '' ? '' : esc(lang('Events.frequencies.' . (in_array($value, Recurrence::FREQUENCIES, true) ? $value : 'daily'))))
-            ->callbackColumn('source_module', static fn ($value): string => $value === null || $value === '' ? '' : ui_badge(lang('Events.managedBy', [(string) $value]), 'info', 'bi bi-lock'))
+            ->callbackColumn('source_module', static fn ($value, array $row = []): string => self::managedBy($value, $row))
             ->callbackExport('visibility', static fn ($value): string => (string) $value)
             ->callbackExport('status', static fn ($value): string => (string) $value)
             ->callbackExport('recur_freq', static fn ($value): string => (string) $value)
@@ -146,6 +147,17 @@ final class Events extends BackendController
                 if ($operation !== 'delete') {
                     self::clearUnusedAudience((int) $id);
                 }
+
+                if (in_array($operation, ['delete', 'restore'], true)) {
+                    // iCal clients only accept a cancellation (or its undo) with a higher SEQUENCE.
+                    db_connect()->table('events')->set('sequence', 'sequence + 1', false)->where('id', (int) $id)->update();
+                }
+
+                CalendarService::changed(match ($operation) {
+                    'insert' => CalendarService::EVENT_CREATED,
+                    'delete' => CalendarService::EVENT_DELETED,
+                    default  => CalendarService::EVENT_UPDATED,
+                }, (int) $id);
             })
             ->defaultOrder('starts_at', 'desc');
 
@@ -423,6 +435,29 @@ final class Events extends BackendController
         }
 
         return $labels;
+    }
+
+    /**
+     * The "Managed by <module>" badge of an event published by another module, with an
+     * "Edit in <module>" link back to the source record.
+     *
+     * @param array<string, mixed> $row
+     */
+    public static function managedBy(mixed $module, array $row): string
+    {
+        if (! is_string($module) || $module === '') {
+            return '';
+        }
+
+        $label = CalendarView::moduleLabel($module);
+        $html  = ui_badge(lang('Events.managedBy', [$label]), 'info', 'bi bi-lock');
+        $url   = CalendarView::sourceUrl($row['source_url'] ?? null);
+
+        if ($url !== null) {
+            $html .= ' <a class="small" href="' . esc($url, 'attr') . '"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> ' . esc(lang('Events.editIn', [$label])) . '</a>';
+        }
+
+        return $html;
     }
 
     public static function visibilityBadge(string $visibility): string

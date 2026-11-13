@@ -6,6 +6,8 @@ namespace Modules\Core\Config;
 
 use CodeIgniter\Config\BaseService;
 use Modules\Core\Activity\ActivityLogger;
+use Modules\Core\Calendar\CalendarPublisher;
+use Modules\Core\Calendar\NullCalendar;
 use Modules\Core\Frontend\AssetManifest;
 use Modules\Core\Install\InstallState;
 use Modules\Core\Notifications\Notifier;
@@ -90,5 +92,20 @@ class Services extends BaseService
         }
 
         return new InstallState(assumeConfigured: ENVIRONMENT === 'testing');
+    }
+
+    /**
+     * The calendar API (`publish()` / `unpublish()`, docs/calendar-api.md): the class of
+     * `Config\Calendars::$publisher` (the Events module's service), else a `NullCalendar`.
+     */
+    public static function calendar(bool $getShared = true): CalendarPublisher
+    {
+        if ($getShared) {
+            return static::getSharedInstance('calendar');
+        }
+
+        $class = config(Calendars::class)->publisher;
+
+        return is_a($class, CalendarPublisher::class, true) ? new $class() : new NullCalendar();
     }
 }

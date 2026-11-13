@@ -12,13 +12,15 @@
  *   locale    page language (ca, es, en)
  *   view      first view on larger screens; phones start with the list
  *   category  select element id of the category filter (optional)
+ *   toggles   form id of the calendar toggles (optional; back office): a change is saved
+ *             with a POST to the form's action and the events are reloaded
  *   error     text shown when the library or the events cannot be loaded
  *
  * Events are links to their details page (the feed's `url`): a click opens it like any link.
  * Dates are the site's wall-clock times (the feed sends them without offset and the calendar
  * runs in UTC, so a browser in another time zone shows the same times as the site).
  */
-import { get } from 'core/http.js';
+import { get, post } from 'core/http.js';
 
 const loading = new Map();
 
@@ -126,5 +128,16 @@ export async function mount(element, options) {
 
     if (filter) {
         filter.addEventListener('change', () => calendar.refetchEvents());
+    }
+
+    const toggles = options.toggles ? document.getElementById(options.toggles) : null;
+
+    if (toggles) {
+        toggles.querySelectorAll('[data-calendar-submit]').forEach((button) => button.classList.add('d-none'));
+        toggles.addEventListener('change', () => {
+            post(toggles.action, { body: new FormData(toggles) })
+                .then(() => calendar.refetchEvents())
+                .catch(() => {});
+        });
     }
 }

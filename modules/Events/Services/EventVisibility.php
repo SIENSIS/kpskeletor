@@ -20,7 +20,8 @@ use Modules\Core\Content\Audience;
  *
  * Administrators and superadmins follow the same rule (an event "only for John" is not in every
  * admin's calendar); `events-events.all` only widens the administration list. Deleted events are
- * never visible. No raw SQL: every value is bound or escaped by the Query Builder.
+ * never visible, and neither are events of calendars the user may not see (a disabled module, a
+ * calendar permission) or that an `EventAccessPolicy` refuses. No raw SQL: every value is bound or escaped by the Query Builder.
  */
 final class EventVisibility
 {
@@ -39,8 +40,54 @@ final class EventVisibility
     public static function apply(BaseBuilder $builder, ?User $user, string $alias = 'events', bool $publicOnly = false): BaseBuilder
     {
         $builder->where($alias . '.deleted_at', null);
+        self::calendars($builder, $user, $alias);
 
         return self::audience($builder, $user, $alias, $publicOnly);
+    }
+
+    /**
+     * Only events of calendars the user may see (docs/calendar-api.md): events created by hand
+     * (no calendar) and events of the calendars of **enabled** modules whose permission, if they
+     * declare one, the user holds. Events of a disabled module are therefore hidden.
+     *
+     * @param BaseBuilder<BaseConnection<object|resource, object|resource>> $builder
+     *
+     * @return BaseBuilder<BaseConnection<object|resource, object|resource>>
+     */
+    public static function calendars(BaseBuilder $builder, ?User $user, string $alias = 'events'): BaseBuilder
+    {
+        $ids = array_values(array_diff(array_keys((new Calendars())->visibleTo($user)), [Calendars::OWN]));
+
+        $builder->groupStart()->where($alias . '.calendar', null);
+
+        if ($ids !== []) {
+            $builder->orWhereIn($alias . '.calendar', $ids);
+        }
+
+        return $builder->groupEnd();
+    }
+
+    /**
+     * Whether the access policy of the event's calendar (if any) lets the user see it; the policy
+     * only narrows what the visibility allows. Guests never pass a policy.
+     *
+     * @param array<string, mixed> $row a row of `events`
+     */
+    public static function allowedByPolicy(array $row, ?User $user, ?Calendars $calendars = null): bool
+    {
+        $calendar = $row['calendar'] ?? null;
+
+        if (! is_string($calendar) || $calendar === '') {
+            return true;
+        }
+
+        $policy = ($calendars ?? new Calendars())->policy($calendar);
+
+        if ($policy === null) {
+            return true;
+        }
+
+        return $user !== null && $policy->canSee($user, (string) ($row['source_key'] ?? ''));
     }
 
     /**
@@ -87,8 +134,15 @@ final class EventVisibility
      */
     public static function canSee(int $id, ?User $user, bool $publicOnly = false): bool
     {
-        return $id > 0 && self::apply(db_connect()->table('events'), $user, 'events', $publicOnly)
+        if ($id <= 0) {
+            return false;
+        }
+
+        $row = self::apply(db_connect()->table('events'), $user, 'events', $publicOnly)
+            ->select('events.id, events.calendar, events.source_key')
             ->where('events.id', $id)
-            ->countAllResults() === 1;
+            ->get(1)->getRowArray();
+
+        return is_array($row) && self::allowedByPolicy($row, $user);
     }
 }

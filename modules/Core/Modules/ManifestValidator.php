@@ -81,7 +81,7 @@ final class ManifestValidator
         $this->checkClassList('notifications');
         $this->checkBackup();
         $this->checkCalendars();
-        $this->checkClassList('calendarProviders');
+        $this->checkClassList('calendarProviders', \Modules\Core\Calendar\CalendarProvider::class);
         $this->checkApi();
         $this->checkCsp();
         $this->checkOutboundHosts();
@@ -399,6 +399,26 @@ final class ManifestValidator
 
             if (array_key_exists('permission', $definition) && ! is_string($definition['permission'])) {
                 $this->error("{$key}['permission']", 'mustBe', ['string']);
+            }
+
+            foreach (['policy' => \Modules\Core\Calendar\EventAccessPolicy::class, 'source' => \Modules\Core\Calendar\CalendarSource::class] as $option => $interface) {
+                if (! array_key_exists($option, $definition)) {
+                    continue;
+                }
+
+                $class = $definition[$option];
+
+                if (! is_string($class) || ! class_exists($class)) {
+                    $this->error("{$key}['{$option}']", 'classMissing', [is_string($class) ? $class : '?']);
+                } elseif (! is_subclass_of($class, $interface)) {
+                    $this->error("{$key}['{$option}']", 'notWidget', [$class, $interface]);
+                }
+            }
+
+            foreach (array_keys($definition) as $option) {
+                if (! in_array($option, ['label', 'color', 'permission', 'policy', 'source'], true)) {
+                    $this->error($key, 'unknownKey', [(string) $option]);
+                }
             }
         }
     }

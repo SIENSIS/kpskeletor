@@ -68,7 +68,7 @@ final class EventsModuleTest extends EventsTestCase
             $migrations[] = new $class(Database::forge('tests'));
         }
 
-        $this->assertCount(6, $migrations);
+        $this->assertCount(9, $migrations);
 
         foreach (array_reverse($migrations) as $migration) {
             \assert($migration instanceof Migration);
@@ -84,9 +84,11 @@ final class EventsModuleTest extends EventsTestCase
 
         $this->db->resetDataCache();
 
-        foreach (['event_categories', 'event_category_translations', 'events', 'event_translations', 'event_audience', 'event_reminders'] as $table) {
+        foreach (['event_categories', 'event_category_translations', 'events', 'event_translations', 'event_audience', 'event_reminders', 'ical_tokens', 'event_calendar_preferences'] as $table) {
             $this->assertTrue($this->db->tableExists($table), $table);
         }
+
+        $this->assertTrue($this->db->fieldExists('allow_reminders', 'events'));
     }
 
     public function testDemoDataLoadsAndIsRemovedCompletely(): void

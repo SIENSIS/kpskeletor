@@ -87,13 +87,16 @@ abstract class ModuleManifest
     public array $backup = [];
 
     /**
-     * Calendars the module publishes events to: key => [label, color, permission (optional)].
+     * Calendars the module publishes events to (docs/calendar-api.md): key => [label, color, and
+     * optionally permission (required to see any of its events; without it each event's
+     * visibility decides), policy (an `EventAccessPolicy` class) and source (a `CalendarSource`
+     * class for `calendar:resync`)]. Its id in events is `<module in lower case>.<key>`.
      *
      * @var array<string, array<string, string>>
      */
     public array $calendars = [];
 
-    /** @var list<string> On-the-fly calendar event providers */
+    /** @var list<string> On-the-fly calendar event providers (`CalendarProvider` classes) */
     public array $calendarProviders = [];
 
     /**
