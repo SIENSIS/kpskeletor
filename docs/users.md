@@ -117,8 +117,9 @@ site.
   every date of birth, **whether or not it is shared**, for administrative work; only for holders
   of `users-users.birthdate` (default: `admin`); hidden in the calendar view until the user shows
   it; independent of the setting.
-- **The user's record** (Users › show) shows the full date of birth and whether it is shared, only
-  with `users-users.birthdate`.
+- **The user's record** (Users › show) shows the full date of birth, whether it is shared, and
+  an hourglass icon whose tooltip gives the age in completed years (native `title`, no
+  JavaScript; also read by screen readers), only with `users-users.birthdate`.
 
 Example (a school): management (`admin`) sees every group; teachers (`editor`) see the teachers;
 students (`user`) without `users-birthdays.view` see nothing. A student's shared birthday is seen

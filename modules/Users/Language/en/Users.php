@@ -150,5 +150,6 @@ return [
         'birthDate' => 'Date of birth',
         'shared' => 'Shared in the calendar',
         'notShared' => 'Not shared',
+        'age' => '{0} years old',
     ],
 ];

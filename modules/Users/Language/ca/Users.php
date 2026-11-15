@@ -150,5 +150,6 @@ return [
         'birthDate' => 'Data de naixement',
         'shared' => 'Compartit al calendari',
         'notShared' => 'No compartit',
+        'age' => '{0} anys',
     ],
 ];

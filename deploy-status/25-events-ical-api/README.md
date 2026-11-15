@@ -200,6 +200,7 @@ birth). The flame at the bottom right is CodeIgniter's development toolbar.
 | `screenshots/13-user-record-date-of-birth.png` | The user's record with the date of birth and "Not shared" (`users-users.birthdate`) |
 | `screenshots/14-profile-share-birthday.png` | The profile: "Share my birthday in the calendar" |
 | `screenshots/15-calendar-switches-phone-dark.png` | The switches at phone width, dark mode (editor) |
+| `screenshots/16-user-record-age-tooltip.png` | The record: the age as the tooltip of the hourglass icon (the browser's native tooltip is not drawn in headless captures: the same text is shown in a box for the picture) |
 
 Screenshots 10–15: `deploy-status/25-events-ical-api/screenshots-decisions.mjs`, after a fresh install (three demo users given a date of birth).
 

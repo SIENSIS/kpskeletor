@@ -125,6 +125,7 @@ final class BirthdaysProviderTest extends UsersTestCase
         $page = (string) $this->send('GET', 'backend/users/show/' . $this->code($this->colleague->id))->response()->getBody();
         $this->assertStringContainsString('Date of birth', $page);
         $this->assertStringContainsString('Not shared', $page);
+        $this->assertStringContainsString('44 years old', html_entity_decode($page, ENT_QUOTES | ENT_HTML5), 'The age (born 20 May 1982, today 15 January 2027) as a tooltip.');
         $this->send('POST', 'logout');
 
         (new GrantManager())->setGroupGrants(null, 'editor', ['users-users.list', 'users-users.show', 'users-birthdays.view', 'auth-profile.*', 'dashboard.view']);
@@ -149,6 +150,14 @@ final class BirthdaysProviderTest extends UsersTestCase
         sort($expected);
         $this->assertSame($expected, $targets);
         $this->assertSame(['Directora', 'Profe A'], $this->names($this->colleague));
+    }
+
+    public function testTheAgeCountsCompletedYears(): void
+    {
+        $this->assertSame(16, \Modules\Users\Controllers\Users::age('2010-05-25', new DateTimeImmutable('2027-05-24')));
+        $this->assertSame(17, \Modules\Users\Controllers\Users::age('2010-05-25', new DateTimeImmutable('2027-05-25')));
+        $this->assertSame(0, \Modules\Users\Controllers\Users::age('2027-01-01', new DateTimeImmutable('2027-01-15')));
+        $this->assertNull(\Modules\Users\Controllers\Users::age('2030-01-01', new DateTimeImmutable('2027-01-15')), 'A date in the future has no age.');
     }
 
     public function testDefaultsAreWrittenWhenTheReservedGroupsAreCreatedAndNeverOverwritten(): void

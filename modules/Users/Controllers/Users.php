@@ -286,9 +286,31 @@ final class Users extends BackendController
             return '—';
         }
 
-        return ui_date($date, 'date') . ' ' . ((bool) $row['share_birthday']
+        $age  = self::age($date);
+        $hint = $age === null ? '' : lang('Users.birthdays.age', [$age]);
+        // The age as a tooltip (native title: no JavaScript, allowed by the CSP) and for screen readers.
+        $icon = $age === null ? '' : ' <i class="bi bi-hourglass-split text-body-secondary" title="' . esc($hint, 'attr') . '" aria-hidden="true"></i>'
+            . '<span class="visually-hidden">' . esc($hint) . '</span>';
+
+        return ui_date($date, 'date') . $icon . ' ' . ((bool) $row['share_birthday']
             ? ui_badge(lang('Users.birthdays.shared'), 'success', 'bi bi-calendar-heart')
             : ui_badge(lang('Users.birthdays.notShared'), 'light', 'bi bi-eye-slash'));
+    }
+
+    /**
+     * Completed years at today's date in the site's time zone (null for a date in the future).
+     */
+    public static function age(string $birthDate, ?\DateTimeInterface $today = null): ?int
+    {
+        $zone  = new \DateTimeZone(function_exists('site_timezone') ? site_timezone() : 'UTC');
+        $birth = \DateTimeImmutable::createFromFormat('!Y-m-d', substr($birthDate, 0, 10), $zone);
+        $today = $today === null ? new \DateTimeImmutable(\CodeIgniter\I18n\Time::now($zone)->toDateString(), $zone) : \DateTimeImmutable::createFromInterface($today);
+
+        if ($birth === false || $birth > $today) {
+            return null;
+        }
+
+        return $birth->diff($today)->y;
     }
 
     /**
