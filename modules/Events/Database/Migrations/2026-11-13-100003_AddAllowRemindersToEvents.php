@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Events\Database\Migrations;
 
+use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\Migration;
 
 /**
@@ -22,15 +23,16 @@ final class AddAllowRemindersToEvents extends Migration
     public function down(): void
     {
         // The table may already be gone (a down() of its creating migration ran first).
-        if (! $this->db->tableExists('events')) {
+        $db = $this->db;
+
+        if (! $db instanceof BaseConnection || ! $db->tableExists('events')) {
             return;
         }
 
-        $this->db->resetDataCache();
-        $columns = array_values(array_filter((array) 'allow_reminders', fn (string $column): bool => $this->db->fieldExists($column, 'events')));
+        $db->resetDataCache();
 
-        if ($columns !== []) {
-            $this->forge->dropColumn('events', $columns);
+        if ($db->fieldExists('allow_reminders', 'events')) {
+            $this->forge->dropColumn('events', 'allow_reminders');
         }
     }
 }

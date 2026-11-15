@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\News\Database\Migrations;
 
+use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\Migration;
 
 /**
@@ -25,12 +26,14 @@ final class AddEventDateToNews extends Migration
     public function down(): void
     {
         // The table may already be gone (a down() of its creating migration ran first).
-        if (! $this->db->tableExists('news')) {
+        $db = $this->db;
+
+        if (! $db instanceof BaseConnection || ! $db->tableExists('news')) {
             return;
         }
 
-        $this->db->resetDataCache();
-        $columns = array_values(array_filter((array) ['event_starts_at', 'event_ends_at', 'event_all_day'], fn (string $column): bool => $this->db->fieldExists($column, 'news')));
+        $db->resetDataCache();
+        $columns = array_values(array_filter(['event_starts_at', 'event_ends_at', 'event_all_day'], static fn (string $column): bool => $db->fieldExists($column, 'news')));
 
         if ($columns !== []) {
             $this->forge->dropColumn('news', $columns);

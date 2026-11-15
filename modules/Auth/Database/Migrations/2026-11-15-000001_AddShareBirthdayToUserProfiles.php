@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Database\Migrations;
 
+use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\Migration;
 
 /**
@@ -22,15 +23,16 @@ final class AddShareBirthdayToUserProfiles extends Migration
     public function down(): void
     {
         // The table may already be gone (a down() of its creating migration ran first).
-        if (! $this->db->tableExists('user_profiles')) {
+        $db = $this->db;
+
+        if (! $db instanceof BaseConnection || ! $db->tableExists('user_profiles')) {
             return;
         }
 
-        $this->db->resetDataCache();
-        $columns = array_values(array_filter((array) 'share_birthday', fn (string $column): bool => $this->db->fieldExists($column, 'user_profiles')));
+        $db->resetDataCache();
 
-        if ($columns !== []) {
-            $this->forge->dropColumn('user_profiles', $columns);
+        if ($db->fieldExists('share_birthday', 'user_profiles')) {
+            $this->forge->dropColumn('user_profiles', 'share_birthday');
         }
     }
 }
