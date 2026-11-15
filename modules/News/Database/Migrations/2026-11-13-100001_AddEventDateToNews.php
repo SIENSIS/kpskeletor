@@ -24,6 +24,16 @@ final class AddEventDateToNews extends Migration
 
     public function down(): void
     {
-        $this->forge->dropColumn('news', ['event_starts_at', 'event_ends_at', 'event_all_day']);
+        // The table may already be gone (a down() of its creating migration ran first).
+        if (! $this->db->tableExists('news')) {
+            return;
+        }
+
+        $this->db->resetDataCache();
+        $columns = array_values(array_filter((array) ['event_starts_at', 'event_ends_at', 'event_all_day'], fn (string $column): bool => $this->db->fieldExists($column, 'news')));
+
+        if ($columns !== []) {
+            $this->forge->dropColumn('news', $columns);
+        }
     }
 }

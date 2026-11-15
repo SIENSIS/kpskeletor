@@ -21,6 +21,16 @@ final class AddAllowRemindersToEvents extends Migration
 
     public function down(): void
     {
-        $this->forge->dropColumn('events', 'allow_reminders');
+        // The table may already be gone (a down() of its creating migration ran first).
+        if (! $this->db->tableExists('events')) {
+            return;
+        }
+
+        $this->db->resetDataCache();
+        $columns = array_values(array_filter((array) 'allow_reminders', fn (string $column): bool => $this->db->fieldExists($column, 'events')));
+
+        if ($columns !== []) {
+            $this->forge->dropColumn('events', $columns);
+        }
     }
 }

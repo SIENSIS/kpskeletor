@@ -21,6 +21,16 @@ final class AddShareBirthdayToUserProfiles extends Migration
 
     public function down(): void
     {
-        $this->forge->dropColumn('user_profiles', 'share_birthday');
+        // The table may already be gone (a down() of its creating migration ran first).
+        if (! $this->db->tableExists('user_profiles')) {
+            return;
+        }
+
+        $this->db->resetDataCache();
+        $columns = array_values(array_filter((array) 'share_birthday', fn (string $column): bool => $this->db->fieldExists($column, 'user_profiles')));
+
+        if ($columns !== []) {
+            $this->forge->dropColumn('user_profiles', $columns);
+        }
     }
 }
