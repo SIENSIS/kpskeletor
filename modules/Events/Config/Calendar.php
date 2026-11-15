@@ -34,4 +34,25 @@ class Calendar extends BaseConfig
 
     /** Most occurrences a recurring event can produce (safety cap of the expansion). */
     public int $maxOccurrences = 1000;
+
+    /** Seconds the results of calendar providers are cached per user and range (0: no cache). */
+    public int $providerCacheSeconds = 300;
+
+    /** Days before today covered by the iCal feeds. */
+    public int $icalPastDays = 90;
+
+    /** Days after today covered by the iCal feeds. */
+    public int $icalFutureDays = 365;
+
+    /** Days a deleted event stays in the iCal feeds as cancelled (so clients remove it too). */
+    public int $icalGraceDays = 30;
+
+    /** Refresh hint of the iCal feeds (`REFRESH-INTERVAL`, `X-PUBLISHED-TTL`; an ISO 8601 duration). */
+    public string $icalRefresh = 'PT1H';
+
+    /** Seconds an iCal feed is cached (0: no cache). Changes of events clear the cache. */
+    public int $icalCacheSeconds = 300;
+
+    /** Whether the public iCal feeds (`ical/public/…`) exist (they also need `$publicCalendar`). */
+    public bool $publicFeeds = true;
 }

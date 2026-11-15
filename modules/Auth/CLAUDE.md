@@ -30,6 +30,7 @@ sessions" on top of Shield. Core module (cannot be disabled). Full description: 
   `TwoFactor` (method, encrypted TOTP secret, reset), `Totp` (otphp + QR SVG), `RecoveryCodes`,
   `EmailCodes`, `Reauth`, `InstallTwoFactor` (2FA offered to the first superadmin by `php spark app:install`, listener of the Core's `install.superadmin`; D-18-05), `Impersonation` (state in the PHP session; started by the Users
   module, ended by `ImpersonationController`, logout or the `authsession` filter on expiry).
+- Profile: `share_birthday` (consent for the "Birthdays" calendar, off by default; D-25-08).
 - Tables: `user_profiles`, `user_sessions`, `known_devices`, `user_two_factor`,
   `user_recovery_codes`.
 - Avatars (session 23, D-23-01, D-23-04): `Services/Avatars.php` (the profile's file-picker field,

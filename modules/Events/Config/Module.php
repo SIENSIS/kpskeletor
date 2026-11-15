@@ -16,8 +16,9 @@ use Modules\Core\Config\ModuleManifest;
  * - `calendar` (page): the calendar view, the event details and the user's reminders (`view`),
  *   granted to every group.
  *
- * Configuration: `Config/Calendar.php` (D-00-04, D-24-05). The calendar API (`$calendars`,
- * `$calendarProviders`) and iCal arrive in session 25.
+ * Configuration: `Config/Calendar.php` (D-00-04, D-24-05). The calendar API (`service('calendar')`,
+ * other modules' `$calendars` and `$calendarProviders`) and the iCal feeds: docs/calendar-api.md,
+ * docs/events.md (session 25). Menu "Calendar subscription" in the user menu.
  */
 final class Module extends ModuleManifest
 {
@@ -62,6 +63,7 @@ final class Module extends ModuleManifest
         ['resource' => 'calendar', 'label' => 'Events.menu.calendar', 'icon' => 'bi bi-calendar3', 'order' => 25],
         ['resource' => 'events', 'label' => 'Events.menu.events', 'icon' => 'bi bi-calendar-event', 'order' => 1, 'parent' => 'calendar'],
         ['resource' => 'categories', 'label' => 'Events.menu.categories', 'icon' => 'bi bi-tags', 'order' => 2, 'parent' => 'calendar'],
+        ['route' => 'events-subscription', 'permission' => 'events-calendar.view', 'label' => 'Events.menu.subscription', 'icon' => 'bi bi-rss', 'order' => 26, 'zone' => 'user'],
     ];
 
     /** Link type "Calendar" of the public menu editor. */
@@ -85,7 +87,10 @@ final class Module extends ModuleManifest
     /** No outbound requests. */
     public array $outboundHosts = [];
 
-    /** Calendars of other modules and providers arrive in session 25 (calendar API). */
+    /**
+     * No declared calendar: the events created by hand form the built-in calendar `events`.
+     * Other modules declare theirs (docs/calendar-api.md).
+     */
     public array $calendars = [];
 
     /** No API resource yet: `events` is a Core endpoint of session 26. */

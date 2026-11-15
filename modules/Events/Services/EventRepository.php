@@ -34,7 +34,7 @@ final class EventRepository
     /**
      * The occurrences of the visible events that overlap `[$from, $to)`, by start.
      *
-     * @param array{category?: int} $filters
+     * @param array{category?: int, categories?: list<int>, calendars?: list<string>} $filters `calendars`: only these calendar ids
      *
      * @return list<array<string, mixed>>
      */
@@ -71,7 +71,29 @@ final class EventRepository
             $builder->where('events.category_id', (int) $filters['category']);
         }
 
-        $rows = $this->withTexts($builder->get()->getResultArray());
+        if (($filters['categories'] ?? []) !== []) {
+            // Events of other calendars have no category: the category filter only applies to own events.
+            $builder->groupStart()->whereIn('events.category_id', array_map('intval', $filters['categories']))->orWhere('events.calendar IS NOT NULL')->groupEnd();
+        }
+
+        if (isset($filters['calendars'])) {
+            $calendars = $filters['calendars'];
+            $builder->groupStart()->where('1 = 0', null, false);
+
+            if (in_array(Calendars::OWN, $calendars, true)) {
+                $builder->orWhere('events.calendar', null);
+            }
+
+            $others = array_values(array_diff($calendars, [Calendars::OWN]));
+
+            if ($others !== []) {
+                $builder->orWhereIn('events.calendar', $others);
+            }
+
+            $builder->groupEnd();
+        }
+
+        $rows = $this->withTexts($this->allowed($builder->get()->getResultArray(), $user));
         $list = [];
 
         foreach ($rows as $row) {
@@ -92,9 +114,10 @@ final class EventRepository
      */
     public function find(?User $user, int $id, bool $publicOnly = false): ?array
     {
-        $row = $this->visible($user, $publicOnly)->where('events.id', $id)->get(1)->getRowArray();
+        $row  = $this->visible($user, $publicOnly)->where('events.id', $id)->get(1)->getRowArray();
+        $rows = is_array($row) ? $this->allowed([$row], $user) : [];
 
-        return is_array($row) ? $this->withTexts([$row])[0] : null;
+        return $rows === [] ? null : $this->withTexts($rows)[0];
     }
 
     /**
@@ -205,6 +228,38 @@ final class EventRepository
     }
 
     /**
+     * Visible events deleted since `$since` (iCal feeds publish them as cancelled for a grace
+     * period, so clients that already had them remove them too).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function deletedSince(?User $user, DateTimeInterface $since, bool $publicOnly = false): array
+    {
+        $storage = new DateTimeZone(config('App')->appTimezone ?: 'UTC');
+        $builder = db_connect()->table('events')->select('events.*')
+            ->where('events.deleted_at IS NOT NULL')
+            ->where('events.deleted_at >=', DateTimeImmutable::createFromInterface($since)->setTimezone($storage)->format('Y-m-d H:i:s'));
+        EventVisibility::calendars($builder, $user);
+        EventVisibility::audience($builder, $user, 'events', $publicOnly);
+
+        return $this->withTexts($this->allowed($builder->get()->getResultArray(), $user));
+    }
+
+    /**
+     * Rows of `events` whose calendar's access policy (if any) lets the user see them.
+     *
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function allowed(array $rows, ?User $user): array
+    {
+        $calendars = new Calendars();
+
+        return array_values(array_filter($rows, static fn (array $row): bool => EventVisibility::allowedByPolicy($row, $user, $calendars)));
+    }
+
+    /**
      * Adds `title`, `description` (sanitised), `category_name` and `display_color`.
      *
      * @param list<array<string, mixed>> $rows
@@ -218,6 +273,7 @@ final class EventRepository
         }
 
         $texts      = ContentTranslations::texts('event_translations', 'event_id', array_column($rows, 'id'), ['title', 'description']);
+        $calendars  = (new Calendars())->all();
         $categories = [];
 
         foreach ($this->categories(false) as $category) {
@@ -230,7 +286,8 @@ final class EventRepository
             $rows[$i]['title']         = (string) ($texts[(int) $row['id']]['title'] ?? '');
             $rows[$i]['description']   = HtmlSanitizer::clean((string) ($texts[(int) $row['id']]['description'] ?? ''));
             $rows[$i]['category_name'] = $category['name'] ?? null;
-            $rows[$i]['display_color'] = self::color($row['color'] ?? null) ?? ($category['color'] ?? null);
+            $rows[$i]['display_color'] = self::color($row['color'] ?? null) ?? ($category['color'] ?? null) ?? ($calendars[Calendars::of($row)]['color'] ?? null);
+            $rows[$i]['calendar_label'] = $calendars[Calendars::of($row)]['label'] ?? null;
         }
 
         return $rows;

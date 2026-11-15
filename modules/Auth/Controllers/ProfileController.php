@@ -109,6 +109,8 @@ final class ProfileController extends BackendController
             'timezone'   => $data['timezone'],
             'theme_mode' => $data['theme_mode'],
             'birth_date' => $data['birth_date'] === '' ? null : $data['birth_date'],
+            // Consent to show the birthday in the "Birthdays" calendar (D-25-08); off without a date.
+            'share_birthday' => $data['birth_date'] !== '' && $this->request->getPost('share_birthday') === '1' ? 1 : 0,
         ];
         model(UserProfileModel::class)->saveFor((int) $user->id, $profile);
 

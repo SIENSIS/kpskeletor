@@ -95,6 +95,8 @@ return [
         'timezone'             => 'Zona horària',
         'themeMode'            => 'Mode de color',
         'birthDate'            => 'Data de naixement',
+        'shareBirthday' => 'Comparteix el meu aniversari al calendari',
+        'shareBirthdayHelp' => 'Només el dia i el mes, i només amb els grups que permetin els administradors. Desactivat: el teu aniversari no es mostra al calendari compartit.',
         'avatar'               => 'Avatar',
         'avatarHelp'           => 'JPG, PNG o WebP, fins a 2 MB. La imatge es torna a codificar (sense metadades) i només la veuen els usuaris que han iniciat la sessió. Desa el perfil per aplicar el canvi.',
         'groups'               => 'Grups',

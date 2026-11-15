@@ -612,7 +612,8 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Tables:** `ical_tokens` (user, hash, categories/calendars filter, last_access, revoked_at);
   `events` already has source columns; birthday column (contradiction 37).
 - **Commands:** `calendar:resync <module>`; routes `ical/public/(:segment).ics`,
-  `ical/user/(:segment).ics`, `events/(:segment)/export.ics`.
+  `ical/user/(:segment).ics`, `backend/calendar/event/(:segment)/export.ics` and
+  `calendar/event/(:segment)/export.ics` (D-25-01), `backend/calendar/subscription`.
 - **Tests:** RFC 5545 validation, regenerated token invalidates the old URL, permission change
   reflected, `304`, publish/unpublish idempotent, locked published events, providers filtered by
   user, disabled module events hidden.
@@ -716,6 +717,9 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** all modules.
 - **Risks:** `codeigniter4/translations` has no `ca` folder at all (every system file needs a
   Catalan copy); kpapy's `localeFallbacks` must follow the same chain for content.
+- **From session 25 (D-25-10):** a "translated text" setting type (one input per active locale,
+  stored as JSON) in the Settings module; move `Users.birthdayGreetingCa|Es|En` to one
+  `Users.birthdayGreeting` setting.
 
 ## 32 — Tasks tutorial module and AI tooling (`deploy/32-tasks-module.md`)
 

@@ -95,6 +95,8 @@ return [
         'timezone'             => 'Time zone',
         'themeMode'            => 'Colour mode',
         'birthDate'            => 'Date of birth',
+        'shareBirthday' => 'Share my birthday in the calendar',
+        'shareBirthdayHelp' => 'Only the day and month, and only with the groups the administrators allow. Off: your birthday is not shown in the shared calendar.',
         'avatar'               => 'Avatar',
         'avatarHelp'           => 'JPG, PNG or WebP, up to 2 MB. The image is re-encoded (no metadata) and only signed-in users see it. Save the profile to apply the change.',
         'groups'               => 'Groups',

@@ -60,6 +60,9 @@ return [
         'description'  => 'Descripció',
         'position'     => 'Ordre',
         'active'       => 'Activa',
+        'event_starts_at' => 'Data de l\'esdeveniment',
+        'event_ends_at' => 'Final de l\'esdeveniment',
+        'event_all_day' => 'Tot el dia',
     ],
     'help' => [
         'slug'         => 'Paraules en minúscules separades per guions. Deixeu-ho en blanc per crear-la a partir del títol en català.',
@@ -70,6 +73,7 @@ return [
         'expiresAt'    => 'Opcional. Després d’aquesta data la publicació ja no es mostra.',
         'publishedAt'  => 'Deixeu-ho en blanc per publicar ara; una data futura programa la publicació.',
         'cover'        => 'JPG, PNG o WebP, com a màxim 5 MB.',
+        'eventStartsAt' => 'Opcional, només per als avisos: un avís publicat amb data es mostra al calendari, per al mateix públic.',
     ],
     'types'        => ['article' => 'Article', 'notice' => 'Avís'],
     'typesPlural'  => ['article' => 'Articles', 'notice' => 'Avisos'],
@@ -78,6 +82,7 @@ return [
     'statuses'     => ['draft' => 'Esborrany', 'scheduled' => 'Programada', 'published' => 'Publicada', 'expired' => 'Caducada'],
     'errors'       => [
         'expiresBeforePublished' => 'La data de caducitat ha de ser posterior a la de publicació.',
+        'eventEndsBeforeStart' => 'El final de l\'esdeveniment ha de ser posterior a l\'inici.',
     ],
     'publish'          => 'Publica',
     'publishConfirm'   => 'Voleu publicar aquesta publicació? Els avisos privats ho notifiquen als lectors.',
@@ -144,5 +149,8 @@ return [
     'api' => [
         'summary'     => 'Notícies',
         'description' => 'Les notícies que pot llegir l’usuari del token (públiques, privades i les dels seus grups), publicades i no caducades.',
+    ],
+    'cal' => [
+        'notices' => 'Avisos',
     ],
 ];

@@ -95,6 +95,8 @@ return [
         'timezone'             => 'Zona horaria',
         'themeMode'            => 'Modo de color',
         'birthDate'            => 'Fecha de nacimiento',
+        'shareBirthday' => 'Compartir mi cumpleaños en el calendario',
+        'shareBirthdayHelp' => 'Solo el día y el mes, y solo con los grupos que permitan los administradores. Desactivado: tu cumpleaños no se muestra en el calendario compartido.',
         'avatar'               => 'Avatar',
         'avatarHelp'           => 'JPG, PNG o WebP, hasta 2 MB. La imagen se vuelve a codificar (sin metadatos) y solo la ven los usuarios que han iniciado sesión. Guarde el perfil para aplicar el cambio.',
         'groups'               => 'Grupos',

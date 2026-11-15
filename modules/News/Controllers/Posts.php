@@ -14,6 +14,7 @@ use Modules\Core\Security\HtmlSanitizer;
 use Modules\Core\Text\Slugger;
 use Modules\News\Services\NewsRepository;
 use Modules\News\Services\NewsVisibility;
+use Modules\News\Services\NoticeCalendar;
 use Modules\News\Services\Publisher;
 use Modules\News\Services\ReadReceipts;
 use Modules\News\Storage\CoverUploads;
@@ -130,11 +131,14 @@ final class Posts extends BackendController
             ->fieldType('pinned', 'boolean')
             ->fieldType('published_at', 'datetime')
             ->fieldType('expires_at', 'datetime')
+            ->fieldType('event_starts_at', 'datetime')
+            ->fieldType('event_ends_at', 'datetime')
+            ->fieldType('event_all_day', 'boolean')
             ->callbackField('cover', static fn ($value, ?array $row, array $field): string => CoverUploads::renderPicker('cover', $value, $field))
             ->callbackColumn('cover', static fn ($value): string => self::coverPreview($value))
             ->columns(['title', 'type', 'category_id', 'visibility', 'status', 'published_at', 'author_id'])
-            ->fields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id'])
-            ->showFields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id', 'created_at', 'updated_at'])
+            ->fields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'event_starts_at', 'event_ends_at', 'event_all_day', 'slug', 'cover', 'author_id'])
+            ->showFields(['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'event_starts_at', 'event_ends_at', 'event_all_day', 'slug', 'cover', 'author_id', 'created_at', 'updated_at'])
             ->exportColumns(['title', 'summary', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'author_id'])
             ->searchFields(['title', 'summary', 'slug'])
             ->filters(['type', 'category_id', 'visibility', 'status', 'groups', 'author_id'])
@@ -142,6 +146,8 @@ final class Posts extends BackendController
                 'slug'         => Slugger::rules(),
                 'published_at' => 'permit_empty|valid_date',
                 'expires_at'   => 'permit_empty|valid_date',
+                'event_starts_at' => 'permit_empty|valid_date',
+                'event_ends_at'   => 'permit_empty|valid_date',
                 'cover'        => 'permit_empty|max_length[32]',
             ])
             ->setDefault('type', 'article')
@@ -153,6 +159,7 @@ final class Posts extends BackendController
             ->setHelp('groups', lang('News.help.groups'))
             ->setHelp('priority', lang('News.help.priority'))
             ->setHelp('expires_at', lang('News.help.expiresAt'))
+            ->setHelp('event_starts_at', lang('News.help.eventStartsAt'))
             ->setHelp('published_at', lang('News.help.publishedAt'))
             ->setHelp('cover', lang('News.help.cover'))
             ->displayAs($this->labels())
@@ -166,6 +173,10 @@ final class Posts extends BackendController
             ->callbackExport('published_at', static fn ($value): string => (string) $value)
             ->beforeInsert(fn (array $data): array|string => $this->beforeSave($data, $crud, null, $mine ? $me : null))
             ->beforeUpdate(fn (array $data, string $id, array $old): array|string => $this->beforeSave($data, $crud, (int) $id, null, $old))
+            // Notices with an event date in the calendar (calendar API, push).
+            ->afterWrite(static function (string $operation, string $id): void {
+                NoticeCalendar::sync((int) $id);
+            })
             ->defaultOrder('id', 'desc');
 
         $crud->addOperation('publish', static function (string $id, array $row): string {
@@ -183,6 +194,7 @@ final class Posts extends BackendController
 
         $crud->addOperation('unpublish', static function (string $id): string {
             db_connect()->table('news')->where('id', (int) $id)->update(['status' => 'draft']);
+            NoticeCalendar::sync((int) $id);
 
             return lang('News.unpublishedOk');
         }, [
@@ -243,7 +255,7 @@ final class Posts extends BackendController
             }
         }
 
-        foreach (['published_at', 'expires_at'] as $field) {
+        foreach (['published_at', 'expires_at', 'event_starts_at', 'event_ends_at'] as $field) {
             if (array_key_exists($field, $data) && $data[$field] === '') {
                 $data[$field] = null;
             }
@@ -252,6 +264,11 @@ final class Posts extends BackendController
         if (($data['published_at'] ?? null) !== null && ($data['expires_at'] ?? null) !== null
             && strtotime((string) $data['expires_at']) <= strtotime((string) $data['published_at'])) {
             return lang('News.errors.expiresBeforePublished');
+        }
+
+        if (($data['event_starts_at'] ?? null) !== null && ($data['event_ends_at'] ?? null) !== null
+            && strtotime((string) $data['event_ends_at']) < strtotime((string) $data['event_starts_at'])) {
+            return lang('News.errors.eventEndsBeforeStart');
         }
 
         return $data;
@@ -322,7 +339,7 @@ final class Posts extends BackendController
     {
         $labels = [];
 
-        foreach (['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'slug', 'cover', 'author_id', 'created_at', 'updated_at'] as $field) {
+        foreach (['title', 'summary', 'body', 'type', 'priority', 'pinned', 'category_id', 'visibility', 'groups', 'status', 'published_at', 'expires_at', 'event_starts_at', 'event_ends_at', 'event_all_day', 'slug', 'cover', 'author_id', 'created_at', 'updated_at'] as $field) {
             $labels[$field] = lang('News.fields.' . $field);
         }
 

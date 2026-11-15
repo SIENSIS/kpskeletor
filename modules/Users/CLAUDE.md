@@ -6,13 +6,16 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 ## Resources and permissions
 
 - `users-users` (crud, no delete/export/import/trash): `list`, `show`, `add`, `edit` and the row
-  operations `ban`, `forcereset`, `reset2fa`, `logout`, `impersonate`, `access`.
+  operations `ban`, `forcereset`, `reset2fa`, `logout`, `impersonate`, `access`, and the extra
+  `birthdate` (dates of birth in the record and the administrative birthdays calendar).
+- `users-birthdays` (page): `view` — may see the shared "Birthdays" calendar (every reserved group).
 - `users-groups` (crud over the Core `groups` table, no export/import/trash).
 - `users-matrix` (page): `view`, `edit`.
 - Default grants: `admin` everything except `users-users.impersonate`.
 - Menu (`settings` zone): Users, Groups, Permissions.
 - Setting `Users.impersonationMinutes` (30, 1–120, Settings › Security › Impersonation).
-- No tables of its own (Shield's tables and the Core `groups` table), no demo data (the demo users
+- Tables of its own: `group_birthday_audiences` (D-25-08; created with defaults),
+  `group_birthday_greetings`, `birthday_greetings_sent` (D-25-09); no demo data (the demo users
   are Auth's), no outbound hosts or CSP sources. Asset: `Assets/js/matrix.js` (`users/matrix`).
 - Widget `users.summary` (`Widgets/UsersSummary.php`, async, `users-users.list`): active accounts,
   users online (option `onlineMinutes`), active accounts without 2FA.
@@ -32,6 +35,22 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 
 D-15-01 (names and URLs) decided by the owner as proposed; D-15-02 … D-15-05 accepted (`docs/decisions.md`).
 
+## Calendar (session 25)
+
+Two pull calendars (D-25-07, D-25-08; `docs/users.md`, "Birthdays calendar"): `users.birthdays`
+(`Calendar/BirthdaysProvider.php`: setting `Users.birthdaysCalendar`, off by default + the owner's
+consent `user_profiles.share_birthday` + `users-birthdays.view` + table `group_birthday_audiences`
+edited in Groups "Sees the birthdays of") and `users.birthdaysadmin`
+(`Calendar/AdminBirthdaysProvider.php`, every date of birth, `users-users.birthdate`, hidden by
+default). Shared code `Calendar/Birthdays.php`. The record shows the date of birth with
+`users-users.birthdate` (with the age as a tooltip). Tests `Tests/BirthdaysProviderTest.php`.
+
+Birthday greetings (D-25-09): task `Tasks/SendBirthdayGreetings.php` (daily at
+`Users.birthdayGreetingTime`), notification `Notifications/BirthdayGreeting.php`, service
+`Services/BirthdayGreetings.php`; groups chosen with the switch of the Groups form
+(`group_birthday_greetings`), once a year (`birthday_greetings_sent`); settings
+`birthdayGreetingSharedOnly` (on), `birthdayGreetingCa|Es|En`. Tests `Tests/BirthdayGreetingsTest.php`.
+
 ## Open tasks
 
 - Search by email and filters by group or 2FA in the users list: they live in other tables and
@@ -40,6 +59,8 @@ D-15-01 (names and URLs) decided by the owner as proposed; D-15-02 … D-15-05 a
 - Custom groups created after a module's first sync do not receive that module's later default
   grants for "every group" (only the grants shared by the reserved groups at creation time).
 - Session 23: avatars in the list.
+- Session 31 (D-25-10): move `birthdayGreetingCa|Es|En` to one "translated text" setting
+  `birthdayGreeting` (one input per active locale), migrating the stored values.
 
 ## How to test
 

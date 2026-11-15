@@ -94,6 +94,56 @@ See `docs/auth.md` › "Impersonation": superadmins only, never another superadm
 re-authentication, limited by `Users.impersonationMinutes` (30), with a banner and "Back to my
 account", sensitive actions refused meanwhile, start and end in the activity log.
 
+## Birthdays calendar
+
+Two calendars computed on the fly (calendar API, pull; `docs/calendar-api.md`; D-25-07, D-25-08):
+all-day events with the day and month only ("<name>'s birthday", never the year or the age; 29
+February shown on 28 February in common years) of active, non-banned users who entered a date of
+birth in their profile (`user_profiles.birth_date`, Auth). Nothing is stored; never on the public
+site.
+
+- **"Birthdays"** (`users.birthdays`, `Calendar/BirthdaysProvider.php`): a birthday is shown only
+  when **all** of these hold:
+  1. the setting `Users.birthdaysCalendar` is on (Settings › Users › Calendar; **off by default**);
+  2. the person **consented** in their profile ("Share my birthday in the calendar",
+     `user_profiles.share_birthday`, off by default; cleared without a date);
+  3. the viewer holds `users-birthdays.view` (default: every reserved group; remove it from a
+     group, e.g. students, so its members see no birthday at all);
+  4. one of the viewer's groups may see one of the person's groups: table
+     `group_birthday_audiences`, edited in **Users › Groups › "Sees the birthdays of"**. Defaults
+     (created with the table): each reserved group sees its own members, `admin` sees every
+     reserved group.
+- **"Birthdays (administration)"** (`users.birthdaysadmin`, `Calendar/AdminBirthdaysProvider.php`):
+  every date of birth, **whether or not it is shared**, for administrative work; only for holders
+  of `users-users.birthdate` (default: `admin`); hidden in the calendar view until the user shows
+  it; independent of the setting.
+- **The user's record** (Users › show) shows the full date of birth, whether it is shared, and
+  an hourglass icon whose tooltip gives the age in completed years (native `title`, no
+  JavaScript; also read by screen readers), only with `users-users.birthdate`.
+
+Example (a school): management (`admin`) sees every group; teachers (`editor`) see the teachers;
+students (`user`) without `users-birthdays.view` see nothing. A student's shared birthday is seen
+by the management, not by the teachers; an unshared one only in the administrative calendar and
+the record.
+
+## Birthday greetings
+
+On their birthday (site time zone; 29 February greeted on 28 February in common years), the
+members of the groups chosen in **Users › Groups › "Greet the members on their birthday"**
+(table `group_birthday_greetings`; none by default) receive the notification **"Birthday
+greeting"** (`Notifications/BirthdayGreeting.php`): in the bell by default, by email if they
+choose it, and each user can turn it off in their notification preferences. Once a year per user
+(`birthday_greetings_sent`, rows older than two years purged). The greeting only reaches the
+person (D-25-09).
+
+- Task `Tasks/SendBirthdayGreetings.php`, daily at `Users.birthdayGreetingTime` (`HH:MM`, default
+  08:00; a new value moves the task on the scheduler's next sync).
+- `Users.birthdayGreetingSharedOnly` (on by default): only users who share their birthday in the
+  calendar (privacy); off: every member of the greeted groups with a date of birth.
+- The message per language, `Users.birthdayGreetingCa`, `…Es`, `…En` (`{name}` = the user's name);
+  each user receives the one of their language. Settings › Users › "Birthday greetings".
+- Service `Services/BirthdayGreetings.php`; tests `Tests/BirthdayGreetingsTest.php`.
+
 ## Activity log
 
 CRUD writes are logged by `AuditedCrud`. The module adds `user_created`, `email_changed`,

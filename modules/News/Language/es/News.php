@@ -60,6 +60,9 @@ return [
         'description'  => 'Descripción',
         'position'     => 'Orden',
         'active'       => 'Activa',
+        'event_starts_at' => 'Fecha del evento',
+        'event_ends_at' => 'Final del evento',
+        'event_all_day' => 'Todo el día',
     ],
     'help' => [
         'slug'         => 'Palabras en minúsculas separadas por guiones. Déjelo en blanco para crearla a partir del título en catalán.',
@@ -70,6 +73,7 @@ return [
         'expiresAt'    => 'Opcional. Después de esta fecha la publicación ya no se muestra.',
         'publishedAt'  => 'Déjelo en blanco para publicar ahora; una fecha futura programa la publicación.',
         'cover'        => 'JPG, PNG o WebP, como máximo 5 MB.',
+        'eventStartsAt' => 'Opcional, solo para los avisos: un aviso publicado con fecha se muestra en el calendario, para el mismo público.',
     ],
     'types'        => ['article' => 'Artículo', 'notice' => 'Aviso'],
     'typesPlural'  => ['article' => 'Artículos', 'notice' => 'Avisos'],
@@ -78,6 +82,7 @@ return [
     'statuses'     => ['draft' => 'Borrador', 'scheduled' => 'Programada', 'published' => 'Publicada', 'expired' => 'Caducada'],
     'errors'       => [
         'expiresBeforePublished' => 'La fecha de caducidad debe ser posterior a la de publicación.',
+        'eventEndsBeforeStart' => 'El final del evento debe ser posterior al inicio.',
     ],
     'publish'          => 'Publicar',
     'publishConfirm'   => '¿Publicar esta publicación? Los avisos privados lo notifican a sus lectores.',
@@ -144,5 +149,8 @@ return [
     'api' => [
         'summary'     => 'Noticias',
         'description' => 'Las noticias que puede leer el usuario del token (públicas, privadas y las de sus grupos), publicadas y no caducadas.',
+    ],
+    'cal' => [
+        'notices' => 'Avisos',
     ],
 ];

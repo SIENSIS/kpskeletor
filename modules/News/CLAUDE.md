@@ -43,10 +43,17 @@ description: `docs/news.md`.
 D-17-01 (separate API resource `news-api`) and D-17-08 ("Insert image" with the file picker in session 23) decided by the owner, D-17-02 … D-17-06 accepted, D-17-07 applied (kpapy `where(Closure)`)
 (`docs/decisions.md`); D-00-35, D-00-36, D-00-40, D-00-41, D-00-42.
 
+## Calendar (session 25)
+
+Notices with an event date (`event_starts_at`, `event_ends_at`, `event_all_day`; migration
+`AddEventDateToNews`) are published to `news.notices` while published and readable
+(`Services/NoticeCalendar.php`, also the calendar's `CalendarSource`); every write and state
+change calls `NoticeCalendar::sync()` (CRUD `afterWrite`, publish/unpublish, `Publisher`).
+Tests `Tests/NoticeCalendarTest.php`. D-25-06.
+
 ## Open tasks
 
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
-- Session 25: the `news.notices` calendar (`groups` → `restricted`, D-00-41).
 - Session 26: read receipts and notices in the API.
 
 ## How to test

@@ -7,6 +7,7 @@ namespace Modules\Auth\Tests;
 use CodeIgniter\Database\Migration;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
+use Modules\Auth\Database\Migrations\AddShareBirthdayToUserProfiles;
 use Modules\Auth\Database\Migrations\CreateKnownDevices;
 use Modules\Auth\Database\Migrations\CreateUserProfiles;
 use Modules\Auth\Database\Migrations\CreateUserRecoveryCodes;
@@ -37,7 +38,7 @@ final class AuthMigrationsTest extends CIUnitTestCase
     {
         return array_map(
             static fn (string $class): Migration => new $class(\Config\Database::forge('tests')),
-            [CreateUserProfiles::class, CreateUserSessions::class, CreateKnownDevices::class, CreateUserTwoFactor::class, CreateUserRecoveryCodes::class],
+            [CreateUserProfiles::class, AddShareBirthdayToUserProfiles::class, CreateUserSessions::class, CreateKnownDevices::class, CreateUserTwoFactor::class, CreateUserRecoveryCodes::class],
         );
     }
 
@@ -66,5 +67,6 @@ final class AuthMigrationsTest extends CIUnitTestCase
         }
 
         $this->assertTables(true);
+        $this->assertTrue($this->db->fieldExists('share_birthday', 'user_profiles'));
     }
 }

@@ -60,6 +60,9 @@ return [
         'description'  => 'Description',
         'position'     => 'Order',
         'active'       => 'Active',
+        'event_starts_at' => 'Event date',
+        'event_ends_at' => 'Event end',
+        'event_all_day' => 'All-day event',
     ],
     'help' => [
         'slug'         => 'Lower-case words separated by hyphens. Leave it blank to build it from the Catalan title.',
@@ -70,6 +73,7 @@ return [
         'expiresAt'    => 'Optional. After this date the post is no longer shown.',
         'publishedAt'  => 'Leave it blank to publish now; a future date schedules the post.',
         'cover'        => 'JPG, PNG or WebP, at most 5 MB.',
+        'eventStartsAt' => 'Optional, only for notices: a published notice with a date is shown in the calendar, for the same audience.',
     ],
     'types'        => ['article' => 'Article', 'notice' => 'Notice'],
     'typesPlural'  => ['article' => 'Articles', 'notice' => 'Notices'],
@@ -78,6 +82,7 @@ return [
     'statuses'     => ['draft' => 'Draft', 'scheduled' => 'Scheduled', 'published' => 'Published', 'expired' => 'Expired'],
     'errors'       => [
         'expiresBeforePublished' => 'The expiry date must be after the publication date.',
+        'eventEndsBeforeStart' => 'The end of the event must be after its start.',
     ],
     'publish'          => 'Publish',
     'publishConfirm'   => 'Publish this post? Private notices notify their readers.',
@@ -144,5 +149,8 @@ return [
     'api' => [
         'summary'     => 'News',
         'description' => 'The news the token\'s user may read (public, private and their groups\'), published and not expired.',
+    ],
+    'cal' => [
+        'notices' => 'Notices',
     ],
 ];

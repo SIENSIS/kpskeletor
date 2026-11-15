@@ -10,6 +10,8 @@ use Modules\Core\Controllers\FrontendController;
 use Modules\Events\Services\CalendarComponent;
 use Modules\Events\Services\EventDetails;
 use Modules\Events\Services\EventRepository;
+use Modules\Events\Services\IcalExport;
+use Modules\Events\Services\IcalFeeds;
 
 /**
  * The public calendar: **only `public` events**, whoever is signed in (private and restricted
@@ -18,7 +20,7 @@ use Modules\Events\Services\EventRepository;
  *
  * - `GET calendar` (`?category=<slug>`);
  * - `GET calendar/feed?start=&end=[&category=<id>]` (JSON, rate limit `feeds`);
- * - `GET calendar/event/{code}[?date=YYYY-MM-DD]`.
+ * - `GET calendar/event/{code}[?date=YYYY-MM-DD]`, `calendar/event/{code}/export.ics`.
  */
 final class PublicCalendar extends FrontendController
 {
@@ -77,8 +79,26 @@ final class PublicCalendar extends FrontendController
         return $this->render('Modules\Events\Views\public\show', [
             'title'       => (string) $event['title'],
             'event'       => EventDetails::build($event, is_string($date) ? $date : null),
+            'exportUrl'   => site_url('calendar/event/' . $code . '/export.ics'),
             'breadcrumbs' => [['label' => lang('Events.publicTitle'), 'url' => site_url('calendar')], ['label' => (string) $event['title']]],
         ]);
+    }
+
+    /**
+     * `GET calendar/event/{code}/export.ics`: a public event as a static iCal copy.
+     */
+    public function export(string $code): ResponseInterface
+    {
+        $this->enabled();
+
+        $id    = EventRepository::idFromCode($code);
+        $event = $id === null ? null : (new EventRepository())->find(null, $id, true);
+
+        if ($event === null) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        return IcalExport::download((new IcalFeeds())->single($event, site_url('calendar/event/' . $code)), (string) $event['title'], $this->response);
     }
 
     private function enabled(): void

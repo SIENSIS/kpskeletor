@@ -322,7 +322,7 @@ final class Module extends ModuleManifest
     public array $backup = ['files' => ['news']];
 
     /** Calendars the module publishes events to ('permission' optional), and on-the-fly event providers (see Events) */
-    public array $calendars         = ['notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545']];
+    public array $calendars         = ['notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545', 'source' => \Modules\News\Services\NoticeCalendar::class]];
     public array $calendarProviders = [];
 
     /** API resources (kpapy) under /api/v1: metadata checked against Config/Routes.php (see "JSON API") */
@@ -1092,7 +1092,7 @@ group): name, email, avatar (file picker in `upload` mode, stored on the **priva
 user's personal space), language, time zone, theme mode, password change, 2FA method (none /
 email / app) with recovery codes, notification preferences, and "my sessions". Shield's `users`
 table has none of the profile fields, so Auth owns a `user_profiles` table (one migration: name,
-language, time zone, theme mode, avatar, an optional `birth_date`).
+language, time zone, theme mode, avatar, an optional `birth_date` and `share_birthday`).
 
 ### Users
 
@@ -1400,18 +1400,24 @@ field declares how it works:
   category, using a vendored MIT-licensed calendar library through a `data-component` (JSON
   feed endpoint by date range, respecting visibility and permissions); click to open the event.
 * **iCal (RFC 5545), two different features:**
-  * **One-off export** of an event (`.ics` download): the client imports a static copy; later
-    changes do not reach it.
+  * **One-off export** of an event (`.ics` download, next to its details page:
+    `backend/calendar/event/{code}/export.ics` and, for public events,
+    `calendar/event/{code}/export.ics`): the client imports a static copy; later changes do not
+    reach it.
   * **Subscribable feeds** (read-only, one-way): external clients (Synology Calendar, Google,
     Outlook, Apple, Thunderbird) poll the URL periodically and show changes, new events and
     deletions on their next refresh. Two-way sync (CalDAV) is out of scope.
-    * **Public feed** per category (or all categories): public events only, no login.
+    * **Public feed** per category (or all categories): `ical/public/all.ics`,
+      `ical/public/<category slug>.ics`; public events only, no login (`ratelimit:feeds`).
     * **One personal feed per user** with every event they can see (public, private and their
-      groups' events), filterable by category from the profile, so one subscription is enough.
-      Clients cannot log in, so the URL carries a **random secret token** (stored hashed),
-      which the user can copy, **regenerate** (invalidating the previous URL) or revoke. The
+      groups' events, other modules' calendars and providers), filterable by calendar and
+      category, so one subscription is enough: `ical/user/<secret>.ics`. Clients cannot log in,
+      so the URL carries a **random secret token** (stored hashed, so the URL is shown only once,
+      when it is created or regenerated; creating or regenerating needs re-authentication), which
+      the user can copy, **regenerate** (invalidating the previous URL) or revoke. The
       feed is evaluated with that user's current permissions on every request (a user who loses
-      access stops seeing the events). The last access is shown in the profile and logged.
+      access stops seeing the events). The last access is shown on the subscription screen and
+      logged. Texts are in the user's own language.
   * **Robust format:** stable `UID` per event, `SEQUENCE` and `LAST-MODIFIED` so clients detect
     changes; cancelled or deleted events published as `STATUS:CANCELLED` for a grace period (e.g.
     30 days) so they also disappear from clients that already had them; recurrences as `RRULE` /
@@ -1422,8 +1428,12 @@ field declares how it works:
   * **Performance:** `ETag` / `Last-Modified` with `304 Not Modified` when nothing changed, a
     limited range (e.g. 3 months back, 12 months ahead, configurable), and a short cache per
     feed; rate-limited per token.
-  * **In the profile:** "Copy URL" and a `webcal://` link, short instructions for Synology,
-    Google, Outlook and Apple, the category filter, and "Regenerate".
+  * **Screen "Calendar subscription"** (`backend/calendar/subscription`, user menu,
+    `events-calendar.view`; `POST …/generate` with `reauth`, `…/revoke`, `…/filters`): the new
+    URL once with "Copy" and a `webcal://` link, the state and last access, short instructions
+    for Synology, Google, Outlook, Apple and Thunderbird, the calendar and category filters, and
+    "Regenerate" / "Revoke". Configuration in `Config\Calendar` (`icalPastDays`,
+    `icalFutureDays`, `icalGraceDays`, `icalRefresh`, `icalCacheSeconds`, `publicFeeds`).
   * **Reminders in the client (optional):** reminders the user asked for in the application are
     also included in their personal feed as `VALARM`.
 * **Reminders:** users can ask for a reminder; a scheduled task sends the notifications.
@@ -1466,8 +1476,13 @@ both supported:
   `$calendarProviders`. They must return **stable keys** (used as iCal `UID`) and only events the
   user may see; results are cached per user and range for a few minutes.
 * **Calendars:** each module declares its calendars in the manifest (`$calendars`: label, colour,
-  and an optional required permission; without it, each event's visibility decides). In the calendar view each user toggles the calendars they want to see
-  (saved as a preference); the personal iCal feed can be filtered by calendars as well as
+  and optionally `permission` (without it, each event's visibility decides), `policy` (an
+  `EventAccessPolicy` class) and `source` (a `CalendarSource` class)); their id is
+  `<module in lower case>.<key>` and events created by hand form the calendar `events`. The
+  contracts (`CalendarEvent`, `CalendarPublisher`, `CalendarProvider`, `EventAccessPolicy`,
+  `CalendarSource`) live in `Modules\Core\Calendar`; without the Events module
+  `service('calendar')` does nothing. In the calendar view each user toggles the calendars they
+  want to see (saved as a preference, `POST backend/calendar/calendars`); the personal iCal feed can be filtered by calendars as well as
   categories. Categories remain for events created by hand.
 * **Consistency:** events and providers of a disabled module are hidden; uninstalling a module
   deletes its published events; `php spark calendar:resync <module>` asks the module for all its
@@ -1478,8 +1493,15 @@ both supported:
   * **News (push):** a notice may have an optional event date; saving it publishes the event to
     the `news.notices` calendar with the notice's visibility, and unpublishing or deleting the
     notice removes it.
-  * **Users (pull):** a "Birthdays" provider (read-only, enabled by a setting, from the optional
-    `user_profiles.birth_date`, only the day and month, only to logged-in users) shows the provider mode without storing anything.
+  * **Users (pull):** a "Birthdays" provider (read-only, enabled by a setting, off by default,
+    from the optional `user_profiles.birth_date`, only the day and month, only to logged-in users)
+    shows the provider mode without storing anything. A birthday is shown only if its owner
+    consented in the profile (`share_birthday`, off by default), the viewer holds
+    `users-birthdays.view` and one of the viewer's groups may see one of the owner's groups (a
+    table edited in Users › Groups: "Sees the birthdays of"). An administrative calendar
+    "Birthdays (administration)" shows every date of birth, shared or not, to holders of
+    `users-users.birthdate` (hidden by default in the calendar view), who also see the date of
+    birth in the user's record.
 
 ### Updates
 
