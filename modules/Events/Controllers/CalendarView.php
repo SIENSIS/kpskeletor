@@ -31,7 +31,8 @@ use Modules\Events\Services\Reminders;
  *   `Config\Calendar::$reminderOptions`, empty to remove it; refused when the event does not
  *   allow reminders);
  * - `GET backend/calendar/event/{code}/export.ics`: one-off iCal export;
- * - `POST backend/calendar/calendars`: the calendars the user shows or hides.
+ * - `POST backend/calendar/calendars`: the calendars the user shows or hides (`calendars[]`, or
+ *   `only=<id>` to show one calendar, or `all` to show every calendar).
  *
  * Events of other modules' calendars and providers are included (docs/calendar-api.md).
  */
@@ -127,8 +128,17 @@ final class CalendarView extends BackendController
     {
         $user    = $this->currentUser();
         $service = new Calendars();
-        $shown   = array_map('strval', (array) ($this->request->getPost('calendars') ?? []));
-        $hidden  = $service->setHidden($user, array_values(array_diff(array_keys($service->visibleTo($user)), $shown)));
+        $visible = array_keys($service->visibleTo($user));
+        $only    = (string) $this->request->getPost('only');
+        $shown   = match (true) {
+            $this->request->getPost('all') !== null => $visible,                // "Show all"
+            $only !== ''                            => [$only],                 // "Only this one"
+            default                                 => array_map('strval', (array) ($this->request->getPost('calendars') ?? [])),
+        };
+        // A calendar the user may not see changes nothing.
+        $hidden = $only !== '' && ! in_array($only, $visible, true)
+            ? $service->hidden($user)
+            : $service->setHidden($user, array_values(array_diff($visible, $shown)));
 
         if ($this->request->isAJAX() || str_contains($this->request->getHeaderLine('Accept'), 'application/json')) {
             return $this->json(['hidden' => $hidden]);

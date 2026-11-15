@@ -96,12 +96,34 @@ account", sensitive actions refused meanwhile, start and end in the activity log
 
 ## Birthdays calendar
 
-`Calendar/BirthdaysProvider.php` (calendar API, pull; `docs/calendar-api.md`) adds an all-day
-event on the birthday of every active, non-banned user who entered a date of birth in their profile
-(`user_profiles.birth_date`, Auth): day and month only, "<name>'s birthday", 29 February shown on 28
-February in common years. Nothing is stored. Calendar `users.birthdays` (no permission: every
-signed-in user, never the public site). **Off by default**: setting `Users.birthdaysCalendar`
-(Settings › Users › Calendar). D-25-07.
+Two calendars computed on the fly (calendar API, pull; `docs/calendar-api.md`; D-25-07, D-25-08):
+all-day events with the day and month only ("<name>'s birthday", never the year or the age; 29
+February shown on 28 February in common years) of active, non-banned users who entered a date of
+birth in their profile (`user_profiles.birth_date`, Auth). Nothing is stored; never on the public
+site.
+
+- **"Birthdays"** (`users.birthdays`, `Calendar/BirthdaysProvider.php`): a birthday is shown only
+  when **all** of these hold:
+  1. the setting `Users.birthdaysCalendar` is on (Settings › Users › Calendar; **off by default**);
+  2. the person **consented** in their profile ("Share my birthday in the calendar",
+     `user_profiles.share_birthday`, off by default; cleared without a date);
+  3. the viewer holds `users-birthdays.view` (default: every reserved group; remove it from a
+     group, e.g. students, so its members see no birthday at all);
+  4. one of the viewer's groups may see one of the person's groups: table
+     `group_birthday_audiences`, edited in **Users › Groups › "Sees the birthdays of"**. Defaults
+     (created with the table): each reserved group sees its own members, `admin` sees every
+     reserved group.
+- **"Birthdays (administration)"** (`users.birthdaysadmin`, `Calendar/AdminBirthdaysProvider.php`):
+  every date of birth, **whether or not it is shared**, for administrative work; only for holders
+  of `users-users.birthdate` (default: `admin`); hidden in the calendar view until the user shows
+  it; independent of the setting.
+- **The user's record** (Users › show) shows the full date of birth and whether it is shared, only
+  with `users-users.birthdate`.
+
+Example (a school): management (`admin`) sees every group; teachers (`editor`) see the teachers;
+students (`user`) without `users-birthdays.view` see nothing. A student's shared birthday is seen
+by the management, not by the teachers; an unshared one only in the administrative calendar and
+the record.
 
 ## Activity log
 

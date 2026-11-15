@@ -10,6 +10,7 @@ return [
         'users' => 'Users',
         'groups' => 'Groups',
         'matrix' => 'Permission matrix',
+        'birthdays' => 'Birthdays calendar',
     ],
     'perm' => [
         'ban' => 'Ban and unban',
@@ -19,6 +20,7 @@ return [
         'impersonate' => 'Impersonate',
         'access' => 'Change groups and permissions',
         'matrixEdit' => 'Change the matrix',
+        'birthdate' => 'See dates of birth (record and administrative calendar)',
     ],
     'menu' => [
         'users' => 'Users',
@@ -104,6 +106,8 @@ return [
         'required' => 'Required',
         'reservedYes' => 'Reserved',
         'cannotDelete' => 'Reserved groups and groups with members cannot be deleted.',
+        'birthdayGroups' => 'Sees the birthdays of',
+        'birthdayGroupsHelp' => 'In the "Birthdays" calendar, the members of this group see the birthdays shared by the members of these groups (they also need the permission to see the calendar).',
     ],
     'matrix' => [
         'title' => 'Permission matrix',
@@ -142,5 +146,9 @@ return [
     'birthdays' => [
         'calendar' => 'Birthdays',
         'title' => '{0}\'s birthday',
+        'adminCalendar' => 'Birthdays (administration)',
+        'birthDate' => 'Date of birth',
+        'shared' => 'Shared in the calendar',
+        'notShared' => 'Not shared',
     ],
 ];

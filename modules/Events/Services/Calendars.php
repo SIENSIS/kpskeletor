@@ -18,7 +18,8 @@ use Modules\Core\Registry\DeclarationRegistry;
  *   `<module in lower case>.<key>` (e.g. `news.notices`). A calendar with a `permission` is only
  *   shown to users holding it; without one, each event's visibility decides (D-00-41).
  *
- * Each user may hide calendars in the calendar view (`event_calendar_preferences`).
+ * Each user may hide calendars in the calendar view (`event_calendar_preferences`); a calendar
+ * declared `'hidden' => true` starts hidden until the user shows it.
  */
 final class Calendars
 {
@@ -32,13 +33,13 @@ final class Calendars
     /**
      * Every calendar of enabled modules, the own one first: id => definition.
      *
-     * @return array<string, array{id: string, module: string, label: string, color: string|null, permission: string|null, policy: string|null, source: string|null}>
+     * @return array<string, array{id: string, module: string, label: string, color: string|null, permission: string|null, policy: string|null, source: string|null, hidden: bool}>
      */
     public function all(): array
     {
         $calendars = [self::OWN => [
             'id' => self::OWN, 'module' => 'Events', 'label' => lang('Events.calendars.own'), 'color' => null,
-            'permission' => null, 'policy' => null, 'source' => null,
+            'permission' => null, 'policy' => null, 'source' => null, 'hidden' => false,
         ]];
 
         foreach ($this->registry->calendars() as $key => $declaration) {
@@ -53,6 +54,7 @@ final class Calendars
                 'permission' => is_string($definition['permission'] ?? null) && $definition['permission'] !== '' ? $definition['permission'] : null,
                 'policy'     => is_string($definition['policy'] ?? null) ? $definition['policy'] : null,
                 'source'     => is_string($definition['source'] ?? null) ? $definition['source'] : null,
+                'hidden'     => ($definition['hidden'] ?? false) === true,
             ];
         }
 
@@ -62,7 +64,7 @@ final class Calendars
     /**
      * The calendars a user (or a guest: `null`) may see events of.
      *
-     * @return array<string, array{id: string, module: string, label: string, color: string|null, permission: string|null, policy: string|null, source: string|null}>
+     * @return array<string, array{id: string, module: string, label: string, color: string|null, permission: string|null, policy: string|null, source: string|null, hidden: bool}>
      */
     public function visibleTo(?User $user): array
     {
@@ -103,15 +105,26 @@ final class Calendars
     }
 
     /**
-     * The calendars the user has hidden in the calendar view.
+     * The calendars hidden in the user's calendar view: those they hid, plus the calendars declared
+     * `hidden` (by default) that they have not shown. Stored as ids (hidden) and `+id` (a hidden
+     * by default calendar the user chose to show).
      *
      * @return list<string>
      */
     public function hidden(User $user): array
     {
-        $row = db_connect()->table('event_calendar_preferences')->where('user_id', (int) $user->id)->get()->getRowArray();
+        $row     = db_connect()->table('event_calendar_preferences')->where('user_id', (int) $user->id)->get()->getRowArray();
+        $stored  = is_array($row) && is_string($row['hidden'] ?? null) ? explode(',', $row['hidden']) : [];
+        $hidden  = self::split(implode(',', array_filter($stored, static fn (string $id): bool => ! str_starts_with(trim($id), '+'))));
+        $shown   = self::split(implode(',', array_map(static fn (string $id): string => ltrim(trim($id), '+'), array_filter($stored, static fn (string $id): bool => str_starts_with(trim($id), '+')))));
 
-        return is_array($row) ? self::split($row['hidden'] ?? null) : [];
+        foreach ($this->all() as $id => $calendar) {
+            if ($calendar['hidden'] && ! in_array($id, $shown, true) && ! in_array($id, $hidden, true)) {
+                $hidden[] = $id;
+            }
+        }
+
+        return $hidden;
     }
 
     /**
@@ -123,9 +136,18 @@ final class Calendars
      */
     public function setHidden(User $user, array $hidden): array
     {
-        $hidden = array_values(array_intersect(array_keys($this->visibleTo($user)), $hidden));
+        $visible = $this->visibleTo($user);
+        $hidden  = array_values(array_intersect(array_keys($visible), $hidden));
+        $stored  = $hidden;
+
+        foreach ($visible as $id => $calendar) {
+            if ($calendar['hidden'] && ! in_array($id, $hidden, true)) {
+                $stored[] = '+' . $id;
+            }
+        }
+
         $db     = db_connect();
-        $values = ['hidden' => $hidden === [] ? null : implode(',', $hidden), 'updated_at' => Time::now()->toDateTimeString()];
+        $values = ['hidden' => $stored === [] ? null : implode(',', $stored), 'updated_at' => Time::now()->toDateTimeString()];
 
         if ($db->table('event_calendar_preferences')->where('user_id', (int) $user->id)->countAllResults() > 0) {
             $db->table('event_calendar_preferences')->where('user_id', (int) $user->id)->update($values);

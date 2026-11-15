@@ -12,8 +12,9 @@
  *   locale    page language (ca, es, en)
  *   view      first view on larger screens; phones start with the list
  *   category  select element id of the category filter (optional)
- *   toggles   form id of the calendar toggles (optional; back office): a change is saved
- *             with a POST to the form's action and the events are reloaded
+ *   toggles   form id of the calendar toggles (optional; back office): a change, "only this
+ *             one" or "show all" is saved with a POST to the form's action and the events are
+ *             reloaded; each toggle gets its calendar's colour (data-color)
  *   error     text shown when the library or the events cannot be loaded
  *
  * Events are links to their details page (the feed's `url`): a click opens it like any link.
@@ -133,11 +134,23 @@ export async function mount(element, options) {
     const toggles = options.toggles ? document.getElementById(options.toggles) : null;
 
     if (toggles) {
+        const save = () => post(toggles.action, { body: new FormData(toggles) })
+            .then(() => calendar.refetchEvents())
+            .catch(() => {});
+
         toggles.querySelectorAll('[data-calendar-submit]').forEach((button) => button.classList.add('d-none'));
-        toggles.addEventListener('change', () => {
-            post(toggles.action, { body: new FormData(toggles) })
-                .then(() => calendar.refetchEvents())
-                .catch(() => {});
+        // The calendar's colour (CSSOM: allowed by the strict CSP, unlike style="").
+        toggles.querySelectorAll('[data-color]').forEach((pill) => pill.style.setProperty('--events-calendar-color', pill.dataset.color));
+        toggles.addEventListener('change', save);
+        // "Only this one" and "Show all" switch the checkboxes here and save without reloading.
+        toggles.querySelectorAll('button[name="only"], button[name="all"]').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                toggles.querySelectorAll('input[name="calendars[]"]').forEach((input) => {
+                    input.checked = button.name === 'all' || input.value === button.value;
+                });
+                save();
+            });
         });
     }
 }

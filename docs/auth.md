@@ -14,7 +14,7 @@ mode"), the profile and "my sessions" on top of Shield.
 | `GET/POST reset-password`, `GET/POST reset-password/new?token=` | Reset link by email, then a new password |
 | `GET auth/captcha` | Captcha image (404 while `Auth.captcha` is off) |
 | `GET/POST auth/lock` | Idle lock screen (`Auth.idleTimeout`) |
-| `backend/profile` (`auth-profile.view`/`.edit`) | Name, email (needs the current password), language, time zone, colour mode, birth date |
+| `backend/profile` (`auth-profile.view`/`.edit`) | Name, email (needs the current password), language, time zone, colour mode, birth date and whether to share the birthday in the calendar (`share_birthday`, off by default; D-25-08, `docs/users.md`) |
 | `backend/profile/password` (`auth-profile.view`/`.edit`) | Password change; the only back-office page while a reset is forced |
 | `backend/profile/sessions` (`auth-sessions.view`/`.revoke`) | Open sessions with remote logout, API tokens with revocation |
 | `GET auth/a/show`, `POST auth/a/verify`, `auth/a/handle`, `auth/a/cancel` | 2FA step of a pending login (code, recovery code, new email code, cancel); 404 without a pending login |

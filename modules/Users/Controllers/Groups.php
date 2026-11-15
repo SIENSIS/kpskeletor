@@ -39,9 +39,11 @@ final class Groups extends BackendController
             ->setTable(GroupRegistry::TABLE)
             ->setSubject(lang('Users.groups.group'), lang('Users.groups.title'))
             ->columns(['title', 'name', 'two_factor', 'reserved', 'members'])
-            ->addFields(['name', 'title', 'description', 'two_factor'])
-            ->editFields(['title', 'description', 'two_factor'])
-            ->showFields(['name', 'title', 'description', 'two_factor', 'reserved', 'members', 'created_at'])
+            // Whose shared birthdays the members of this group see (D-25-08).
+            ->setRelationNN('birthday_groups', 'group_birthday_audiences', GroupRegistry::TABLE, 'group_id', 'target_group_id', 'title', ['order' => 'title'])
+            ->addFields(['name', 'title', 'description', 'two_factor', 'birthday_groups'])
+            ->editFields(['title', 'description', 'two_factor', 'birthday_groups'])
+            ->showFields(['name', 'title', 'description', 'two_factor', 'birthday_groups', 'reserved', 'members', 'created_at'])
             ->searchFields(['name', 'title'])
             ->unsortable(['members'])
             ->displayAs([
@@ -51,6 +53,7 @@ final class Groups extends BackendController
                 'two_factor'  => lang('Users.groups.twoFactor'),
                 'reserved'    => lang('Users.groups.reserved'),
                 'members'     => lang('Users.groups.members'),
+                'birthday_groups' => lang('Users.groups.birthdayGroups'),
                 'created_at'  => lang('Users.groups.created'),
             ])
             ->fieldType('two_factor', 'select', ['options' => $policies])
@@ -63,6 +66,7 @@ final class Groups extends BackendController
             ])
             ->setHelp('name', lang('Users.groups.nameHelp'))
             ->setHelp('two_factor', lang('Users.groups.twoFactorHelp'))
+            ->setHelp('birthday_groups', lang('Users.groups.birthdayGroupsHelp'))
             ->setDefault('two_factor', GroupRegistry::OPTIONAL)
             ->callbackColumn('two_factor', static fn ($value): string => $value === GroupRegistry::REQUIRED
                 ? ui_badge(lang('Users.groups.required'), 'warning', 'bi bi-shield-lock') : ui_badge(lang('Users.groups.optional'), 'light'))

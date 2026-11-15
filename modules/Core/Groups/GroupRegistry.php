@@ -31,6 +31,9 @@ use Throwable;
  */
 final class GroupRegistry
 {
+    /** CodeIgniter event fired with the names of the reserved groups just created (`ensureReserved()`). */
+    public const EVENT_RESERVED_CREATED = 'reservedGroupsCreated';
+
     public const TABLE = 'groups';
 
     public const OPTIONAL = 'optional';
@@ -57,7 +60,7 @@ final class GroupRegistry
         $existing = array_keys($this->all());
         $defaults = config('AuthGroups')->groups;
         $now      = Time::now()->toDateTimeString();
-        $created  = 0;
+        $created  = [];
 
         foreach (EscalationGuard::RESERVED_GROUPS as $name) {
             if (in_array($name, $existing, true)) {
@@ -73,10 +76,15 @@ final class GroupRegistry
                 'created_at'  => $now,
                 'updated_at'  => $now,
             ]);
-            $created++;
+            $created[] = $name;
         }
 
-        return $created;
+        if ($created !== []) {
+            // Modules can add their defaults for the new groups (e.g. Users' birthdays audiences).
+            Events::trigger(self::EVENT_RESERVED_CREATED, $created);
+        }
+
+        return count($created);
     }
 
     /**

@@ -61,13 +61,17 @@ final class Users extends BackendController
             ->columns(['username', 'email', 'groups', 'two_factor', 'status', 'last_active'])
             ->addFields(['username', 'email', 'password', 'password_confirm'])
             ->editFields(['username', 'email', 'active'])
-            ->showFields(['username', 'email', 'groups', 'permissions', 'two_factor', 'status', 'active', 'last_active', 'created_at'])
+            // The date of birth (from the profile) only with `users-users.birthdate` (D-25-08).
+            ->showFields(['username', 'email', 'groups', 'permissions', 'two_factor', 'status', 'active', 'last_active', 'created_at',
+                ...($this->can('users-users.birthdate') ? ['birth_date'] : [])])
+            ->callbackColumn('birth_date', static fn ($value, array $row): string => self::birthDate((int) ($row['id'] ?? 0)))
             // Only columns of `users` can be searched or filtered: the email, groups and 2FA live
             // in other tables (kpcrudy request in docs/library-requests.md).
             ->searchFields(['username'])
             ->filters(['active', 'status', 'last_active'])
             ->unsortable(['email', 'groups', 'two_factor', 'status'])
             ->displayAs([
+                'birth_date'  => lang('Users.birthdays.birthDate'),
                 'username'         => lang('Users.users.username'),
                 'email'            => lang('Users.users.email'),
                 'password'         => lang('Users.users.password'),
@@ -267,6 +271,24 @@ final class Users extends BackendController
         $method = (new TwoFactor())->method($userId);
 
         return $method === null ? ui_badge(lang('Users.users.twoFactorOff'), 'light') : ui_badge(lang('Users.users.twoFactor_' . $method), 'success', 'bi bi-shield-check');
+    }
+
+    /**
+     * The date of birth in the user's profile (D-25-08: `users-users.birthdate`), whether or not the
+     * user shares it in the calendar.
+     */
+    public static function birthDate(int $id): string
+    {
+        $row  = db_connect()->table('user_profiles')->select('birth_date, share_birthday')->where('user_id', $id)->get(1)->getRowArray();
+        $date = is_array($row) && is_string($row['birth_date']) ? $row['birth_date'] : null;
+
+        if ($date === null) {
+            return '—';
+        }
+
+        return ui_date($date, 'date') . ' ' . ((bool) $row['share_birthday']
+            ? ui_badge(lang('Users.birthdays.shared'), 'success', 'bi bi-calendar-heart')
+            : ui_badge(lang('Users.birthdays.notShared'), 'light', 'bi bi-eye-slash'));
     }
 
     /**

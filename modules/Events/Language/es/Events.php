@@ -178,6 +178,8 @@ return [
         'own'   => 'Eventos',
         'apply' => 'Aplicar',
         'saved' => 'Calendarios guardados.',
+        'only'  => 'Solo {0}',
+        'all'   => 'Mostrar todo',
     ],
     'ical' => [
         'personalName' => '{0} · Mi calendario',

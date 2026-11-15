@@ -178,6 +178,8 @@ return [
         'own'   => 'Esdeveniments',
         'apply' => 'Aplica',
         'saved' => 'Calendaris desats.',
+        'only'  => 'Només {0}',
+        'all'   => 'Mostra-ho tot',
     ],
     'ical' => [
         'personalName' => '{0} · El meu calendari',

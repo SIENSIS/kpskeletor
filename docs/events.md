@@ -124,8 +124,10 @@ Two different features (D-25-01 … D-25-03):
 ## Calendars and other modules
 
 The calendar view shows the calendars the user can see (the own `events` calendar and those
-declared by enabled modules, e.g. *Notices* of News and *Birthdays* of Users) as checkboxes; each
-user's choice is saved (`event_calendar_preferences`). Events published by another module show
+declared by enabled modules, e.g. *Notices* of News and *Birthdays* of Users) as switches with the
+calendar's colour, an "only this one" button on each and "Show all" (D-25-08); each user's choice
+is saved (`event_calendar_preferences`) and works without JavaScript too. Calendars declared
+`'hidden' => true` (e.g. *Birthdays (administration)*) start hidden until the user shows them. Events published by another module show
 "Managed by <module>" and "Edit in <module>" in the administration and the details. How modules
 use it: `docs/calendar-api.md`.
 

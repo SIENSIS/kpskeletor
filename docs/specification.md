@@ -1092,7 +1092,7 @@ group): name, email, avatar (file picker in `upload` mode, stored on the **priva
 user's personal space), language, time zone, theme mode, password change, 2FA method (none /
 email / app) with recovery codes, notification preferences, and "my sessions". Shield's `users`
 table has none of the profile fields, so Auth owns a `user_profiles` table (one migration: name,
-language, time zone, theme mode, avatar, an optional `birth_date`).
+language, time zone, theme mode, avatar, an optional `birth_date` and `share_birthday`).
 
 ### Users
 
@@ -1493,8 +1493,15 @@ both supported:
   * **News (push):** a notice may have an optional event date; saving it publishes the event to
     the `news.notices` calendar with the notice's visibility, and unpublishing or deleting the
     notice removes it.
-  * **Users (pull):** a "Birthdays" provider (read-only, enabled by a setting, from the optional
-    `user_profiles.birth_date`, only the day and month, only to logged-in users) shows the provider mode without storing anything.
+  * **Users (pull):** a "Birthdays" provider (read-only, enabled by a setting, off by default,
+    from the optional `user_profiles.birth_date`, only the day and month, only to logged-in users)
+    shows the provider mode without storing anything. A birthday is shown only if its owner
+    consented in the profile (`share_birthday`, off by default), the viewer holds
+    `users-birthdays.view` and one of the viewer's groups may see one of the owner's groups (a
+    table edited in Users › Groups: "Sees the birthdays of"). An administrative calendar
+    "Birthdays (administration)" shows every date of birth, shared or not, to holders of
+    `users-users.birthdate` (hidden by default in the calendar view), who also see the date of
+    birth in the user's record.
 
 ### Updates
 

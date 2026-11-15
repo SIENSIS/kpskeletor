@@ -71,6 +71,12 @@ $mode = $value('theme_mode', $profile['theme_mode'] ?? 'auto');
                 <label for="birth_date" class="form-label"><?= esc(lang('Auth.profile.birthDate')) ?></label>
                 <input type="date" class="form-control<?= $invalid('birth_date') ?>" id="birth_date" name="birth_date" value="<?= esc($value('birth_date', $profile['birth_date'])) ?>">
                 <?= $feedback('birth_date') ?>
+                <div class="form-check mt-2">
+                    <input type="hidden" name="share_birthday" value="0">
+                    <input class="form-check-input" type="checkbox" id="share_birthday" name="share_birthday" value="1" aria-describedby="share-birthday-help"<?= (string) (old('share_birthday') ?? (string) (int) ($profile['share_birthday'] ?? 0)) === '1' ? ' checked' : '' ?>>
+                    <label class="form-check-label" for="share_birthday"><?= esc(lang('Auth.profile.shareBirthday')) ?></label>
+                    <div id="share-birthday-help" class="form-text"><?= esc(lang('Auth.profile.shareBirthdayHelp')) ?></div>
+                </div>
             </div>
             <div class="col-md-6">
                 <label for="current_password" class="form-label"><?= esc(lang('Auth.profile.currentPassword')) ?></label>

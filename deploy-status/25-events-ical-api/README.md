@@ -74,6 +74,34 @@ Branch: `claude/awesome-feynman-p4kb32` · Pull request: [SIENSIS/kpskeletor#33]
 - Calendar clients send no language: the personal feed uses the user's profile language
   (`RecipientLocale`), public feeds the site's default.
 
+## Decisions 25 (owner, 2026-11-15)
+
+| ID | Title | Decision |
+|---|---|---|
+| D-25-01 | iCal URLs, calendar API names, subscription screen | As built |
+| D-25-08 | Who sees whose birthday | Option C, applied in this branch |
+
+D-25-08 as applied:
+
+- **Consent:** "Share my birthday in the calendar" in the profile (`user_profiles.share_birthday`,
+  off by default, cleared without a date).
+- **Shared calendar "Birthdays":** setting on, the owner's consent, the viewer's
+  `users-birthdays.view` and the groups table `group_birthday_audiences` (Users › Groups ›
+  "Sees the birthdays of"; defaults: each reserved group sees itself, `admin` sees all; written
+  when the table is created or, on a fresh install, when `modules:sync` creates the reserved
+  groups: new Core event `GroupRegistry::EVENT_RESERVED_CREATED`).
+- **Administrative calendar "Birthdays (administration)"** and the **date of birth in the user's
+  record**: every date of birth, shared or not, with `users-users.birthdate` (default `admin`);
+  the calendar is hidden by default.
+- **Calendar view:** switches with the calendar's colour, an "only this one" button on each,
+  "Show all", calendars declared `'hidden' => true` start hidden (manifest key checked by the
+  validator). Everything works without JavaScript too.
+- 129 permissions (`users-birthdays.view`, `users-users.birthdate`). **Existing sites:** default
+  grants are applied once per module (D-02-04), so grant the two new permissions in the permission
+  matrix after updating.
+- Tests: `BirthdaysProviderTest` (11, the school example), `ProfileTest::testSharingTheBirthdayIsAnExplicitChoice`,
+  `CalendarApiTest::testCalendarsDeclaredHiddenStartHiddenAndOnlyOrAllSwitchQuickly`.
+
 ## How to try it
 
 ```bash
@@ -166,10 +194,18 @@ birth). The flame at the bottom right is CodeIgniter's development toolbar.
 | `screenshots/07-subscription-new-address.png` | The new address, shown once, with Copy and `webcal://` (full page; the sticky save bar of the filters form overlaps its help text only in this full-page capture) |
 | `screenshots/08-subscription-active.png` | The active feed afterwards: state, created, last access, regenerate/revoke (the address is no longer shown) |
 | `screenshots/09-subscription-phone-dark.png` | Phone width, dark mode |
+| `screenshots/10-calendar-switches-admin-hidden.png` | D-25-08: switches with colours; "Birthdays (administration)" hidden by default (viewer: the superadmin, who sees the superadmins' shared birthdays) |
+| `screenshots/11-calendar-only-administrative-birthdays.png` | "Only this one" on the administrative calendar: every date of birth, Pau's included although not shared |
+| `screenshots/12-group-sees-birthdays-of.png` | Users › Groups: "Sees the birthdays of" |
+| `screenshots/13-user-record-date-of-birth.png` | The user's record with the date of birth and "Not shared" (`users-users.birthdate`) |
+| `screenshots/14-profile-share-birthday.png` | The profile: "Share my birthday in the calendar" |
+| `screenshots/15-calendar-switches-phone-dark.png` | The switches at phone width, dark mode (editor) |
+
+Screenshots 10–15: `deploy-status/25-events-ical-api/screenshots-decisions.mjs`, after a fresh install (three demo users given a date of birth).
 
 ## Known issues
 
-- The Birthdays calendar is offered in the toggles even while its setting is off (it is empty).
+- The Birthdays calendar is offered in the switches even while its setting is off (it is empty).
 - A weekly event whose chosen days exclude the start's weekday: iCal counts `DTSTART` as an
   occurrence, the expansion does not (edge case).
 - Permission changes reach a cached feed within `icalCacheSeconds` (5 minutes).

@@ -39,6 +39,8 @@ final class Module extends ModuleManifest
                 'logout'      => 'Users.perm.logout',
                 'impersonate' => 'Users.perm.impersonate',
                 'access'      => 'Users.perm.access',
+                // The full date of birth in the user's record and the administrative birthdays calendar (D-25-08).
+                'birthdate'   => 'Users.perm.birthdate',
             ],
         ],
         'groups' => [
@@ -51,6 +53,11 @@ final class Module extends ModuleManifest
             'type'  => 'page',
             'extra' => ['edit' => 'Users.perm.matrixEdit'],
         ],
+        // The "Birthdays" calendar: who may see shared birthdays at all (whose: the groups table, D-25-08).
+        'birthdays' => [
+            'label' => 'Users.res.birthdays',
+            'type'  => 'page',
+        ],
     ];
 
     /**
@@ -61,8 +68,12 @@ final class Module extends ModuleManifest
         'admin' => [
             'users-users.list', 'users-users.show', 'users-users.add', 'users-users.edit',
             'users-users.ban', 'users-users.forcereset', 'users-users.reset2fa', 'users-users.logout',
-            'users-users.access', 'users-groups.*', 'users-matrix.*',
+            'users-users.access', 'users-users.birthdate', 'users-groups.*', 'users-matrix.*',
+            'users-birthdays.view',
         ],
+        'superadmin' => ['users-birthdays.view'],
+        'editor'     => ['users-birthdays.view'],
+        'user'       => ['users-birthdays.view'],
     ];
 
     public array $menu = [
@@ -95,14 +106,18 @@ final class Module extends ModuleManifest
         ],
     ];
 
-    /** Calendar of the birthdays provider; no permission: every signed-in user sees it when enabled. */
+    /**
+     * Calendars of the birthdays providers (D-25-08): the shared one (consent + groups table) and
+     * the administrative one (every date of birth, `users-users.birthdate`, hidden by default).
+     */
     public array $calendars = [
-        'birthdays' => ['label' => 'Users.birthdays.calendar', 'color' => '#d63384'],
+        'birthdays'      => ['label' => 'Users.birthdays.calendar', 'color' => '#d63384', 'permission' => 'users-birthdays.view'],
+        'birthdaysadmin' => ['label' => 'Users.birthdays.adminCalendar', 'color' => '#6f42c1', 'permission' => 'users-users.birthdate', 'hidden' => true],
     ];
 
     /** Events computed on the fly, never stored (docs/calendar-api.md, "Providers"). */
-    public array $calendarProviders = [\Modules\Users\Calendar\BirthdaysProvider::class];
+    public array $calendarProviders = [\Modules\Users\Calendar\BirthdaysProvider::class, \Modules\Users\Calendar\AdminBirthdaysProvider::class];
 
-    /** No tables of its own (Shield's tables and the Core `groups` table are backed up by the Core). */
+    /** Its only table, `group_birthday_audiences`, is backed up with the database (no files). */
     public array $backup = [];
 }

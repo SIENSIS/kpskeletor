@@ -401,6 +401,10 @@ final class ManifestValidator
                 $this->error("{$key}['permission']", 'mustBe', ['string']);
             }
 
+            if (array_key_exists('hidden', $definition) && ! is_bool($definition['hidden'])) {
+                $this->error("{$key}['hidden']", 'mustBe', ['bool']);
+            }
+
             foreach (['policy' => \Modules\Core\Calendar\EventAccessPolicy::class, 'source' => \Modules\Core\Calendar\CalendarSource::class] as $option => $interface) {
                 if (! array_key_exists($option, $definition)) {
                     continue;
@@ -416,7 +420,7 @@ final class ManifestValidator
             }
 
             foreach (array_keys($definition) as $option) {
-                if (! in_array($option, ['label', 'color', 'permission', 'policy', 'source'], true)) {
+                if (! in_array($option, ['label', 'color', 'permission', 'policy', 'source', 'hidden'], true)) {
                     $this->error($key, 'unknownKey', [(string) $option]);
                 }
             }

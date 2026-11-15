@@ -10,6 +10,7 @@ return [
         'users' => 'Usuarios',
         'groups' => 'Grupos',
         'matrix' => 'Matriz de permisos',
+        'birthdays' => 'Calendario de cumpleaños',
     ],
     'perm' => [
         'ban' => 'Bloquear y desbloquear',
@@ -19,6 +20,7 @@ return [
         'impersonate' => 'Suplantar',
         'access' => 'Cambiar grupos y permisos',
         'matrixEdit' => 'Cambiar la matriz',
+        'birthdate' => 'Ver las fechas de nacimiento (ficha y calendario de administración)',
     ],
     'menu' => [
         'users' => 'Usuarios',
@@ -104,6 +106,8 @@ return [
         'required' => 'Obligatoria',
         'reservedYes' => 'Reservado',
         'cannotDelete' => 'Los grupos reservados y los grupos con miembros no se pueden borrar.',
+        'birthdayGroups' => 'Ve los cumpleaños de',
+        'birthdayGroupsHelp' => 'En el calendario «Cumpleaños», los miembros de este grupo ven los cumpleaños que comparten los miembros de estos grupos (también necesitan el permiso para ver el calendario).',
     ],
     'matrix' => [
         'title' => 'Matriz de permisos',
@@ -142,5 +146,9 @@ return [
     'birthdays' => [
         'calendar' => 'Cumpleaños',
         'title' => 'Cumpleaños de {0}',
+        'adminCalendar' => 'Cumpleaños (administración)',
+        'birthDate' => 'Fecha de nacimiento',
+        'shared' => 'Compartido en el calendario',
+        'notShared' => 'No compartido',
     ],
 ];

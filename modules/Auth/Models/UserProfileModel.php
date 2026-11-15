@@ -14,7 +14,7 @@ final class UserProfileModel extends Model
     protected $table         = 'user_profiles';
     protected $returnType    = 'array';
     protected $useTimestamps = true;
-    protected $allowedFields = ['user_id', 'name', 'locale', 'timezone', 'theme_mode', 'avatar', 'birth_date'];
+    protected $allowedFields = ['user_id', 'name', 'locale', 'timezone', 'theme_mode', 'avatar', 'birth_date', 'share_birthday'];
 
     /**
      * The user's profile; an empty profile when the user has none yet.
@@ -25,7 +25,7 @@ final class UserProfileModel extends Model
     {
         $row = $this->where('user_id', $userId)->first();
 
-        return is_array($row) ? $row : ['user_id' => $userId, 'name' => null, 'locale' => null, 'timezone' => null, 'theme_mode' => null, 'avatar' => null, 'birth_date' => null];
+        return is_array($row) ? $row : ['user_id' => $userId, 'name' => null, 'locale' => null, 'timezone' => null, 'theme_mode' => null, 'avatar' => null, 'birth_date' => null, 'share_birthday' => 0];
     }
 
     /**

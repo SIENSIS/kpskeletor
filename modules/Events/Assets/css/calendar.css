@@ -34,3 +34,13 @@
     text-decoration: line-through;
 }
 
+
+/* Calendar toggles: each pill takes its calendar's colour (set by calendar.js through the CSSOM). */
+.events-calendar-toggle {
+    border-left: 0.35rem solid var(--events-calendar-color, var(--bs-border-color)) !important;
+}
+
+.events-calendar-toggle .form-check-input:checked {
+    background-color: var(--events-calendar-color, var(--bs-primary));
+    border-color: var(--events-calendar-color, var(--bs-primary));
+}

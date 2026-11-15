@@ -6,13 +6,15 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 ## Resources and permissions
 
 - `users-users` (crud, no delete/export/import/trash): `list`, `show`, `add`, `edit` and the row
-  operations `ban`, `forcereset`, `reset2fa`, `logout`, `impersonate`, `access`.
+  operations `ban`, `forcereset`, `reset2fa`, `logout`, `impersonate`, `access`, and the extra
+  `birthdate` (dates of birth in the record and the administrative birthdays calendar).
+- `users-birthdays` (page): `view` — may see the shared "Birthdays" calendar (every reserved group).
 - `users-groups` (crud over the Core `groups` table, no export/import/trash).
 - `users-matrix` (page): `view`, `edit`.
 - Default grants: `admin` everything except `users-users.impersonate`.
 - Menu (`settings` zone): Users, Groups, Permissions.
 - Setting `Users.impersonationMinutes` (30, 1–120, Settings › Security › Impersonation).
-- No tables of its own (Shield's tables and the Core `groups` table), no demo data (the demo users
+- One table of its own, `group_birthday_audiences` (D-25-08; created with defaults), no demo data (the demo users
   are Auth's), no outbound hosts or CSP sources. Asset: `Assets/js/matrix.js` (`users/matrix`).
 - Widget `users.summary` (`Widgets/UsersSummary.php`, async, `users-users.list`): active accounts,
   users online (option `onlineMinutes`), active accounts without 2FA.
@@ -34,9 +36,13 @@ D-15-01 (names and URLs) decided by the owner as proposed; D-15-02 … D-15-05 a
 
 ## Calendar (session 25)
 
-`Calendar/BirthdaysProvider.php` (calendar `users.birthdays`, pull): off by default, setting
-`Users.birthdaysCalendar` (group `calendar`); day and month only. Tests
-`Tests/BirthdaysProviderTest.php`. D-25-07.
+Two pull calendars (D-25-07, D-25-08; `docs/users.md`, "Birthdays calendar"): `users.birthdays`
+(`Calendar/BirthdaysProvider.php`: setting `Users.birthdaysCalendar`, off by default + the owner's
+consent `user_profiles.share_birthday` + `users-birthdays.view` + table `group_birthday_audiences`
+edited in Groups "Sees the birthdays of") and `users.birthdaysadmin`
+(`Calendar/AdminBirthdaysProvider.php`, every date of birth, `users-users.birthdate`, hidden by
+default). Shared code `Calendar/Birthdays.php`. The record shows the date of birth with
+`users-users.birthdate`. Tests `Tests/BirthdaysProviderTest.php`.
 
 ## Open tasks
 

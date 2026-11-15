@@ -47,6 +47,7 @@ final class CalendarApiTest extends EventsTestCase
             ['calendar', 'lessons', ['label' => 'Lessons', 'color' => '#0d6efd', 'policy' => EnrolledPolicy::class, 'source' => LessonsSource::class]],
             ['calendar', 'deadlines', ['label' => 'Deadlines', 'color' => '#fd7e14']],
             ['calendar', 'staff', ['label' => 'Staff', 'color' => '#6c757d', 'permission' => 'events-events.all']],
+            ['calendar', 'archive', ['label' => 'Archive', 'color' => '#adb5bd', 'hidden' => true]],
             ['calendarProvider', DeadlinesProvider::class, []],
         ] as [$kind, $key, $definition]) {
             $db->table('module_declarations')->insert(['module' => 'Courses', 'kind' => $kind, 'key' => $key, 'definition' => json_encode($definition)]);
@@ -238,6 +239,32 @@ final class CalendarApiTest extends EventsTestCase
         $this->assertNotContains('events', $hidden);
         $this->assertNotContains('courses.staff', $hidden, 'Only calendars the user can see are stored.');
         $this->assertSame(['Propi'], $this->feedTitles());
+    }
+
+    public function testCalendarsDeclaredHiddenStartHiddenAndOnlyOrAllSwitchQuickly(): void
+    {
+        $user = $this->createUser('ana@example.com', 'user');
+        $this->login('ana@example.com');
+        $this->event('Propi');
+        $service = new CalendarService();
+        $service->publish('Courses', 'old', new CalendarEvent(title: 'Arxivat', start: new DateTimeImmutable('tomorrow 11:00'), calendar: 'courses.archive'));
+        $service->publish('Courses', 'deadline', new CalendarEvent(title: 'Publicat', start: new DateTimeImmutable('tomorrow 11:00'), calendar: 'courses.deadlines'));
+
+        $this->assertContains('courses.archive', (new Calendars())->hidden($user), 'Hidden until the user shows it.');
+        $this->assertNotContains('Arxivat', $this->feedTitles());
+        $page = $this->body('GET', 'backend/calendar');
+        $this->assertMatchesRegularExpression('/value="courses\.archive"(?![^>]*checked)[^>]*>/', $page);
+        $this->assertStringContainsString('data-color="#adb5bd"', $page);
+
+        $this->send('POST', 'backend/calendar/calendars', ['only' => 'courses.archive'])->assertRedirect();
+        $this->assertSame(['Arxivat'], $this->feedTitles(), 'Only this one.');
+
+        $this->send('POST', 'backend/calendar/calendars', ['all' => '1'])->assertRedirect();
+        $this->assertSame(['Arxivat', 'Lliurament de la pràctica', 'Propi', 'Publicat'], $this->sorted($this->feedTitles()), 'Show all, the hidden-by-default one included.');
+        $this->assertNotContains('courses.archive', (new Calendars())->hidden($user), 'The choice to show it is remembered.');
+
+        $this->send('POST', 'backend/calendar/calendars', ['only' => 'courses.staff'])->assertRedirect();
+        $this->assertSame(['Arxivat', 'Lliurament de la pràctica', 'Propi', 'Publicat'], $this->sorted($this->feedTitles()), 'A calendar the user may not see changes nothing.');
     }
 
     public function testResyncPublishesMissingEventsAndRemovesStaleOnes(): void

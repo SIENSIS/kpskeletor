@@ -51,6 +51,22 @@ final class ProfileTest extends AuthTestCase
         $this->send('GET', 'backend/profile')->assertSee('Mi perfil');
     }
 
+    public function testSharingTheBirthdayIsAnExplicitChoice(): void
+    {
+        $user = $this->createUser();
+        $this->login('ana@example.com');
+
+        $this->send('POST', 'backend/profile', $this->form());
+        $this->assertSame(0, (int) model(UserProfileModel::class)->forUser((int) $user->id)['share_birthday'], 'Off by default (D-25-08).');
+
+        $this->send('POST', 'backend/profile', $this->form(['share_birthday' => '1']));
+        $this->assertSame(1, (int) model(UserProfileModel::class)->forUser((int) $user->id)['share_birthday']);
+        $this->send('GET', 'backend/profile')->assertSee('name="share_birthday"');
+
+        $this->send('POST', 'backend/profile', $this->form(['share_birthday' => '1', 'birth_date' => '']));
+        $this->assertSame(0, (int) model(UserProfileModel::class)->forUser((int) $user->id)['share_birthday'], 'Nothing to share without a date.');
+    }
+
     public function testInvalidValuesAreRefused(): void
     {
         $user = $this->createUser();

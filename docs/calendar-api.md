@@ -25,6 +25,7 @@ public array $calendars = [
         'permission' => 'courses-sessions.list',    // needed to see ANY event of it
         'policy'     => \Modules\Courses\Calendar\EnrolledOnly::class,   // EventAccessPolicy
         'source'     => \Modules\Courses\Calendar\SessionsSource::class, // CalendarSource (resync)
+        'hidden'     => true,                           // hidden in the calendar view until shown
     ],
 ];
 public array $calendarProviders = [\Modules\Courses\Calendar\DeadlinesProvider::class];

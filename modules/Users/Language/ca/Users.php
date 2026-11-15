@@ -10,6 +10,7 @@ return [
         'users' => 'Usuaris',
         'groups' => 'Grups',
         'matrix' => 'Matriu de permisos',
+        'birthdays' => 'Calendari d\'aniversaris',
     ],
     'perm' => [
         'ban' => 'Bloquejar i desbloquejar',
@@ -19,6 +20,7 @@ return [
         'impersonate' => 'Suplantar',
         'access' => 'Canviar grups i permisos',
         'matrixEdit' => 'Canviar la matriu',
+        'birthdate' => 'Veure les dates de naixement (fitxa i calendari d\'administració)',
     ],
     'menu' => [
         'users' => 'Usuaris',
@@ -104,6 +106,8 @@ return [
         'required' => 'Obligatòria',
         'reservedYes' => 'Reservat',
         'cannotDelete' => 'Els grups reservats i els grups amb membres no es poden esborrar.',
+        'birthdayGroups' => 'Veu els aniversaris de',
+        'birthdayGroupsHelp' => 'Al calendari «Aniversaris», els membres d\'aquest grup veuen els aniversaris que comparteixen els membres d\'aquests grups (també cal el permís per veure el calendari).',
     ],
     'matrix' => [
         'title' => 'Matriu de permisos',
@@ -142,5 +146,9 @@ return [
     'birthdays' => [
         'calendar' => 'Aniversaris',
         'title' => 'Aniversari de {0}',
+        'adminCalendar' => 'Aniversaris (administració)',
+        'birthDate' => 'Data de naixement',
+        'shared' => 'Compartit al calendari',
+        'notShared' => 'No compartit',
     ],
 ];
