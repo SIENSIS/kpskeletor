@@ -8,11 +8,13 @@ use CodeIgniter\I18n\Time;
 use Modules\Core\Demo\DemoData;
 use Modules\Core\Demo\DemoSeeder;
 use Modules\Core\Security\HtmlSanitizer;
+use Modules\News\Services\NoticeCalendar;
 
 /**
  * Demo data of the News module, in Catalan only (`php spark modules:demo News`): two categories,
  * public articles (public site and RSS), a private article, a pinned critical notice for every
- * signed-in user, a warning notice for the `editor` group, a scheduled article and a draft.
+ * signed-in user, a warning notice for the `editor` group (both with an event date: they are
+ * in the calendar "Notices"), a scheduled article and a draft.
  * Authors are the Auth demo users when they exist. Every row goes through `$demo`.
  */
 final class NewsDemoSeeder extends DemoSeeder
@@ -57,6 +59,8 @@ final class NewsDemoSeeder extends DemoSeeder
                 'title' => 'Tall del servei dissabte', 'summary' => 'El portal no estarà disponible dissabte de 8 a 10 h per manteniment.',
                 'body' => '<p>Desem la feina abans de dissabte a les 8 h. Durant el manteniment no es podrà iniciar la sessió.</p>',
                 'visibility' => 'private', 'published' => $now->subHours(5), 'expires' => $now->addDays(5),
+                // In the calendar "Notices" (calendar API, push).
+                'event' => [$now->addDays(3)->setHour(8)->setMinute(0)->setSecond(0), $now->addDays(3)->setHour(10)->setMinute(0)->setSecond(0)],
             ],
             [
                 'slug' => 'revisio-dels-continguts-del-web', 'category' => $institutional, 'author' => $admin, 'type' => 'notice',
@@ -64,6 +68,7 @@ final class NewsDemoSeeder extends DemoSeeder
                 'title' => 'Revisió dels continguts del web', 'summary' => 'Els editors han de revisar les seves publicacions abans de divendres.',
                 'body' => '<p>Reviseu els textos, les imatges de portada i les categories de les vostres publicacions.</p>',
                 'visibility' => 'groups', 'published' => $now->subHours(20), 'expires' => $now->addDays(10),
+                'event' => [$now->addDays(4)->setHour(0)->setMinute(0)->setSecond(0), null, true],
             ],
             [
                 'slug' => 'horari-d-estiu', 'category' => $institutional, 'author' => $admin, 'type' => 'notice',
@@ -118,6 +123,9 @@ final class NewsDemoSeeder extends DemoSeeder
             'status'       => $post['status'] ?? 'published',
             'published_at' => $published?->toDateTimeString(),
             'expires_at'   => $expires?->toDateTimeString(),
+            'event_starts_at' => isset($post['event'][0]) ? $post['event'][0]->toDateTimeString() : null,
+            'event_ends_at'   => isset($post['event'][1]) ? $post['event'][1]->toDateTimeString() : null,
+            'event_all_day'   => ($post['event'][2] ?? false) ? 1 : 0,
             'author_id'    => $post['author'],
             // Demo notices do not notify anybody.
             'notified_at'  => ($post['type'] ?? 'article') === 'notice' ? $now->toDateTimeString() : null,
@@ -138,6 +146,15 @@ final class NewsDemoSeeder extends DemoSeeder
 
             if (is_array($row)) {
                 $demo->insert('news_groups', ['news_id' => $id, 'group_id' => (int) $row['id']]);
+            }
+        }
+
+        // A notice with a date goes to the calendar; its event is demo data too (removed with it).
+        if (isset($post['event']) && NoticeCalendar::sync($id)) {
+            $event = db_connect()->table('events')->select('id')->where('source_module', 'News')->where('source_key', NoticeCalendar::key($id))->get()->getRowArray();
+
+            if (is_array($event)) {
+                $demo->record('events', (int) $event['id']);
             }
         }
     }

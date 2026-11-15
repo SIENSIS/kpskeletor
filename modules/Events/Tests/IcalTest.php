@@ -143,6 +143,17 @@ final class IcalTest extends EventsTestCase
         $this->assertNotFound('GET', 'ical/user/' . $secret . '.ics');
     }
 
+    public function testThePersonalFeedIsInTheUsersOwnLanguage(): void
+    {
+        $user   = $this->createUser('ana@example.com', 'user');
+        $secret = (new IcalFeeds())->issue($user);
+        $id     = $this->event('Reunió');
+        db_connect()->table('event_translations')->insert(['event_id' => $id, 'locale' => 'es', 'title' => 'Reunión', 'description' => null]);
+        db_connect()->table('user_profiles')->insert(['user_id' => $user->id, 'locale' => 'es']);
+
+        $this->assertSame(['Reunión'], $this->summaries('ical/user/' . $secret . '.ics'), 'Calendar clients send no language: the profile decides.');
+    }
+
     public function testUnknownOrMalformedSecretsAreNotFound(): void
     {
         $this->assertNotFound('GET', 'ical/user/' . str_repeat('A', 43) . '.ics');

@@ -9,6 +9,7 @@ use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Filters\RateLimit;
+use Modules\Core\Notifications\RecipientLocale;
 use Modules\Core\Permissions\Authorization;
 use Modules\Core\Security\RateLimiter;
 use Modules\Events\Config\Calendar;
@@ -57,7 +58,12 @@ final class IcalFeed extends Controller
             ]);
         }
 
-        return $this->respond($feeds->personal($user, $row), 'private');
+        // Calendar clients send no language: the texts are in the user's own language.
+        $locale = RecipientLocale::for($user);
+        $this->request->setLocale($locale);
+        $feed = RecipientLocale::using($locale, static fn (): array => $feeds->personal($user, $row));
+
+        return $this->respond($feed, 'private');
     }
 
     public function public(string $file): ResponseInterface

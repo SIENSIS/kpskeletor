@@ -140,7 +140,7 @@ final class IcalFeeds
     {
         $categories = self::ids($row['categories'] ?? null);
         $calendars  = Calendars::split($row['calendars'] ?? null);
-        $key        = 'user_' . (int) $user->id . '_' . md5(implode(',', $categories) . '|' . implode(',', $calendars));
+        $key        = 'user_' . (int) $user->id . '_' . service('language')->getLocale() . '_' . md5(implode(',', $categories) . '|' . implode(',', $calendars));
 
         return $this->cached($key, function () use ($user, $categories, $calendars): array {
             [$from, $to] = $this->range();
@@ -178,7 +178,7 @@ final class IcalFeeds
      */
     public function public(?array $category): array
     {
-        $key = 'public_' . ($category === null ? 'all' : (int) $category['id']);
+        $key = 'public_' . service('language')->getLocale() . '_' . ($category === null ? 'all' : (int) $category['id']);
 
         return $this->cached($key, function () use ($category): array {
             [$from, $to] = $this->range();
