@@ -32,7 +32,7 @@ pull request open), *merged* (in `main`).
 | 22 | Files module: file manager and folder ACL | merged | `claude/upbeat-brown-vq8taw` | [SIENSIS/kpskeletor#30](https://github.com/SIENSIS/kpskeletor/pull/30) | [`deploy-status/22-files-manager/`](../deploy-status/22-files-manager/README.md) |
 | 23 | Files module: file picker, upload tokens and avatars | merged | `claude/wizardly-meitner-t9fp4s` | [SIENSIS/kpskeletor#31](https://github.com/SIENSIS/kpskeletor/pull/31) | [`deploy-status/23-files-picker/`](../deploy-status/23-files-picker/README.md) |
 | 24 | Events module: calendar, administration and audiences | merged | `claude/gallant-curie-rmfn7k` | [SIENSIS/kpskeletor#32](https://github.com/SIENSIS/kpskeletor/pull/32) | [`deploy-status/24-events-core/`](../deploy-status/24-events-core/README.md) |
-| 25 | Events module: iCal feeds and calendar API | done | `claude/awesome-feynman-p4kb32` | [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) | [`deploy-status/25-events-ical-api/`](../deploy-status/25-events-ical-api/README.md) |
+| 25 | Events module: iCal feeds and calendar API | merged | `claude/awesome-feynman-p4kb32` | [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) | [`deploy-status/25-events-ical-api/`](../deploy-status/25-events-ical-api/README.md) |
 
 ## MVP review (session 19)
 
