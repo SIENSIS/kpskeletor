@@ -717,6 +717,9 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Depends on:** all modules.
 - **Risks:** `codeigniter4/translations` has no `ca` folder at all (every system file needs a
   Catalan copy); kpapy's `localeFallbacks` must follow the same chain for content.
+- **From session 25 (D-25-10):** a "translated text" setting type (one input per active locale,
+  stored as JSON) in the Settings module; move `Users.birthdayGreetingCa|Es|En` to one
+  `Users.birthdayGreeting` setting.
 
 ## 32 — Tasks tutorial module and AI tooling (`deploy/32-tasks-module.md`)
 

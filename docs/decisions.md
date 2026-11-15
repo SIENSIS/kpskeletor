@@ -225,6 +225,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-25-07 | 25 | The birthdays calendar: off by default, day and month only | Accepted (proposal) |
 | D-25-08 | 25 | Who sees whose birthday: consent, permission, group table and an administrative calendar (decide) | Applied (decided) |
 | D-25-09 | 25 | Birthday greetings as notifications (decide) | Applied (decided) |
+| D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Decided |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2333,4 +2334,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Applied (decided)
 - **Decision (2026-11-15):** «A, amb opció de felicitar només els qui comparteixen l'aniversari». As proposal A, plus: a setting "Greet only users who share their birthday" (on by default, to respect privacy), and the time of the task as a setting (default 08:00) so it can be changed later without code. **Must change:** Users (task, notification type, settings, tables for the groups to greet and the greetings sent, Groups form), docs, tests.
 - **Applied in:** `modules/Users/Database/Migrations/2026-11-15-100002_CreateGroupBirthdayGreetings.php`, `…100003_CreateBirthdayGreetingsSent.php`, `modules/Users/Services/BirthdayGreetings.php`, `Notifications/BirthdayGreeting.php`, `Tasks/SendBirthdayGreetings.php`, `Controllers/Groups.php` (switch), `Config/Module.php` (settings `birthdayGreetingSharedOnly`, `birthdayGreetingTime`, `birthdayGreetingCa|Es|En`, group `greetings`); tests `BirthdayGreetingsTest`, `RegistrySyncTest`; `docs/users.md`.
+
+## D-25-10 — Per-language settings that follow the site's languages (decide)
+
+- **Where:** D-25-09 (the birthday greeting is three settings, `Users.birthdayGreetingCa|Es|En`); session 31 (internationalisation, the locale restriction setting).
+- **Problem:** Per-language settings are fixed in the manifest: restricting the site's languages leaves an unused field, and a new language has no field.
+- **Proposal:** A) Now: a setting type "translated text" in the Settings module (one setting stored as JSON, one input per active locale, default from the language file, Catalan fallback), used by the greetings. B) The same in session 31, where the site's active locales are defined.
+- **Status:** Decided
+- **Decision (2026-11-15):** «B: ho deixem per a la sessió 31, i així si apareixen més coses ja ho tocarem». Session 31 adds the "translated text" setting type (the texts are still written and edited in the UI; the language file only gives the default) and moves the birthday greetings to one setting `Users.birthdayGreeting`, with a migration of the stored values. Until then the three fixed settings stay. **Must change:** `deploy/31-i18n.md` (scope; done), `docs/plan.md` session 31 (done); the code in session 31.
 

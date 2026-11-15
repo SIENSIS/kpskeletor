@@ -59,6 +59,8 @@ Birthday greetings (D-25-09): task `Tasks/SendBirthdayGreetings.php` (daily at
 - Custom groups created after a module's first sync do not receive that module's later default
   grants for "every group" (only the grants shared by the reserved groups at creation time).
 - Session 23: avatars in the list.
+- Session 31 (D-25-10): move `birthdayGreetingCa|Es|En` to one "translated text" setting
+  `birthdayGreeting` (one input per active locale), migrating the stored values.
 
 ## How to test
 
