@@ -223,6 +223,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-25-05 | 25 | Publishing contract: idempotency, unpublish as soft delete, purge on uninstall | Accepted (proposal) |
 | D-25-06 | 25 | New columns `events.allow_reminders` and the notice's event date | Accepted (proposal) |
 | D-25-07 | 25 | The birthdays calendar: off by default, day and month only | Accepted (proposal) |
+| D-25-08 | 25 | Who sees whose birthday: consent, permission, group table and an administrative calendar (decide) | Decided |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2311,4 +2312,13 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** Setting `Users.birthdaysCalendar` (bool, default **off**: birthdays are personal data), group "Calendar"; calendar `users.birthdays` without a permission; active, non-banned users with `user_profiles.birth_date`; title "<name>'s birthday" (never the year or age); 29 February shown on 28 February in common years.
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Users/Calendar/BirthdaysProvider.php`, `modules/Users/Config/Module.php`; `BirthdaysProviderTest`
+
+## D-25-08 — Who sees whose birthday: consent, permission, group table and an administrative calendar (decide)
+
+- **Where:** specification "Users (pull)" (birthdays provider), D-25-07; owner's request after session 25 (an educational centre: teachers share with teachers and the management; students see no birthday; only management, heads of studies and the office see the students').
+- **Problem:** When the birthdays calendar is on, every signed-in user sees the birthday of everybody who entered a date of birth: no consent, no control per group. Management may also need the dates for administrative tasks even without consent.
+- **Proposal:** A) a permission that bypasses consent in the same calendar; B) the social calendar always respects consent, the management sees the date of birth in the user's record; C) B plus an internal administrative calendar.
+- **Alternatives:** see the proposal (options A, B, C); earlier: only one permission, or each user choosing the audience.
+- **Status:** Decided
+- **Decision (2026-11-15):** «C». (1) **Consent:** each user decides in their profile whether they share their birthday (off by default). (2) **Social calendar "Birthdays"** (`users.birthdays`): only users with the new permission `users-birthdays.view` see it; a setting table says, for each group, whose groups' birthdays its members see (e.g. teachers → teachers; management/office → every group); only shared birthdays appear, for everybody, management included. (3) **Administrative data:** a new permission `users-users.birthdate` shows the full date of birth in the user's record (Users), regardless of consent. (4) **Administrative calendar "Birthdays (administration)"** (`users.birthdaysadmin`), declared with `permission => users-users.birthdate`: every birthday of active users, regardless of consent, only for holders of that permission. **Must change:** Auth (profile field and column for consent), Users (provider(s), permissions, settings, record), specification "Users", docs, tests.
 
