@@ -54,3 +54,11 @@ $routes->group('ical', ['namespace' => 'Modules\Events\Controllers'], static fun
     $routes->get('user/(:segment)', 'IcalFeed::personal/$1', ['filter' => 'ratelimit:feeds']);
     $routes->get('public/(:segment)', 'IcalFeed::public/$1', ['filter' => 'ratelimit:feeds']);
 });
+
+// API (D-26-01): the user's events (token, `events-api.*`) and the public events (GET only, no
+// token, rate-limited per IP by `kpapy:public`).
+\Kpapy\Resource::routes($routes, 'api/v1/events', '\Modules\Events\Controllers\Api\Events::index', ['filter' => 'kpapy']);
+$routes->get('api/v1/public/events', '\Modules\Events\Controllers\Api\PublicEvents::index', ['filter' => 'kpapy:public']);
+$routes->get('api/v1/public/events/(:segment)', '\Modules\Events\Controllers\Api\PublicEvents::index', ['filter' => 'kpapy:public']);
+$routes->options('api/v1/public/events', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);
+$routes->options('api/v1/public/events/(:segment)', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);

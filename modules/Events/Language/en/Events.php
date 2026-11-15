@@ -58,6 +58,7 @@ return [
         'events'     => 'Events',
         'categories' => 'Event categories',
         'calendar'   => 'Calendar',
+        'api'        => 'Calendar API',
     ],
     'perm' => [
         'all'       => 'See and manage every event',
@@ -235,5 +236,14 @@ return [
         'noSource' => 'The module {0} declares no calendar source: nothing to synchronise.',
         'failed'   => 'The calendar of {0} could not be synchronised: {1}',
         'done'     => '{0}: {1} event(s) published or updated, {2} unchanged, {3} removed.',
+    ],
+    'api' => [
+        'summary' => 'Events',
+        'description' => 'The events the token\'s user sees (public, private and those restricted to their audience), with the recurrence as a rule.',
+        'publicSummary' => 'Public events',
+        'publicDescription' => 'The public events, like the public calendar. No token; limited per IP.',
+        'occurrences' => 'The occurrences in a range (?start=YYYY-MM-DD&end=YYYY-MM-DD, optionally &calendars=a,b and &category=<slug>), recurrences expanded.',
+        'calendars' => 'The calendars the user may see.',
+        'unknownCategory' => 'This category does not exist.',
     ],
 ];

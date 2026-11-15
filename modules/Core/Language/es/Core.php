@@ -146,6 +146,7 @@ return [
         'uninstall' => 'Desinstalar módulos',
         'demo'      => 'Cargar y eliminar datos de demostración',
         'run' => 'Ejecutar ahora las tareas programadas',
+        'markRead'  => 'Marcar como leídas (API)',
     ],
     'toggle' => [
         'coreModule'           => '{0} es un módulo del núcleo y no se puede desactivar.',
@@ -633,5 +634,14 @@ return [
         'corsOrigins' => '«{0}» no es un origen válido: use https://host[:port] (http:// solo para localhost).',
         'uploadTypes' => '«{0}» no puede ser un tipo de archivo permitido.',
         'minConfig' => 'El valor no puede ser inferior a {0}, el mínimo del archivo de configuración.',
+    ],
+    'api' => [
+        'notifications' => [
+            'summary' => 'Notificaciones',
+            'description' => 'Las notificaciones del usuario del token (la campanita), en el idioma de la petición.',
+            'unread' => 'El número de notificaciones no leídas.',
+            'read' => 'Marca la notificación como leída.',
+            'readAll' => 'Marca todas las notificaciones como leídas.',
+        ],
     ],
 ];

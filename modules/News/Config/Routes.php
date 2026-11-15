@@ -13,7 +13,7 @@ use Modules\Core\Crud\CrudFactory;
  * Back office (`backend` chain + `can:`): the CRUDs `news-posts`, `news-mine`, `news-categories`
  * (kpcrudy routes, registered before the reader's `backend/news/read/…`), the reader screen
  * `news-read`. Public site: `news`, `news/feed.xml`, `news/category/{slug}`, `news/{slug}`.
- * API: `api/v1/news` (kpapy filter).
+ * API: `api/v1/news` (kpapy filter), `api/v1/public/news` (GET, `kpapy:public`).
  *
  * @var RouteCollection $routes
  */
@@ -37,3 +37,9 @@ $routes->group('news', ['namespace' => 'Modules\News\Controllers'], static funct
 });
 
 Resource::routes($routes, 'api/v1/news', '\Modules\News\Controllers\Api\Posts::index', ['filter' => 'kpapy']);
+
+// Public posts without a token (D-26-01): GET only, rate-limited per IP by `kpapy:public`.
+$routes->get('api/v1/public/news', '\Modules\News\Controllers\Api\PublicNews::index', ['filter' => 'kpapy:public']);
+$routes->get('api/v1/public/news/(:segment)', '\Modules\News\Controllers\Api\PublicNews::index', ['filter' => 'kpapy:public']);
+$routes->options('api/v1/public/news', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);
+$routes->options('api/v1/public/news/(:segment)', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);

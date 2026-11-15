@@ -17,7 +17,7 @@ final class Module extends ModuleManifest
      * The Modules screen (session 29) and the module commands: modules.list, modules.toggle,
      * modules.sync, modules.upload, modules.uninstall and modules.demo.
      * The user's notifications (list page, bell, preferences: `core-notifications.*`, granted to
-     * every group) and the scheduled tasks screen (`schedule.list`, `schedule.show`,
+     * every group; `read` marks them read through `api/v1/notifications`, D-26-01) and the scheduled tasks screen (`schedule.list`, `schedule.show`,
      * `schedule.run` for "run now").
      */
     public array $resources = [
@@ -38,6 +38,9 @@ final class Module extends ModuleManifest
             'label'  => 'Core.res.notifications',
             'type'   => 'crud',
             'except' => ['add', 'edit', 'export', 'import', 'trash', 'restore', 'purge'],
+            'extra'  => [
+                'read' => 'Core.perm.markRead',
+            ],
         ],
         'schedule' => [
             'label'  => 'Core.res.schedule',
@@ -289,6 +292,11 @@ final class Module extends ModuleManifest
      * upload, uninstall and demo stay with the superadmin (who bypasses the checks). Personal
      * screens (notifications) go to every group (D-00-17).
      */
+    /** The user's notifications in the API (D-26-01). */
+    public array $api = [
+        'notifications' => ['path' => 'notifications', 'handler' => '\Modules\Core\Controllers\Api\Notifications::index'],
+    ];
+
     public array $defaultGrants = [
         'superadmin' => ['core-notifications.*'],
         'admin'      => ['modules.list', 'modules.toggle', 'modules.sync', 'core-notifications.*', 'schedule.*'],

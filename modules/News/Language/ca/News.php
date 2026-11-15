@@ -18,6 +18,7 @@ return [
         'publish' => 'Publicar i despublicar',
         'author'  => 'Veure i canviar l’autor; modificar publicacions d’altres autors',
         'readers' => 'Veure qui ha llegit una publicació',
+        'read'    => 'Marcar com a llegida (API)',
     ],
     'menu' => [
         'read'       => 'Notícies',
@@ -149,6 +150,10 @@ return [
     'api' => [
         'summary'     => 'Notícies',
         'description' => 'Les notícies que pot llegir l’usuari del token (públiques, privades i les dels seus grups), publicades i no caducades.',
+        'read'        => 'Marca la notícia com a llegida per l’usuari del token.',
+        'notices'     => 'Els avisos de l’usuari: fixats primer, després per prioritat i data (?unread=1 només els no llegits).',
+        'publicSummary'     => 'Notícies públiques',
+        'publicDescription' => 'Les notícies públiques publicades i no caducades, les mateixes que el lloc públic. Sense token; limitat per IP.',
     ],
     'cal' => [
         'notices' => 'Avisos',

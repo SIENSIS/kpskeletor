@@ -146,6 +146,7 @@ return [
         'uninstall' => 'Desinstal·lar mòduls',
         'demo'      => 'Carregar i eliminar dades de demostració',
         'run' => 'Executar ara les tasques programades',
+        'markRead'  => 'Marcar com a llegides (API)',
     ],
     'toggle' => [
         'coreModule'           => '{0} és un mòdul del nucli i no es pot desactivar.',
@@ -633,5 +634,14 @@ return [
         'corsOrigins' => '«{0}» no és un origen vàlid: feu servir https://host[:port] (http:// només per a localhost).',
         'uploadTypes' => '«{0}» no pot ser un tipus de fitxer permès.',
         'minConfig' => 'El valor no pot ser inferior a {0}, el mínim del fitxer de configuració.',
+    ],
+    'api' => [
+        'notifications' => [
+            'summary' => 'Notificacions',
+            'description' => 'Les notificacions de l’usuari del token (la campaneta), en l’idioma de la petició.',
+            'unread' => 'El nombre de notificacions no llegides.',
+            'read' => 'Marca la notificació com a llegida.',
+            'readAll' => 'Marca totes les notificacions com a llegides.',
+        ],
     ],
 ];

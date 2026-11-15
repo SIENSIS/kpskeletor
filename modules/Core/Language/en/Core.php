@@ -146,6 +146,7 @@ return [
         'uninstall' => 'Uninstall modules',
         'demo'      => 'Load and remove demo data',
         'run' => 'Run scheduled tasks now',
+        'markRead'  => 'Mark as read (API)',
     ],
     'toggle' => [
         'coreModule'           => '{0} is a core module and cannot be disabled.',
@@ -633,5 +634,14 @@ return [
         'corsOrigins' => '"{0}" is not a valid origin: use https://host[:port] (http:// only for localhost).',
         'uploadTypes' => '"{0}" cannot be an allowed file type.',
         'minConfig' => 'The value cannot be lower than {0}, the minimum of the configuration file.',
+    ],
+    'api' => [
+        'notifications' => [
+            'summary' => 'Notifications',
+            'description' => 'The token\'s user\'s notifications (the bell), in the request\'s language.',
+            'unread' => 'The number of unread notifications.',
+            'read' => 'Marks the notification as read.',
+            'readAll' => 'Marks every notification as read.',
+        ],
     ],
 ];

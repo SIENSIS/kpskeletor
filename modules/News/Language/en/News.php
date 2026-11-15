@@ -18,6 +18,7 @@ return [
         'publish' => 'Publish and unpublish',
         'author'  => 'See and change the author; change posts of other authors',
         'readers' => 'See who has read a post',
+        'read'    => 'Mark as read (API)',
     ],
     'menu' => [
         'read'       => 'News',
@@ -149,6 +150,10 @@ return [
     'api' => [
         'summary'     => 'News',
         'description' => 'The news the token\'s user may read (public, private and their groups\'), published and not expired.',
+        'read'        => 'Marks the post as read by the token\'s user.',
+        'notices'     => 'The user\'s notices: pinned first, then by priority and date (?unread=1 only unread ones).',
+        'publicSummary'     => 'Public news',
+        'publicDescription' => 'The public posts that are published and not expired, the same as the public site. No token; limited per IP.',
     ],
     'cal' => [
         'notices' => 'Notices',
