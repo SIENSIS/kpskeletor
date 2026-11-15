@@ -1,6 +1,6 @@
 # Session 25 — Events module: iCal feeds and calendar API
 
-Branch: `claude/awesome-feynman-p4kb32` · Pull request: "Session 25: Events module: iCal feeds and calendar API" · Date: 2026-11-15
+Branch: `claude/awesome-feynman-p4kb32` · Pull request: [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) · Date: 2026-11-15
 
 ## What was built
 
