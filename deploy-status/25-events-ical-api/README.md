@@ -79,7 +79,8 @@ Branch: `claude/awesome-feynman-p4kb32` · Pull request: [SIENSIS/kpskeletor#33]
 | ID | Title | Decision |
 |---|---|---|
 | D-25-01 | iCal URLs, calendar API names, subscription screen | As built |
-| D-25-08 | Who sees whose birthday | Option C, applied in this branch |
+| D-25-08 | Who sees whose birthday | Option C, applied in this branch (+ the age as a tooltip in the record) |
+| D-25-09 | Birthday greetings | Option A + "only those who share" (on by default) + the time as a setting |
 
 D-25-08 as applied:
 
@@ -101,6 +102,8 @@ D-25-08 as applied:
   matrix after updating.
 - Tests: `BirthdaysProviderTest` (11, the school example), `ProfileTest::testSharingTheBirthdayIsAnExplicitChoice`,
   `CalendarApiTest::testCalendarsDeclaredHiddenStartHiddenAndOnlyOrAllSwitchQuickly`.
+
+D-25-09 as applied (`docs/users.md`, "Birthday greetings"): a daily task (`Users.birthdayGreetingTime`, 08:00) greets, once a year and only on the day, the members of the groups with the switch "Greet the members on their birthday" (Users › Groups; none by default); with `Users.birthdayGreetingSharedOnly` (on) only those who share their birthday; the message per language with `{name}`; notification "Birthday greeting" (bell; email or off per user). Screenshots 17–19: `screenshots-greetings.mjs`. Tests `BirthdayGreetingsTest` (8).
 
 ## How to try it
 
@@ -200,6 +203,9 @@ birth). The flame at the bottom right is CodeIgniter's development toolbar.
 | `screenshots/13-user-record-date-of-birth.png` | The user's record with the date of birth and "Not shared" (`users-users.birthdate`) |
 | `screenshots/14-profile-share-birthday.png` | The profile: "Share my birthday in the calendar" |
 | `screenshots/15-calendar-switches-phone-dark.png` | The switches at phone width, dark mode (editor) |
+| `screenshots/17-settings-birthday-greetings.png` | D-25-09: Settings › Users › Birthday greetings (only those who share, time, message per language) |
+| `screenshots/18-group-greet-switch.png` | Users › Groups: "Greet the members on their birthday" |
+| `screenshots/19-birthday-greeting-notification.png` | The greeting received by the editor on their birthday |
 | `screenshots/16-user-record-age-tooltip.png` | The record: the age as the tooltip of the hourglass icon (the browser's native tooltip is not drawn in headless captures: the same text is shown in a box for the picture) |
 
 Screenshots 10–15: `deploy-status/25-events-ical-api/screenshots-decisions.mjs`, after a fresh install (three demo users given a date of birth).

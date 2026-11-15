@@ -85,6 +85,11 @@ final class Module extends ModuleManifest
     /** @var list<string> Dashboard widget "Users summary" (active users, online, without 2FA). */
     public array $widgets = [\Modules\Users\Widgets\UsersSummary::class];
 
+    /** Birthday greetings (D-25-09): a daily task and its notification. */
+    public array $tasks = [\Modules\Users\Tasks\SendBirthdayGreetings::class];
+
+    public array $notifications = [\Modules\Users\Notifications\BirthdayGreeting::class];
+
     /** Edited in Settings › Security. */
     public array $settings = [
         // Minutes an impersonation lasts before the superadmin gets their own account back.
@@ -103,6 +108,46 @@ final class Module extends ModuleManifest
             'label'   => 'Users.settings.birthdaysCalendar',
             'help'    => 'Users.settings.birthdaysCalendarHelp',
             'group'   => 'calendar',
+        ],
+        // Birthday greetings (D-25-09); the groups to greet are chosen in Users › Groups.
+        'birthdayGreetingSharedOnly' => [
+            'type'    => 'bool',
+            'default' => true,
+            'label'   => 'Users.settings.birthdayGreetingSharedOnly',
+            'help'    => 'Users.settings.birthdayGreetingSharedOnlyHelp',
+            'group'   => 'greetings',
+        ],
+        'birthdayGreetingTime' => [
+            'type'    => 'string',
+            'default' => '08:00',
+            'rules'   => 'required|exact_length[5]|valid_date[H:i]',
+            'label'   => 'Users.settings.birthdayGreetingTime',
+            'help'    => 'Users.settings.birthdayGreetingTimeHelp',
+            'group'   => 'greetings',
+        ],
+        'birthdayGreetingCa' => [
+            'type'    => 'string',
+            'default' => 'Per molts anys, {name}! 🎉',
+            'rules'   => 'required|max_length[300]',
+            'label'   => 'Users.settings.birthdayGreetingCa',
+            'help'    => 'Users.settings.birthdayGreetingHelp',
+            'group'   => 'greetings',
+        ],
+        'birthdayGreetingEs' => [
+            'type'    => 'string',
+            'default' => '¡Feliz cumpleaños, {name}! 🎉',
+            'rules'   => 'required|max_length[300]',
+            'label'   => 'Users.settings.birthdayGreetingEs',
+            'help'    => 'Users.settings.birthdayGreetingHelp',
+            'group'   => 'greetings',
+        ],
+        'birthdayGreetingEn' => [
+            'type'    => 'string',
+            'default' => 'Happy birthday, {name}! 🎉',
+            'rules'   => 'required|max_length[300]',
+            'label'   => 'Users.settings.birthdayGreetingEn',
+            'help'    => 'Users.settings.birthdayGreetingHelp',
+            'group'   => 'greetings',
         ],
     ];
 

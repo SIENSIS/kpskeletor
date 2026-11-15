@@ -126,6 +126,24 @@ students (`user`) without `users-birthdays.view` see nothing. A student's shared
 by the management, not by the teachers; an unshared one only in the administrative calendar and
 the record.
 
+## Birthday greetings
+
+On their birthday (site time zone; 29 February greeted on 28 February in common years), the
+members of the groups chosen in **Users › Groups › "Greet the members on their birthday"**
+(table `group_birthday_greetings`; none by default) receive the notification **"Birthday
+greeting"** (`Notifications/BirthdayGreeting.php`): in the bell by default, by email if they
+choose it, and each user can turn it off in their notification preferences. Once a year per user
+(`birthday_greetings_sent`, rows older than two years purged). The greeting only reaches the
+person (D-25-09).
+
+- Task `Tasks/SendBirthdayGreetings.php`, daily at `Users.birthdayGreetingTime` (`HH:MM`, default
+  08:00; a new value moves the task on the scheduler's next sync).
+- `Users.birthdayGreetingSharedOnly` (on by default): only users who share their birthday in the
+  calendar (privacy); off: every member of the greeted groups with a date of birth.
+- The message per language, `Users.birthdayGreetingCa`, `…Es`, `…En` (`{name}` = the user's name);
+  each user receives the one of their language. Settings › Users › "Birthday greetings".
+- Service `Services/BirthdayGreetings.php`; tests `Tests/BirthdayGreetingsTest.php`.
+
 ## Activity log
 
 CRUD writes are logged by `AuditedCrud`. The module adds `user_created`, `email_changed`,

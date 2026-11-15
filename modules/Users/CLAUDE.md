@@ -14,7 +14,8 @@ impersonation. Core module (cannot be disabled). Full description: `docs/users.m
 - Default grants: `admin` everything except `users-users.impersonate`.
 - Menu (`settings` zone): Users, Groups, Permissions.
 - Setting `Users.impersonationMinutes` (30, 1–120, Settings › Security › Impersonation).
-- One table of its own, `group_birthday_audiences` (D-25-08; created with defaults), no demo data (the demo users
+- Tables of its own: `group_birthday_audiences` (D-25-08; created with defaults),
+  `group_birthday_greetings`, `birthday_greetings_sent` (D-25-09); no demo data (the demo users
   are Auth's), no outbound hosts or CSP sources. Asset: `Assets/js/matrix.js` (`users/matrix`).
 - Widget `users.summary` (`Widgets/UsersSummary.php`, async, `users-users.list`): active accounts,
   users online (option `onlineMinutes`), active accounts without 2FA.
@@ -42,7 +43,13 @@ consent `user_profiles.share_birthday` + `users-birthdays.view` + table `group_b
 edited in Groups "Sees the birthdays of") and `users.birthdaysadmin`
 (`Calendar/AdminBirthdaysProvider.php`, every date of birth, `users-users.birthdate`, hidden by
 default). Shared code `Calendar/Birthdays.php`. The record shows the date of birth with
-`users-users.birthdate`. Tests `Tests/BirthdaysProviderTest.php`.
+`users-users.birthdate` (with the age as a tooltip). Tests `Tests/BirthdaysProviderTest.php`.
+
+Birthday greetings (D-25-09): task `Tasks/SendBirthdayGreetings.php` (daily at
+`Users.birthdayGreetingTime`), notification `Notifications/BirthdayGreeting.php`, service
+`Services/BirthdayGreetings.php`; groups chosen with the switch of the Groups form
+(`group_birthday_greetings`), once a year (`birthday_greetings_sent`); settings
+`birthdayGreetingSharedOnly` (on), `birthdayGreetingCa|Es|En`. Tests `Tests/BirthdayGreetingsTest.php`.
 
 ## Open tasks
 

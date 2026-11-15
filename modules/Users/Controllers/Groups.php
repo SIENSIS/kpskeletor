@@ -9,6 +9,7 @@ use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Groups\GroupRegistry;
 use Modules\Core\Permissions\Authorization;
+use Modules\Users\Services\BirthdayGreetings;
 
 /**
  * Groups (resource `users-groups`, kpcrudy over the Core `groups` table; docs/users.md).
@@ -41,9 +42,13 @@ final class Groups extends BackendController
             ->columns(['title', 'name', 'two_factor', 'reserved', 'members'])
             // Whose shared birthdays the members of this group see (D-25-08).
             ->setRelationNN('birthday_groups', 'group_birthday_audiences', GroupRegistry::TABLE, 'group_id', 'target_group_id', 'title', ['order' => 'title'])
-            ->addFields(['name', 'title', 'description', 'two_factor', 'birthday_groups'])
-            ->editFields(['title', 'description', 'two_factor', 'birthday_groups'])
-            ->showFields(['name', 'title', 'description', 'two_factor', 'birthday_groups', 'reserved', 'members', 'created_at'])
+            ->addFields(['name', 'title', 'description', 'two_factor', 'birthday_groups', 'birthday_greet'])
+            ->editFields(['title', 'description', 'two_factor', 'birthday_groups', 'birthday_greet'])
+            ->showFields(['name', 'title', 'description', 'two_factor', 'birthday_groups', 'birthday_greet', 'reserved', 'members', 'created_at'])
+            // Birthday greetings (D-25-09): a switch stored in `group_birthday_greetings`.
+            ->callbackField('birthday_greet', static fn ($value, ?array $row): string => self::greetSwitch($row))
+            ->callbackColumn('birthday_greet', static fn ($value, array $row): string => BirthdayGreetings::greets((int) ($row['id'] ?? 0))
+                ? ui_badge(lang('Users.greetings.on'), 'success', 'bi bi-balloon-heart') : ui_badge(lang('Users.greetings.off'), 'light'))
             ->searchFields(['name', 'title'])
             ->unsortable(['members'])
             ->displayAs([
@@ -54,6 +59,7 @@ final class Groups extends BackendController
                 'reserved'    => lang('Users.groups.reserved'),
                 'members'     => lang('Users.groups.members'),
                 'birthday_groups' => lang('Users.groups.birthdayGroups'),
+                'birthday_greet'  => lang('Users.groups.birthdayGreet'),
                 'created_at'  => lang('Users.groups.created'),
             ])
             ->fieldType('two_factor', 'select', ['options' => $policies])
@@ -87,8 +93,14 @@ final class Groups extends BackendController
 
                 return $data;
             })
-            ->afterInsert(static fn (string $id, array $data) => $registry->created((string) $data['name']))
-            ->afterUpdate(static fn () => $registry->changed())
+            ->afterInsert(function (string $id, array $data) use ($registry): void {
+                $registry->created((string) $data['name']);
+                BirthdayGreetings::setGreets((int) $id, $this->request->getPost('birthday_greet') === '1');
+            })
+            ->afterUpdate(function (string $id) use ($registry): void {
+                $registry->changed();
+                BirthdayGreetings::setGreets((int) $id, $this->request->getPost('birthday_greet') === '1');
+            })
             ->beforeDelete(static fn (string $id, array $row): ?string => $registry->canDelete((string) $row['name']) ? null : lang('Users.groups.cannotDelete'))
             ->afterDelete(static fn (string $id, array $row) => $registry->deleted((string) $row['name']));
 
@@ -97,6 +109,23 @@ final class Groups extends BackendController
         }
 
         return $this->renderCrud($crud);
+    }
+
+    /**
+     * The switch "Greet the members on their birthday" of the form (a hidden 0 so that turning it
+     * off is posted too).
+     *
+     * @param array<string, mixed>|null $row
+     */
+    private static function greetSwitch(?array $row): string
+    {
+        $checked = $row !== null && BirthdayGreetings::greets((int) ($row['id'] ?? 0));
+
+        return '<input type="hidden" name="birthday_greet" value="0">'
+            . '<div class="form-check form-switch">'
+            . '<input class="form-check-input" type="checkbox" role="switch" id="birthday_greet" name="birthday_greet" value="1"' . ($checked ? ' checked' : '') . '>'
+            . '<label class="form-check-label" for="birthday_greet">' . esc(lang('Users.groups.birthdayGreetLabel')) . '</label>'
+            . '</div><div class="form-text">' . esc(lang('Users.groups.birthdayGreetHelp')) . '</div>';
     }
 
     /**
