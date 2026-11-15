@@ -612,7 +612,8 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 - **Tables:** `ical_tokens` (user, hash, categories/calendars filter, last_access, revoked_at);
   `events` already has source columns; birthday column (contradiction 37).
 - **Commands:** `calendar:resync <module>`; routes `ical/public/(:segment).ics`,
-  `ical/user/(:segment).ics`, `events/(:segment)/export.ics`.
+  `ical/user/(:segment).ics`, `backend/calendar/event/(:segment)/export.ics` and
+  `calendar/event/(:segment)/export.ics` (D-25-01), `backend/calendar/subscription`.
 - **Tests:** RFC 5545 validation, regenerated token invalidates the old URL, permission change
   reflected, `304`, publish/unpublish idempotent, locked published events, providers filtered by
   user, disabled module events hidden.

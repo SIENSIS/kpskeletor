@@ -46,7 +46,7 @@ events* widget and the "Calendar" menu link type. Full description: `docs/events
 
 D-24-01 (names, URLs, configuration) and D-24-02 (assignable groups) decided by the owner as built; D-24-03 …
 D-24-10 accepted (`docs/decisions.md`); D-00-04, D-00-40, D-00-41. Session 25: D-25-01 (iCal URLs and
-API names, **open**), D-25-02 … D-25-07 accepted.
+API names, decided as built by the owner), D-25-02 … D-25-07 accepted.
 
 ## Open tasks
 

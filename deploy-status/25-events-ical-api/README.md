@@ -64,7 +64,7 @@ Branch: `claude/awesome-feynman-p4kb32` · Pull request: [SIENSIS/kpskeletor#33]
 
 ## Decisions and deviations
 
-- **D-25-01 (open, decide):** iCal URLs, API names, manifest keys and the subscription screen —
+- **D-25-01 (decided as built by the owner, Decisions 25):** iCal URLs, API names, manifest keys and the subscription screen —
   built as proposed so they can still be renamed. The export URL deviates from the plan
   (`events/{code}/export.ics`) to sit next to the details pages of D-24-01.
 - D-25-02 (secret shown once, hashed, re-authentication), D-25-03 (deterministic documents,
@@ -182,4 +182,4 @@ birth). The flame at the bottom right is CodeIgniter's development toolbar.
   permissions and disabled modules) plus `EventVisibility::allowedByPolicy()` per row; reuse
   `EventRepository::occurrences()` and `ProvidedEvents`.
 - Session 29: the module uninstaller must call `CalendarService::purgeModule(<Module>)`.
-- D-25-01 is open: run `deploy/decide.md`.
+- D-25-01 was decided as built (Decisions 25): the URLs and API names are final.
