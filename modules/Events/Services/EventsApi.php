@@ -11,6 +11,7 @@ use DateTimeImmutable;
 use Kpapy\Http\ApiException;
 use Kpapy\Resource;
 use Modules\Core\Content\ContentTranslations;
+use Modules\Core\Security\HtmlSanitizer;
 
 /**
  * The kpapy resources of the calendar (D-26-01; docs/events.md, "API"): `api/v1/events` (the
@@ -44,7 +45,14 @@ final class EventsApi
         $resource = (new Resource())
             ->setBasePath($basePath)
             ->setTable('events')
-            ->where(static fn (BaseBuilder $builder): BaseBuilder => self::visible($builder, $user, $publicOnly))
+            // The one visibility rule (the deleted filter included), minus what access policies refuse.
+            ->where(static function (BaseBuilder $builder) use ($user, $publicOnly): BaseBuilder {
+                $viewer  = $publicOnly ? null : $user;
+                $refused = self::refusedByPolicy($viewer);
+                EventVisibility::apply($builder, $viewer, 'events', $publicOnly);
+
+                return $refused === [] ? $builder : $builder->whereNotIn('events.id', $refused);
+            })
             ->setTranslations('event_translations', 'event_id', 'locale', ['title', 'description'], ContentTranslations::LOCALES, ['required' => ['ca']])
             ->fields(['id', 'title', 'description', 'starts_at', 'ends_at', 'all_day', 'location', 'url', 'category', 'calendar', 'color', 'visibility', 'status', 'organiser', 'recurrence', 'updated_at'])
             ->listFields(['id', 'title', 'starts_at', 'ends_at', 'all_day', 'location', 'category', 'calendar', 'color', 'visibility', 'status', 'recurrence'])
@@ -57,9 +65,9 @@ final class EventsApi
             ->callbackField('recurrence', static fn ($value, array $row): ?array => self::recurrence($row))
             ->transform(static function (array $item): array {
                 if (is_string($item['description'] ?? null)) {
-                    $item['description'] = \Modules\Core\Security\HtmlSanitizer::clean($item['description']);
+                    $item['description'] = HtmlSanitizer::clean($item['description']);
                 } elseif (is_array($item['description'] ?? null)) {
-                    $item['description'] = array_map(static fn ($text): ?string => is_string($text) ? \Modules\Core\Security\HtmlSanitizer::clean($text) : null, $item['description']);
+                    $item['description'] = array_map(static fn ($text): ?string => is_string($text) ? HtmlSanitizer::clean($text) : null, $item['description']);
                 }
 
                 return $item;
@@ -86,26 +94,6 @@ final class EventsApi
                 'row' => false, 'method' => 'get', 'permission' => 'list', 'description' => lang('Events.api.calendars'),
             ])
             ->describe(lang('Events.api.summary'), lang('Events.api.description'));
-    }
-
-    /**
-     * The visibility conditions plus the events an access policy refuses.
-     *
-     * @param BaseBuilder<\CodeIgniter\Database\BaseConnection<object|resource, object|resource>> $builder
-     *
-     * @return BaseBuilder<\CodeIgniter\Database\BaseConnection<object|resource, object|resource>>
-     */
-    public static function visible(BaseBuilder $builder, ?User $user, bool $publicOnly): BaseBuilder
-    {
-        // kpapy's where(Closure) runs inside its own query: the deleted filter is part of the rule.
-        EventVisibility::apply($builder, $publicOnly ? null : $user, 'events', $publicOnly);
-        $refused = self::refusedByPolicy($publicOnly ? null : $user);
-
-        if ($refused !== []) {
-            $builder->whereNotIn('events.id', $refused);
-        }
-
-        return $builder;
     }
 
     /**
@@ -140,7 +128,7 @@ final class EventsApi
         $request = service('request');
         $range   = $request instanceof IncomingRequest ? CalendarComponent::range($request) : null;
 
-        if ($range === null || ! $request instanceof IncomingRequest) {
+        if ($range === null) {
             throw ApiException::validation(['start' => [lang('Events.errors.range')]]);
         }
 
@@ -279,10 +267,10 @@ final class EventsApi
         return [
             'freq'       => $row['recur_freq'],
             'interval'   => max(1, (int) ($row['recur_interval'] ?? 1)),
-            'days'       => Calendars::split($row['recur_days'] ?? null),
+            'days'       => array_values(array_filter(array_map('trim', explode(',', strtolower((string) ($row['recur_days'] ?? '')))))),
             'until'      => is_string($row['recur_until'] ?? null) && $row['recur_until'] !== '' ? substr($row['recur_until'], 0, 10) : null,
             'count'      => is_numeric($row['recur_count'] ?? null) ? (int) $row['recur_count'] : null,
-            'exceptions' => Calendars::split($row['recur_exceptions'] ?? null),
+            'exceptions' => array_keys(Recurrence::exceptions((string) ($row['recur_exceptions'] ?? ''))),
         ];
     }
 }
