@@ -7,6 +7,7 @@ namespace Modules\Core\Filters;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Modules\Core\Maintenance\MaintenanceMode;
 use Modules\Core\Scheduler\TaskRunner;
 use Throwable;
 
@@ -113,6 +114,10 @@ final class PoorMansCron implements FilterInterface
         }
 
         ignore_user_abort(true);
+
+        if ((new MaintenanceMode())->isOn()) {
+            return;
+        }
 
         try {
             (new TaskRunner())->runDue(null, TaskRunner::SOURCE_WEB);

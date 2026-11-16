@@ -215,6 +215,23 @@ return [
         'skipToContent'   => 'Salta al contingut',
         'toggleSidebar'   => 'Plega o desplega el menú',
     ],
+    'archive' => [
+        'invalid'        => 'El fitxer no és un arxiu vàlid.',
+        'tooManyEntries' => 'L\'arxiu té més de {0} entrades.',
+        'link'           => 'L\'arxiu conté un enllaç simbòlic ({0}).',
+        'ratio'          => 'L\'entrada {0} està massa comprimida (possible bomba zip).',
+        'duplicate'      => 'L\'entrada {0} hi apareix dues vegades.',
+        'tooLarge'       => 'L\'arxiu és massa gran un cop extret.',
+        'sizeMismatch'   => 'L\'entrada {0} és més gran del que declara.',
+        'cannotWrite'    => 'No s\'ha pogut extreure l\'arxiu (la carpeta no es pot escriure).',
+        'badName'        => 'L\'arxiu conté un camí prohibit: {0}',
+        'missing'        => 'L\'arxiu no té l\'entrada {0}.',
+    ],
+    'maintenance' => [
+        'title'   => 'Lloc en manteniment',
+        'message' => 'El lloc s\'està actualitzant o restaurant. Torneu-ho a provar d\'aquí a uns minuts.',
+        'skipped' => 'Omès: el mode de manteniment està activat.',
+    ],
     'errors' => [
         'home'        => 'Ves a la pàgina d\'inici',
         'forbidden'   => [

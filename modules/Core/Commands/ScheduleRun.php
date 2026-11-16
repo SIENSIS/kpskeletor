@@ -6,6 +6,7 @@ namespace Modules\Core\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
+use Modules\Core\Maintenance\MaintenanceMode;
 use Modules\Core\Scheduler\TaskResult;
 use Modules\Core\Scheduler\TaskRun;
 use Modules\Core\Scheduler\TaskRunner;
@@ -34,6 +35,13 @@ final class ScheduleRun extends BaseCommand
      */
     public function run(array $params)
     {
+        // Nothing runs while maintenance mode is on (a restore may be replacing the database).
+        if ((new MaintenanceMode())->isOn()) {
+            CLI::write(lang('Core.maintenance.skipped'));
+
+            return EXIT_SUCCESS;
+        }
+
         if (! db_connect()->tableExists('scheduled_tasks')) {
             CLI::error(lang('Core.schedule.notInstalled'));
 

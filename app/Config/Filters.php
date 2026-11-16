@@ -52,7 +52,8 @@ class Filters extends BaseFilters
         // (`authsession`). Then the request rate limit per user (`RateLimit`, limit `backend`)
         // and the scheduler fallback for hosts without cron (`PoorMansCron`, after filter, off
         // unless the setting Core.poorMansCron is on).
-        // Maintenance mode and the activity hook join this list in the sessions that build them.
+        // Maintenance mode is a global filter (`maintenance`, session 27); the activity hook joins
+        // this list in the session that builds it.
         // Each route adds its own `can:` filter.
         'backend' => [
             SessionAuth::class,
@@ -101,16 +102,21 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
+            // `progress/*`: JSON progress of long jobs (e.g. a restore), read from files while the
+            // database is replaced; the filters below that read the database or the session skip it.
+            // Maintenance mode (Modules\Core\Maintenance\MaintenanceMode): 503 for every request but the
+            // paths the mode allows; first, so nothing below touches a database being restored.
+            'maintenance',
             // The web installer (`install`, only before installation) runs without a database.
-            'moduleenabled' => ['except' => ['install', 'install/*']], // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
-            'cspmodules' => ['except' => ['install', 'install/*']], // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
+            'moduleenabled' => ['except' => ['install', 'install/*', 'progress/*']], // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
+            'cspmodules' => ['except' => ['install', 'install/*', 'progress/*']], // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
             'csrf' => ['except' => ['api/*']], // Every POST except the token-only API (CodeIgniter's CSRF, session based)
-            'authsession' => ['except' => ['api/*', 'install', 'install/*']], // Session hardening (never on the token-only API): lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
+            'authsession' => ['except' => ['api/*', 'install', 'install/*', 'progress/*']], // Session hardening (never on the token-only API): lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
             // 'honeypot',
             // 'invalidchars',
         ],
         'after' => [
-            'csrftoken' => ['except' => ['api/*']], // A script's POST gets the regenerated CSRF token back (Modules\Core\Filters\CsrfTokenHeader; core/http.js refreshCsrf())
+            'csrftoken' => ['except' => ['api/*', 'progress/*']], // A script's POST gets the regenerated CSRF token back (Modules\Core\Filters\CsrfTokenHeader; core/http.js refreshCsrf())
             // 'honeypot',
             // Never 'secureheaders' (replaced by the required `securityheaders`, D-00-28).
         ],
