@@ -36,7 +36,7 @@ pull request open), *merged* (in `main`).
 | 26 | Core API endpoints | merged | `claude/keen-allen-cq2rvw` | [SIENSIS/kpskeletor#34](https://github.com/SIENSIS/kpskeletor/pull/34) | [`deploy-status/26-core-api/`](../deploy-status/26-core-api/README.md) |
 | 27 | Backup module | merged | `claude/blissful-feynman-0ypdap` | [SIENSIS/kpskeletor#35](https://github.com/SIENSIS/kpskeletor/pull/35) | [`deploy-status/27-backup/`](../deploy-status/27-backup/README.md) |
 | 28 | Updates module and app:update | merged | `ccr-a5d307ea-vyzp92` | [SIENSIS/kpskeletor#36](https://github.com/SIENSIS/kpskeletor/pull/36) | [`deploy-status/28-updates/`](../deploy-status/28-updates/README.md) |
-| 29 | Modules screen, ZIP installs and uninstall | done | `ccr-562a7c0f-4i8vha` | (pull request "Session 29: Modules screen, ZIP installs and uninstall") | [`deploy-status/29-module-packages/`](../deploy-status/29-module-packages/README.md) |
+| 29 | Modules screen, ZIP installs and uninstall | done | `ccr-562a7c0f-4i8vha` | [SIENSIS/kpskeletor#37](https://github.com/SIENSIS/kpskeletor/pull/37) | [`deploy-status/29-module-packages/`](../deploy-status/29-module-packages/README.md) |
 
 ## MVP review (session 19)
 

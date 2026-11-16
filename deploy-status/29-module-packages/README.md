@@ -1,6 +1,6 @@
 # Session 29 — Modules screen, ZIP installs and uninstall
 
-Branch: `ccr-562a7c0f-4i8vha` · Pull request: "Session 29: Modules screen, ZIP installs and uninstall" · Date: 2026-11-16
+Branch: `ccr-562a7c0f-4i8vha` · Pull request: [SIENSIS/kpskeletor#37](https://github.com/SIENSIS/kpskeletor/pull/37) · Date: 2026-11-16
 
 ## What was built
 
