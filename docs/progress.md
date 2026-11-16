@@ -34,7 +34,7 @@ pull request open), *merged* (in `main`).
 | 24 | Events module: calendar, administration and audiences | merged | `claude/gallant-curie-rmfn7k` | [SIENSIS/kpskeletor#32](https://github.com/SIENSIS/kpskeletor/pull/32) | [`deploy-status/24-events-core/`](../deploy-status/24-events-core/README.md) |
 | 25 | Events module: iCal feeds and calendar API | merged | `claude/awesome-feynman-p4kb32` | [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) | [`deploy-status/25-events-ical-api/`](../deploy-status/25-events-ical-api/README.md) |
 | 26 | Core API endpoints | merged | `claude/keen-allen-cq2rvw` | [SIENSIS/kpskeletor#34](https://github.com/SIENSIS/kpskeletor/pull/34) | [`deploy-status/26-core-api/`](../deploy-status/26-core-api/README.md) |
-| 27 | Backup module | done | `claude/blissful-feynman-0ypdap` | (this branch's pull request) | [`deploy-status/27-backup/`](../deploy-status/27-backup/README.md) |
+| 27 | Backup module | done | `claude/blissful-feynman-0ypdap` | [SIENSIS/kpskeletor#35](https://github.com/SIENSIS/kpskeletor/pull/35) | [`deploy-status/27-backup/`](../deploy-status/27-backup/README.md) |
 
 ## MVP review (session 19)
 

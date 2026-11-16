@@ -1,6 +1,6 @@
 # Session 27 — Backup module
 
-Branch `claude/blissful-feynman-0ypdap` · pull request "Session 27: Backup module".
+Branch `claude/blissful-feynman-0ypdap` · pull request [SIENSIS/kpskeletor#35](https://github.com/SIENSIS/kpskeletor/pull/35) "Session 27: Backup module".
 
 ## What was built
 
