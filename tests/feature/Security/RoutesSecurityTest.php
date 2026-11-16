@@ -106,6 +106,11 @@ final class RoutesSecurityTest extends CIUnitTestCase
             ['GET', 'backend/users/access/([0-9]+)'],
             ['POST', 'backend/users/access/([0-9]+)'],
             ['POST', 'backend/users/permissions'],
+            ['GET', 'backend/backups/download/([^/]+)'],
+            ['GET', 'backend/backups/restore/([^/]+)'],
+            ['POST', 'backend/backups/restore/([^/]+)'],
+            ['GET', 'backend/backups/upload'],
+            ['POST', 'backend/backups/upload'],
         ] as [$verb, $path]) {
             $this->assertArrayHasKey($path, $routes->getRoutes($verb), "{$verb} {$path} exists.");
             $this->assertContains('reauth', $routes->getFiltersForRoute($path, $verb), "{$verb} {$path} asks for re-authentication.");
