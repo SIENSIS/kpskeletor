@@ -156,6 +156,12 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   `writable/backups`, never served).
 - ZIP files from outside (backups, module packages) only through `Modules\Core\Archive\SafeZip`
   (zip-slip and zip-bomb checks).
+- Module and theme packages only through `Modules\Core\Packages` (`PackageValidator`,
+  `PackageInstaller`, `Uninstaller`, `StagedPackages`; `docs/packages.md`): read without running
+  them, installed and uninstalled only from the console (`modules:install`, `--pending`), never by
+  the web server; the Core asks other modules through events (`packageBackup`,
+  `moduleUninstalling`, `moduleVersions`), and a module that keeps data about other modules
+  listens to `moduleUninstalling`.
 - Maintenance mode only through `Modules\Core\Maintenance\MaintenanceMode` (its state is a file;
   the global `maintenance` filter answers 503; by hand: Settings › Actions or
   `php spark app:maintenance`; `maintenance.manage` holders bypass only that mode). Paths under `progress/*` serve the JSON progress of

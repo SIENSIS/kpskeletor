@@ -136,3 +136,10 @@ entries `verify_failed`, `download`, `upload_refused`, `restore_refused`, `resto
 `Retention`, `BackupRepository` (files and the `backups` table), `EnvFile`, `BackupPassword`,
 `ConsolePassword`. Core: `Modules\Core\Archive\SafeZip` (zip-slip and zip-bomb checks, shared with
 module packages) and `Modules\Core\Maintenance\MaintenanceMode`.
+
+## Backups before module changes
+
+Installing, upgrading or uninstalling a module or theme (`modules:install`, `modules:uninstall`,
+`themes:*`, staged operations) asks for a full backup through the Core event `packageBackup`;
+this module answers it (origin `package`, password from `backup.password`/`BACKUP_PASSWORD` or
+`--password`). See `docs/packages.md`.

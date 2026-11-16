@@ -51,6 +51,7 @@ API names, decided as built by the owner), D-25-02 … D-25-07 accepted.
 
 ## Open tasks
 
+- Done in session 29: `CalendarService::purgeModule()` is now part of the Core's `CalendarPublisher` contract: the Core's Uninstaller calls it for the uninstalled module (unless `--keep-data`); no `Config/Events.php` (D-00-04). (`docs/packages.md`)
 - Session 29: the module uninstaller must call `CalendarService::purgeModule(<Module>)`.
 - Weekly events whose `recur_days` exclude the start's weekday: iCal counts DTSTART as an
   occurrence, the expansion does not (edge case; the form could normalise it).

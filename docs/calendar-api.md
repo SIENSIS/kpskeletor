@@ -59,6 +59,8 @@ service('calendar')->unpublish('Courses', "session-{$id}");   // deleted or canc
   event comes back. Both return whether the calendar changed.
 - `unpublish()` soft-deletes: iCal clients receive the event as `STATUS:CANCELLED` for
   `Config\Calendar::$icalGraceDays` (30) days.
+- `purgeModule(<Module>)` deletes every event of a module for good; only the Core's uninstaller
+  calls it (`modules:uninstall` without `--keep-data`, docs/packages.md).
 - Visibility `public`, `private` (signed-in users) or `restricted` (group **names** and user ids;
   unknown groups throw `InvalidArgumentException`, unknown users are dropped).
 - Published events are **locked** in the calendar administration: badge "Managed by Courses" and

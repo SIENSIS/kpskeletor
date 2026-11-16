@@ -35,7 +35,8 @@ pull request open), *merged* (in `main`).
 | 25 | Events module: iCal feeds and calendar API | merged | `claude/awesome-feynman-p4kb32` | [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) | [`deploy-status/25-events-ical-api/`](../deploy-status/25-events-ical-api/README.md) |
 | 26 | Core API endpoints | merged | `claude/keen-allen-cq2rvw` | [SIENSIS/kpskeletor#34](https://github.com/SIENSIS/kpskeletor/pull/34) | [`deploy-status/26-core-api/`](../deploy-status/26-core-api/README.md) |
 | 27 | Backup module | merged | `claude/blissful-feynman-0ypdap` | [SIENSIS/kpskeletor#35](https://github.com/SIENSIS/kpskeletor/pull/35) | [`deploy-status/27-backup/`](../deploy-status/27-backup/README.md) |
-| 28 | Updates module and app:update | done | `ccr-a5d307ea-vyzp92` | [SIENSIS/kpskeletor#36](https://github.com/SIENSIS/kpskeletor/pull/36) | [`deploy-status/28-updates/`](../deploy-status/28-updates/README.md) |
+| 28 | Updates module and app:update | merged | `ccr-a5d307ea-vyzp92` | [SIENSIS/kpskeletor#36](https://github.com/SIENSIS/kpskeletor/pull/36) | [`deploy-status/28-updates/`](../deploy-status/28-updates/README.md) |
+| 29 | Modules screen, ZIP installs and uninstall | done | `ccr-562a7c0f-4i8vha` | (pull request "Session 29: Modules screen, ZIP installs and uninstall") | [`deploy-status/29-module-packages/`](../deploy-status/29-module-packages/README.md) |
 
 ## MVP review (session 19)
 
@@ -70,6 +71,7 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Decisions
 
+- **29:** Modules screen (`backend/modules`: modules, packages, themes tabs; docs/packages.md), `modules:install <zip|url>` / `--pending`, `modules:uninstall [--keep-data]`, `themes:install`, `themes:uninstall`; packages read without running them (`ManifestReader`), validated (`PackageValidator`: single folder, SafeZip, extensions, sizes, zip bombs, `php -l`, minisign signatures), installed with backup + maintenance + atomic move + `modules:sync` in a new process and rollback (`PackageInstaller`); staged uploads in `module_packages` (`StagedPackages`); uninstall clean-up through `service('calendar')->purgeModule()` (new method of the Core's `CalendarPublisher`) and the `moduleUninstalling` event (Menus, Dashboard). **Open (decide):** D-29-01 (URLs, manifest `description`/`author`, `Config\Packages` keys, command options, Core events) and D-29-02 (new modules disabled in production unless `packages.autoEnable`). D-29-03 … D-29-09 accepted.
 - **28:** Updates module (`docs/updates.md`): releases read from GitHub/GitLab through `OutboundClient` (`ReleaseSource`), newest semver tag (D-28-05), result in `writable/updates/status.json` (D-28-01), widget `updates.version`, notification `NewVersion` once per version, page `backend/updates` with safe release notes, daily task, `updates:check`; `app:update` verifies the archive (SHA-256 + minisign Ed25519, `SignatureVerifier`) or the git tag **before** maintenance mode, then backup, code (protected paths, replaced files kept), composer, `modules:sync`, caches (D-28-03, D-28-04). Maintenance mode by hand in Settings › Actions and `app:maintenance` with a message and a superadmin bypass (D-28-02). D-28-01 and D-28-02 decided (Decisions 28: D-28-01 as built; D-28-02 → Core permission `maintenance.manage`, no default grant, turns the mode on/off and bypasses it); D-28-03 … D-28-07 accepted (D-28-07, owner's request: the 503 page is the theme's `errors/maintenance` view drawn with the file configuration only).
 
 
@@ -124,6 +126,7 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Deviations from the specification
 
+- **29:** one table `module_packages` instead of `module_packages` + `pending_uninstalls` (D-29-04); `modules:install --pending` also runs the uninstall requests; the theme "preview" is the theme's screenshot image and colours, not a live preview (D-29-07); the web "Sync" button stops when the namespaces file is not writable (D-29-05). **Small changes in other modules** (Core contracts): `Config/Events.php` listeners in Backup (`packageBackup`, backup origin `package`), Menus, Dashboard (`moduleUninstalling`) and Updates (`moduleVersions`); `SemVer::compare()`.
 - **28:** `app:update` downloads and verifies the release before turning maintenance mode on (the spec lists maintenance first; D-28-04); maintenance mode is not a stored setting but a card in Settings › Actions (D-28-02); the first archive update can only warn about local changes. **Earlier gap fixed:** `OutboundClient` forwarded credential headers on cross-origin redirects (D-28-06).
 
 
@@ -165,6 +168,7 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Known issues
 
+- **29:** the package's widget/task class names are shown as written (not resolved through `use` imports) and its menu labels as language keys before it is installed; the Core has its own minisign verifier (`SignatureCheck`, a copy of Updates' `SignatureVerifier`: merge in session 35); uninstall with `--keep-data` keeps the migration history, so reinstalling does not recreate tables but its seeder runs again; the debug toolbar (development) reports a CSP violation of its own on the themes tab; the module table scrolls horizontally inside its card on phones; staged installs in the back office could only be exercised through the service in tests (`is_uploaded_file()`), the UI upload was checked with Playwright. Composer still needs the known issue 04 workaround.
 - **28:** minisign interoperability checked against the format, not the CLI (not installable here); no real repository reachable (fake transport); the maintenance banner is large at phone width. Composer still needs the known issue 04 workaround (scratch copy, phpstan from a shallow clone of tag 2.3.5).
 
 
@@ -205,6 +209,7 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Notes for the next session
 
+- Session 30+: see `deploy-status/29-module-packages/README.md` and `docs/packages.md`: `security:check` should verify that `modules/`, `themes/` and `app/Config/` are not writable by the web user and that `writable/packages` is not served, warn when `packages.requireSignature` is off in production or `packages.publicKeys` is empty, and report `packages.autoEnable`; refused packages are `package_refused` security log entries. Session 35: merge `Modules\Core\Packages\SignatureCheck` and `Modules\Updates\Services\SignatureVerifier`. D-29-01 and D-29-02 are Open (decide).
 - Session 29+: see `deploy-status/28-updates/README.md` and `docs/updates.md`: `SignatureVerifier` (minisign) and `ReleaseSource` can serve signed module packages and modules' `$repository`; maintenance mode by hand through `MaintenanceMode::enableByHand()` (superadmin bypass only for that mode); session 30: warn when `updates.repository` is set without `updates.publicKeys`, check `writable/updates` permissions; session 36: release procedure (archive + `.sha256` + `.minisig`, signed tag). D-28-01 and D-28-02 decided (Decisions 28).
 
 
