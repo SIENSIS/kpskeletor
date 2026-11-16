@@ -102,7 +102,13 @@ final class OutboundClient
                 throw new OutboundException(OutboundException::REASON_REDIRECTS, 'Too many redirects.');
             }
 
-            $url = self::absolute((string) $response->header('location'), $url);
+            $next = self::absolute((string) $response->header('location'), $url);
+
+            if (self::origin($next) !== self::origin($url)) {
+                $headers = self::withoutCredentials($headers);
+            }
+
+            $url = $next;
 
             if ($response->status === 303 || (in_array($response->status, [301, 302], true) && $method === 'POST')) {
                 $method = 'GET';
@@ -157,6 +163,33 @@ final class OutboundClient
         }
 
         return [$host, $port, $addresses[0]];
+    }
+
+    /**
+     * Headers that carry credentials are never sent to another origin (a redirect from an API
+     * to a storage host must not leak the API token).
+     */
+    public const CREDENTIAL_HEADERS = ['authorization', 'proxy-authorization', 'cookie', 'private-token', 'job-token'];
+
+    /**
+     * @param array<string, string> $headers
+     *
+     * @return array<string, string>
+     */
+    public static function withoutCredentials(array $headers): array
+    {
+        return array_filter($headers, static fn (string $name): bool => ! in_array(strtolower($name), self::CREDENTIAL_HEADERS, true), ARRAY_FILTER_USE_KEY);
+    }
+
+    private static function origin(string $url): string
+    {
+        $parts = parse_url($url);
+
+        if (! is_array($parts)) {
+            return '';
+        }
+
+        return strtolower(($parts['scheme'] ?? '') . '://' . ($parts['host'] ?? '') . ':' . ($parts['port'] ?? 443));
     }
 
     /**
