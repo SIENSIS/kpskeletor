@@ -19,4 +19,9 @@ final class NullCalendar implements CalendarPublisher
     {
         return false;
     }
+
+    public function purgeModule(string $module): int
+    {
+        return 0;
+    }
 }

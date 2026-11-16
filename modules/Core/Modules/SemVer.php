@@ -168,6 +168,14 @@ final class SemVer
         return [(int) $m[1], (int) ($m[2] ?? 0), (int) ($m[3] ?? 0), $m[4] ?? '', $given];
     }
 
+    /**
+     * -1, 0 or 1 as $a is lower than, equal to or higher than $b (pre-releases sort first).
+     */
+    public static function compare(string $a, string $b): int
+    {
+        return version_compare(self::normalise($a), self::normalise($b));
+    }
+
     private static function normalise(string $version): string
     {
         [$major, $minor, $patch, $pre] = self::parts($version);

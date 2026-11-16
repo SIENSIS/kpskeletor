@@ -47,6 +47,7 @@ final class ModuleSynchronizer
         private readonly ?ThemeValidator $themes = null,
         private readonly ?AssetPublisher $assets = null,
         private readonly ?OpenApiDocument $openApi = null,
+        private readonly ?bool $autoEnable = null,
     ) {
     }
 
@@ -102,6 +103,7 @@ final class ModuleSynchronizer
         $registry = $this->registry ?? model(ModuleModel::class, false);
         $known    = $registry->allByName();
         $now      = Time::now()->toDateTimeString();
+        $enable   = $this->enablesNewModules($known === []);
 
         foreach ($report->order as $name) {
             $manifest = $manifests[$name];
@@ -114,7 +116,7 @@ final class ModuleSynchronizer
                 $registry->insert([
                     'name'         => $name,
                     'version'      => $manifest->version,
-                    'enabled'      => 1,
+                    'enabled'      => $enable || $name === 'Core' ? 1 : 0,
                     'installed_at' => $now,
                     'updated_at'   => $now,
                 ]);
@@ -239,6 +241,20 @@ final class ModuleSynchronizer
         $resolver->order($manifests);
 
         return [$manifests, array_merge($errors, $resolver->errors())];
+    }
+
+    /**
+     * Whether modules found for the first time are enabled (D-29-02): always on the first sync of
+     * an installation and outside production; in production only with `Packages.autoEnable`.
+     * A module installed with `modules:install --enable` is enabled by the installer.
+     */
+    private function enablesNewModules(bool $firstSync): bool
+    {
+        if ($this->autoEnable !== null) {
+            return $this->autoEnable || $firstSync;
+        }
+
+        return $firstSync || ENVIRONMENT !== 'production' || (bool) config('Packages')->autoEnable;
     }
 
     private function seed(string $module): bool

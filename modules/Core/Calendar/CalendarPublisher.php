@@ -26,4 +26,11 @@ interface CalendarPublisher
      * @return bool whether the calendar changed
      */
     public function unpublish(string $module, string $key): bool;
+
+    /**
+     * Deletes every event of `$module` for good (the module is being uninstalled; docs/packages.md).
+     *
+     * @return int how many events were deleted
+     */
+    public function purgeModule(string $module): int;
 }
