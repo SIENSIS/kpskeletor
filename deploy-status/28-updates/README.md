@@ -1,6 +1,6 @@
 # Session 28 — Updates module and app:update
 
-Branch: `ccr-a5d307ea-vyzp92` · Pull request: (see `docs/progress.md`) · Date: 2026-11-16
+Branch: `ccr-a5d307ea-vyzp92` · Pull request: [SIENSIS/kpskeletor#36](https://github.com/SIENSIS/kpskeletor/pull/36) · Date: 2026-11-16
 
 ## What was built
 
