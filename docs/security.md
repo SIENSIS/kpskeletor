@@ -149,3 +149,32 @@ backslashes, `javascript:`, `data:`, `https://site@evil`, control characters) go
 
 See `docs/outbound-requests.md`: `OutboundClient` (HTTPS, allow-list, private addresses refused
 after DNS and redirects) and the SMTP host check.
+
+## Maintenance mode
+
+`Modules\Core\Maintenance\MaintenanceMode` (D-27-02) keeps its state in
+`writable/maintenance.json`. While it is on, the global `maintenance` filter (the first one)
+answers 503 with `Retry-After` and a page that reads no database, except the paths given when it
+was turned on (a restore allows only `progress/backup/*`); `schedule:run` and the poor man's cron
+do nothing. Paths under `progress/*` return the JSON progress of long jobs and skip the filters
+that read the database or the session (`moduleenabled`, `cspmodules`, `authsession`,
+`csrftoken`); they must never return secrets. Restores turn it on and off (docs/backup-restore.md);
+session 28 adds the setting and the screen.
+
+## Archives
+
+ZIP files from outside (backups, module packages) are read only through
+`Modules\Core\Archive\SafeZip`: entry names are checked on their stored bytes (relative, `/` only,
+no `..`/`.`/empty segments, no control characters or drive letters, under the allowed prefixes),
+symbolic links are refused, and the number of entries, the total uncompressed size and the
+compression ratio of each entry are limited before anything is extracted; sizes are enforced again
+while copying, and each file is written by the class itself with the given permissions. A restore
+never writes server code or server configuration into a public disk.
+
+## Backups
+
+Backups contain `.env` and every secret, so they are always encrypted with a password of at least
+12 characters that is never stored (Argon2id + libsodium secretstream), created `0640` in
+`writable/backups` (never served) and downloaded or restored only after re-authentication;
+restore is superadmin-only by default. See `docs/backup-restore.md`.
+
