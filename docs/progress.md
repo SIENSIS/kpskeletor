@@ -33,7 +33,7 @@ pull request open), *merged* (in `main`).
 | 23 | Files module: file picker, upload tokens and avatars | merged | `claude/wizardly-meitner-t9fp4s` | [SIENSIS/kpskeletor#31](https://github.com/SIENSIS/kpskeletor/pull/31) | [`deploy-status/23-files-picker/`](../deploy-status/23-files-picker/README.md) |
 | 24 | Events module: calendar, administration and audiences | merged | `claude/gallant-curie-rmfn7k` | [SIENSIS/kpskeletor#32](https://github.com/SIENSIS/kpskeletor/pull/32) | [`deploy-status/24-events-core/`](../deploy-status/24-events-core/README.md) |
 | 25 | Events module: iCal feeds and calendar API | merged | `claude/awesome-feynman-p4kb32` | [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) | [`deploy-status/25-events-ical-api/`](../deploy-status/25-events-ical-api/README.md) |
-| 26 | Core API endpoints | done | `claude/keen-allen-cq2rvw` | PR_LINK | [`deploy-status/26-core-api/`](../deploy-status/26-core-api/README.md) |
+| 26 | Core API endpoints | done | `claude/keen-allen-cq2rvw` | [SIENSIS/kpskeletor#34](https://github.com/SIENSIS/kpskeletor/pull/34) | [`deploy-status/26-core-api/`](../deploy-status/26-core-api/README.md) |
 
 ## MVP review (session 19)
 

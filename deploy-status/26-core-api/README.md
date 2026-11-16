@@ -1,6 +1,6 @@
 # Session 26 — Core API endpoints
 
-Branch: `claude/keen-allen-cq2rvw` · Pull request: PR_LINK · Date: 2026-11-16
+Branch: `claude/keen-allen-cq2rvw` · Pull request: [SIENSIS/kpskeletor#34](https://github.com/SIENSIS/kpskeletor/pull/34) · Date: 2026-11-16
 
 ## What was built
 
