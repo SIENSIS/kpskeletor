@@ -78,7 +78,7 @@ final class CatalogueBuilderTest extends CIUnitTestCase
             [
                 'modules.list', 'modules.toggle', 'modules.sync', 'modules.upload', 'modules.uninstall', 'modules.demo',
                 'core-notifications.list', 'core-notifications.show', 'core-notifications.delete', 'core-notifications.read',
-                'schedule.list', 'schedule.show', 'schedule.run', 'settings.core',
+                'maintenance.manage', 'schedule.list', 'schedule.show', 'schedule.run', 'settings.core',
             ],
             array_keys($catalogue),
         );
