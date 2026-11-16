@@ -225,4 +225,5 @@ or horizontal scroll: none).
   of `writable/backups` (0750/0640) and `writable/maintenance.json`; `progress/*` routes return no
   secrets.
 - New convention: `progress/*` paths skip the filters that read the database or the session.
-- Decisions D-27-01, D-27-02 and D-27-05 are Open (decide): run `deploy/decide.md`.
+- Decisions D-27-01, D-27-02 and D-27-05 were decided as built (Decisions 27) and applied to the
+  specification, `CLAUDE.md` and `deploy/28`–`30`.

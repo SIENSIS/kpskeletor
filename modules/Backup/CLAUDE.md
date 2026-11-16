@@ -10,7 +10,7 @@ Full description: `docs/backup-restore.md`.
   `backup.list` (list and verify), `backup.show`, `backup.delete`, extras `backup.create`,
   `backup.download` (+ `reauth`), `backup.restore` (+ `reauth`; also "upload a backup file").
 - Default grants: admin `backup.list`, `backup.show`, `backup.create`; the rest only superadmin
-  (D-27-01, Open).
+  (D-27-01, decided).
 - URLs: `backend/backups` (kpcrudy list), `create`, `verify/<id>`, `download/<id>`,
   `recover/<id>` (restore; `restore/<id>` is kpcrudy's trash URL), `upload`, `jobs/<job>`; `progress/backup/<job>` (JSON, no session/database,
   reachable in maintenance mode). Masked ids use the context `backups`.
@@ -38,8 +38,8 @@ Full description: `docs/backup-restore.md`.
 ## Decisions
 
 D-27-01 (names/URLs/settings/grants), D-27-02 (maintenance mode, `progress/*`) and D-27-05
-(uploads outside the Storage service) are Open (decide); D-27-03, D-27-04, D-27-06 … D-27-09
-accepted; D-00-45, D-00-46, D-00-47, D-00-39.
+(uploads outside the Storage service) decided by the owner as built (Decisions 27); D-27-03,
+D-27-04, D-27-06 … D-27-09 accepted; D-00-45, D-00-46, D-00-47, D-00-39.
 
 ## Open tasks
 

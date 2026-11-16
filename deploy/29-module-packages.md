@@ -47,7 +47,9 @@ Managing modules and themes from the UI and the console.
 - `modules:install <zip|url>` (validation: single folder, manifest, zip-slip, symlinks, extensions,
   sizes, zip bombs, `php -l`, optional signatures with publisher keys in
   `Modules\Core\Config\Packages`, HTTPS + allow-list for URLs), atomic move,
-  backup, maintenance; staged installs (`writable/packages`, approval, `--pending`, expiry);
+  backup (`BackupService::create()`), maintenance (`MaintenanceMode`); ZIPs read only through
+  `Modules\Core\Archive\SafeZip` (session 27: zip-slip, links, entry count, size, ratio);
+  staged installs (`writable/packages`, approval, `--pending`, expiry);
   `modules:uninstall [--keep-data]`; `themes:install|uninstall`.
 - Tests: acceptance criterion 3 including refused packages.
 

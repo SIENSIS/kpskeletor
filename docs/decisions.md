@@ -232,11 +232,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-26-04 | 26 | The OpenAPI document written by `modules:sync` | Accepted (proposal) |
 | D-26-05 | 26 | Calendar access policies and providers in the events API | Accepted (proposal) |
 | D-26-06 | 26 | `make:module --api` needs `--crud` | Accepted (proposal) |
-| D-27-01 | 27 | Backup permission names, URLs, settings and default grants (decide) | Open |
-| D-27-02 | 27 | Maintenance mode now, as a file and a global filter, and the `progress/*` paths (decide) | Open |
+| D-27-01 | 27 | Backup permission names, URLs, settings and default grants (decide) | Applied (decided) |
+| D-27-02 | 27 | Maintenance mode now, as a file and a global filter, and the `progress/*` paths (decide) | Applied (decided) |
 | D-27-03 | 27 | The database dump: Query Builder only, schema from the backup's own migrations | Accepted (proposal) |
 | D-27-04 | 27 | Restores from the back office: a job after the response, progress in files | Accepted (proposal) |
-| D-27-05 | 27 | Uploaded backup files are not stored through the Storage service (decide) | Open |
+| D-27-05 | 27 | Uploaded backup files are not stored through the Storage service (decide) | Applied (decided) |
 | D-27-06 | 27 | The safety backup, a failed restore and the `.env` | Accepted (proposal) |
 | D-27-07 | 27 | `SafeZip` in the Core; what a restore never writes | Accepted (proposal) |
 | D-27-08 | 27 | What the modules' `$backup` declarations mean | Accepted (proposal) |
@@ -2422,8 +2422,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The specification names the permissions but not the URLs, the settings, the extra `show` permission of the list's detail view, who verifies or uploads, nor the default grants.
 - **Proposal:** One resource `backups` named `backup` (single-resource module): `backup.list` (list and **verify**), `backup.show` (detail view, from kpcrudy), `backup.delete`, extras `backup.create`, `backup.download` (+ `reauth`) and `backup.restore` (+ `reauth`; also **upload a backup file**, which is only useful to restore). URLs: `backend/backups` (list, kpcrudy), `backend/backups/create`, `verify/<id>`, `download/<id>`, `recover/<id>` (restore; `restore/<id>` is kpcrudy's own trash URL), `upload`, `jobs/<job>` (result of a restore) and `progress/backup/<job>` (JSON progress, D-27-02). Settings: `Backup.scheduled` (bool, off), `Backup.scheduledType` (`full`/`db`), `Backup.keepDaily` 7, `Backup.keepWeekly` 4, `Backup.keepMonthly` 6 (0 in the three keeps everything). Default grants: admin `backup.list`, `backup.show`, `backup.create`; download, delete and restore only for the superadmin (a downloaded backup holds every secret of `.env`; an administrator who could create *and* download would get the encryption key with a password of their own).
 - **Alternatives:** A) Admin also gets `backup.download` (an admin then holds every secret). B) Verify under `backup.download` (verifying reveals nothing but the manifest). C) A separate `backup.upload` permission.
-- **Status:** Open
-- **Applied in:** `modules/Backup/Config/{Module,Routes}.php`, `modules/Backup/Controllers/Backups.php`; tests `BackupScreensTest`, `BackupModuleTest::testManifestAndGrants`.
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com s'ha construït (recomanada)». The permission names, URLs, settings and default grants stay as built: admin `backup.list`, `backup.show`, `backup.create`; download, delete and restore only for the superadmin; verify under `backup.list`, upload under `backup.restore`; restore URL `backend/backups/recover/<id>`.
+- **Applied in:** `docs/specification.md` ("Backup": URLs, permissions, grants, settings), `modules/Backup/Config/{Module,Routes}.php`, `modules/Backup/Controllers/Backups.php`; tests `BackupScreensTest`, `BackupModuleTest::testManifestAndGrants`.
 
 ## D-27-02 — Maintenance mode now, as a file and a global filter, and the `progress/*` paths (decide)
 
@@ -2431,8 +2432,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** A restore must enter maintenance mode, which session 28 was to build with its setting. A setting lives in the database, which the restore replaces; the restore's progress must stay reachable while every other page answers 503, and its endpoint cannot use the session or the database.
 - **Proposal:** `Modules\Core\Maintenance\MaintenanceMode` keeps the state in `writable/maintenance.json` (reason, since, allowed paths), and the global filter `maintenance` (first global filter) answers 503 + `Retry-After: 60` with a plain page that reads nothing from the database (JSON for API and JSON requests), except the paths given when it was turned on. `schedule:run` and the poor man's cron do nothing meanwhile; the console works. New convention: `progress/*` paths serve the JSON progress of long jobs; `moduleenabled`, `cspmodules`, `authsession` and `csrftoken` skip them (they read the database or the session). Session 28 adds the setting/screen (turning it on by hand, a superadmin bypass) on top of this class.
 - **Alternatives:** A) Store the state as a setting (lost while the database is replaced). B) Wait for session 28 and restore without maintenance mode (users write to a database being replaced). C) Exempt the restore's own back-office page instead of a `progress/*` endpoint (needs the session and the database).
-- **Status:** Open
-- **Applied in:** `modules/Core/Maintenance/MaintenanceMode.php`, `modules/Core/Filters/Maintenance.php`, `modules/Core/Views/errors/maintenance.php`, `modules/Core/Config/Registrar.php`, `app/Config/Filters.php`, `modules/Core/Commands/ScheduleRun.php`, `modules/Core/Filters/PoorMansCron.php`; test `MaintenanceModeTest`.
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com s'ha construït (recomanada)». Maintenance mode stays in the Core as a file (`writable/maintenance.json`) and the global `maintenance` filter, built now; `progress/*` paths are a convention (JSON progress read from files, no session/database filters, never secrets). Session 28 adds the setting, the screen and the superadmin bypass on top of `MaintenanceMode`.
+- **Applied in:** `docs/specification.md` ("RBAC" backend chain, "Settings", "Backup"), `CLAUDE.md`, `deploy/28-updates.md`, `deploy/30-security-check.md`, `docs/security.md`, `modules/Core/Maintenance/MaintenanceMode.php`, `modules/Core/Filters/Maintenance.php`, `app/Config/Filters.php`; test `MaintenanceModeTest`.
 
 ## D-27-03 — The database dump: Query Builder only, schema from the backup's own migrations
 
@@ -2458,8 +2460,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The Storage service stores into its disks with a `stored_files` row; backups live in `writable/backups` (outside both disks, never served, not backed up themselves) and a restore replaces `stored_files`.
 - **Proposal:** "Upload a backup" (`backup.restore` + `reauth` + `ratelimit:uploads`) accepts only a file that starts with a valid backup header (`ArchiveCrypto::isBackup()`) and is at most `Config\Backup::$maxUploadBytes`, moves it into `writable/backups` with a generated name (`backup-<date>-upload-<random>.kpbackup`, 0640) and records it; nothing in it is used before it is decrypted and authenticated with its password. Refusals are security entries.
 - **Alternatives:** A) A third Storage disk `backups` (its rows would be lost by every restore; the backup would have to exclude it). B) Only the console can bring backups from elsewhere (copy the file into `writable/backups`).
-- **Status:** Open
-- **Applied in:** `modules/Backup/Controllers/Backups.php` (`upload()`), `modules/Backup/Services/ArchiveCrypto.php`.
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com s'ha construït (recomanada)». Uploaded backup files are a documented exception to "uploads through the Storage service only": header check, size limit, generated name, `writable/backups` (0640), never served, nothing used before decryption and authentication; refusals are security entries.
+- **Applied in:** `docs/specification.md` ("Backup"), `CLAUDE.md`, `docs/storage.md`, `deploy/30-security-check.md`, `modules/Backup/Controllers/Backups.php` (`upload()`).
 
 ## D-27-06 — The safety backup, a failed restore and the `.env`
 
