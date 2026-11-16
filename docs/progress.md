@@ -34,7 +34,8 @@ pull request open), *merged* (in `main`).
 | 24 | Events module: calendar, administration and audiences | merged | `claude/gallant-curie-rmfn7k` | [SIENSIS/kpskeletor#32](https://github.com/SIENSIS/kpskeletor/pull/32) | [`deploy-status/24-events-core/`](../deploy-status/24-events-core/README.md) |
 | 25 | Events module: iCal feeds and calendar API | merged | `claude/awesome-feynman-p4kb32` | [SIENSIS/kpskeletor#33](https://github.com/SIENSIS/kpskeletor/pull/33) | [`deploy-status/25-events-ical-api/`](../deploy-status/25-events-ical-api/README.md) |
 | 26 | Core API endpoints | merged | `claude/keen-allen-cq2rvw` | [SIENSIS/kpskeletor#34](https://github.com/SIENSIS/kpskeletor/pull/34) | [`deploy-status/26-core-api/`](../deploy-status/26-core-api/README.md) |
-| 27 | Backup module | done | `claude/blissful-feynman-0ypdap` | [SIENSIS/kpskeletor#35](https://github.com/SIENSIS/kpskeletor/pull/35) | [`deploy-status/27-backup/`](../deploy-status/27-backup/README.md) |
+| 27 | Backup module | merged | `claude/blissful-feynman-0ypdap` | [SIENSIS/kpskeletor#35](https://github.com/SIENSIS/kpskeletor/pull/35) | [`deploy-status/27-backup/`](../deploy-status/27-backup/README.md) |
+| 28 | Updates module and app:update | done | `ccr-a5d307ea-vyzp92` | PR_LINK | [`deploy-status/28-updates/`](../deploy-status/28-updates/README.md) |
 
 ## MVP review (session 19)
 
@@ -68,6 +69,8 @@ removed), `Modules\Core\Text\Slugger` and `Modules\Core\Security\HtmlSanitizer` 
 translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Decisions
+
+- **28:** Updates module (`docs/updates.md`): releases read from GitHub/GitLab through `OutboundClient` (`ReleaseSource`), newest semver tag (D-28-05), result in `writable/updates/status.json` (D-28-01), widget `updates.version`, notification `NewVersion` once per version, page `backend/updates` with safe release notes, daily task, `updates:check`; `app:update` verifies the archive (SHA-256 + minisign Ed25519, `SignatureVerifier`) or the git tag **before** maintenance mode, then backup, code (protected paths, replaced files kept), composer, `modules:sync`, caches (D-28-03, D-28-04). Maintenance mode by hand in Settings › Actions and `app:maintenance` with a message and a superadmin bypass (D-28-02). D-28-01 and D-28-02 open (decide); D-28-03 … D-28-06 accepted.
 
 
 - **26:** Core API endpoints as kpapy resources with the web's visibility rules: News (`POST news/{id}/read`, `GET news/notices`), Events (`events`, `occurrences`, `calendars`; `Services/EventsApi.php`), Core notifications (`notifications`, `unread`, `read`, `read-all`), public `public/news` and `public/events` (GET only, no resolver, per IP, D-26-02). New permissions `news-api.read`, `core-notifications.read`, `events-api.list|show` (133; D-26-01 decided as built, Decisions 26). Read markers not logged (D-26-03). `ApiAuditor` in `permissions:check`; OpenAPI copy `writable/api/openapi.json` on `modules:sync` (D-26-04); access policies and providers in the events API (D-26-05); `make:module --crud=<table> --api` (D-26-06, D-19-03 applied).
@@ -121,6 +124,8 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Deviations from the specification
 
+- **28:** `app:update` downloads and verifies the release before turning maintenance mode on (the spec lists maintenance first; D-28-04); maintenance mode is not a stored setting but a card in Settings › Actions (D-28-02); the first archive update can only warn about local changes. **Earlier gap fixed:** `OutboundClient` forwarded credential headers on cross-origin redirects (D-28-06).
+
 
 - **26:** acceptance criterion 10's `news-posts.list` token is `news-api.list` (D-17-01); read markers are not in the activity log (D-26-03); public endpoints have no catalogue resource (D-26-02). Earlier gap fixed: the News API's `pinned` was a string (`fieldType('pinned', 'boolean')` is kpcrudy's name; kpapy's is `bool`).
 - **25:** the export URL is `…/event/{code}/export.ics` next to the details pages, not the plan's `events/{code}/export.ics` (D-25-01); the feed URL is shown only once (it is stored hashed, D-25-02); the subscription screen is an Events page in the user menu, not part of Auth's profile; the birthdays calendar is off by default.
@@ -160,6 +165,8 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 
 ## Known issues
 
+- **28:** minisign interoperability checked against the format, not the CLI (not installable here); no real repository reachable (fake transport); the maintenance banner is large at phone width; an administrator who turns maintenance on loses access until a superadmin or the console turns it off (D-28-02). Composer still needs the known issue 04 workaround (scratch copy, phpstan from a shallow clone of tag 2.3.5).
+
 
 - **27 (Decisions 27):** D-27-01 (Backup permissions/URLs/settings/grants), D-27-02 (maintenance mode in the Core now, `progress/*` paths) and D-27-05 (backup uploads outside the Storage service) decided by the owner as built and applied to the specification, `CLAUDE.md` and sessions 28–30; the back-office restore runs inside the request without FastCGI (`php spark serve`, mod_php); "upload a backup" has no feature test (`is_uploaded_file()`); a backup does not list its own row after being restored (shown as found); kpcrudy's development route check refused `backend/backups/restore/<id>` (its trash URL), so the restore URL is `recover/<id>`; **earlier gap fixed:** `AuthSession` failed (500) when a session's tracking row vanished (D-27-09). Composer still needs the known issue 04 workaround (scratch copy, phpstan from a shallow clone of tag 2.3.5).
 - **26:** existing sites must grant `events-api.*` in the permission matrix after updating (default grants are applied once per module); provider events are only in `events/occurrences`; the docs page shows kpapy's generic response codes for custom operations. **Composer (known issue 04), new finding:** the environment's proxy replaces any GitHub credentials with its own and only allows API downloads for the repositories attached to the session, so `COMPOSER_AUTH` is never used and `phpstan/phpstan` (zip only) cannot be downloaded; with the owner's authorisation (2026-11-16) `composer install --prefer-source` ran in a scratch copy whose lock pointed phpstan at a shallow clone of the tag `2.3.5` (the lock's commit) and `vendor/` was moved in (project files unchanged).
@@ -197,6 +204,8 @@ translation fallback, group audience and publish workflow (`docs/plan.md`).
 - The 56 open questions from `docs/plan.md` are decided and applied (`docs/decisions.md`).
 
 ## Notes for the next session
+
+- Session 29+: see `deploy-status/28-updates/README.md` and `docs/updates.md`: `SignatureVerifier` (minisign) and `ReleaseSource` can serve signed module packages and modules' `$repository`; maintenance mode by hand through `MaintenanceMode::enableByHand()` (superadmin bypass only for that mode); session 30: warn when `updates.repository` is set without `updates.publicKeys`, check `writable/updates` permissions; session 36: release procedure (archive + `.sha256` + `.minisig`, signed tag). D-28-01 and D-28-02 open (decide).
 
 
 - Session 27+: see `deploy-status/26-core-api/README.md` and `docs/api.md` ("Core endpoints"): a module's API resource with `make:module --crud=<table> --api` or by copying `modules/News/Controllers/Api/Posts.php` (private) / `PublicNews.php` (public); `permissions:check` refuses a kpapy resource route without its `$api` entry; `writable/api/openapi.json` is generated (not backed up). D-26-01 decided as built (Decisions 26).
