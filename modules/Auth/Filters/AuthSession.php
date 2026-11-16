@@ -124,7 +124,8 @@ final class AuthSession implements FilterInterface
             $row = $tracker->start($user, false);
         }
 
-        if ($row['ended_at'] !== null) {
+        // A row just started (e.g. its tracking row vanished with a database restore) has no `ended_at`.
+        if (($row['ended_at'] ?? null) !== null) {
             $this->endPhpSession();
             $tracker->forgetSelector($row['remember_selector'] ?? null);
 
