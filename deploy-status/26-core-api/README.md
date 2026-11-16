@@ -152,11 +152,11 @@ New tests (36) and updated ones:
 
 Results:
 
-- `vendor/bin/phpunit`: PHPUNIT_RESULT
+- `vendor/bin/phpunit`: **OK (1086 tests, 6418 assertions)** in 10 min (one order-dependent failure found on the way and fixed: `ApiTestCase` now resets CodeIgniter's shared negotiator per request, so `Accept-Language` is the current request's; `NotificationsApiTest` checks a Catalan and then an English request).
 - `vendor/bin/phpstan analyse`: **[OK] No errors**.
 - `vendor/bin/php-cs-fixer fix --dry-run --diff`: **0 files** to fix.
 - `php spark permissions:check`: **Permissions OK: 133 permission(s) in the catalogue, 261 route(s) checked.**
-- `php spark csp:check`: CSP_RESULT
+- `php spark csp:check`: **No inline scripts, handlers or styles in the project views.** `php spark assets:publish --check`: up to date.
 - `php spark modules:sync`: OpenAPI document written once, then "Nothing to do".
 - `php spark security:check`: does not exist yet (session 30).
 - Screenshot script: no CSP violation, no page error, no horizontal scroll.
