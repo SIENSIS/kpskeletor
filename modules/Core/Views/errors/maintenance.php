@@ -2,7 +2,9 @@
 /**
  * Maintenance mode page (503, Modules\Core\Filters\Maintenance). Plain HTML on purpose: while the
  * mode is on the database may be replaced (a restore), so nothing here reads settings, the theme
- * or the database.
+ * or the database. `$message` is the administrator's plain-text message (MaintenanceMode).
+ *
+ * @var string $message
  */
 ?>
 <!doctype html>
@@ -16,7 +18,7 @@
 <body>
 <main>
     <h1><?= esc(lang('Core.maintenance.title')) ?></h1>
-    <p><?= esc(lang('Core.maintenance.message')) ?></p>
+    <p><?= esc(($message ?? '') !== '' ? $message : lang('Core.maintenance.message')) ?></p>
 </main>
 </body>
 </html>

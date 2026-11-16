@@ -9,6 +9,7 @@ use Modules\Core\Cache\CacheClearer;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Frontend\AssetPublisher;
 use Modules\Core\Mail\MailQueue;
+use Modules\Core\Maintenance\MaintenanceMode;
 use Modules\Core\Modules\CacheInvalidator;
 use Modules\Settings\Services\SettingsTabs;
 use Throwable;
@@ -22,7 +23,11 @@ use Throwable;
  *   widgets, assets, modules) and the theme registry; never the whole cache store, which also
  *   holds the rate limiter's counters;
  * - publish assets (`settings.security` + re-authentication): modules' and themes' assets into
- *   `public/assets/…` and `public/themes/` only (D-00-33), like `php spark assets:publish`.
+ *   `public/assets/…` and `public/themes/` only (D-00-33), like `php spark assets:publish`;
+ * - maintenance mode on/off (`settings.security` + re-authentication; D-28-02): the Core's
+ *   `MaintenanceMode` turned on by hand (an optional message, the login paths open, signed-in
+ *   superadmins keep using the site); a mode turned on by a restore or an update is not turned
+ *   off from here.
  */
 final class Actions extends BackendController
 {
@@ -37,6 +42,8 @@ final class Actions extends BackendController
             'email'       => (string) auth()->user()?->email,
             'pending'     => $this->pendingEmails(),
             'canPublish'  => $this->can('settings.security'),
+            'maintenance' => (new MaintenanceMode())->state(),
+            'messageMax'  => MaintenanceMode::MESSAGE_MAX,
         ]);
     }
 
@@ -84,6 +91,42 @@ final class Actions extends BackendController
         security_log('Settings', 'assets_published', ['resource' => 'settings', 'changes' => ['owners' => $changes]]);
 
         return $this->back('success', lang('Settings.actions.assetsPublished', [array_sum(array_diff_key($changes, ['manifest' => 0]))]));
+    }
+
+    public function maintenance(): RedirectResponse
+    {
+        $mode  = new MaintenanceMode();
+        $state = $mode->state();
+
+        if ($this->request->getPost('state') === 'on') {
+            $message = (string) $this->request->getPost('message');
+
+            if (mb_strlen(trim($message)) > MaintenanceMode::MESSAGE_MAX) {
+                return $this->back('error', lang('Settings.actions.maintenanceTooLong', [MaintenanceMode::MESSAGE_MAX]));
+            }
+
+            if ($state !== null && $state['reason'] !== MaintenanceMode::REASON_MANUAL) {
+                return $this->back('error', lang('Settings.actions.maintenanceBusy'));
+            }
+
+            $mode->enableByHand($message);
+            security_log('Settings', 'maintenance_on', ['resource' => 'settings', 'summary' => MaintenanceMode::cleanMessage($message)]);
+
+            return $this->back('success', lang('Settings.actions.maintenanceEnabled'));
+        }
+
+        if ($state === null) {
+            return $this->back('success', lang('Settings.actions.maintenanceDisabled'));
+        }
+
+        if ($state['reason'] !== MaintenanceMode::REASON_MANUAL) {
+            return $this->back('error', lang('Settings.actions.maintenanceBusy'));
+        }
+
+        $mode->disable();
+        security_log('Settings', 'maintenance_off', ['resource' => 'settings']);
+
+        return $this->back('success', lang('Settings.actions.maintenanceDisabled'));
     }
 
     private function pendingEmails(): int
