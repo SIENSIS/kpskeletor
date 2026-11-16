@@ -151,9 +151,9 @@ superadmin bypass only with a session and only for a mode turned on by hand, the
 `OutboundClientTest::testCredentialsAreNotSentToAnotherOrigin`.
 
 ```text
-vendor/bin/phpunit                    OK (1162 tests, 6995 assertions)   [baseline: 1122 tests]
+vendor/bin/phpunit                    OK (1164 tests, 7005 assertions)   [baseline: 1122 tests]
 vendor/bin/phpstan analyse            [OK] No errors (level 6)
-vendor/bin/php-cs-fixer fix --dry-run Found 0 of 858 files that can be fixed
+vendor/bin/php-cs-fixer fix --dry-run Found 0 of 859 files that can be fixed
 php spark permissions:check           Permissions OK: 142 permission(s) in the catalogue, 279 route(s) checked.
 php spark csp:check                   No inline scripts, handlers or styles in the project views.
 php spark modules:sync                (run by app:install) Updates: default grants applied (2 added).
