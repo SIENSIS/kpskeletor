@@ -194,4 +194,7 @@ return [
         'backend_custom_deleted'   => 'Deleted a custom group or link of the back-office menu',
         'custom_forbidden'         => 'Refused: custom menu link without permission',
     ],
+    'uninstall' => [
+        'removed' => 'Menus: {0} customisations and items removed.',
+    ],
 ];

@@ -72,4 +72,7 @@ return [
         'group_layout_saved' => 'Disposición del panel de un grupo guardada',
         'widget_forbidden'   => 'Datos de un widget denegados',
     ],
+    'uninstall' => [
+        'removed' => 'Panel: {0} widgets quitados de las disposiciones de los grupos.',
+    ],
 ];

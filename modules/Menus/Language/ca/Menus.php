@@ -194,4 +194,7 @@ return [
         'backend_custom_deleted'   => 'Ha suprimit un grup o enllaç propi del menú del back-office',
         'custom_forbidden'         => 'Refusat: enllaç propi de menú sense permís',
     ],
+    'uninstall' => [
+        'removed' => 'Menús: {0} personalitzacions i elements esborrats.',
+    ],
 ];

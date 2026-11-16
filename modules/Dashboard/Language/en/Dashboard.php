@@ -72,4 +72,7 @@ return [
         'group_layout_saved' => 'Dashboard group layout saved',
         'widget_forbidden'   => 'Widget data refused',
     ],
+    'uninstall' => [
+        'removed' => 'Dashboard: {0} widgets removed from the group layouts.',
+    ],
 ];
