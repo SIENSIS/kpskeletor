@@ -50,5 +50,8 @@ $routes->group('backend', ['namespace' => 'Modules\Core\Controllers'], static fu
 
 CrudFactory::routes($routes, 'core-notifications', 'backend/notifications', '\Modules\Core\Controllers\Notifications::index');
 
+// The same notifications in the API (D-26-01; token required).
+\Kpapy\Resource::routes($routes, 'api/v1/notifications', '\Modules\Core\Controllers\Api\Notifications::index', ['filter' => 'kpapy']);
+
 // Scheduled tasks (schedule.list / schedule.show / schedule.run for "run now").
 CrudFactory::routes($routes, 'schedule', 'backend/schedule', '\Modules\Core\Controllers\Schedule::index');

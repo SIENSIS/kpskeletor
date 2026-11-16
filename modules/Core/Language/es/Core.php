@@ -66,6 +66,8 @@ return [
         'pruneList' => 'Ningún módulo genera ya estos permisos: {0}.',
         'pruneConfirm' => '¿Eliminar estos {0} permisos y las concesiones que los nombran?',
         'assets'      => '{0}: recursos publicados ({1} archivo(s) cambiados).',
+        'openApi'        => 'Documento OpenAPI escrito en writable/api/openapi.json ({0} ruta(s)).',
+        'openApiWarning' => 'La API no se ha podido describir: {0}',
     ],
     'list' => [
         'module'        => 'Módulo',
@@ -101,6 +103,10 @@ return [
         'crudFailed' => 'No se ha podido generar el CRUD: {0}. El módulo se ha creado; corrija el problema y ejecute la orden indicada arriba.',
         'crudCreated' => 'Se ha creado el CRUD {0}: {1} (ruta backend/{2}).',
         'crudNext' => 'Siguiente paso: php spark modules:sync y adapte el CRUD en {0} (campos, relaciones, hideFields(), where()) y sus pruebas.',
+        'apiNeedsCrud' => '--api necesita --crud=<tabla>: el recurso de la API es el de la tabla del CRUD.',
+        'apiGenerating' => 'Escribiendo el recurso de la API con php spark kpapy:make {0}…',
+        'apiFailed' => 'No se ha podido generar el recurso de la API: {0}. El módulo y el CRUD se han creado; corregid el problema y ejecutad el comando indicado.',
+        'apiCreated' => 'Recurso de la API {0} creado: {1} (ruta {2}).',
     ],
     'cancelled' => 'Cancelado: no se ha cambiado nada.',
     'res' => [
@@ -146,6 +152,7 @@ return [
         'uninstall' => 'Desinstalar módulos',
         'demo'      => 'Cargar y eliminar datos de demostración',
         'run' => 'Ejecutar ahora las tareas programadas',
+        'markRead'  => 'Marcar como leídas (API)',
     ],
     'toggle' => [
         'coreModule'           => '{0} es un módulo del núcleo y no se puede desactivar.',
@@ -633,5 +640,14 @@ return [
         'corsOrigins' => '«{0}» no es un origen válido: use https://host[:port] (http:// solo para localhost).',
         'uploadTypes' => '«{0}» no puede ser un tipo de archivo permitido.',
         'minConfig' => 'El valor no puede ser inferior a {0}, el mínimo del archivo de configuración.',
+    ],
+    'api' => [
+        'notifications' => [
+            'summary' => 'Notificaciones',
+            'description' => 'Las notificaciones del usuario del token (la campanita), en el idioma de la petición.',
+            'unread' => 'El número de notificaciones no leídas.',
+            'read' => 'Marca la notificación como leída.',
+            'readAll' => 'Marca todas las notificaciones como leídas.',
+        ],
     ],
 ];

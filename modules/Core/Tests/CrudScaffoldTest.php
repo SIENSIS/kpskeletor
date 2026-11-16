@@ -10,6 +10,7 @@ use Config\Database;
 use Kpcrudy\Generator\CrudGenerator;
 use Modules\Core\Config\ModuleManifest;
 use Modules\Core\Controllers\BackendController;
+use Modules\Core\Modules\ApiScaffold;
 use Modules\Core\Modules\CrudScaffold;
 use Modules\Core\Modules\ManifestValidator;
 use Modules\Core\Modules\ModuleGenerator;
@@ -142,5 +143,37 @@ final class CrudScaffoldTest extends CIUnitTestCase
         file_put_contents($path, $content);
 
         return $path;
+    }
+
+    public function testWithApiTheTemplatesDeclareTheResourceAndItsScopeTest(): void
+    {
+        $name  = $this->uniqueModuleName();
+        $lower = strtolower($name);
+        $path  = (new ModuleGenerator($this->tempRoot()))->generate($name, $lower . '_books', true);
+
+        $manifest = (string) file_get_contents($path . '/Config/Module.php');
+        $this->assertStringContainsString("'books' => ['path' => '{$lower}/books', 'handler' => '\\\\Modules\\\\{$name}\\\\Controllers\\\\Api\\\\Books::index']", $manifest);
+
+        $test = (string) file_get_contents($path . "/Tests/{$name}ApiTest.php");
+        $this->assertStringContainsString("'api/v1/{$lower}/books'", $test);
+        $this->assertStringContainsString("['{$lower}-books.list']", $test);
+
+        service('autoloader')->addNamespace('Modules\\' . $name, $path);
+        $class = "Modules\\{$name}\\Config\\Module";
+        $this->assertSame(['books' => ['path' => $lower . '/books', 'handler' => "\\Modules\\{$name}\\Controllers\\Api\\Books::index"]], (new $class())->api);
+
+        $this->assertSame([
+            'kpapy:make', 'news_posts',
+            '--namespace', 'Modules\\News',
+            '--controller', 'Api/Posts',
+            '--route', 'api/v1/news/posts',
+            '--resource', 'news-posts',
+            '--filter', 'kpapy',
+            '--extends', 'CodeIgniter\\Controller',
+        ], ApiScaffold::makeArguments('News', 'news_posts'));
+        $this->assertSame("<?php\n\ndeclare(strict_types=1);\nnamespace A;\nfinal class B extends C {}\n", ApiScaffold::rewriteController("<?php\nnamespace A;\nclass B extends C {}\n"));
+
+        $this->expectException(\InvalidArgumentException::class);
+        (new ModuleGenerator($this->tempRoot()))->generate($name . 'Y', null, true);
     }
 }

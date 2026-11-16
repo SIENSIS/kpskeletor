@@ -14,7 +14,9 @@ use Modules\Core\Config\ModuleManifest;
  *   event, not only those of the user's audience or created by them) and `duplicate`;
  * - `categories` (kpcrudy): the categories;
  * - `calendar` (page): the calendar view, the event details and the user's reminders (`view`),
- *   granted to every group.
+ *   granted to every group;
+ * - `api` (D-26-01): the `events` API resource (`events-api.list`, `events-api.show`), every
+ *   group; `api/v1/public/events` is public (no token, no permission, public events only).
  *
  * Configuration: `Config/Calendar.php` (D-00-04, D-24-05). The calendar API (`service('calendar')`,
  * other modules' `$calendars` and `$calendarProviders`) and the iCal feeds: docs/calendar-api.md,
@@ -45,18 +47,23 @@ final class Module extends ModuleManifest
             'label' => 'Events.res.calendar',
             'type'  => 'page',
         ],
+        'api' => [
+            'label'  => 'Events.res.api',
+            'type'   => 'crud',
+            'except' => ['add', 'edit', 'delete', 'export', 'import', 'trash', 'restore', 'purge'],
+        ],
     ];
 
     public array $defaultGrants = [
-        'superadmin' => ['events-calendar.*'],
-        'admin'      => ['events-events.*', 'events-categories.*', 'events-calendar.*'],
+        'superadmin' => ['events-calendar.*', 'events-api.*'],
+        'admin'      => ['events-events.*', 'events-categories.*', 'events-calendar.*', 'events-api.*'],
         'editor'     => [
             'events-events.list', 'events-events.show', 'events-events.add', 'events-events.edit',
             'events-events.delete', 'events-events.duplicate', 'events-events.export', 'events-events.import',
             'events-categories.list', 'events-categories.show',
-            'events-calendar.*',
+            'events-calendar.*', 'events-api.*',
         ],
-        'user' => ['events-calendar.*'],
+        'user' => ['events-calendar.*', 'events-api.*'],
     ];
 
     public array $menu = [
@@ -93,6 +100,8 @@ final class Module extends ModuleManifest
      */
     public array $calendars = [];
 
-    /** No API resource yet: `events` is a Core endpoint of session 26. */
-    public array $api = [];
+    public array $api = [
+        'events'        => ['path' => 'events', 'handler' => '\Modules\Events\Controllers\Api\Events::index'],
+        'public-events' => ['path' => 'public/events', 'handler' => '\Modules\Events\Controllers\Api\PublicEvents::index'],
+    ];
 }

@@ -16,7 +16,9 @@ use Modules\Core\Config\ModuleManifest;
  * - `categories` (kpcrudy): the categories;
  * - `mine` (kpcrudy, "My posts"): the posts of the signed-in author, `where()` pattern;
  * - `read` (page, D-00-42): the reader screen every group gets (`news-read.view`);
- * - `api` (D-17-01): the `news` API resource (`news-api.list`, `news-api.show`), every group.
+ * - `api` (D-17-01): the `news` API resource (`news-api.list`, `news-api.show`, and `news-api.read`
+ *   for `POST api/v1/news/{id}/read`, D-26-01), every group.
+ *   `api/v1/public/news` (D-26-01) is public: no token, no permission, public posts only.
  *
  * No `import`: posts and categories are written through the forms (sanitised body, slugs).
  */
@@ -59,6 +61,9 @@ final class Module extends ModuleManifest
             'label'  => 'News.res.api',
             'type'   => 'crud',
             'except' => ['add', 'edit', 'delete', 'export', 'import', 'trash', 'restore', 'purge'],
+            'extra'  => [
+                'read' => 'News.perm.read',
+            ],
         ],
     ];
 
@@ -126,6 +131,7 @@ final class Module extends ModuleManifest
     ];
 
     public array $api = [
-        'news' => ['path' => 'news', 'handler' => '\Modules\News\Controllers\Api\Posts::index'],
+        'news'        => ['path' => 'news', 'handler' => '\Modules\News\Controllers\Api\Posts::index'],
+        'public-news' => ['path' => 'public/news', 'handler' => '\Modules\News\Controllers\Api\PublicNews::index'],
     ];
 }

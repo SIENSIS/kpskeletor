@@ -58,6 +58,7 @@ return [
         'events'     => 'Eventos',
         'categories' => 'Categorías de eventos',
         'calendar'   => 'Calendario',
+        'api'        => 'API del calendario',
     ],
     'perm' => [
         'all'       => 'Ver y gestionar todos los eventos',
@@ -235,5 +236,14 @@ return [
         'noSource' => 'El módulo {0} no declara ninguna fuente de calendario: no hay nada que sincronizar.',
         'failed'   => 'No se ha podido sincronizar el calendario de {0}: {1}',
         'done'     => '{0}: {1} evento(s) publicados o actualizados, {2} sin cambios, {3} eliminados.',
+    ],
+    'api' => [
+        'summary' => 'Eventos',
+        'description' => 'Los eventos que ve el usuario del token (públicos, privados y los restringidos a su audiencia), con la recurrencia como regla.',
+        'publicSummary' => 'Eventos públicos',
+        'publicDescription' => 'Los eventos públicos, como el calendario público. Sin token; limitado por IP.',
+        'occurrences' => 'Las ocurrencias de un intervalo (?start=AAAA-MM-DD&end=AAAA-MM-DD, opcionalmente &calendars=a,b y &category=<slug>), con las recurrencias desplegadas.',
+        'calendars' => 'Los calendarios que puede ver el usuario.',
+        'unknownCategory' => 'Esta categoría no existe.',
     ],
 ];

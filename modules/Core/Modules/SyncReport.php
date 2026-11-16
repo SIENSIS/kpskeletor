@@ -54,6 +54,14 @@ final class SyncReport
      */
     public array $assets = [];
 
+    /** Whether `writable/api/openapi.json` was (re)written. */
+    public bool $openApiChanged = false;
+
+    public int $openApiPaths = 0;
+
+    /** @var list<string> resources kpapy could not describe (path: error) */
+    public array $openApiWarnings = [];
+
     /** @var list<string> modules whose demo data was loaded */
     public array $demoLoaded = [];
 
@@ -77,7 +85,8 @@ final class SyncReport
             || $this->pruned !== []
             || $this->grantsApplied !== []
             || $this->declarationsChanged
-            || $this->assets !== [];
+            || $this->assets !== []
+            || $this->openApiChanged;
     }
 
     /**
@@ -135,6 +144,14 @@ final class SyncReport
             if ($owner !== 'manifest') {
                 $lines[] = lang('Core.sync.assets', [$owner, $count]);
             }
+        }
+
+        if ($this->openApiChanged) {
+            $lines[] = lang('Core.sync.openApi', [$this->openApiPaths]);
+        }
+
+        foreach ($this->openApiWarnings as $warning) {
+            $lines[] = lang('Core.sync.openApiWarning', [$warning]);
         }
 
         if ($this->pruned !== []) {

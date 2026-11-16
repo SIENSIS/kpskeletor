@@ -1059,12 +1059,19 @@ and kpapy do not depend on each other: the skeleton is what makes them share per
     (setting) and can be refreshed.
 * **Core endpoints** (each one a kpapy resource with the same visibility rules as the web):
   * `me`: profile, preferences, language, avatar URL (signed, valid for one hour, private);
-  * `news`: list and details (public, private and group news the user can see), `POST
-    news/{id}/read` (mark as read), notices for the user;
-  * `events`: events by date range and calendars (published and provider events), with
-    `restricted` audiences respected;
-  * `notifications`: list, unread count, mark one/all as read;
-  * `public/news` and `public/events`: public read-only endpoints without a token (rate-limited).
+  * `news`: list and details (public, private and group news the user can see; `news-api.list`,
+    `news-api.show`), `POST news/{id}/read` (mark as read; `news-api.read`), `GET news/notices`
+    (the user's notices, `?unread=1`);
+  * `events` (resource `events-api`: `list`, `show`): the stored events, `GET
+    events/occurrences?start=&end=[&calendars=][&category=]` (a date range, recurrences expanded,
+    published and provider events) and `GET events/calendars`, with `restricted` audiences,
+    calendar permissions and access policies respected;
+  * `notifications` (`core-notifications.*`): list and details, `GET notifications/unread`,
+    `POST notifications/{id}/read` and `POST notifications/read-all` (`core-notifications.read`);
+  * `public/news[/{id}]` and `public/events[/{id}|/occurrences]`: public read-only endpoints
+    without a token (`GET` only, no permission, public records only, rate-limited per IP).
+  * The API permissions are granted to every group; a token limited to listing gets `403` on any
+    write.
 * **Modules expose their own resources** with routes in their own `Config/Routes.php` under
   `api/v1/<path>` (written by `kpapy:make` or `make:module --api`), and declare them in the
   manifest (`$api`: path and the handling controller method). `$api` is metadata: `modules:sync`
@@ -1342,8 +1349,9 @@ field declares how it works:
 * **Reader screen:** a read-only back-office screen (resource `news-read`, `type: page`,
   permission `news-read.view` granted to every group) that lists the posts the user may see, with
   the detail page and "mark as read"; ordinary users never need `news-posts.list`.
-* **API:** resource `news-api` (`list`, `show`, granted to every group; `api/v1/news`): the
-  posts the token's user may read, with the reader screen's visibility rules. Settings
+* **API:** resource `news-api` (`list`, `show`, `read`, granted to every group; `api/v1/news`,
+  `api/v1/news/notices`, `POST api/v1/news/{id}/read`): the posts the token's user may read, with
+  the reader screen's visibility rules; `api/v1/public/news` for public posts without a token. Settings
   `News.perPage` (public list) and `News.feedItems` (RSS).
 * **Images inside the body:** the editor's "Insert image" button opens the file picker (see
   "Files"); the body keeps only images of the site itself.
@@ -1374,7 +1382,8 @@ field declares how it works:
   and written by kpcrudy itself).
 * **Permissions and URLs:** `events-events.*` (CRUD with import, extras `all` and `duplicate`),
   `events-categories.*` (CRUD without import or trash), `events-calendar.view` (every group:
-  calendar, details and reminders). Back office `backend/events`, `backend/events/categories`,
+  calendar, details and reminders), `events-api.list`/`.show` (every group: the `api/v1/events`
+  resource). Back office `backend/events`, `backend/events/categories`,
   `backend/calendar`, `backend/calendar/feed?start=&end=`, `backend/calendar/event/{code}`,
   `POST backend/calendar/event/{code}/reminder`; public `calendar`, `calendar/feed` (rate-limited,
   public events only) and `calendar/event/{code}` (`{code}` = masked id).

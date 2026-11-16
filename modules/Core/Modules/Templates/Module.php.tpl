@@ -47,7 +47,7 @@ final class Module extends \Modules\Core\Config\ModuleManifest
     public array $backup = [];
 
     /** API resources (kpapy, `api/v1/<path>`, docs/api.md), e.g. ['{{name}}' => ['path' => '{{name}}', 'handler' => '\\Modules\\{{Name}}\\Controllers\\Api\\Items::index']]. */
-    public array $api = [];
+    public array $api = [{{apiEntry}}];
 
     /** Extra Content-Security-Policy sources per directive (docs/frontend.md), e.g. ['img-src' => ['https://tiles.example.com']]. */
     public array $csp = [];

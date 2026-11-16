@@ -91,14 +91,83 @@ final class NewsApiTest extends ApiTestCase
         $this->api('GET', 'api/v1/news', null, $this->tokenFor($user, ['news-read.view']))->assertStatus(403);
     }
 
+    public function testMarkingAPostAsReadNeedsTheReadScopeAndAReadablePost(): void
+    {
+        $user    = $this->createUser('ana@example.com', 'user');
+        $visible = $this->newsPost('Visible', 'private');
+        $hidden  = $this->newsPost('Amagada', 'groups', ['editor']);
+        $token   = $this->tokenFor($user);
+        $path    = 'api/v1/news/' . Crud::maskId($visible, 'news');
+
+        $first = $this->api('POST', $path . '/read', null, $token);
+        $first->assertStatus(200);
+        $this->assertSame(['read' => true, 'marked' => true], $this->json($first)['data']);
+        $this->assertSame(['read' => true, 'marked' => false], $this->json($this->api('POST', $path . '/read', null, $token))['data']);
+        $this->assertTrue($this->json($this->api('GET', $path, null, $token))['data']['read']);
+
+        // A post the user may not read is not found, and nothing is written.
+        $this->api('POST', 'api/v1/news/' . Crud::maskId($hidden, 'news') . '/read', null, $token)->assertStatus(404);
+        $this->assertSame(0, db_connect()->table('news_reads')->where('news_id', $hidden)->countAllResults());
+    }
+
+    /**
+     * Acceptance criterion 10 (API part): a token limited to listing can list but gets 403 on any write.
+     */
+    public function testATokenLimitedToListingCannotWrite(): void
+    {
+        $user  = $this->createUser('ana@example.com', 'admin');
+        $id    = $this->newsPost('Visible', 'private');
+        $token = $this->tokenFor($user, ['news-api.list']);
+        $path  = 'api/v1/news/' . Crud::maskId($id, 'news');
+
+        $this->api('GET', 'api/v1/news', null, $token)->assertStatus(200);
+        $this->api('POST', $path . '/read', null, $token)->assertStatus(403);
+        $this->assertContains($this->api('POST', 'api/v1/news', ['title' => 'Nova'], $token)->response()->getStatusCode(), [403, 405]);
+        $this->assertContains($this->api('PATCH', $path, ['title' => 'Canviada'], $token)->response()->getStatusCode(), [403, 405]);
+        $this->assertContains($this->api('DELETE', $path, null, $token)->response()->getStatusCode(), [403, 405]);
+        $this->assertSame(0, db_connect()->table('news_reads')->countAllResults());
+        $this->assertSame(1, db_connect()->table('news')->where('deleted_at', null)->countAllResults());
+    }
+
+    public function testTheSuperadminsTokenIsLimitedByItsScopesToo(): void
+    {
+        $user = $this->createUser('root@example.com', 'superadmin');
+        $id   = $this->newsPost('Visible', 'private');
+
+        $this->api('POST', 'api/v1/news/' . Crud::maskId($id, 'news') . '/read', null, $this->tokenFor($user, ['news-api.list']))->assertStatus(403);
+        $this->api('POST', 'api/v1/news/' . Crud::maskId($id, 'news') . '/read', null, $this->tokenFor($user, ['news-api.read']))->assertStatus(200);
+    }
+
+    public function testNoticesAreTheUsersReadableNoticesWithTheirReadState(): void
+    {
+        $user    = $this->createUser('ana@example.com', 'user');
+        $read    = $this->newsPost('Avís llegit', 'private', [], 'published', 'notice');
+        $this->newsPost('Avís nou', 'private', [], 'published', 'notice');
+        $this->newsPost('Avís editors', 'groups', ['editor'], 'published', 'notice');
+        $this->newsPost('Article', 'private');
+        $token = $this->tokenFor($user);
+        $this->api('POST', 'api/v1/news/' . Crud::maskId($read, 'news') . '/read', null, $token)->assertStatus(200);
+
+        $all = $this->json($this->api('GET', 'api/v1/news/notices', null, $token))['data'];
+        $titles = array_column($all, 'read', 'title');
+        ksort($titles);
+        $this->assertSame(['Avís llegit' => true, 'Avís nou' => false], $titles);
+        $this->assertSame(Crud::maskId($read, 'news'), array_column($all, 'id', 'title')['Avís llegit']);
+
+        $unread = $this->json($this->api('GET', 'api/v1/news/notices?unread=1', null, $token))['data'];
+        $this->assertSame(['Avís nou'], array_column($unread, 'title'));
+
+        $this->api('GET', 'api/v1/news/notices', null, $this->tokenFor($user, ['activity-mine.list']))->assertStatus(403);
+    }
+
     /**
      * @param list<string> $groups
      */
-    private function newsPost(string $title, string $visibility, array $groups = [], string $status = 'published'): int
+    private function newsPost(string $title, string $visibility, array $groups = [], string $status = 'published', string $type = 'article'): int
     {
         $db = db_connect();
         $db->table('news')->insert([
-            'slug' => url_title(strtolower($title), '-', true), 'type' => 'article', 'priority' => 'info', 'pinned' => 0,
+            'slug' => url_title(strtolower($title), '-', true), 'type' => $type, 'priority' => 'info', 'pinned' => 0,
             'visibility' => $visibility, 'status' => $status, 'published_at' => date('Y-m-d H:i:s', time() - 3600),
         ]);
         $id = (int) $db->insertID();

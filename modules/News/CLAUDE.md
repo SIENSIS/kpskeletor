@@ -13,13 +13,14 @@ description: `docs/news.md`.
 - `news-mine` (crud − `import`, `export`, trash; extra `publish`): "My posts" (`where()`).
 - `news-categories` (crud − `import`, trash).
 - `news-read` (page: `view`): the reader screen.
-- `news-api` (crud − everything but `list`, `show`): the `news` API resource (D-17-01).
+- `news-api` (crud − everything but `list`, `show`; extra `read`, D-26-01): the `news` API resource (D-17-01).
 - Grants: admin all; editor posts list/show/add/edit/publish, categories list/show, `news-mine.*`,
   `news-read.*`, `news-api.*`; user and superadmin `news-read.*`, `news-api.*`.
 - Settings `News.perPage`, `News.feedItems`. Menu: "News" (reader) with "All posts", "My posts",
   "Categories". Widgets `news.notices`, `news.latest`. Task `Tasks/ExpireNotices.php`.
   Notification `Notifications/NewNotice.php`. Link type `Menu/CategoryLink.php`. API
-  `Controllers/Api/Posts.php` (`api/v1/news`).
+  `Controllers/Api/Posts.php` (`api/v1/news`, `news/notices`, `POST news/{id}/read`) and
+  `Controllers/Api/PublicNews.php` (`api/v1/public/news`, no token, D-26-02).
 - Tables: `news_categories`, `news_category_translations`, `news`, `news_translations`,
   `news_groups` (surrogate `id`, unique pair), `news_reads` (one migration each).
 
@@ -54,7 +55,7 @@ Tests `Tests/NoticeCalendarTest.php`. D-25-06.
 ## Open tasks
 
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
-- Session 26: read receipts and notices in the API.
+- Done in session 26: read receipts and notices in the API, public news (D-26-01 decided as built).
 
 ## How to test
 

@@ -58,6 +58,7 @@ return [
         'events'     => 'Esdeveniments',
         'categories' => 'Categories d’esdeveniments',
         'calendar'   => 'Calendari',
+        'api'        => 'API del calendari',
     ],
     'perm' => [
         'all'       => 'Veure i gestionar tots els esdeveniments',
@@ -235,5 +236,14 @@ return [
         'noSource' => 'El mòdul {0} no declara cap font de calendari: no hi ha res a sincronitzar.',
         'failed'   => 'No s\'ha pogut sincronitzar el calendari de {0}: {1}',
         'done'     => '{0}: {1} esdeveniment(s) publicats o actualitzats, {2} sense canvis, {3} eliminats.',
+    ],
+    'api' => [
+        'summary' => 'Esdeveniments',
+        'description' => 'Els esdeveniments que veu l’usuari del token (públics, privats i els restringits a la seva audiència), amb la recurrència com a regla.',
+        'publicSummary' => 'Esdeveniments públics',
+        'publicDescription' => 'Els esdeveniments públics, com el calendari públic. Sense token; limitat per IP.',
+        'occurrences' => 'Les ocurrències d’un interval (?start=AAAA-MM-DD&end=AAAA-MM-DD, opcionalment &calendars=a,b i &category=<slug>), amb les recurrències desplegades.',
+        'calendars' => 'Els calendaris que pot veure l’usuari.',
+        'unknownCategory' => 'Aquesta categoria no existeix.',
     ],
 ];

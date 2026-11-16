@@ -118,6 +118,19 @@ final class CrudPermissionsTest extends RbacTestCase
         (new CrudPermissions())->allows('news-categories', 'list', null, $crud);
     }
 
+    public function testUndeclaredApiOperationsFailLoudlyOutsideProduction(): void
+    {
+        $api = (new Resource())->setTable('modules')->setResource('news-categories')->readOnly()
+            ->addOperation('archive', static fn (): null => null);
+
+        $this->assertSame(['archive'], (new CrudPermissions())->undeclared('news-categories', $api));
+
+        Context::set($this->createUser('editor@example.com', 'editor'));
+        $this->expectException(UndeclaredPermissionException::class);
+        $this->expectExceptionMessage('archive');
+        (new CrudPermissions())->allows('news-categories', 'list', null, $api);
+    }
+
     /**
      * A CRUD over the `modules` table named like the fake News categories (no trash, no export).
      */

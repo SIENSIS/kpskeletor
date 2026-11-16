@@ -49,6 +49,9 @@ abstract class ApiTestCase extends TwoFactorTestCase
     {
         Services::resetSingle('response');
         Services::resetSingle('auth');
+        // The shared negotiator keeps the first request it was built with (one request per
+        // process in production): a fresh one reads this request's Accept-Language.
+        Services::resetSingle('negotiator');
         Context::reset();
         $_SESSION = [];
         service('superglobals')->setCookieArray([]);

@@ -17,6 +17,8 @@ use Modules\Core\Config\Version;
  * With a CRUD table (`make:module <Name> --crud=<table>`) the migration creates that table and
  * the manifest, menu and language files declare its `crud` resource (`CrudScaffold`); the
  * controller and route are then written by `kpcrudy:make` and rewritten to the Core's factory.
+ * With `--api` too, the manifest declares the kpapy resource in `$api`, a scope test is written
+ * (`Tests/<Name>ApiTest.php`) and `kpapy:make` writes the controller and route (`ApiScaffold`).
  */
 final class ModuleGenerator
 {
@@ -75,9 +77,13 @@ final class ModuleGenerator
      *
      * @throws \InvalidArgumentException when the name is invalid or the module exists
      */
-    public function generate(string $name, ?string $crudTable = null): string
+    public function generate(string $name, ?string $crudTable = null, bool $api = false): string
     {
         $error = $this->nameError($name) ?? ($crudTable !== null ? CrudScaffold::tableError($crudTable) : null);
+
+        if ($error === null && $api && $crudTable === null) {
+            $error = lang('Core.make.apiNeedsCrud');
+        }
 
         if ($error !== null) {
             throw new \InvalidArgumentException($error);
@@ -95,6 +101,7 @@ final class ModuleGenerator
             '{{table}}'          => $table,
             '{{migrationClass}}' => 'Create' . ($crudTable === null ? $name . 'Items' : str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))),
             ...CrudScaffold::templateValues($name, $crudTable),
+            ...ApiScaffold::templateValues($name, $api ? $crudTable : null),
         ];
 
         $path = $this->root . '/' . $name;
@@ -102,6 +109,11 @@ final class ModuleGenerator
         foreach (self::FILES as $template => $target) {
             $content = (string) file_get_contents(__DIR__ . '/Templates/' . $template);
             $this->write($path . '/' . strtr($target, $replace), strtr($content, $replace));
+        }
+
+        if ($api && $crudTable !== null) {
+            $content = (string) file_get_contents(__DIR__ . '/Templates/ApiTest.php.tpl');
+            $this->write($path . '/Tests/' . $name . 'ApiTest.php', strtr($content, $replace));
         }
 
         foreach (self::FOLDERS as $folder) {

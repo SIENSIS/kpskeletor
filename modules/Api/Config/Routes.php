@@ -27,7 +27,12 @@ $routes->group('api/v1', static function (RouteCollection $routes): void {
     $routes->post('auth/token/refresh', '\Modules\Api\Controllers\LoginController::refresh', $token);
     $routes->get('me/tokens', '\Kpapy\Auth\TokenController::index', $token);
     $routes->delete('me/tokens/(:num)', '\Kpapy\Auth\TokenController::delete/$1', $token);
-    $routes->get('me', '\Modules\Api\Controllers\Me::index', $token + ['as' => 'api-me']);
+    $routes->get('me', '\Modules\Api\Controllers\Me::index', $token + ['as' => 'api-me', 'openapi' => [
+        'tags'      => ['Account'],
+        'summary'   => 'Current user',
+        'description' => 'The token\'s user: masked id, name, email, language, time zone, colour mode, avatar URL, groups, 2FA method and the token\'s name, scopes and expiry.',
+        'responses' => ['200' => ['description' => 'The authenticated user']],
+    ]]);
 
     // CORS preflights of the endpoints above (answered by the filter).
     foreach (['auth/token', 'auth/token/verify', 'auth/token/refresh', 'me', 'me/tokens', 'me/tokens/(:num)'] as $path) {

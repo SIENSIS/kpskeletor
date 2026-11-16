@@ -51,6 +51,12 @@ final class ActivityLabelsTest extends CIUnitTestCase
 
         foreach (glob(ROOTPATH . 'modules/*/Controllers/{,*/}*.php', GLOB_BRACE) ?: [] as $file) {
             $source = (string) file_get_contents($file);
+
+            // kpapy resources are not kpcrudy CRUDs: `AuditedCrud` does not log their operations
+            // (their writes log themselves; read markers are not logged, D-26-03).
+            if (str_contains($source, 'use Kpapy\\Resource;') && ! str_contains($source, 'renderCrud(')) {
+                continue;
+            }
             $module = basename(dirname($file, str_contains($file, '/Controllers/Api/') ? 3 : 2));
             $skipped = [];
 

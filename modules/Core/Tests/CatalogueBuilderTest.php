@@ -77,7 +77,7 @@ final class CatalogueBuilderTest extends CIUnitTestCase
         $this->assertSame(
             [
                 'modules.list', 'modules.toggle', 'modules.sync', 'modules.upload', 'modules.uninstall', 'modules.demo',
-                'core-notifications.list', 'core-notifications.show', 'core-notifications.delete',
+                'core-notifications.list', 'core-notifications.show', 'core-notifications.delete', 'core-notifications.read',
                 'schedule.list', 'schedule.show', 'schedule.run', 'settings.core',
             ],
             array_keys($catalogue),

@@ -66,6 +66,8 @@ return [
         'pruneList' => 'Cap mòdul no genera ja aquests permisos: {0}.',
         'pruneConfirm' => 'Voleu eliminar aquests {0} permisos i les concessions que els anomenen?',
         'assets'      => '{0}: recursos publicats ({1} fitxer(s) canviats).',
+        'openApi'        => 'Document OpenAPI escrit a writable/api/openapi.json ({0} camí/camins).',
+        'openApiWarning' => 'L’API no s’ha pogut descriure: {0}',
     ],
     'list' => [
         'module'        => 'Mòdul',
@@ -101,6 +103,10 @@ return [
         'crudFailed' => 'No s’ha pogut generar el CRUD: {0}. El mòdul s’ha creat; corregiu el problema i executeu l’ordre indicada a dalt.',
         'crudCreated' => 'S’ha creat el CRUD {0}: {1} (ruta backend/{2}).',
         'crudNext' => 'Següent pas: php spark modules:sync i adapteu el CRUD a {0} (camps, relacions, hideFields(), where()) i les seves proves.',
+        'apiNeedsCrud' => '--api necessita --crud=<taula>: el recurs de l’API és el de la taula del CRUD.',
+        'apiGenerating' => 'S’està escrivint el recurs de l’API amb php spark kpapy:make {0}…',
+        'apiFailed' => 'No s’ha pogut generar el recurs de l’API: {0}. El mòdul i el CRUD s’han creat; corregiu el problema i executeu l’ordre indicada.',
+        'apiCreated' => 'Recurs de l’API {0} creat: {1} (ruta {2}).',
     ],
     'cancelled' => 'Cancel·lat: no s\'ha canviat res.',
     'res' => [
@@ -146,6 +152,7 @@ return [
         'uninstall' => 'Desinstal·lar mòduls',
         'demo'      => 'Carregar i eliminar dades de demostració',
         'run' => 'Executar ara les tasques programades',
+        'markRead'  => 'Marcar com a llegides (API)',
     ],
     'toggle' => [
         'coreModule'           => '{0} és un mòdul del nucli i no es pot desactivar.',
@@ -633,5 +640,14 @@ return [
         'corsOrigins' => '«{0}» no és un origen vàlid: feu servir https://host[:port] (http:// només per a localhost).',
         'uploadTypes' => '«{0}» no pot ser un tipus de fitxer permès.',
         'minConfig' => 'El valor no pot ser inferior a {0}, el mínim del fitxer de configuració.',
+    ],
+    'api' => [
+        'notifications' => [
+            'summary' => 'Notificacions',
+            'description' => 'Les notificacions de l’usuari del token (la campaneta), en l’idioma de la petició.',
+            'unread' => 'El nombre de notificacions no llegides.',
+            'read' => 'Marca la notificació com a llegida.',
+            'readAll' => 'Marca totes les notificacions com a llegides.',
+        ],
     ],
 ];
