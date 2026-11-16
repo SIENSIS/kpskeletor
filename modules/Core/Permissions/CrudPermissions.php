@@ -85,6 +85,19 @@ final class CrudPermissions implements CrudResolver, ApiResolver
      */
     public function undeclared(string $resource, object $crud): array
     {
+        return $this->missing($resource, $crud->permissionCatalogue());
+    }
+
+    /**
+     * Operations of a list (`permissionCatalogue()` of a CRUD or API resource, or kpapy's
+     * description of one) that the catalogue does not declare for the resource.
+     *
+     * @param list<string> $catalogue
+     *
+     * @return list<string>
+     */
+    public function missing(string $resource, array $catalogue): array
+    {
         $declared = [];
 
         foreach (array_keys($this->catalogue->stored()) as $name) {
@@ -93,9 +106,9 @@ final class CrudPermissions implements CrudResolver, ApiResolver
             }
         }
 
-        $asked = array_diff($crud->permissionCatalogue(), self::LIST_OPERATIONS);
+        $asked = array_diff($catalogue, self::LIST_OPERATIONS);
 
-        if (array_intersect(['search', 'filters', 'bulk'], $crud->permissionCatalogue()) !== []) {
+        if (array_intersect(self::LIST_OPERATIONS, $catalogue) !== []) {
             $asked[] = 'list';
         }
 

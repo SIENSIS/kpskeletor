@@ -6,25 +6,31 @@ namespace Modules\Core\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
+use Modules\Core\Modules\ApiScaffold;
 use Modules\Core\Modules\CrudScaffold;
 use Modules\Core\Modules\ModuleDiscovery;
 use Modules\Core\Modules\ModuleGenerator;
 use Modules\Core\Modules\NamespaceFile;
 
 /**
- * php spark make:module <Name> [--crud=<table>]
+ * php spark make:module <Name> [--crud=<table>] [--api]
  *
  * With `--crud`, the migration creates that table, the manifest declares its `crud` resource
  * (`<module>-<key>`), the table is migrated and `php spark kpcrudy:make` writes the controller and
  * the route, which are then rewritten to `CrudFactory` (`CrudScaffold`, D-00-09). kpcrudy:make
  * runs as its own process: it reads its options from the command line.
+ *
+ * With `--api` (needs `--crud`, D-19-03), `php spark kpapy:make` writes the API resource of the same
+ * table (`api/v1/<module>/<key>`, `setResource()` = the CRUD's resource, `kpapy` filter), the
+ * manifest declares it in `$api` and `Tests/<Name>ApiTest.php` checks the token and its scopes
+ * (`ApiScaffold`).
  */
 final class MakeModule extends BaseCommand
 {
     protected $group       = 'Modules';
     protected $name        = 'make:module';
     protected $description = 'Generates a module in modules/<Name> (optionally with a kpcrudy CRUD) and registers its namespace.';
-    protected $usage       = 'make:module <Name> [--crud=<table>]';
+    protected $usage       = 'make:module <Name> [--crud=<table>] [--api]';
 
     /** @var array<string, string> */
     protected $arguments = [
@@ -34,6 +40,7 @@ final class MakeModule extends BaseCommand
     /** @var array<string, string> */
     protected $options = [
         '--crud' => 'Table of a kpcrudy CRUD to generate (e.g. news_posts): migration, resource, controller and route',
+        '--api'  => 'With --crud: also the kpapy API resource of the table (api/v1/<module>/<key>), its $api entry and a scope test',
     ];
 
     /**
@@ -52,8 +59,13 @@ final class MakeModule extends BaseCommand
         $crud  = ModulesSync::option($params, 'crud');
         $table = is_string($crud) ? trim($crud) : null;
 
+        $api       = ModulesSync::option($params, 'api') !== null;
         $generator = new ModuleGenerator();
         $error     = $generator->nameError($name) ?? ($table !== null ? CrudScaffold::tableError($table) : null);
+
+        if ($error === null && $api && $table === null) {
+            $error = lang('Core.make.apiNeedsCrud');
+        }
 
         if ($crud === true || $error !== null) {
             CLI::error($error ?? lang('Core.make.invalidTable', ['']));
@@ -61,13 +73,15 @@ final class MakeModule extends BaseCommand
             return EXIT_ERROR;
         }
 
-        $path = $generator->generate($name, $table);
+        $path = $generator->generate($name, $table, $api);
         (new NamespaceFile())->write((new ModuleDiscovery())->folders());
 
         CLI::write(lang('Core.make.created', [$name, clean_path($path)]), 'green');
 
         if ($table !== null) {
-            return $this->crud($name, $table, $path);
+            $status = $this->crud($name, $table, $path);
+
+            return $status === EXIT_SUCCESS && $api ? $this->api($name, $table, $path) : $status;
         }
 
         CLI::write(lang('Core.make.next'));
@@ -108,6 +122,29 @@ final class MakeModule extends BaseCommand
 
         CLI::write(lang('Core.make.crudCreated', [$resource, clean_path($controller), strtolower($name) . '/' . CrudScaffold::resourceKey($name, $table)]), 'green');
         CLI::write(lang('Core.make.crudNext', [clean_path($controller)]));
+
+        return EXIT_SUCCESS;
+    }
+
+    /**
+     * Runs kpapy:make for the module's table and rewrites the controller it wrote.
+     */
+    private function api(string $name, string $table, string $path): int
+    {
+        $arguments = ApiScaffold::makeArguments($name, $table);
+
+        CLI::write(lang('Core.make.apiGenerating', [implode(' ', array_map(escapeshellarg(...), array_slice($arguments, 1)))]));
+
+        if (($error = $this->spark($arguments)) !== null) {
+            CLI::error(lang('Core.make.apiFailed', [$error]));
+
+            return EXIT_ERROR;
+        }
+
+        $controller = $path . '/Controllers/' . ApiScaffold::controller($name, $table) . '.php';
+        file_put_contents($controller, ApiScaffold::rewriteController((string) file_get_contents($controller)));
+
+        CLI::write(lang('Core.make.apiCreated', [CrudScaffold::resource($name, $table), clean_path($controller), 'api/v1/' . ApiScaffold::path($name, $table)]), 'green');
 
         return EXIT_SUCCESS;
     }

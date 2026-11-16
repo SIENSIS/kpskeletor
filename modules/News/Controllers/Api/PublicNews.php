@@ -38,7 +38,7 @@ final class PublicNews extends Controller
             ->setTranslations('news_translations', 'news_id', 'locale', ['title', 'summary', 'body'], array_keys(PostsCrud::LOCALES), ['required' => ['ca']])
             ->fields(['id', 'slug', 'type', 'priority', 'pinned', 'category', 'title', 'summary', 'body', 'cover_url', 'url', 'published_at', 'expires_at'])
             ->listFields(['id', 'slug', 'type', 'priority', 'pinned', 'category', 'title', 'summary', 'cover_url', 'url', 'published_at', 'expires_at'])
-            ->fieldType('pinned', 'boolean')
+            ->fieldType('pinned', 'bool')
             ->callbackField('category', static fn ($value, array $row): ?string => self::categorySlug($row['category_id'] ?? null))
             ->callbackField('cover_url', static fn ($value, array $row): ?string => CoverUploads::urlOf(is_string($row['cover'] ?? null) ? $row['cover'] : null))
             ->callbackField('url', static fn ($value, array $row): string => site_url('news/' . rawurlencode((string) ($row['slug'] ?? ''))))

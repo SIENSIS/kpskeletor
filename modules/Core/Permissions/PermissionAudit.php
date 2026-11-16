@@ -18,7 +18,8 @@ use Modules\Core\Registry\ApiRouteChecker;
  *   the stored catalogue (run `modules:sync`); Shield's matrix out of date; route problems
  *   (`RouteSecurityAuditor`, with the generated catalogue); `$api` entries without their route
  *   (`ApiRouteChecker`); kpcrudy CRUDs not made with
- *   `CrudFactory` or asking about undeclared operations (`CrudAuditor`).
+ *   `CrudFactory` or asking about undeclared operations (`CrudAuditor`); kpapy resources not
+ *   declared in `$api`, not rendering a `Resource` or asking about undeclared operations (`ApiAuditor`).
  * - warnings: stored permissions no manifest generates (`modules:sync --prune`); grants naming
  *   unknown permissions; atomic grants without the permissions they imply.
  *
@@ -95,6 +96,7 @@ final class PermissionAudit
 
         if (db_connect()->tableExists('permissions')) {
             $errors = [...$errors, ...(new CrudAuditor($this->catalogue))->audit($routes)];
+            $errors = [...$errors, ...(new ApiAuditor($this->catalogue))->audit($routes, $manifests)];
         }
 
         return [

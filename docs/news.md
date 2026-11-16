@@ -30,6 +30,9 @@ the Core; a kpapy resource; the Storage service; HTMLPurifier; demo data; tests.
 | `news`, `news/{slug}`, `news/category/{slug}` | public | Public posts only (`News.perPage` per page) |
 | `news/feed.xml` | public | RSS 2.0 of the latest public posts (`News.feedItems`) |
 | `GET api/v1/news`, `GET api/v1/news/{id}` | `news-api.list` / `news-api.show` (every group) | Readable posts as JSON (kpapy, read-only) |
+| `GET api/v1/news/notices` | `news-api.list` | The user's notices like the widget (`?unread=1`, `?limit=`) |
+| `POST api/v1/news/{id}/read` | `news-api.read` (every group, D-26-01) | Marks a readable post as read |
+| `GET api/v1/public/news`, `GET api/v1/public/news/{id}` | none (`kpapy:public`, per IP) | Public posts only (D-26-02) |
 
 Permission names and URLs: decision **D-17-01** (decided: the API has its own resource
 `news-api`). Images inside the body: decision **D-17-08** (decided: an "Insert image" button with
@@ -86,7 +89,7 @@ widgets (`docs/widgets.md`).
 - Menu link type `news.category` (`Menu/CategoryLink.php`, D-17-05) for the public menus of
   session 21.
 - Backup: the tables and the files of `modules/news` (Backup, session 27). The `news.notices`
-  calendar arrives in session 25; read receipts and notices in the API in session 26.
+  calendar arrives in session 25; read receipts and notices in the API in session 26 (`docs/api.md`).
 
 ## Calendar
 
@@ -117,6 +120,6 @@ the `editor` group, an information notice, a scheduled article and a draft, all 
 `vendor/bin/phpunit modules/News`: `PostsCrudTest` (read-only user, forged POSTs, own posts,
 `author` hidden, "My posts", sanitised body, slugs, publish and notifications, readers),
 `ReaderTest` (visibility, details, mark as read), `WidgetsAndTaskTest` (notices per audience,
-widget "mark as read", the task), `PublicSiteTest` (public pages and feed), `NewsApiTest` (list
+widget "mark as read", the task), `PublicSiteTest` (public pages and feed), `NewsApiTest`/`PublicNewsApiTest` (list
 and details with visibility, scopes, read-only), `NewsModuleTest` (manifest, migrations
 up/down/up, sanitiser, slugs, link type). Base class `Tests/NewsTestCase.php`.

@@ -18,6 +18,7 @@ use Modules\Core\Permissions\PermissionCatalogue;
 use Modules\Core\Permissions\ShieldMatrix;
 use Modules\Core\Registry\ApiRouteChecker;
 use Modules\Core\Registry\DeclarationRegistry;
+use Modules\Core\Registry\OpenApiDocument;
 use Modules\Core\Theme\ThemeValidator;
 
 /**
@@ -29,7 +30,8 @@ use Modules\Core\Theme\ThemeValidator;
  *
  * Every check (manifests, dependencies, duplicate permissions, `$api` routes) runs before
  * anything is written, the themes included (ThemeValidator). Step 7 publishes the assets of the
- * Core, the modules and the themes and writes the asset manifest (AssetPublisher).
+ * Core, the modules and the themes and writes the asset manifest (AssetPublisher); step 10 writes
+ * the OpenAPI document of `api/v1` to `writable/api/openapi.json` (OpenApiDocument).
  */
 final class ModuleSynchronizer
 {
@@ -44,6 +46,7 @@ final class ModuleSynchronizer
         private readonly ?DemoDataManager $demo = null,
         private readonly ?ThemeValidator $themes = null,
         private readonly ?AssetPublisher $assets = null,
+        private readonly ?OpenApiDocument $openApi = null,
     ) {
     }
 
@@ -171,6 +174,13 @@ final class ModuleSynchronizer
         $groups->ensureReserved();
         $groups->mirror();
         (new ShieldMatrix($this->permissions))->write();
+
+        // 10. The OpenAPI document of api/v1 (writable/api/openapi.json), after the catalogue and
+        //     the declarations so every resource describes itself with the current manifests.
+        $openApi                 = ($this->openApi ?? new OpenApiDocument())->write();
+        $report->openApiChanged  = $openApi['changed'];
+        $report->openApiPaths    = $openApi['paths'];
+        $report->openApiWarnings = $openApi['warnings'];
 
         // Demo data (optional): after the caches, so the registry is current.
         if ($demo !== null) {

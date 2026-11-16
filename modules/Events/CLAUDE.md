@@ -11,8 +11,9 @@ events* widget and the "Calendar" menu link type. Full description: `docs/events
   `all`, the list and every operation are limited to the events the user sees or created.
 - `events-categories` (crud − `import`, trash).
 - `events-calendar` (page: `view`): calendar, feed, details, reminders — every group.
+- `events-api` (`list`, `show`, session 26): the `events` API resource — every group.
 - Grants: admin all; editor events list/show/add/edit/delete/duplicate/export/import, categories
-  list/show; every group `events-calendar.*`.
+  list/show; every group `events-calendar.*`, `events-api.*`.
 - Configuration `Config/Calendar.php` (never `Config/Events.php`; no manifest settings, D-24-05).
   Menu: "Calendar" with "Events" and "Categories". Widget `events.upcoming`. Task
   `Tasks/SendReminders.php`. Notification `Notifications/EventReminder.php`. Link type
@@ -53,8 +54,9 @@ API names, decided as built by the owner), D-25-02 … D-25-07 accepted.
 - Session 29: the module uninstaller must call `CalendarService::purgeModule(<Module>)`.
 - Weekly events whose `recur_days` exclude the start's weekday: iCal counts DTSTART as an
   occurrence, the expansion does not (edge case; the form could normalise it).
-- Session 26: the `events` and `public/events` API endpoints (use `EventVisibility` with kpapy's
-  `where(Closure)`).
+- Done in session 26: `api/v1/events` (+ `occurrences`, `calendars`; resource `events-api`, every
+  group) and `api/v1/public/events` (`Services/EventsApi.php`, `Controllers/Api/`; D-26-01 open,
+  D-26-05). Existing sites: grant `events-api.*` in the matrix after updating.
 - kpcrudy: `ajax` for `setRelationNN()` (users field, D-24-04).
 
 ## How to test

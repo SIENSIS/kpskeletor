@@ -63,6 +63,7 @@ final class EventsApiTest extends ApiTestCase
         $this->assertSame('Reunió', $data['title']);
         $this->assertSame('<p>Text de Reunió</p>', $data['description']);
         $this->assertSame('events', $data['calendar']);
+        $this->assertFalse($data['all_day']);
         $this->assertSame(['freq' => 'weekly', 'interval' => 1, 'days' => ['tu', 'th'], 'until' => null, 'count' => 6, 'exceptions' => ['2030-01-01']], $data['recurrence']);
     }
 

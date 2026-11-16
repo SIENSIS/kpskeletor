@@ -179,7 +179,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-18-08 | 18 | Order of the steps, `.env` permissions and the lock file | Accepted (proposal) |
 | D-19-01 | 19 | Demo users' random passwords: shown once, how | Accepted (proposal) |
 | D-19-02 | 19 | Routes under `api/` outside `api/v1/` | Accepted (proposal) |
-| D-19-03 | 19 | `make:module --api` | Accepted (proposal) |
+| D-19-03 | 19 | `make:module --api` | Applied |
 | D-19-04 | 19 | Shared Core helpers extracted from News | Accepted (proposal) |
 | D-19-05 | 19 | HTTP on `localhost` with `php spark serve` | Applied (decided) |
 | D-20-01 | 20 | Pages permission names, URLs, the home page setting and the theme's page templates (decide) | Applied (decided) |
@@ -226,6 +226,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-25-08 | 25 | Who sees whose birthday: consent, permission, group table and an administrative calendar (decide) | Applied (decided) |
 | D-25-09 | 25 | Birthday greetings as notifications (decide) | Applied (decided) |
 | D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Decided |
+| D-26-01 | 26 | Core API permission names and URLs (decide) | Open |
+| D-26-02 | 26 | Public API endpoints: GET only, no permission resolver, public records only | Accepted (proposal) |
+| D-26-03 | 26 | Read markers in the API are not written to the activity log | Accepted (proposal) |
+| D-26-04 | 26 | The OpenAPI document written by `modules:sync` | Accepted (proposal) |
+| D-26-05 | 26 | Calendar access policies and providers in the events API | Accepted (proposal) |
+| D-26-06 | 26 | `make:module --api` needs `--crud` | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -1918,8 +1924,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** `make:module` only implements `--crud`; `--api` was never built (no session file names it explicitly). It is not part of acceptance criterion 2.
 - **Proposal:** Build it in session 26 (Core API endpoints, where the API catalogue checks are completed): with `--crud`, run `kpapy:make` for the same table, route it under `api/v1/<module>` with the `kpapy` filter, `setResource()` = the CRUD's resource, add the `$api` entry and an API scope test. Until then the manifest template shows the `$api` format and `docs/api.md` the manual steps.
 - **Alternatives:** A) Build it now (new feature, out of this session's scope). B) Remove `--api` from `CLAUDE.md` and the spec (changes a documented command; owner's call).
-- **Status:** Accepted (proposal)
-- **Applied in:** `docs/plan.md` (session 26 and 32 notes)
+- **Status:** Applied
+- **Applied in:** `docs/plan.md` (session 26 and 32 notes); built in session 26 (D-26-06: `modules/Core/Modules/ApiScaffold.php`, `make:module --crud=<table> --api`)
 
 ## D-19-04 — Shared Core helpers extracted from News
 
@@ -2342,4 +2348,61 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** A) Now: a setting type "translated text" in the Settings module (one setting stored as JSON, one input per active locale, default from the language file, Catalan fallback), used by the greetings. B) The same in session 31, where the site's active locales are defined.
 - **Status:** Decided
 - **Decision (2026-11-15):** «B: ho deixem per a la sessió 31, i així si apareixen més coses ja ho tocarem». Session 31 adds the "translated text" setting type (the texts are still written and edited in the UI; the language file only gives the default) and moves the birthday greetings to one setting `Users.birthdayGreeting`, with a migration of the stored values. Until then the three fixed settings stay. **Must change:** `deploy/31-i18n.md` (scope; done), `docs/plan.md` session 31 (done); the code in session 31.
+
+## D-26-01 — Core API permission names and URLs (decide)
+
+- **Where:** specification "JSON API (kpapy)" › "Core endpoints" (`news` with `POST news/{id}/read` and the user's notices, `events` by range and calendars, `notifications` list/unread/mark read, `public/news`, `public/events`); plan session 26; D-17-01 (`news-api`), D-24-01, D-25-01.
+- **Problem:** The specification names the endpoints but not their permissions nor the exact paths of the notices, the occurrences and the unread count. kpapy checks token scopes against `<resource>.<operation>`: if marking as read used `list`, a token limited to listing could write (acceptance criterion 10: "403 on any write"). The calendar is a page resource (`events-calendar.view`), which kpapy cannot ask `list`/`show`.
+- **Proposal (built):**
+  - Permissions (every group; `news-api.*` and `core-notifications.*` are already wildcards, so existing sites get the new ones): `news-api.read` (mark a post as read), `core-notifications.read` (mark notifications as read), and a new resource `events-api` (`list`, `show`, like `news-api`). 133 permissions.
+  - URLs: `GET api/v1/news/notices[?unread=1&limit=]`, `POST api/v1/news/{id}/read`; `GET api/v1/events[/{id}]`, `GET api/v1/events/occurrences?start=&end=[&calendars=a,b][&category=<slug>]`, `GET api/v1/events/calendars`; `GET api/v1/notifications[/{id}]`, `GET api/v1/notifications/unread`, `POST api/v1/notifications/{id}/read`, `POST api/v1/notifications/read-all`; `GET api/v1/public/news[/{id}]`, `GET api/v1/public/events[/{id}|/occurrences]`. Public endpoints have no catalogue resource (D-26-02).
+  - Existing installations: default grants are applied once per module (D-02-04), so grant `events-api.*` to the groups in the permission matrix after updating (fresh installs get it).
+- **Alternatives:** A) Mark as read with `list` (no new names; a list-only token can write). B) Extra `list`/`show` operations on `events-calendar` (the page would carry API operations, what D-17-01 rejected for News). C) Catalogue resources for the public endpoints (`news-public.*`, `events-public.*`) granted to guests (guests have no groups; names that grant nothing). D) Other paths (`api/v1/news/{id}/mark`, `api/v1/calendar/…`, `api/v1/notifications/count`).
+- **Status:** Open
+- **Applied in:** `modules/News/Config/Module.php`, `modules/Events/Config/Module.php`, `modules/Core/Config/Module.php` (resources, `$api`), the controllers in `modules/*/Controllers/Api/`, `modules/Events/Services/EventsApi.php`; tests `NewsApiTest`, `PublicNewsApiTest`, `EventsApiTest`, `NotificationsApiTest`, counting tests (`PermissionsCommandsTest` 133, `ShieldMatrixTest`, `CatalogueBuilderTest`).
+
+## D-26-02 — Public API endpoints: GET only, no permission resolver, public records only
+
+- **Where:** specification "Core endpoints" (`public/news` and `public/events`: "public read-only endpoints without a token (rate-limited)"); D-19-02 (`kpapy:public` only for GET).
+- **Problem:** kpapy's `Resource::routes()` registers every method, which the route audit refuses for `kpapy:public`; the shared resolver denies every guest (no user), so a public resource cannot use it.
+- **Proposal:** Only `GET` routes (`<path>` and `<path>/(:any)`, plus `OPTIONS` for CORS), marked with the `kpapy` route option so kpapy's OpenAPI generator and `permissions:check` see them; the resource has no resolver (`setPermissionResolver(null)`), allows `list` and `show` with `setPermission()` and `readOnly()`; its `where()` is the public-site rule (`NewsVisibility`/`EventVisibility` with `publicOnly`), so a token never widens it; rate limit `Core.rateLimitApiIp` per IP (kpapy's `rateLimitPublic`); `public/events` answers 404 while `Config\Calendar::$publicCalendar` is off. Ids are the same masked codes as everywhere else.
+- **Alternatives:** A) `kpapy:optional` on the user endpoints (one endpoint, public results without a token: harder to reason about, and a token would change the answer).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/News/Controllers/Api/PublicNews.php`, `modules/Events/Controllers/Api/PublicEvents.php`, the modules' `Config/Routes.php`; tests `PublicNewsApiTest`, `EventsApiTest::testPublicEvents*`.
+
+## D-26-03 — Read markers in the API are not written to the activity log
+
+- **Where:** specification "Cross-cutting" ("every write and every login in the activity log"); the back office does not log "mark as read" (News reader, notifications bell).
+- **Problem:** Marking a post or a notification as read is personal state, not content: logging every read would flood the log and record what each person reads.
+- **Proposal:** Read markers (`POST news/{id}/read`, `POST notifications/{id}/read`, `POST notifications/read-all`) are not logged, the same as in the back office. Content writes through the API (none in the Core yet; modules' resources made with `make:module --api`) follow the activity rules of their module. `ActivityLabelsTest` no longer scans kpapy resources (`AuditedCrud` only audits kpcrudy CRUDs).
+- **Alternatives:** A) Log them as `read` entries (labels `<Module>.activity.read`).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/News/Controllers/Api/Posts.php`, `modules/Core/Controllers/Api/Notifications.php`, `tests/feature/Crud/ActivityLabelsTest.php`.
+
+## D-26-04 — The OpenAPI document written by `modules:sync`
+
+- **Where:** session 26 scope ("OpenAPI generation on `modules:sync`"); plan risk: "keep it in `writable/`".
+- **Problem:** Where the document goes, whether the web serves it, and how to keep a second sync from rewriting it.
+- **Proposal:** Step 10 of `modules:sync` (`Modules\Core\Registry\OpenApiDocument`) builds the `api/v1` document with kpapy's generator and writes `writable/api/openapi.json` (0640) only when it changed, without `servers` (the CLI's base URL is not the site's). `writable/` is never served; the live document stays at `backend/api/docs/openapi.json` (`api.docs`) and `api/v1/openapi.json` (`Api.publicSpec`). Resources kpapy cannot describe are reported as sync lines. `GET me` is described with the `openapi` route option.
+- **Alternatives:** A) Serve the file instead of generating it live (stale after a code change without sync). B) Write it to `public/` (public by default, against the specification).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Registry/OpenApiDocument.php`, `modules/Core/Modules/{ModuleSynchronizer,SyncReport}.php`, `modules/Api/Config/Routes.php`; test `ModulesSyncTest::testFirstSyncInstallsSecondSyncChangesNothing`.
+
+## D-26-05 — Calendar access policies and providers in the events API
+
+- **Where:** specification "Core endpoints" (`events`: "published and provider events, with `restricted` audiences respected"); D-25-04 (policies).
+- **Problem:** `EventAccessPolicy` decides per row in PHP, but kpapy's list, counts and pages need SQL conditions; provider events are computed per user and are not rows.
+- **Proposal:** The resource's `where()` applies `EventVisibility::apply()` and excludes the ids of policy calendars' events the policy refuses (`EventsApi::refusedByPolicy()`; guests: all of them). Stored events are listed with the recurrence as a rule; `occurrences` expands recurrences in a range (`Config\Calendar::$maxRangeDays`) and adds the providers' events for the token's user (never on the public endpoint). `calendars` lists the calendars the user may see with their own "hidden" choice; the API shows every visible calendar unless `?calendars=` narrows it.
+- **Alternatives:** A) Only `occurrences` (no list/show resource). B) Apply the user's hidden calendars to the API too (an app has its own switches).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Events/Services/EventsApi.php`; tests `EventsApiTest`.
+
+## D-26-06 — `make:module --api` needs `--crud`
+
+- **Where:** D-19-03; `CLAUDE.md`, specification "Modules" (`make:module` with `--api`).
+- **Problem:** Without a table there is nothing for `kpapy:make` to describe.
+- **Proposal:** `--api` requires `--crud=<table>`. `kpapy:make` writes `Controllers/Api/<Key>.php` (rewritten to strict types and a final class) and the route `api/v1/<module>/<key>` with the `kpapy` filter; `setResource()` is the CRUD's resource; the manifest declares it in `$api`; `Tests/<Name>ApiTest.php` checks the token (401), the scopes (200/403) and a user without the permission (403). Checked by hand: the generated module syncs, passes `permissions:check`, its 8 tests and PHPStan.
+- **Alternatives:** A) `--api` alone generates an empty resource (nothing to list).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Modules/{ApiScaffold,ModuleGenerator}.php`, `Templates/{Module.php.tpl,ApiTest.php.tpl}`, `modules/Core/Commands/MakeModule.php`; test `CrudScaffoldTest::testWithApiTheTemplatesDeclareTheResourceAndItsScopeTest`. D-19-03 is now built.
 

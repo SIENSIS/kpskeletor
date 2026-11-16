@@ -17,6 +17,7 @@ use Modules\Core\Modules\ModuleGenerator;
 use Modules\Core\Modules\ModuleSynchronizer;
 use Modules\Core\Modules\NamespaceFile;
 use Modules\Core\Modules\SyncFailedException;
+use Modules\Core\Registry\OpenApiDocument;
 
 /**
  * modules:sync end to end on the test database, with the real Core and a generated module in a
@@ -57,6 +58,7 @@ final class ModulesSyncTest extends CIUnitTestCase
         return new ModuleSynchronizer(
             new ModuleDiscovery([ROOTPATH . 'modules', $this->tempRoot()]),
             new NamespaceFile($this->tempRoot() . '/ModuleNamespaces.php'),
+            openApi: new OpenApiDocument($this->tempRoot() . '/api/openapi.json'),
         );
     }
 
@@ -80,6 +82,13 @@ final class ModulesSyncTest extends CIUnitTestCase
         $this->assertTrue($this->db->tableExists(strtolower($this->module) . '_items'));
         $this->assertTrue($this->db->tableExists('users'), 'Shield migrations run first');
         $this->assertSame(1, $invalidated);
+        $this->assertTrue($first->openApiChanged);
+        $this->assertSame([], $first->openApiWarnings);
+        $document = json_decode((string) file_get_contents($this->tempRoot() . '/api/openapi.json'), true);
+        $this->assertIsArray($document);
+        $this->assertSame('3.1.0', $document['openapi']);
+        $this->assertArrayHasKey('/api/v1/notifications', $document['paths'], 'The OpenAPI document of api/v1 (session 26).');
+        $this->assertArrayHasKey('/api/v1/public/news', $document['paths']);
 
         $namespaces = require $this->tempRoot() . '/ModuleNamespaces.php';
         $this->assertIsArray($namespaces);

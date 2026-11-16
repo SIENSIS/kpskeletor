@@ -111,7 +111,10 @@ user's own notifications.
 | `POST backend/notifications/read-all` | Marks everything as read (JSON for the bell, otherwise back to the list) |
 | `backend/profile/notifications` | Preferences (GET form, POST save) |
 
-The API endpoints (`api/v1/notifications`) arrive with the Core API (session 26).
+The API (`docs/api.md`, session 26): `GET api/v1/notifications[/{id}]` (the user's own, rendered in
+the request's language), `GET api/v1/notifications/unread`, `POST api/v1/notifications/{id}/read`
+and `POST api/v1/notifications/read-all` (`core-notifications.read`, every group, D-26-01);
+`Modules\Core\Controllers\Api\Notifications` on top of the same table as `Inbox`.
 
 ## Notification types of the skeleton
 

@@ -66,6 +66,8 @@ return [
         'pruneList' => 'Cap mòdul no genera ja aquests permisos: {0}.',
         'pruneConfirm' => 'Voleu eliminar aquests {0} permisos i les concessions que els anomenen?',
         'assets'      => '{0}: recursos publicats ({1} fitxer(s) canviats).',
+        'openApi'        => 'Document OpenAPI escrit a writable/api/openapi.json ({0} camí/camins).',
+        'openApiWarning' => 'L’API no s’ha pogut descriure: {0}',
     ],
     'list' => [
         'module'        => 'Mòdul',
@@ -101,6 +103,10 @@ return [
         'crudFailed' => 'No s’ha pogut generar el CRUD: {0}. El mòdul s’ha creat; corregiu el problema i executeu l’ordre indicada a dalt.',
         'crudCreated' => 'S’ha creat el CRUD {0}: {1} (ruta backend/{2}).',
         'crudNext' => 'Següent pas: php spark modules:sync i adapteu el CRUD a {0} (camps, relacions, hideFields(), where()) i les seves proves.',
+        'apiNeedsCrud' => '--api necessita --crud=<taula>: el recurs de l’API és el de la taula del CRUD.',
+        'apiGenerating' => 'S’està escrivint el recurs de l’API amb php spark kpapy:make {0}…',
+        'apiFailed' => 'No s’ha pogut generar el recurs de l’API: {0}. El mòdul i el CRUD s’han creat; corregiu el problema i executeu l’ordre indicada.',
+        'apiCreated' => 'Recurs de l’API {0} creat: {1} (ruta {2}).',
     ],
     'cancelled' => 'Cancel·lat: no s\'ha canviat res.',
     'res' => [

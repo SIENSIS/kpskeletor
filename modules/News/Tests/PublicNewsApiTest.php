@@ -36,6 +36,7 @@ final class PublicNewsApiTest extends ApiTestCase
         $this->assertSame(['Pública'], array_column($data, 'title'));
         $this->assertStringEndsWith('/news/publica', (string) $data[0]['url']);
         $this->assertArrayNotHasKey('visibility', $data[0]);
+        $this->assertFalse($data[0]['pinned'], 'A boolean, not "0".');
     }
 
     public function testATokenDoesNotWidenThePublicEndpoint(): void

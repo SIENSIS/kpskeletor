@@ -39,7 +39,7 @@ final class Notifications extends Controller
             ->setResource('core-notifications')
             ->where('user_id', $userId)
             ->fields(['id', 'module', 'type', 'title', 'body', 'icon', 'url', 'read', 'created_at'])
-            ->fieldType('read', 'boolean')
+            ->fieldType('read', 'bool')
             ->callbackField('type', static fn ($value, array $row): string => self::shortType((string) ($row['type'] ?? '')))
             ->callbackField('title', static fn ($value, array $row): string => Notifier::messageOf($row)->title)
             ->callbackField('body', static fn ($value, array $row): string => Notifier::messageOf($row)->body)

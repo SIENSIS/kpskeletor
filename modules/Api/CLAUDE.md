@@ -41,8 +41,9 @@ D-10-01 … D-10-05 in `docs/decisions.md`.
 
 - Done in session 14: `Api.*` are in Settings › Security (`group` `security.api`; `corsOrigins` is a `list` validated by `cors_origins`).
 - Session 23: `avatar_url` in `me`.
-- Session 26: Core endpoints (news, events, notifications, public ones) and the API catalogue
-  check in `permissions:check`.
+- Done in session 26: Core endpoints (in their modules: News, Events, Core notifications; public
+  ones), `ApiAuditor` in `permissions:check`, the OpenAPI copy on `modules:sync`, `GET me` in the
+  OpenAPI document (`openapi` route option).
 
 ## How to test
 

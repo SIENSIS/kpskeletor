@@ -91,7 +91,44 @@ Content-Type: application/json
 | `GET me/tokens`, `DELETE me/tokens/{id}` | `kpapy` | the user's tokens (kpapy's `TokenController`); since kpapy 1.1 only tokens with unrestricted scopes (`*`) or the `tokens.manage` scope (`Config\Kpapy::$tokensScope`) |
 | `GET openapi.json` | `kpapy:public` | only with the setting `Api.publicSpec` |
 
+## Core endpoints (session 26)
+
+Each one is a kpapy resource with the same visibility rules as the web (decisions D-26-01 …
+D-26-05). Ids are the back office's masked codes. Read-only unless stated.
+
+| Endpoint | Permission (scope) | |
+|---|---|---|
+| `GET news[/{id}]` | `news-api.list` / `.show` | posts the user may read (public, private, their groups'), `read` flag; `?filter[type]=notice`, `?q=`, `?lang=` |
+| `GET news/notices[?unread=1&limit=10]` | `news-api.list` | the user's notices like the dashboard widget (pinned, priority, date) |
+| `POST news/{id}/read` | `news-api.read` | marks a readable post as read (`{"read": true, "marked": bool}`); unreadable → 404 |
+| `GET events[/{id}]` | `events-api.list` / `.show` | events the user sees (public, private, `restricted` audience, calendar permissions and policies); recurrence as a rule |
+| `GET events/occurrences?start=YYYY-MM-DD&end=YYYY-MM-DD[&calendars=events,news.notices][&category=<slug>]` | `events-api.list` | occurrences in a range (≤ `maxRangeDays`), recurrences expanded, providers' events (birthdays…) included; invalid range → 422 |
+| `GET events/calendars` | `events-api.list` | calendars the user may see (`id`, `module`, `label`, `color`, `hidden` = their choice in the calendar view) |
+| `GET notifications[/{id}]` | `core-notifications.list` / `.show` | the user's own notifications (bell), title/body/url in the request's language |
+| `GET notifications/unread` | `core-notifications.list` | `{"unread": n}` |
+| `POST notifications/{id}/read`, `POST notifications/read-all` | `core-notifications.read` | mark one or all as read |
+| `GET public/news[/{id}]` | none (`kpapy:public`) | public posts only, with `url` on the public site |
+| `GET public/events[/{id}\|/occurrences]` | none (`kpapy:public`) | public events only (no providers); 404 while the public calendar is off |
+
+Every group holds `news-api.*`, `events-api.*` and `core-notifications.*`; a token narrows them
+with its scopes (superadmins included): a token limited to `news-api.list` lists news but gets 403
+on `POST news/{id}/read` (acceptance criterion 10). Public endpoints are `GET` only, ask no
+permission, ignore any token (they never show more) and are limited per IP
+(`Core.rateLimitApiIp`, `429` + `Retry-After`). Marking as read is personal state and, as in the
+back office, is not written to the activity log (D-26-03).
+
+```bash
+curl -s "https://example.com/api/v1/events/occurrences?start=2026-12-01&end=2027-01-01" -H "Authorization: Bearer $TOKEN"
+curl -s -X POST https://example.com/api/v1/notifications/read-all -H "Authorization: Bearer $TOKEN"
+curl -s "https://example.com/api/v1/public/news?per_page=5"
+```
+
 ## A module's resources
+
+`php spark make:module Library --crud=library_books --api` writes all of it for a new module:
+`kpapy:make` writes `Controllers/Api/Books.php` (resource `library-books`, the CRUD's) and the route
+`api/v1/library/books`, the manifest declares it in `$api` and `Tests/LibraryApiTest.php` checks
+the token and its scopes (D-26-06). By hand:
 
 ```php
 // modules/News/Config/Routes.php (written by kpapy:make or make:module --api)
@@ -123,7 +160,14 @@ public array $api = [
   `kpapy:hmac`; `kpapy:public` only for GET; `kpapy:login` only on `auth/token*`), checked by
   `RoutesSecurityTest` and `permissions:check`. A disabled module answers 404.
 - Every operation the resource can ask about must be declared in the manifest (outside
-  production, an undeclared one throws `UndeclaredPermissionException`).
+  production, an undeclared one throws `UndeclaredPermissionException`). `permissions:check`
+  also checks it ahead of time (`ApiAuditor`): every kpapy resource route must be declared in a
+  `$api`, render a `Kpapy\Resource` (kpapy's describe mode, nothing touches the data) and ask
+  only about declared operations; public resources (`kpapy:public`) ask none.
+- A public resource (no token) registers only `GET` routes with `['filter' => 'kpapy:public',
+  'kpapy' => true]` (the option makes it a resource for the OpenAPI document and the audit),
+  `setPermissionResolver(null)` and `setPermission('list'|'show', true)`; copy
+  `modules/News/Controllers/Api/PublicNews.php`.
 - No kpapy upload fields: `uploadPath` points at an unused folder (library request); files go
   through the Storage service.
 
@@ -138,8 +182,8 @@ public array $api = [
   required by default).
 - **HTTPS:** plain HTTP is refused in production (`requireHttps`); behind a proxy configure
   `Config\App::$proxyIPs`.
-- **Logging:** logins, refusals, token creation and revocation go to the application log until
-  the activity log (session 12).
+- **Logging:** logins, refusals, token creation and revocation are in the activity log; read
+  markers are not (D-26-03).
 
 ## Documentation page
 
@@ -147,18 +191,21 @@ public array $api = [
 every endpoint and **Try it**: paste a token or sign in like an app, send real requests (same
 permissions, scopes and rate limits), copy them as `curl`. `backend/api/docs/openapi.json` is the
 OpenAPI 3.1 document. Nothing is public unless `Api.publicSpec` is on, which also serves it at
-`/api/v1/openapi.json`. A static copy: `php spark kpapy:openapi --prefix api/v1 --output
-writable/openapi.json`.
+`/api/v1/openapi.json`. `php spark modules:sync` writes a static copy to
+`writable/api/openapi.json` (never served; without `servers`; rewritten only when it changes,
+D-26-04); `php spark kpapy:openapi --prefix api/v1 --output <file>` writes one anywhere.
 
 ### Example: listing with a personal token
 
 ```bash
 curl -s https://example.com/api/v1/me -H "Authorization: Bearer $TOKEN"
-curl -s "https://example.com/api/v1/news?sort=-published_at&per_page=10" -H "Authorization: Bearer $TOKEN"   # session 17+
+curl -s "https://example.com/api/v1/news?sort=-published_at&per_page=10" -H "Authorization: Bearer $TOKEN"
 ```
 
 ## Tests
 
 Copy `modules/Api/Tests/ApiTestCase.php` (JSON requests without a session, a token helper, a
 fresh cache) and `ApiResourceTest.php` (scopes, masked ids, problem+json, ETags, rate limits) for
-a module's resource; `tests/_support/Api/SampleNotesApi.php` is the smallest resource.
+a module's resource; `tests/_support/Api/SampleNotesApi.php` is the smallest resource. The Core
+endpoints' tests: `modules/News/Tests/{NewsApiTest,PublicNewsApiTest}.php`,
+`modules/Events/Tests/EventsApiTest.php`, `modules/Core/Tests/{NotificationsApiTest,ApiAuditorTest}.php`.

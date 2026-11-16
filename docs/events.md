@@ -166,7 +166,13 @@ D-24-05), overridable from `.env` (`calendar.maxRangeDays = 200`):
   `Config/Registrar.php`); menu entry "Calendar subscription" (user menu).
 - **Activity log:** `ical_created`, `ical_regenerated`, `ical_revoked`, `ical_filters`,
   `ical_accessed`, `calendar_resync`.
-- No backup files, CSP sources, outbound hosts or API resources (the `events` API is session 26).
+- No backup files, CSP sources or outbound hosts.
+- **API** (session 26, `docs/api.md`, D-26-01/D-26-05): resource `events-api` (`list`, `show`, every
+  group): `GET api/v1/events[/{id}]` (stored events, recurrence as a rule),
+  `GET api/v1/events/occurrences?start=&end=[&calendars=][&category=]` (expanded, with providers),
+  `GET api/v1/events/calendars`; public `GET api/v1/public/events[/{id}|/occurrences]` (public events
+  only, no token, per IP). One rule: `EventVisibility` in kpapy's `where(Closure)`, minus the events an
+  access policy refuses (`Services/EventsApi.php`).
 
 ## Demo data
 

@@ -38,8 +38,9 @@ $routes->group('news', ['namespace' => 'Modules\News\Controllers'], static funct
 
 Resource::routes($routes, 'api/v1/news', '\Modules\News\Controllers\Api\Posts::index', ['filter' => 'kpapy']);
 
-// Public posts without a token (D-26-01): GET only, rate-limited per IP by `kpapy:public`.
-$routes->get('api/v1/public/news', '\Modules\News\Controllers\Api\PublicNews::index', ['filter' => 'kpapy:public']);
-$routes->get('api/v1/public/news/(:segment)', '\Modules\News\Controllers\Api\PublicNews::index', ['filter' => 'kpapy:public']);
+// Public posts without a token (D-26-01): GET only, rate-limited per IP by `kpapy:public`; the
+// `kpapy` option marks the base route as a kpapy resource (OpenAPI, permissions:check).
+$routes->get('api/v1/public/news', '\Modules\News\Controllers\Api\PublicNews::index', ['filter' => 'kpapy:public', 'kpapy' => true]);
+$routes->get('api/v1/public/news/(:any)', '\Modules\News\Controllers\Api\PublicNews::index', ['filter' => 'kpapy:public']);
 $routes->options('api/v1/public/news', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);
-$routes->options('api/v1/public/news/(:segment)', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);
+$routes->options('api/v1/public/news/(:any)', static fn () => service('response')->setStatusCode(204), ['filter' => 'kpapy:public']);
