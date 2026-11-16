@@ -68,6 +68,7 @@ return [
         'schedule' => 'Programada',
         'safety'   => 'De seguridad (antes de una restauración)',
         'update'   => 'De seguridad (antes de una actualización)',
+        'package'  => 'De seguridad (antes de un cambio de módulo)',
         'upload'   => 'Subida',
         'found'    => 'Encontrada en la carpeta',
     ],
