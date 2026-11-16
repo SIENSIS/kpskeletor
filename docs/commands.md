@@ -40,6 +40,16 @@ The web installer (`/install`) is the same service with a form; see `README.md`.
 | `schedule:run [--task=<name>] [--force]` | The single cron entry (`* * * * * php /path/spark schedule:run`): runs the scheduled tasks that are due, records each run and exits with 1 if one failed. `--task` limits it to one task (class or short class name) if it is due; with `--force` it runs now, due or not (the `withoutOverlapping()` lock still applies). See `docs/scheduler.md`. |
 | `schedule:list` | Every scheduled task of the enabled modules with its schedule, next run, last run and result, and notes (inactive, other environment). |
 
+## Backups
+
+| Command | What it does |
+|---|---|
+| `backup:create [--only=db\|files] [--password]` | Creates an encrypted backup in `writable/backups` (database dump, Storage disks, `writable/uploads` when not empty, `.env`). `--password` asks for the password twice with a hidden prompt (it takes no value); without it the password is `backup.password` from `.env` or `BACKUP_PASSWORD`. At least 12 characters. See `docs/backup-restore.md`. |
+| `backup:list` | The backups, newest first: date, file, type, origin, size, result (files copied into the folder by hand are listed as found). |
+| `backup:verify <file> [--password]` | Decrypts and authenticates the backup and checks every checksum; restores nothing. |
+| `backup:restore <file> [--only=db\|files] [--with-env] [--password] [--yes]` | Restores a backup: checks, safety backup, maintenance mode, database and/or files, `modules:sync`. Asks to type the file name (or `--yes`). Keeps the current `.env` and merges the backup's secrets after a confirmation; `--with-env` replaces the whole `.env`. |
+| `backup:prune` | Deletes the backups the retention settings (`Backup.keepDaily`, `keepWeekly`, `keepMonthly`) do not keep. |
+
 ## Front end
 
 | Command | What it does |

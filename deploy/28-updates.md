@@ -44,7 +44,11 @@ Update notices in the UI and verified updates from the console.
   generates the key pair on their own computer and the private key never enters the repository or
   CI), `updates:check` (task and button, through `OutboundClient`), cache, widget, notification,
   page with release notes.
-- `app:update` with `--dry-run`: local changes check, maintenance, backup, download, checksum and
+- Maintenance mode exists in the Core since session 27 (`Modules\Core\Maintenance\MaintenanceMode`,
+  a file + the global `maintenance` filter; D-27-02): add the site-wide setting/screen (turn it on
+  and off by hand, message) and a superadmin bypass on top of it, never a second mechanism.
+- `app:update` with `--dry-run`: local changes check, maintenance (`MaintenanceMode`), backup
+  (`Modules\Backup\Services\BackupService::create()`), download, checksum and
   Ed25519 signature verification of the release archive (libsodium, minisign-compatible; or a
   signed tag for `git pull` installs), `composer install --no-dev`, `modules:sync`, caches;
   failure handling.

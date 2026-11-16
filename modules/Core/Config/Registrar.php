@@ -7,6 +7,7 @@ namespace Modules\Core\Config;
 use Modules\Core\Filters\Can;
 use Modules\Core\Filters\ContentSecurity;
 use Modules\Core\Filters\CsrfTokenHeader;
+use Modules\Core\Filters\Maintenance;
 use Modules\Core\Filters\ModuleEnabled;
 use Modules\Core\Filters\PoorMansCron;
 use Modules\Core\Filters\RateLimit;
@@ -27,6 +28,7 @@ final class Registrar
                 'can'           => Can::class,
                 'cspmodules'    => ContentSecurity::class,
                 'csrftoken'     => CsrfTokenHeader::class,
+                'maintenance'   => Maintenance::class,
                 'moduleenabled' => ModuleEnabled::class,
                 'poormanscron'  => PoorMansCron::class,
                 'ratelimit'     => RateLimit::class,

@@ -14,6 +14,7 @@ return [
     'Modules\Activity' => __DIR__ . '/../../modules/Activity',
     'Modules\Api' => __DIR__ . '/../../modules/Api',
     'Modules\Auth' => __DIR__ . '/../../modules/Auth',
+    'Modules\Backup' => __DIR__ . '/../../modules/Backup',
     'Modules\Core' => __DIR__ . '/../../modules/Core',
     'Modules\Dashboard' => __DIR__ . '/../../modules/Dashboard',
     'Modules\Events' => __DIR__ . '/../../modules/Events',

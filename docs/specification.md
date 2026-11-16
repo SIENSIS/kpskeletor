@@ -671,7 +671,8 @@ granularity instead of collapsing it into read/create/update/delete.
   * Provide a `can` filter (accepts several permissions, any/all): `can:a.x,b.y` passes with any
     of them, `can:all,a.x,b.y` needs all of them (D-07-02).
   * The `backend` filter chain covers: authentication, forced reset, forced 2FA setup,
-    disabled-module check, maintenance mode, activity log, idle lock and throttling.
+    disabled-module check, activity log, idle lock and throttling; maintenance mode is a global
+    filter (`maintenance`, the first one) for every request.
   * **Default deny:** a back-office route without a `can:` filter fails a CI test (a
     `RoutesSecurityTest` that walks every route under `backend/`); the same test checks that
     every route under `api/v1/` has the `kpapy` filter (`kpapy`, `kpapy:optional` or
@@ -861,7 +862,8 @@ granularity instead of collapsing it into read/create/update/delete.
     outbound hosts, password length, 2FA policy) need `settings.security` and a re-authentication.
 * **Site-wide settings** (Core): site name (`Core.siteName`, empty = the default name), logo
   (theme option), default locale, available locales, time zone (`Core.timezone`, the zone dates
-  are shown in; they are stored in UTC), maintenance mode, idle lock, captcha on/off, 2FA policy
+  are shown in; they are stored in UTC), maintenance mode (the setting and screen on top of the
+  Core's `MaintenanceMode`, whose state is a file, see "Backup"), idle lock, captcha on/off, 2FA policy
   per group, mail transport, themes.
 * **Settings › Security** (Core, `settings.security` + re-authentication): minimum password
   length (`Auth.minimumPasswordLength`), session lifetimes (absolute and remember-me), re-authentication window, rate limits, extra CSP origins per
@@ -1543,7 +1545,8 @@ both supported:
 ### Backup
 
 * **Content of a backup:** the database (all tables, portable dump generated with the Query
-  Builder in chunks, or `mysqldump` when available), the files of both storage disks,
+  Builder in chunks, one JSON-lines file per table without the table prefix; no `mysqldump`,
+  whose output is not portable to SQLite), the files of both storage disks,
   `writable/uploads` (only if not empty), the module registry and versions, **`.env` and the encryption key**, and
   the extra paths declared by modules (`$backup`). A `manifest.json` records the application
   and module versions, date, contents and SHA-256 checksums.
@@ -1566,7 +1569,15 @@ both supported:
     command line, where it would end up in the shell history and the process list);
     non-interactive runs read `backup.password` from `.env` or an environment variable;
   * a back-office page: list of backups (date, size, type, result, who), create now,
-    download (re-authentication required), verify, delete, upload a backup file, and restore.
+    download (re-authentication required), verify, delete, upload a backup file, and restore;
+    URLs `backend/backups`, `…/create`, `…/verify/<id>`, `…/download/<id>`, `…/recover/<id>`
+    (restore; `restore/<id>` is kpcrudy's trash URL), `…/upload`, `…/jobs/<job>` (result of a
+    restore) and `progress/backup/<job>` (JSON progress);
+  * uploaded backup files are an exception to "uploads through the Storage service": only files
+    with a valid backup header and at most `Config\Backup::$maxUploadBytes` are accepted
+    (`backup.restore` + re-authentication + `ratelimit:uploads`), stored in `writable/backups`
+    with a generated name (`0640`), never served, and nothing in them is used before they are
+    decrypted and authenticated; refusals are security entries.
 * **Storage and retention:** in `writable/backups` (outside `public/`), with retention rules
   (keep the last N daily/weekly/monthly) applied by a scheduled task; optional copy to another
   Storage disk.
@@ -1574,18 +1585,32 @@ both supported:
   * requires re-authentication, the backup password and a confirmation typed by the user;
   * verifies checksums and compatibility (core and module versions; refuses a newer backup on
     an older installation);
-  * makes an automatic safety backup first, enters maintenance mode, restores database and
-    files (optionally only one of them), runs `modules:sync`, and leaves maintenance mode;
+  * makes an automatic safety backup first (same password), enters maintenance mode, restores
+    database (the tables are recreated by running the backup's own migrations, then filled) and
+    files (optionally only one of them), runs `modules:sync`, and leaves maintenance mode; a
+    failure after maintenance mode started keeps it on and names the safety backup;
+  * **maintenance mode** (Core, `Modules\Core\Maintenance\MaintenanceMode`): its state is the
+    file `writable/maintenance.json` (a setting would be lost while the database is replaced);
+    the global `maintenance` filter answers 503 with `Retry-After` and a page that reads no
+    database, except the paths allowed when it was turned on; `schedule:run` and the poor man's
+    cron do nothing meanwhile. Paths under `progress/*` return the JSON progress of long jobs
+    from files and skip the filters that read the database or the session; they never return
+    secrets;
   * keeps the current `.env` (database credentials and base URL of the new server) and, after a
     confirmation, merges only the secrets from the backup (`encryption.key`, `app.maskKey`,
-    `backup.password`); `--with-env` restores the whole `.env` (console only). From the UI, when
-    the project root is not writable by the web server (the recommended setup), the merged `.env`
-    content is shown to copy;
-  * long restores from the UI run as a background job with progress; the console is the
+    `backup.password`); `--with-env` restores the whole `.env` (console only). The UI never writes
+    the project root: when the secrets differ it shows the merged `.env` content once, to copy;
+  * long restores from the UI run as a background job with progress (in the same PHP process
+    after the response is sent, so the password is never stored; progress in files under
+    `writable/backups/jobs`); the console is the
     recommended way for large sites.
 * Notifications on success/failure of scheduled backups; everything goes to the activity log.
-* Permissions: `backup.list`, `backup.create`, `backup.download`, `backup.delete`,
-  `backup.restore`.
+* Permissions: `backup.list` (list and verify), `backup.show`, `backup.create`,
+  `backup.download`, `backup.delete`, `backup.restore` (also "upload a backup file"); default
+  grants: administrators `backup.list`, `backup.show`, `backup.create`; download, delete and
+  restore only the superadmin (a downloaded backup holds every secret of `.env`).
+* Settings: `Backup.scheduled` (off), `Backup.scheduledType` (`full` or `db`),
+  `Backup.keepDaily` (7), `Backup.keepWeekly` (4), `Backup.keepMonthly` (6).
 
 ## Security baseline (must be on by default)
 

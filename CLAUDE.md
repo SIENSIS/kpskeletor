@@ -152,6 +152,13 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   HTMLPurifier for rich text; redirects only to internal paths (`safe_redirect()`).
 - Uploads through the Storage service only (`service('storage')->store()`, `UploadRules`;
   allow-lists, random names, no SVG/HTML by default; `docs/storage.md`, `docs/web-server.md`).
+  The one exception is an uploaded backup file (Backup module: header check, generated name,
+  `writable/backups`, never served).
+- ZIP files from outside (backups, module packages) only through `Modules\Core\Archive\SafeZip`
+  (zip-slip and zip-bomb checks).
+- Maintenance mode only through `Modules\Core\Maintenance\MaintenanceMode` (its state is a file;
+  the global `maintenance` filter answers 503). Paths under `progress/*` serve the JSON progress of
+  long jobs from files, skip the database/session filters and never return secrets.
 - No outbound HTTP on regular requests; external calls only through `OutboundClient`
   (HTTPS + allow-list).
 - Secrets only in `.env`; never commit real values, keys, passwords or tokens.

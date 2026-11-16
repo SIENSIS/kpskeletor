@@ -232,6 +232,15 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-26-04 | 26 | The OpenAPI document written by `modules:sync` | Accepted (proposal) |
 | D-26-05 | 26 | Calendar access policies and providers in the events API | Accepted (proposal) |
 | D-26-06 | 26 | `make:module --api` needs `--crud` | Accepted (proposal) |
+| D-27-01 | 27 | Backup permission names, URLs, settings and default grants (decide) | Applied (decided) |
+| D-27-02 | 27 | Maintenance mode now, as a file and a global filter, and the `progress/*` paths (decide) | Applied (decided) |
+| D-27-03 | 27 | The database dump: Query Builder only, schema from the backup's own migrations | Accepted (proposal) |
+| D-27-04 | 27 | Restores from the back office: a job after the response, progress in files | Accepted (proposal) |
+| D-27-05 | 27 | Uploaded backup files are not stored through the Storage service (decide) | Applied (decided) |
+| D-27-06 | 27 | The safety backup, a failed restore and the `.env` | Accepted (proposal) |
+| D-27-07 | 27 | `SafeZip` in the Core; what a restore never writes | Accepted (proposal) |
+| D-27-08 | 27 | What the modules' `$backup` declarations mean | Accepted (proposal) |
+| D-27-09 | 27 | `AuthSession` with a session row started on the fly | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2407,3 +2416,86 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Modules/{ApiScaffold,ModuleGenerator}.php`, `Templates/{Module.php.tpl,ApiTest.php.tpl}`, `modules/Core/Commands/MakeModule.php`; test `CrudScaffoldTest::testWithApiTheTemplatesDeclareTheResourceAndItsScopeTest`. D-19-03 is now built.
 
+## D-27-01 — Backup permission names, URLs, settings and default grants (decide)
+
+- **Where:** specification "Backup" (permissions `backup.list`, `backup.create`, `backup.download`, `backup.delete`, `backup.restore`; "a back-office page"; retention "keep the last N daily/weekly/monthly"), plan session 27 (`backend/backups`).
+- **Problem:** The specification names the permissions but not the URLs, the settings, the extra `show` permission of the list's detail view, who verifies or uploads, nor the default grants.
+- **Proposal:** One resource `backups` named `backup` (single-resource module): `backup.list` (list and **verify**), `backup.show` (detail view, from kpcrudy), `backup.delete`, extras `backup.create`, `backup.download` (+ `reauth`) and `backup.restore` (+ `reauth`; also **upload a backup file**, which is only useful to restore). URLs: `backend/backups` (list, kpcrudy), `backend/backups/create`, `verify/<id>`, `download/<id>`, `recover/<id>` (restore; `restore/<id>` is kpcrudy's own trash URL), `upload`, `jobs/<job>` (result of a restore) and `progress/backup/<job>` (JSON progress, D-27-02). Settings: `Backup.scheduled` (bool, off), `Backup.scheduledType` (`full`/`db`), `Backup.keepDaily` 7, `Backup.keepWeekly` 4, `Backup.keepMonthly` 6 (0 in the three keeps everything). Default grants: admin `backup.list`, `backup.show`, `backup.create`; download, delete and restore only for the superadmin (a downloaded backup holds every secret of `.env`; an administrator who could create *and* download would get the encryption key with a password of their own).
+- **Alternatives:** A) Admin also gets `backup.download` (an admin then holds every secret). B) Verify under `backup.download` (verifying reveals nothing but the manifest). C) A separate `backup.upload` permission.
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com s'ha construït (recomanada)». The permission names, URLs, settings and default grants stay as built: admin `backup.list`, `backup.show`, `backup.create`; download, delete and restore only for the superadmin; verify under `backup.list`, upload under `backup.restore`; restore URL `backend/backups/recover/<id>`.
+- **Applied in:** `docs/specification.md` ("Backup": URLs, permissions, grants, settings), `modules/Backup/Config/{Module,Routes}.php`, `modules/Backup/Controllers/Backups.php`; tests `BackupScreensTest`, `BackupModuleTest::testManifestAndGrants`.
+
+## D-27-02 — Maintenance mode now, as a file and a global filter, and the `progress/*` paths (decide)
+
+- **Where:** specification "Backup" › "Restore" (enters maintenance mode), "Settings" (maintenance mode, session 28), D-14-03 (maintenance mode in session 28), D-07-01 (the `backend` chain).
+- **Problem:** A restore must enter maintenance mode, which session 28 was to build with its setting. A setting lives in the database, which the restore replaces; the restore's progress must stay reachable while every other page answers 503, and its endpoint cannot use the session or the database.
+- **Proposal:** `Modules\Core\Maintenance\MaintenanceMode` keeps the state in `writable/maintenance.json` (reason, since, allowed paths), and the global filter `maintenance` (first global filter) answers 503 + `Retry-After: 60` with a plain page that reads nothing from the database (JSON for API and JSON requests), except the paths given when it was turned on. `schedule:run` and the poor man's cron do nothing meanwhile; the console works. New convention: `progress/*` paths serve the JSON progress of long jobs; `moduleenabled`, `cspmodules`, `authsession` and `csrftoken` skip them (they read the database or the session). Session 28 adds the setting/screen (turning it on by hand, a superadmin bypass) on top of this class.
+- **Alternatives:** A) Store the state as a setting (lost while the database is replaced). B) Wait for session 28 and restore without maintenance mode (users write to a database being replaced). C) Exempt the restore's own back-office page instead of a `progress/*` endpoint (needs the session and the database).
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com s'ha construït (recomanada)». Maintenance mode stays in the Core as a file (`writable/maintenance.json`) and the global `maintenance` filter, built now; `progress/*` paths are a convention (JSON progress read from files, no session/database filters, never secrets). Session 28 adds the setting, the screen and the superadmin bypass on top of `MaintenanceMode`.
+- **Applied in:** `docs/specification.md` ("RBAC" backend chain, "Settings", "Backup"), `CLAUDE.md`, `deploy/28-updates.md`, `deploy/30-security-check.md`, `docs/security.md`, `modules/Core/Maintenance/MaintenanceMode.php`, `modules/Core/Filters/Maintenance.php`, `app/Config/Filters.php`; test `MaintenanceModeTest`.
+
+## D-27-03 — The database dump: Query Builder only, schema from the backup's own migrations
+
+- **Where:** specification "Backup" ("portable dump generated with the Query Builder in chunks, or `mysqldump` when available"); plan risk "`mysqldump` output is not portable to SQLite".
+- **Problem:** A `mysqldump` file cannot be restored on SQLite (nor read safely without running SQL from the archive); a data-only dump needs a schema to load into, and the installed code's schema may be newer than the backup's.
+- **Proposal:** Only the Query Builder dump: one `database/<table>.jsonl` per table with the prefix removed (columns, then one JSON array per row; non-UTF-8 strings as base64), read in chunks of `Config\Backup::$dumpChunk` rows. A restore never runs SQL from the archive: it checks that every migration listed in the backup's own `migrations` table exists in the installed code (otherwise "newer or different version"), drops the application's tables, runs those migrations in their original order, empties every table and inserts the rows (foreign keys off), then `modules:sync` runs the migrations added since. Works across drivers and prefixes (SQLite in tests and development, MariaDB in production).
+- **Alternatives:** A) `mysqldump` when available (not portable, runs SQL from a file). B) Store the schema read from the database (`getFieldData()` loses indexes, keys and defaults).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Backup/Services/DatabaseDumper.php`; tests `BackupServiceTest`.
+
+## D-27-04 — Restores from the back office: a job after the response, progress in files
+
+- **Where:** specification "Backup" ("long restores from the UI run as a background job with progress"); plan session 27 (a `background_jobs` table).
+- **Problem:** There is no queue worker; a job run later (cron) would need the password stored somewhere; a `background_jobs` table would be replaced by the restore itself.
+- **Proposal:** The restore runs in the same PHP process after the response is sent (`fastcgi_finish_request()`/LiteSpeed; inside the request otherwise or with `Config\Backup::$jobsAfterResponse = false`): the password only lives in that process's memory. Before the job starts, a quick check derives the key and authenticates the first chunk, so a wrong password is a form error. Progress is a file `writable/backups/jobs/<id>.json` (0600, id = 128 random bits), read by `progress/backup/<id>` (status, step, percentage only) and polled by `backup/restore-progress.js`; the result page needs `backup.restore` and the job's own user. No `background_jobs` table.
+- **Alternatives:** A) A `background_jobs` table and `schedule:run` (password on disk, table replaced by the restore). B) A detached `spark` process (`exec` is often disabled; password in the process list or a file).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Backup/Services/{RestoreJob,JobStore}.php`, `modules/Backup/Controllers/{Backups,Jobs}.php`, `modules/Backup/Assets/js/restore-progress.js`; tests `BackupScreensTest::testRestoreFromTheBackOffice`, `BackupModuleTest::testJobFilesArePrivateAndPurged`.
+
+## D-27-05 — Uploaded backup files are not stored through the Storage service (decide)
+
+- **Where:** `CLAUDE.md` ("Uploads through the Storage service only"), specification "Backup" ("upload a backup file").
+- **Problem:** The Storage service stores into its disks with a `stored_files` row; backups live in `writable/backups` (outside both disks, never served, not backed up themselves) and a restore replaces `stored_files`.
+- **Proposal:** "Upload a backup" (`backup.restore` + `reauth` + `ratelimit:uploads`) accepts only a file that starts with a valid backup header (`ArchiveCrypto::isBackup()`) and is at most `Config\Backup::$maxUploadBytes`, moves it into `writable/backups` with a generated name (`backup-<date>-upload-<random>.kpbackup`, 0640) and records it; nothing in it is used before it is decrypted and authenticated with its password. Refusals are security entries.
+- **Alternatives:** A) A third Storage disk `backups` (its rows would be lost by every restore; the backup would have to exclude it). B) Only the console can bring backups from elsewhere (copy the file into `writable/backups`).
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com s'ha construït (recomanada)». Uploaded backup files are a documented exception to "uploads through the Storage service only": header check, size limit, generated name, `writable/backups` (0640), never served, nothing used before decryption and authentication; refusals are security entries.
+- **Applied in:** `docs/specification.md` ("Backup"), `CLAUDE.md`, `docs/storage.md`, `deploy/30-security-check.md`, `modules/Backup/Controllers/Backups.php` (`upload()`).
+
+## D-27-06 — The safety backup, a failed restore and the `.env`
+
+- **Where:** specification "Backup" › "Restore", D-00-45, D-00-33 (the web server cannot write the project root).
+- **Problem:** The safety backup needs a password; a restore can fail half way; the back office must not write `.env`.
+- **Proposal:** The safety backup (type `full`, kind `safety` in its file name) is encrypted with the password typed for the restore. A restore refused before any change (password, checksums, versions, migrations) leaves no safety backup and no maintenance mode; a failure after maintenance mode started keeps it on and names the safety backup to restore from the console. The restore never writes `.env`: it reports the secrets (`encryption.key`, `app.maskKey`, `backup.password`) whose values differ and the merged content; the console writes it after a confirmation (`--with-env` replaces it whole), the back office shows it once on the result page (kept 0600 in the job's `.env` file until then; old job files are purged by `PruneBackups`).
+- **Alternatives:** A) A separate password for the safety backup (one more secret to type under pressure). B) Leave maintenance mode on any failure.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Backup/Services/{RestoreService,EnvFile}.php`, `modules/Backup/Commands/BackupRestore.php`, `modules/Backup/Views/job.php`; tests `BackupServiceTest`, `BackupScreensTest`.
+
+## D-27-07 — `SafeZip` in the Core; what a restore never writes
+
+- **Where:** specification "Backup" ("restoring extracts with the same zip-slip and zip-bomb checks as module packages"), session 29 (packages).
+- **Problem:** The checks must be shared with module packages, which arrive in session 29; a backup made elsewhere could carry server code for `public/uploads`.
+- **Proposal:** `Modules\Core\Archive\SafeZip` (zip-slip names checked on the stored bytes, symbolic links, allowed prefixes, entry count, total size, compression ratio, sizes enforced while copying, own extraction with permissions) is used by backups now and by packages in session 29. A restore never writes server code or server configuration (`php`, `phtml`, `.htaccess`, `.user.ini`… `Config\Backup::$neverRestorePublic`) into a public disk, and never backs up nor replaces the top-level `index.html`/`.htaccess`/`web.config` of a storage folder (they belong to the installation).
+- **Alternatives:** A) `ZipArchive::extractTo()` after a name check (no size enforcement).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Archive/{SafeZip,ArchiveRefused}.php`, `modules/Backup/Services/{BackupService,RestoreService}.php`; tests `SafeZipTest`, `BackupServiceTest::testServerCodeIsNeverRestoredIntoThePublicDisk`.
+
+## D-27-08 — What the modules' `$backup` declarations mean
+
+- **Where:** manifest `$backup` (`files`: "paths relative to storage", `tables`), specification "Backup" ("the extra paths declared by modules").
+- **Problem:** Both storage disks are backed up whole and every table is dumped, so the declared paths add nothing to the archive.
+- **Proposal:** Keep the key: the declared paths are listed in the backup's manifest (`modulePaths`) to document what each module keeps in the disks; `tables` needs nothing (every table with the prefix is dumped). A future disk outside the two would use these paths.
+- **Alternatives:** A) Back up only the declared paths (a module that forgets one loses files).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Backup/Services/BackupService.php`.
+
+## D-27-09 — `AuthSession` with a session row started on the fly
+
+- **Where:** `modules/Auth/Filters/AuthSession.php` (session 05).
+- **Problem:** When the tracking row of a signed-in session is missing (e.g. after a database restore), `SessionTracker::start()` returns a row without `ended_at` and the filter failed with an undefined index (500).
+- **Proposal:** Treat a missing `ended_at` as an open session (as the database default). Found while testing restores from the back office.
+- **Alternatives:** —
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Auth/Filters/AuthSession.php`; test `BackupScreensTest::testRestoreFromTheBackOffice`.

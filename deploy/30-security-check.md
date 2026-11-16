@@ -45,7 +45,9 @@ A production-readiness checklist in the console and the back office.
   stored ("last checked on …", warning when older than 7 days); the web user may write only
   `writable/`, `public/assets/modules`, `public/assets/core`, `public/themes` and `public/uploads`;
   stricter file modes than `0750`/`0640` accepted; `--probe` uses a dedicated client limited to
-  the site's own host (HTTP only for the redirect check).
+  the site's own host (HTTP only for the redirect check); from session 27: `backup.password` set
+  when `Backup.scheduled` is on, `writable/backups` and `writable/maintenance.json` not readable by
+  others, `progress/*` routes return no secrets (D-27-02), uploaded backups never served (D-27-05).
 - Security status page (`security.check`), probe button with re-auth, effective CSP and headers,
   dashboard widget, daily task with notification.
 - `app:install` prints the summary at the end.

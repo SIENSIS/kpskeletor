@@ -12,6 +12,11 @@ Disks, permissions, forbidden extensions, image limits and the access rule are c
 `app/Config/Storage.php`. Modules never use these paths: they call the service, so another adapter
 (S3, SFTP) can be added later. Decisions: D-13-01 … D-13-05 in `docs/decisions.md`.
 
+The one exception is "upload a backup file" (Backup module, D-27-05): it accepts only files with a
+valid backup header, stores them in `writable/backups` (outside the disks, never served) with a
+generated name, and nothing in them is used before they are decrypted and authenticated
+(`docs/backup-restore.md`).
+
 ## Storing an upload
 
 A **form field** that takes a file uses the Core's file picker (`PickerField`, signed upload

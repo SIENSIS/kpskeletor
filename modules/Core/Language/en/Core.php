@@ -215,6 +215,23 @@ return [
         'skipToContent'   => 'Skip to the content',
         'toggleSidebar'   => 'Collapse or expand the menu',
     ],
+    'archive' => [
+        'invalid'        => 'The file is not a valid archive.',
+        'tooManyEntries' => 'The archive has more than {0} entries.',
+        'link'           => 'The archive contains a symbolic link ({0}).',
+        'ratio'          => 'The entry {0} is compressed too much (possible zip bomb).',
+        'duplicate'      => 'The entry {0} appears twice.',
+        'tooLarge'       => 'The archive is too large once extracted.',
+        'sizeMismatch'   => 'The entry {0} is larger than declared.',
+        'cannotWrite'    => 'The archive could not be extracted (folder not writable).',
+        'badName'        => 'The archive contains a forbidden path: {0}',
+        'missing'        => 'The archive has no entry {0}.',
+    ],
+    'maintenance' => [
+        'title'   => 'Site under maintenance',
+        'message' => 'The site is being updated or restored. Please try again in a few minutes.',
+        'skipped' => 'Skipped: maintenance mode is on.',
+    ],
     'errors' => [
         'home'        => 'Go to the home page',
         'forbidden'   => [

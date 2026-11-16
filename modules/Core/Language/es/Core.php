@@ -215,6 +215,23 @@ return [
         'skipToContent'   => 'Saltar al contenido',
         'toggleSidebar'   => 'Plegar o desplegar el menú',
     ],
+    'archive' => [
+        'invalid'        => 'El fichero no es un archivo válido.',
+        'tooManyEntries' => 'El archivo tiene más de {0} entradas.',
+        'link'           => 'El archivo contiene un enlace simbólico ({0}).',
+        'ratio'          => 'La entrada {0} está demasiado comprimida (posible bomba zip).',
+        'duplicate'      => 'La entrada {0} aparece dos veces.',
+        'tooLarge'       => 'El archivo es demasiado grande una vez extraído.',
+        'sizeMismatch'   => 'La entrada {0} es mayor de lo declarado.',
+        'cannotWrite'    => 'No se ha podido extraer el archivo (la carpeta no se puede escribir).',
+        'badName'        => 'El archivo contiene una ruta prohibida: {0}',
+        'missing'        => 'El archivo no tiene la entrada {0}.',
+    ],
+    'maintenance' => [
+        'title'   => 'Sitio en mantenimiento',
+        'message' => 'El sitio se está actualizando o restaurando. Vuelva a intentarlo dentro de unos minutos.',
+        'skipped' => 'Omitido: el modo de mantenimiento está activado.',
+    ],
     'errors' => [
         'home'        => 'Ir a la página de inicio',
         'forbidden'   => [
