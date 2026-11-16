@@ -154,12 +154,29 @@ after DNS and redirects) and the SMTP host check.
 
 `Modules\Core\Maintenance\MaintenanceMode` (D-27-02) keeps its state in
 `writable/maintenance.json`. While it is on, the global `maintenance` filter (the first one)
-answers 503 with `Retry-After` and a page that reads no database, except the paths given when it
+answers 503 with `Retry-After` and the theme's maintenance page drawn without the database, except the paths given when it
 was turned on (a restore allows only `progress/backup/*`); `schedule:run` and the poor man's cron
 do nothing. Paths under `progress/*` return the JSON progress of long jobs and skip the filters
 that read the database or the session (`moduleenabled`, `cspmodules`, `authsession`,
-`csrftoken`); they must never return secrets. Restores turn it on and off (docs/backup-restore.md);
-session 28 adds the setting and the screen.
+`csrftoken`); they must never return secrets. Restores and `app:update` turn it on and off
+(docs/backup-restore.md, docs/updates.md) without any bypass.
+
+The 503 page is the theme's `errors/maintenance` view in the `blank` layout, like the other error
+pages (a theme overrides it in `themes/<slug>/Views/errors/maintenance.php`). It is drawn by
+`Modules\Core\Maintenance\MaintenancePage` with a settings service without handlers, so nothing
+reads the database (only the file configuration: `Config\Theme`'s public theme, its default
+options); if the theme fails, a plain HTML page is returned (D-28-07).
+
+**By hand** (D-28-02): Settings › Actions › *Maintenance mode* (`maintenance.manage` +
+re-authentication) or `php spark app:maintenance on|off|status [--message="…"]`. The state file
+then also holds a plain-text message (at most 500 characters, shown escaped on the 503 page and
+in the JSON answer), the login paths (`login`, `login/*`, `logout`, `auth/*`) and the `bypass`
+flag: a request that carries a session cookie of a signed-in user with **`maintenance.manage`**
+passes, with a banner in the back office. The permission is a Core resource with no default grant
+(superadmins always pass; administrators do not get it through `settings.*`; assign it in the
+permission matrix). Nobody else passes; turning it on and off is
+written to the security log. The screen never turns off a mode turned on by a restore or an
+update.
 
 ## Archives
 

@@ -1,0 +1,47 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/28-updates/screenshots",
+  "deviceScaleFactor": 2,
+  "login": {
+    "url": "/login",
+    "user": "root@example.com",
+    "password": "(the password given to app:install)",
+    "userField": "input[name=email]",
+    "passwordField": "input[name=password]",
+    "submit": "button[type=submit]",
+    "waitFor": "/backend"
+  },
+  "shots": [
+    {
+      "url": "/backend/settings/actions",
+      "name": "05-maintenance-on-superadmin",
+      "fullPage": true
+    },
+    {
+      "url": "/backend/settings/actions",
+      "name": "08-maintenance-on-phone-dark",
+      "width": 390,
+      "height": 844,
+      "dark": true
+    },
+    {
+      "url": "/",
+      "name": "06-maintenance-page-guest",
+      "login": false
+    },
+    {
+      "url": "/",
+      "name": "07-maintenance-page-phone",
+      "login": false,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "url": "/",
+      "name": "09-maintenance-page-dark",
+      "login": false,
+      "dark": true
+    }
+  ],
+  "_comment": "Taken after: php spark app:maintenance on --message \"Estem actualitzant el portal. Tornem a les 10:00.\""
+}

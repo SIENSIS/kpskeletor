@@ -87,6 +87,12 @@ CI_ENVIRONMENT = production
 #--------------------------------------------------------------------
 
 # backup.password =
+
+# Updates (docs/updates.md): releases repository, token for a private repository and the
+# minisign public key(s) that release archives must be signed with (empty = updates refused).
+# updates.repository = github:owner/repo
+# updates.token =
+# updates.publicKeys = RW...
 # email.SMTPHost =
 # email.SMTPUser =
 # email.SMTPPass =

@@ -10,8 +10,8 @@ use CodeIgniter\Router\RouteCollection;
  * - `backend/settings`: the first tab the user can open;
  * - `backend/settings/security`: Settings › Security (`settings.security` + `reauth`);
  * - `backend/settings/theme`: the themes and the options of a theme (saving needs `settings.core`);
- * - `backend/settings/actions…`: test email, clear caches (`settings.update`) and publish assets
- *   (`settings.security` + `reauth`);
+ * - `backend/settings/actions…`: test email, clear caches (`settings.update`), publish assets
+ *   (`settings.security` + `reauth`) and maintenance mode on/off (`maintenance.manage` + `reauth`);
  * - `backend/settings/<module>`: a module's tab (saving needs `settings.<module>`, checked by the
  *   controller because a module without settings has no such permission).
  *
@@ -30,6 +30,7 @@ $routes->group('backend/settings', ['namespace' => 'Modules\Settings\Controllers
     $routes->post('actions/email', 'Actions::testEmail', $update);
     $routes->post('actions/caches', 'Actions::clearCaches', $update);
     $routes->post('actions/assets', 'Actions::publishAssets', $security);
+    $routes->post('actions/maintenance', 'Actions::maintenance', ['filter' => ['can:maintenance.manage', 'reauth']]);
     $routes->get('(:segment)', 'Settings::module/$1', $update + ['as' => 'settings-module']);
     $routes->post('(:segment)', 'Settings::saveModule/$1', $update);
 });

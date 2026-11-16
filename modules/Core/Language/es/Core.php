@@ -112,6 +112,7 @@ return [
     'res' => [
         'modules' => 'Módulos',
         'notifications' => 'Notificaciones',
+        'maintenance' => 'Modo de mantenimiento',
         'schedule' => 'Tareas programadas',
     ],
     'groups' => [
@@ -134,6 +135,7 @@ return [
         'checkOk' => 'Permisos correctos: {0} permiso(s) en el catálogo, {1} ruta(s) comprobadas.',
     ],
     'perm' => [
+        'manageMaintenance' => 'Gestionar el modo de mantenimiento y usar el sitio mientras está activado',
         'list'      => 'Listar',
         'show'      => 'Ver',
         'add'       => 'Añadir',
@@ -230,7 +232,15 @@ return [
     'maintenance' => [
         'title'   => 'Sitio en mantenimiento',
         'message' => 'El sitio se está actualizando o restaurando. Vuelva a intentarlo dentro de unos minutos.',
+        'retry'   => 'Volver a intentarlo',
         'skipped' => 'Omitido: el modo de mantenimiento está activado.',
+        'banner'  => 'Modo de mantenimiento activado: los visitantes ven la página de mantenimiento.',
+        'manage'  => 'Gestionarlo',
+        'cliOnHand' => 'Modo de mantenimiento activado. Los usuarios con el permiso maintenance.manage (y los superadministradores) pueden seguir usando el sitio.',
+        'cliOff'  => 'Modo de mantenimiento desactivado.',
+        'cliStatusOff' => 'El modo de mantenimiento está desactivado.',
+        'cliStatusOn'  => 'El modo de mantenimiento está activado desde {0} (motivo: {1}).',
+        'cliUsage' => 'Uso: app:maintenance on|off|status [--message="…"]',
     ],
     'errors' => [
         'home'        => 'Ir a la página de inicio',
@@ -576,6 +586,8 @@ return [
         'task_failed' => 'Tarea programada fallida',
         'forbidden' => 'Acceso denegado (403)',
         'throttled' => 'Límite de peticiones superado',
+        'maintenance_on' => 'Modo de mantenimiento activado',
+        'maintenance_off' => 'Modo de mantenimiento desactivado',
         'outbound' => 'Petición externa',
         'outbound_refused' => 'Petición externa rechazada',
         'preferences_saved' => 'Preferencias de notificaciones guardadas',

@@ -157,7 +157,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - ZIP files from outside (backups, module packages) only through `Modules\Core\Archive\SafeZip`
   (zip-slip and zip-bomb checks).
 - Maintenance mode only through `Modules\Core\Maintenance\MaintenanceMode` (its state is a file;
-  the global `maintenance` filter answers 503). Paths under `progress/*` serve the JSON progress of
+  the global `maintenance` filter answers 503; by hand: Settings › Actions or
+  `php spark app:maintenance`; `maintenance.manage` holders bypass only that mode). Paths under `progress/*` serve the JSON progress of
   long jobs from files, skip the database/session filters and never return secrets.
 - No outbound HTTP on regular requests; external calls only through `OutboundClient`
   (HTTPS + allow-list).

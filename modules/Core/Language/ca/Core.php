@@ -112,6 +112,7 @@ return [
     'res' => [
         'modules' => 'Mòduls',
         'notifications' => 'Notificacions',
+        'maintenance' => 'Mode de manteniment',
         'schedule' => 'Tasques programades',
     ],
     'groups' => [
@@ -134,6 +135,7 @@ return [
         'checkOk' => 'Permisos correctes: {0} permís(os) al catàleg, {1} ruta(es) comprovades.',
     ],
     'perm' => [
+        'manageMaintenance' => 'Gestionar el mode de manteniment i usar el lloc mentre està activat',
         'list'      => 'Llistar',
         'show'      => 'Veure',
         'add'       => 'Afegir',
@@ -230,7 +232,15 @@ return [
     'maintenance' => [
         'title'   => 'Lloc en manteniment',
         'message' => 'El lloc s\'està actualitzant o restaurant. Torneu-ho a provar d\'aquí a uns minuts.',
+        'retry'   => 'Torna-ho a provar',
         'skipped' => 'Omès: el mode de manteniment està activat.',
+        'banner'  => 'Mode de manteniment activat: els visitants veuen la pàgina de manteniment.',
+        'manage'  => 'Gestiona-ho',
+        'cliOnHand' => 'Mode de manteniment activat. Els usuaris amb el permís maintenance.manage (i els superadministradors) poden continuar usant el lloc.',
+        'cliOff'  => 'Mode de manteniment desactivat.',
+        'cliStatusOff' => 'El mode de manteniment està desactivat.',
+        'cliStatusOn'  => 'El mode de manteniment està activat des de {0} (motiu: {1}).',
+        'cliUsage' => 'Ús: app:maintenance on|off|status [--message="…"]',
     ],
     'errors' => [
         'home'        => 'Ves a la pàgina d\'inici',
@@ -576,6 +586,8 @@ return [
         'task_failed' => 'Tasca programada fallida',
         'forbidden' => 'Accés denegat (403)',
         'throttled' => 'Límit de peticions superat',
+        'maintenance_on' => 'Mode de manteniment activat',
+        'maintenance_off' => 'Mode de manteniment desactivat',
         'outbound' => 'Petició externa',
         'outbound_refused' => 'Petició externa refusada',
         'preferences_saved' => 'Preferències de notificacions desades',

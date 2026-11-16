@@ -46,8 +46,17 @@ not checked.
 
 ## Exceptions
 
-`git` and `composer` (console-only `app:update`, session 28) use their own clients; they are
-documented exceptions and never run from a web request.
+`git` and `composer` (console-only `app:update`, docs/updates.md) use their own clients; they are
+documented exceptions and never run from a web request. The release checks and the archive
+download of the Updates module go through `OutboundClient` (the download with a larger size
+limit and timeout, `updates.maxArchiveBytes`).
+
+## Credentials and redirects
+
+Headers that carry credentials (`Authorization`, `Proxy-Authorization`, `Cookie`,
+`PRIVATE-TOKEN`, `JOB-TOKEN`) are dropped when a redirect leads to another origin (scheme, host
+or port): a token sent to an API is never forwarded to the storage host the API redirects a
+download to.
 
 ## Examples
 

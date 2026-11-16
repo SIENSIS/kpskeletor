@@ -105,6 +105,7 @@ Core standard views (`modules/Core/Views/`), every one overridable by a theme:
 | `components/tabs` | `id`, `tabs` (`[['id', 'label', 'content', 'icon', 'active']]`) |
 | `components/card` | `title`, `icon`, `body`, `footer`, `actions` |
 | `errors/403`, `errors/404`, `errors/429`, `errors/500` | `message` (escaped), `homeUrl`; rendered in the `blank` layout |
+| `errors/maintenance` | `message` (the administrator's plain text, escaped; empty = default text), `retry` (URL); the 503 page of maintenance mode in the `blank` layout. Rendered **without the database** (`MaintenancePage`): settings answer only the file configuration (`Config\Theme`'s public theme and default options), so the view must not read models or the session (D-28-07) |
 | `partials/sidebar_menu`, `partials/sidebar_menu_items`, `partials/user_menu` | the generated back-office menu (`backend_menu($zone)`, list of `MenuEntry`; see `docs/menus.md`) |
 
 Small components (`ui_helper`): `ui_badge($text, $variant, $icon)`, `ui_status($status, $label)`,
@@ -116,7 +117,7 @@ turn `javascript:`/`data:`/protocol-relative URLs into `#` (`ui_safe_url()`).
 
 The 404 page (`app/Views/errors/html/error_404.php`), the production 500 page
 (`production.php`) and the 403 of the `can:` filter (JSON when the client asks for it) render the
-theme's `errors/<code>` view, with a plain fallback if the theme itself fails.
+theme's `errors/<code>` view, with a plain fallback if the theme itself fails. The 503 page of maintenance mode is `errors/maintenance` (drawn without the database, D-28-07).
 
 ## Options
 

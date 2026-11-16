@@ -128,6 +128,21 @@ final class OutboundClientTest extends CIUnitTestCase
         }
     }
 
+    public function testCredentialsAreNotSentToAnotherOrigin(): void
+    {
+        $this->transport->responses = [
+            new OutboundResponse(302, ['location' => '/same-host'], ''),
+            new OutboundResponse(302, ['location' => 'https://cdn.example.com/blob?sig=1'], ''),
+            new OutboundResponse(200, [], 'blob'),
+        ];
+        $this->client()->get('https://api.example.com/asset', ['Authorization' => 'Bearer secret', 'PRIVATE-TOKEN' => 'x', 'Accept' => 'application/octet-stream']);
+
+        $this->assertSame('Bearer secret', $this->transport->sent[1]['headers']['Authorization'], 'Same origin: kept.');
+        $this->assertArrayNotHasKey('Authorization', $this->transport->sent[2]['headers']);
+        $this->assertArrayNotHasKey('PRIVATE-TOKEN', $this->transport->sent[2]['headers']);
+        $this->assertSame('application/octet-stream', $this->transport->sent[2]['headers']['Accept']);
+    }
+
     public function testTooManyRedirects(): void
     {
         $this->transport->responses = array_fill(0, 5, new OutboundResponse(302, ['location' => '/again'], ''));

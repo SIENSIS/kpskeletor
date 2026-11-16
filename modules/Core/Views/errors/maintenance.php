@@ -1,22 +1,22 @@
 <?php
 /**
- * Maintenance mode page (503, Modules\Core\Filters\Maintenance). Plain HTML on purpose: while the
- * mode is on the database may be replaced (a restore), so nothing here reads settings, the theme
- * or the database.
+ * Maintenance page (503, Modules\Core\Filters\Maintenance through MaintenancePage) in the active
+ * theme's blank layout, like the other error pages; a theme overrides it in
+ * `themes/<slug>/Views/errors/maintenance.php`. The database may be being replaced: settings
+ * answer the file configuration only (MaintenancePage), and this view must not read anything
+ * else (no models, no session data).
+ *
+ * @var string      $message the administrator's plain-text message (empty = the default text)
+ * @var string|null $retry   the URL to try again
  */
 ?>
-<!doctype html>
-<html lang="<?= esc(service('request')->getLocale(), 'attr') ?>">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex">
-    <title><?= esc(lang('Core.maintenance.title')) ?></title>
-</head>
-<body>
-<main>
-    <h1><?= esc(lang('Core.maintenance.title')) ?></h1>
-    <p><?= esc(lang('Core.maintenance.message')) ?></p>
+<?= $this->extend(theme_layout('blank')) ?>
+<?= $this->section('content') ?>
+<main class="error-page maintenance-page container py-5 text-center">
+    <i class="bi bi-cone-striped error-page-icon text-warning" aria-hidden="true"></i>
+    <p class="display-4 fw-semibold mt-3 mb-0">503</p>
+    <h1 class="h3"><?= esc(lang('Core.maintenance.title')) ?></h1>
+    <p class="text-body-secondary mx-auto maintenance-message"><?= esc(($message ?? '') !== '' ? $message : lang('Core.maintenance.message')) ?></p>
+    <a href="<?= esc(ui_safe_url($retry ?? base_url('/'))) ?>" class="btn btn-primary mt-2"><i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i><?= esc(lang('Core.maintenance.retry')) ?></a>
 </main>
-</body>
-</html>
+<?= $this->endSection() ?>

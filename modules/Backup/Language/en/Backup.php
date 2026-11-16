@@ -67,6 +67,7 @@ return [
         'ui'       => 'Back office',
         'schedule' => 'Scheduled',
         'safety'   => 'Safety (before a restore)',
+        'update'   => 'Safety (before an update)',
         'upload'   => 'Uploaded',
         'found'    => 'Found in the folder',
     ],

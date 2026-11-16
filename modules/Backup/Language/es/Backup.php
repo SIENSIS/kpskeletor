@@ -67,6 +67,7 @@ return [
         'ui'       => 'Administración',
         'schedule' => 'Programada',
         'safety'   => 'De seguridad (antes de una restauración)',
+        'update'   => 'De seguridad (antes de una actualización)',
         'upload'   => 'Subida',
         'found'    => 'Encontrada en la carpeta',
     ],
