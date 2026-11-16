@@ -230,6 +230,7 @@ return [
     'maintenance' => [
         'title'   => 'Sitio en mantenimiento',
         'message' => 'El sitio se está actualizando o restaurando. Vuelva a intentarlo dentro de unos minutos.',
+        'retry'   => 'Volver a intentarlo',
         'skipped' => 'Omitido: el modo de mantenimiento está activado.',
         'banner'  => 'Modo de mantenimiento activado: los visitantes ven la página de mantenimiento.',
         'manage'  => 'Gestionarlo',

@@ -247,6 +247,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-28-04 | 28 | `app:update`: verify before maintenance, protected paths, local changes, recovery | Accepted (proposal) |
 | D-28-05 | 28 | Versions: the installed version, tags, pre-releases and modules' repositories | Accepted (proposal) |
 | D-28-06 | 28 | `OutboundClient` drops credentials on cross-origin redirects | Accepted (proposal) |
+| D-28-07 | 28 | The maintenance page drawn by the theme without the database | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2559,3 +2560,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Never follow redirects for authenticated requests (GitHub asset downloads always redirect).
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Http/OutboundClient.php`, `docs/outbound-requests.md`; tests `OutboundClientTest::testCredentialsAreNotSentToAnotherOrigin`, `ReleaseSourceTest::testPrivateRepositoriesUseTheTokenAndTheApiForDownloads`.
+
+## D-28-07 — The maintenance page drawn by the theme without the database
+
+- **Where:** D-27-02 (the 503 page "reads no database": a plain HTML page), specification "Themes" (error pages through the theme); owner's request (2026-11-16): the maintenance page should look like the 404/500 pages and follow the theme.
+- **Problem:** The theme, the site name and the theme options are settings stored in the database, which a restore may be replacing while the page is shown.
+- **Proposal:** The page is the standard view `errors/maintenance` (Core default in the `blank` layout: icon, 503, title, the administrator's message, "Try again"), overridable by a theme in `themes/<slug>/Views/errors/maintenance.php`. `MaintenancePage::render()` swaps the request's settings service for one without handlers before rendering, so every `setting()` answers the file configuration only (`Config\Theme::$public`, default options and colours, default site name) and nothing reads the database; any failure falls back to the plain page. A theme chosen in Settings (stored in the database) is therefore not used for this page: set it in `Config\Theme`/`.env` (`theme.public`) to see it there too.
+- **Alternatives:** A) Read the stored theme when the mode was turned on by hand (the database is intact then), file configuration only during restores and updates (two looks for the same page). B) Copy the active theme's slug into `maintenance.json` when the mode is turned on.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Maintenance/MaintenancePage.php`, `modules/Core/Filters/Maintenance.php`, `modules/Core/Views/errors/maintenance.php`, `themes/default/Assets/css/theme.css`, `docs/themes.md`, `docs/security.md`; tests `MaintenanceModeTest`, `MaintenanceScreenTest::testThePageIsThemedWithoutReadingStoredSettings`.

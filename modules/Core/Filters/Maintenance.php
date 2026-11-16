@@ -10,12 +10,14 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Maintenance\MaintenanceMode;
+use Modules\Core\Maintenance\MaintenancePage;
 use Modules\Core\Permissions\Authorization;
 use Throwable;
 
 /**
  * Global filter (`maintenance`, first of the global filters): while maintenance mode is on,
- * every request answers 503 with `Retry-After` and a plain page that needs no database, except
+ * every request answers 503 with `Retry-After` and the theme's maintenance page drawn without the
+ * database (MaintenancePage; plain HTML if the theme fails), except
  * the paths the mode allows (MaintenanceMode::allows()). JSON requests get a JSON body.
  *
  * When an administrator turned it on by hand (the state's `bypass` flag, D-28-02), a signed-in
@@ -64,7 +66,7 @@ final class Maintenance implements FilterInterface
             return $response->setJSON(['error' => lang('Core.maintenance.title'), 'message' => $state['message'], 'retryAfter' => self::RETRY_AFTER]);
         }
 
-        return $response->setBody(view('Modules\Core\Views\errors\maintenance', ['message' => $state['message']], ['debug' => false]));
+        return $response->setBody(MaintenancePage::render($state['message']));
     }
 
     private static function superadminSignedIn(RequestInterface $request): bool

@@ -35,6 +35,12 @@
       "login": false,
       "width": 390,
       "height": 844
+    },
+    {
+      "url": "/",
+      "name": "09-maintenance-page-dark",
+      "login": false,
+      "dark": true
     }
   ],
   "_comment": "Taken after: php spark app:maintenance on --message \"Estem actualitzant el portal. Tornem a les 10:00.\""

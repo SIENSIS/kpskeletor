@@ -68,6 +68,9 @@ Branch: `ccr-a5d307ea-vyzp92` · Pull request: [SIENSIS/kpskeletor#36](https://g
   in `writable/updates/previous/<version>/`; local changes of archive installs from
   `writable/updates/files.json` (the first archive update can only warn); git: `merge --ff-only`.
 - D-28-05 (accepted): installed version = `Version::CORE`; highest semver tag; pre-releases off.
+- D-28-07 (accepted, owner's request): the maintenance page is the theme's `errors/maintenance`
+  view (overridable by a theme) drawn with the file configuration only, no database; plain HTML
+  if the theme fails.
 - D-28-06 (accepted): credentials dropped on cross-origin redirects; the archive download uses a
   larger size limit and timeout.
 - Backup: new backup origin `update` (column fits, labels in ca/es/en).
@@ -181,11 +184,15 @@ configured here: updates would be refused), last check, "Check now" and the rele
 shows since when, the reason and the message, and turns it off.*
 
 ![503 page](screenshots/06-maintenance-page-guest.png)
-*06 — What a visitor (or an administrator) gets meanwhile: the 503 page with the message (plain
-HTML that reads no database, unchanged from session 27).*
+*06 — What a visitor (or an administrator) gets meanwhile: the 503 page with the message, drawn
+by the theme like the 404/500 pages without reading the database (D-28-07; guests see English
+until session 31).*
 
 ![503 page, phone](screenshots/07-maintenance-page-phone.png)
 *07 — The 503 page at phone width.*
+
+![503 page, dark](screenshots/09-maintenance-page-dark.png)
+*09 — The 503 page in dark mode.*
 
 ![Maintenance on, phone, dark](screenshots/08-maintenance-on-phone-dark.png)
 *08 — The banner and the back office at phone width in dark mode.*

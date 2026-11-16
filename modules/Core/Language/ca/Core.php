@@ -230,6 +230,7 @@ return [
     'maintenance' => [
         'title'   => 'Lloc en manteniment',
         'message' => 'El lloc s\'està actualitzant o restaurant. Torneu-ho a provar d\'aquí a uns minuts.',
+        'retry'   => 'Torna-ho a provar',
         'skipped' => 'Omès: el mode de manteniment està activat.',
         'banner'  => 'Mode de manteniment activat: els visitants veuen la pàgina de manteniment.',
         'manage'  => 'Gestiona-ho',

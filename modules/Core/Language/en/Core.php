@@ -230,6 +230,7 @@ return [
     'maintenance' => [
         'title'   => 'Site under maintenance',
         'message' => 'The site is being updated or restored. Please try again in a few minutes.',
+        'retry'   => 'Try again',
         'skipped' => 'Skipped: maintenance mode is on.',
         'banner'  => 'Maintenance mode is on: visitors see the maintenance page.',
         'manage'  => 'Manage it',

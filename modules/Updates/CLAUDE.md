@@ -29,7 +29,7 @@ Full description: `docs/updates.md`.
 
 ## Decisions
 
-D-00-48 (Ed25519, owner's key), D-28-01 … D-28-06 (`docs/decisions.md`).
+D-00-48 (Ed25519, owner's key), D-28-01 … D-28-07 (`docs/decisions.md`).
 
 ## Open tasks
 

@@ -296,6 +296,7 @@
 .demo-progress .progress-bar { width: 0; transition: width 0.3s ease; }
 .empty-state-icon { font-size: 3rem; }
 .error-page-icon { font-size: 4rem; }
+.maintenance-message { max-width: 36rem; }
 .status-dot { font-size: 0.5em; vertical-align: middle; }
 .crud-container .table-responsive-wrapper { overflow-x: auto; }
 .form-layout .form-actions { position: sticky; bottom: 0; background-color: var(--bs-body-bg); z-index: 2; }

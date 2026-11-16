@@ -90,6 +90,19 @@ final class MaintenanceScreenTest extends SettingsTestCase
         $this->send('GET', '/')->assertStatus(200);
     }
 
+    public function testThePageIsThemedWithoutReadingStoredSettings(): void
+    {
+        service('settings')->set('Core.siteName', 'Name stored in the database');
+        (new MaintenanceMode())->enableByHand('Back soon');
+
+        $page = (string) $this->send('GET', '/')->getBody();
+
+        $this->assertStringContainsString('class="error-page maintenance-page', $page);
+        $this->assertStringContainsString('Back soon', $page);
+        $this->assertStringNotContainsString('Name stored in the database', $page, 'Only the file configuration is read (the database may be being replaced).');
+        $this->assertStringContainsString('<title>' . esc(lang('Core.maintenance.title')), $page);
+    }
+
     public function testASuperadminWithoutASessionCookieIsNotLetThrough(): void
     {
         $this->createUser('root@example.com', 'superadmin');
