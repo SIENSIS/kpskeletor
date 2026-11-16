@@ -55,7 +55,7 @@ API names, decided as built by the owner), D-25-02 … D-25-07 accepted.
 - Weekly events whose `recur_days` exclude the start's weekday: iCal counts DTSTART as an
   occurrence, the expansion does not (edge case; the form could normalise it).
 - Done in session 26: `api/v1/events` (+ `occurrences`, `calendars`; resource `events-api`, every
-  group) and `api/v1/public/events` (`Services/EventsApi.php`, `Controllers/Api/`; D-26-01 open,
+  group) and `api/v1/public/events` (`Services/EventsApi.php`, `Controllers/Api/`; D-26-01 decided as built,
   D-26-05). Existing sites: grant `events-api.*` in the matrix after updating.
 - kpcrudy: `ajax` for `setRelationNN()` (users field, D-24-04).
 

@@ -69,7 +69,7 @@ Branch: `claude/keen-allen-cq2rvw` · Pull request: PR_LINK · Date: 2026-11-16
 
 | ID | Title | Status |
 |---|---|---|
-| D-26-01 | Core API permission names and URLs **(decide)** | Open (built as proposed) |
+| D-26-01 | Core API permission names and URLs **(decide)** | Decided as built (owner, 2026-11-16) |
 | D-26-02 | Public endpoints: GET only, no resolver, public records only | Accepted |
 | D-26-03 | Read markers in the API are not written to the activity log | Accepted |
 | D-26-04 | The OpenAPI document written by `modules:sync` | Accepted |
@@ -206,8 +206,7 @@ data, as the superadmin; the token of usuari@example.com is typed into the maske
 
 ## What the next session must know
 
-- D-26-01 is **open (decide)**: the permission names and URLs of the Core endpoints can still
-  change; run `deploy/decide.md`.
+- D-26-01 was decided as built (Decisions 26): the permission names and URLs are final.
 - A module's API resource: `make:module --crud=<table> --api`, or copy `Controllers/Api/Posts.php`
   (private) / `PublicNews.php` (public). `permissions:check` now refuses a kpapy resource route
   without its `$api` entry.

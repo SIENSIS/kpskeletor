@@ -55,7 +55,7 @@ Tests `Tests/NoticeCalendarTest.php`. D-25-06.
 ## Open tasks
 
 - Session 21: the Menus module consumes `Menu/CategoryLink.php` (formalise the contract).
-- Done in session 26: read receipts and notices in the API, public news (D-26-01 open: names).
+- Done in session 26: read receipts and notices in the API, public news (D-26-01 decided as built).
 
 ## How to test
 

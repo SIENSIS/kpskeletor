@@ -226,7 +226,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-25-08 | 25 | Who sees whose birthday: consent, permission, group table and an administrative calendar (decide) | Applied (decided) |
 | D-25-09 | 25 | Birthday greetings as notifications (decide) | Applied (decided) |
 | D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Decided |
-| D-26-01 | 26 | Core API permission names and URLs (decide) | Open |
+| D-26-01 | 26 | Core API permission names and URLs (decide) | Applied (decided) |
 | D-26-02 | 26 | Public API endpoints: GET only, no permission resolver, public records only | Accepted (proposal) |
 | D-26-03 | 26 | Read markers in the API are not written to the activity log | Accepted (proposal) |
 | D-26-04 | 26 | The OpenAPI document written by `modules:sync` | Accepted (proposal) |
@@ -2358,8 +2358,9 @@ questions") and from each session's report; they are answered with `deploy/decid
   - URLs: `GET api/v1/news/notices[?unread=1&limit=]`, `POST api/v1/news/{id}/read`; `GET api/v1/events[/{id}]`, `GET api/v1/events/occurrences?start=&end=[&calendars=a,b][&category=<slug>]`, `GET api/v1/events/calendars`; `GET api/v1/notifications[/{id}]`, `GET api/v1/notifications/unread`, `POST api/v1/notifications/{id}/read`, `POST api/v1/notifications/read-all`; `GET api/v1/public/news[/{id}]`, `GET api/v1/public/events[/{id}|/occurrences]`. Public endpoints have no catalogue resource (D-26-02).
   - Existing installations: default grants are applied once per module (D-02-04), so grant `events-api.*` to the groups in the permission matrix after updating (fresh installs get it).
 - **Alternatives:** A) Mark as read with `list` (no new names; a list-only token can write). B) Extra `list`/`show` operations on `events-calendar` (the page would carry API operations, what D-17-01 rejected for News). C) Catalogue resources for the public endpoints (`news-public.*`, `events-public.*`) granted to guests (guests have no groups; names that grant nothing). D) Other paths (`api/v1/news/{id}/mark`, `api/v1/calendar/…`, `api/v1/notifications/count`).
-- **Status:** Open
-- **Applied in:** `modules/News/Config/Module.php`, `modules/Events/Config/Module.php`, `modules/Core/Config/Module.php` (resources, `$api`), the controllers in `modules/*/Controllers/Api/`, `modules/Events/Services/EventsApi.php`; tests `NewsApiTest`, `PublicNewsApiTest`, `EventsApiTest`, `NotificationsApiTest`, counting tests (`PermissionsCommandsTest` 133, `ShieldMatrixTest`, `CatalogueBuilderTest`).
+- **Status:** Applied (decided)
+- **Decision (2026-11-16):** «Com està fet (recomanada)». The Core API keeps the names and URLs as built: permissions `news-api.read`, `core-notifications.read` and the resource `events-api` (`list`, `show`), granted to every group; the URLs listed in the proposal; public endpoints without a catalogue resource. A token limited to listing cannot mark anything as read. **Must change:** `docs/specification.md` ("JSON API" › "Core endpoints", "News", "Events"); nothing in the code.
+- **Applied in:** `modules/News/Config/Module.php`, `modules/Events/Config/Module.php`, `modules/Core/Config/Module.php` (resources, `$api`), the controllers in `modules/*/Controllers/Api/`, `modules/Events/Services/EventsApi.php`; tests `NewsApiTest`, `PublicNewsApiTest`, `EventsApiTest`, `NotificationsApiTest`, counting tests (`PermissionsCommandsTest` 133, `ShieldMatrixTest`, `CatalogueBuilderTest`); decided as built (Decisions 26): `docs/specification.md` ("JSON API" › "Core endpoints", "News", "Events").
 
 ## D-26-02 — Public API endpoints: GET only, no permission resolver, public records only
 
