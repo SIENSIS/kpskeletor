@@ -26,6 +26,7 @@ parameters:
             - CodeIgniter\Settings\Config\
         additionalServices:
             - Modules\Core\Config\Services
+            - Modules\Updates\Config\Services
             - CodeIgniter\Settings\Config\Services
             - CodeIgniter\Shield\Config\Services
         additionalModelNamespaces:

@@ -75,7 +75,7 @@ final class BackupService
      * logged and thrown.
      *
      * @param string $type   `full`, `db` or `files`
-     * @param string $source `console`, `ui`, `schedule` or `safety`
+     * @param string $source `console`, `ui`, `schedule`, `safety` or `update` (app:update)
      *
      * @return array<string, mixed>
      *
