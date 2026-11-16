@@ -33,6 +33,9 @@ final class AppUpdateTest extends UpdatesTestCase
 
     private FakeRunner $runner;
 
+    /** @var array<string, mixed> `backup.password` before the test (other tests may leave one) */
+    private array $savedEnv = [];
+
     /** @var list<string> passwords the backup was made with */
     private array $backups = [];
 
@@ -52,13 +55,15 @@ final class AppUpdateTest extends UpdatesTestCase
         file_put_contents($app . '/.env', 'encryption.key = keep-me');
         file_put_contents($app . '/writable/data.txt', 'keep');
 
-        putenv('BACKUP_PASSWORD=correct-horse-battery');
+        $this->savedEnv            = array_intersect_key($_ENV, ['backup.password' => true]);
+        $_ENV['backup.password']   = 'correct-horse-battery';
     }
 
     protected function tearDown(): void
     {
         AppUpdate::$updater = null;
-        putenv('BACKUP_PASSWORD');
+        unset($_ENV['backup.password']);
+        $_ENV += $this->savedEnv;
         (new MaintenanceMode())->disable();
         parent::tearDown();
     }
