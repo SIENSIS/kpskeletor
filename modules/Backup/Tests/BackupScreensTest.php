@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Backup\Tests;
 
 use CodeIgniter\I18n\Time;
+use CodeIgniter\Test\StreamFilterTrait;
 use Kpcrudy\Crud;
 use Modules\Backup\Services\JobStore;
 
@@ -17,6 +18,8 @@ use Modules\Backup\Services\JobStore;
  */
 final class BackupScreensTest extends BackupTestCase
 {
+    use StreamFilterTrait;
+
     protected function tearDown(): void
     {
         Time::setTestNow();
@@ -139,6 +142,28 @@ final class BackupScreensTest extends BackupTestCase
         // Another user cannot open someone else's job.
         $other = (new JobStore($this->config))->create('restore', (int) $root->id + 1000);
         $this->assertNotFound('GET', "backend/backups/jobs/{$other}");
+    }
+
+    public function testABackupCreatedInTheBackOfficeRestoresFromTheConsole(): void
+    {
+        $this->createUser('root@example.com', 'superadmin');
+        $this->login('root@example.com');
+        file_put_contents($this->root . '/public/photo.jpg', 'jpeg');
+        $this->send('POST', 'backend/backups/create', $this->createForm())->assertRedirectTo(site_url('backend/backups'));
+        $file = $this->service()->repository()->files()[0] ?? '';
+
+        $this->createUser('later@example.com');
+        unlink($this->root . '/public/photo.jpg');
+        putenv('BACKUP_PASSWORD=' . self::PASSWORD);
+
+        try {
+            command("backup:restore {$file} --yes");
+        } finally {
+            putenv('BACKUP_PASSWORD');
+        }
+
+        $this->assertSame(0, db_connect()->table('users')->where('username', 'later')->countAllResults());
+        $this->assertSame('jpeg', file_get_contents($this->root . '/public/photo.jpg'));
     }
 
     public function testDeletingABackupDeletesItsFile(): void

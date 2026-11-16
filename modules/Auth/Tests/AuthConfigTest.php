@@ -47,8 +47,9 @@ final class AuthConfigTest extends CIUnitTestCase
         $filters = new Filters();
 
         $this->assertSame(['except' => ['api/*']], $filters->globals['before']['csrf'] ?? null);
-        // The web installer only exists before installation, when there are no sessions to check (D-18-02).
-        $this->assertSame(['except' => ['api/*', 'install', 'install/*']], $filters->globals['before']['authsession'] ?? null, 'Everywhere except the token-only API and the web installer.');
+        // The web installer only exists before installation, when there are no sessions to check
+        // (D-18-02); `progress/*` serves job progress from files while a restore replaces the database (D-27-02).
+        $this->assertSame(['except' => ['api/*', 'install', 'install/*', 'progress/*']], $filters->globals['before']['authsession'] ?? null, 'Everywhere except the token-only API, the web installer and the progress of jobs.');
         $this->assertSame(['before' => ['backend', 'backend/*']], $filters->filters['backend']);
         $this->assertSame(
             [\CodeIgniter\Shield\Filters\SessionAuth::class, \Modules\Auth\Filters\ForcePasswordReset::class, \Modules\Auth\Filters\ForceTwoFactor::class, \Modules\Core\Filters\RateLimit::class, \Modules\Core\Filters\PoorMansCron::class],
