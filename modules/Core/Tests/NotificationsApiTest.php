@@ -32,6 +32,9 @@ final class NotificationsApiTest extends ApiTestCase
         $this->notification($ana, 'Backup');
         $this->notification($joan, 'Other');
 
+        $catalan = $this->json($this->api('GET', 'api/v1/notifications', null, $this->tokenFor($ana), ['Accept-Language' => 'ca']))['data'];
+        $this->assertSame('Ha fallat la tasca programada Backup', $catalan[0]['title']);
+
         $response = $this->api('GET', 'api/v1/notifications', null, $this->tokenFor($ana), ['Accept-Language' => 'en']);
         $response->assertStatus(200);
         $data = $this->json($response)['data'];
