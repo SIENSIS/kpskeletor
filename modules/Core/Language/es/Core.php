@@ -112,6 +112,7 @@ return [
     'res' => [
         'modules' => 'Módulos',
         'notifications' => 'Notificaciones',
+        'maintenance' => 'Modo de mantenimiento',
         'schedule' => 'Tareas programadas',
     ],
     'groups' => [
@@ -134,6 +135,7 @@ return [
         'checkOk' => 'Permisos correctos: {0} permiso(s) en el catálogo, {1} ruta(s) comprobadas.',
     ],
     'perm' => [
+        'manageMaintenance' => 'Gestionar el modo de mantenimiento y usar el sitio mientras está activado',
         'list'      => 'Listar',
         'show'      => 'Ver',
         'add'       => 'Añadir',
@@ -234,7 +236,7 @@ return [
         'skipped' => 'Omitido: el modo de mantenimiento está activado.',
         'banner'  => 'Modo de mantenimiento activado: los visitantes ven la página de mantenimiento.',
         'manage'  => 'Gestionarlo',
-        'cliOnHand' => 'Modo de mantenimiento activado. Los superadministradores con la sesión iniciada pueden seguir usando el sitio.',
+        'cliOnHand' => 'Modo de mantenimiento activado. Los usuarios con el permiso maintenance.manage (y los superadministradores) pueden seguir usando el sitio.',
         'cliOff'  => 'Modo de mantenimiento desactivado.',
         'cliStatusOff' => 'El modo de mantenimiento está desactivado.',
         'cliStatusOn'  => 'El modo de mantenimiento está activado desde {0} (motivo: {1}).',

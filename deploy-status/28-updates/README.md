@@ -20,7 +20,8 @@ Branch: `ccr-a5d307ea-vyzp92` · Pull request: [SIENSIS/kpskeletor#36](https://g
 - **Maintenance mode by hand** on top of the Core's `MaintenanceMode` (D-27-02): a card in
   **Settings › Actions** (`settings.security` + re-authentication) and `php spark app:maintenance
   on|off|status [--message="…"]`; an optional message on the 503 page, the login still open and a
-  **superadmin bypass** with a banner (only for a mode turned on by hand).
+  **bypass for holders of the new permission `maintenance.manage`** (superadmins always; no
+  default grant; only for a mode turned on by hand) with a banner.
 - **Earlier gap fixed:** `OutboundClient` forwarded `Authorization` and other credential headers
   to the host a redirect pointed to; they are now dropped on cross-origin redirects (D-28-06).
 
@@ -54,13 +55,15 @@ Branch: `ccr-a5d307ea-vyzp92` · Pull request: [SIENSIS/kpskeletor#36](https://g
 
 ## Decisions and deviations
 
-- **D-28-01 (decide, Open):** URLs `backend/updates` and `backend/updates/check`, admin gets
+- **D-28-01 (decided as built, Decisions 28):** URLs `backend/updates` and `backend/updates/check`, admin gets
   `updates.view` + `updates.check`, `.env` keys `updates.*`, default repository empty, result in
   `writable/updates/status.json`, Updates requires Backup.
-- **D-28-02 (decide, Open):** maintenance mode by hand in Settings › Actions (not a stored
-  setting) and `app:maintenance`; `settings.security` + re-authentication; plain-text message
-  (≤ 500 characters); login paths open; only signed-in **superadmins** bypass it, and only a mode
-  turned on by hand; restores/updates are never bypassed nor turned off from the screen.
+- **D-28-02 (decided, Decisions 28):** maintenance mode by hand in Settings › Actions (not a
+  stored setting) and `app:maintenance`; one Core permission **`maintenance.manage`** turns it on
+  and off (+ re-authentication) and lets its holders keep using the site; no default grant
+  (superadmins always pass; administrators do not get it through `settings.*`), assignable in the
+  permission matrix; plain-text message (≤ 500 characters); login paths open; restores and
+  updates are never bypassed nor turned off from the screen.
 - D-28-03 (accepted): release assets `<name>.zip` + `.zip.sha256` + `.zip.minisig`, one
   top-level folder; minisign `ED` and `Ed`; several keys for rotation; no key = refused.
 - D-28-04 (accepted): **download and verify before maintenance mode** (the spec lists
@@ -147,7 +150,8 @@ modules' repositories, the task), `AppUpdateTest` (dry-run plan, unverified rele
 before anything changes, verified archive applied with protected paths untouched, local changes,
 a failure keeps maintenance mode on and names the backup, git tags verified);
 `modules/Settings/Tests/MaintenanceScreenTest.php` (permissions, message, login open,
-superadmin bypass only with a session and only for a mode turned on by hand, the command);
+bypass for holders of `maintenance.manage` only with a session and only for a mode turned on by
+hand, no default grant, the command);
 `OutboundClientTest::testCredentialsAreNotSentToAnotherOrigin`.
 
 ```text
@@ -208,8 +212,6 @@ until session 31).*
 - The first archive update of an installation cannot check local changes (no file list yet); it
   warns (D-28-04).
 - The maintenance banner is large at phone width (it wraps in the top bar).
-- An administrator who turns maintenance mode on loses access until a superadmin or the console
-  turns it off (by design, D-28-02; the confirmation says so).
 - Composer (known issue 04): `phpstan/phpstan` installed from a shallow clone of tag `2.3.5` in a
   scratch copy whose lock pointed at it, `vendor/` moved in (project files unchanged).
 
@@ -222,4 +224,4 @@ until session 31).*
   `writable/maintenance.json`; maintenance mode left on.
 - Session 36: document the release procedure (archive with one top-level folder, `.sha256`,
   `.minisig` from `minisign -S`, signed tag) — first draft in `docs/updates.md`.
-- D-28-01 and D-28-02 are open (decide): run `deploy/decide.md`.
+- D-28-01 and D-28-02 decided and applied (Decisions 28): `maintenance.manage` (143 permissions).

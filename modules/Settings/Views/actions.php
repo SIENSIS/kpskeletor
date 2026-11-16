@@ -9,6 +9,7 @@
  * @var bool                                                                              $canPublish
  * @var array{reason: string, since: string, allow: list<string>, message: string, bypass: bool}|null $maintenance
  * @var int                                                                               $messageMax
+ * @var bool                                                                              $canMaintain
  */
 $actions = [
     ['url' => 'backend/settings/actions/email', 'icon' => 'bi bi-envelope', 'key' => 'email', 'args' => [$email, $pending], 'enabled' => $email !== '', 'confirm' => null],
@@ -47,7 +48,7 @@ $actions = [
                 <span class="text-body-secondary"><?= esc(lang('Settings.actions.maintenanceSince')) ?> <?= ui_date($maintenance['since'] . ' UTC', 'datetime') ?> · <?= esc(lang('Settings.actions.maintenanceReason', [$maintenance['reason']])) ?></span>
             <?php endif ?>
         </p>
-        <?php if (! $canPublish): ?>
+        <?php if (! $canMaintain): ?>
             <p class="small mb-0"><?= ui_badge(lang('Settings.actions.unavailable'), 'secondary') ?></p>
         <?php elseif ($maintenance === null): ?>
             <form action="<?= esc(site_url('backend/settings/actions/maintenance'), 'attr') ?>" method="post" data-confirm="<?= esc(lang('Settings.actions.maintenanceConfirm'), 'attr') ?>">

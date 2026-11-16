@@ -862,7 +862,9 @@ granularity instead of collapsing it into read/create/update/delete.
     outbound hosts, password length, 2FA policy) need `settings.security` and a re-authentication.
 * **Site-wide settings** (Core): site name (`Core.siteName`, empty = the default name), logo
   (theme option), default locale, available locales, time zone (`Core.timezone`, the zone dates
-  are shown in; they are stored in UTC), maintenance mode (the setting and screen on top of the
+  are shown in; they are stored in UTC), maintenance mode (turned on and off by hand in Settings › Actions or `php spark app:maintenance`
+  with the Core permission `maintenance.manage`, no default grant, whose holders keep using the site
+  meanwhile; on top of the
   Core's `MaintenanceMode`, whose state is a file, see "Backup"), idle lock, captcha on/off, 2FA policy
   per group, mail transport, themes.
 * **Settings › Security** (Core, `settings.security` + re-authentication): minimum password
@@ -1540,7 +1542,11 @@ both supported:
 * Downloads only over HTTPS from the allowed hosts (see "Outbound requests"); `git` and
   `composer` use their own clients, run only from the console, and are documented as exceptions
   in `docs/outbound-requests.md`.
-* Permissions: `updates.view`, `updates.check`.
+* Permissions: `updates.view`, `updates.check` (default grant: admin both). URLs:
+  `backend/updates` (the page) and `POST backend/updates/check` ("check now"). Configuration in
+  `.env`: `updates.repository` (empty by default: nothing is checked until it is set),
+  `updates.token`, `updates.publicKeys`; the result of the last check is kept in
+  `writable/updates/status.json`.
 
 ### Backup
 

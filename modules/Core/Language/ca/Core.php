@@ -112,6 +112,7 @@ return [
     'res' => [
         'modules' => 'Mòduls',
         'notifications' => 'Notificacions',
+        'maintenance' => 'Mode de manteniment',
         'schedule' => 'Tasques programades',
     ],
     'groups' => [
@@ -134,6 +135,7 @@ return [
         'checkOk' => 'Permisos correctes: {0} permís(os) al catàleg, {1} ruta(es) comprovades.',
     ],
     'perm' => [
+        'manageMaintenance' => 'Gestionar el mode de manteniment i usar el lloc mentre està activat',
         'list'      => 'Llistar',
         'show'      => 'Veure',
         'add'       => 'Afegir',
@@ -234,7 +236,7 @@ return [
         'skipped' => 'Omès: el mode de manteniment està activat.',
         'banner'  => 'Mode de manteniment activat: els visitants veuen la pàgina de manteniment.',
         'manage'  => 'Gestiona-ho',
-        'cliOnHand' => 'Mode de manteniment activat. Els superadministradors amb la sessió iniciada poden continuar usant el lloc.',
+        'cliOnHand' => 'Mode de manteniment activat. Els usuaris amb el permís maintenance.manage (i els superadministradors) poden continuar usant el lloc.',
         'cliOff'  => 'Mode de manteniment desactivat.',
         'cliStatusOff' => 'El mode de manteniment està desactivat.',
         'cliStatusOn'  => 'El mode de manteniment està activat des de {0} (motiu: {1}).',

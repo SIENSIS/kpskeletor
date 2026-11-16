@@ -8,9 +8,10 @@ use CodeIgniter\Test\StreamFilterTrait;
 use Modules\Core\Maintenance\MaintenanceMode;
 
 /**
- * Maintenance mode turned on by hand (D-28-02): Settings › Actions (`settings.security` +
- * re-authentication, forged POSTs refused), the message on the 503 page, the login paths still
- * open, signed-in superadmins bypass it (with a banner) and nobody else does, a mode turned on
+ * Maintenance mode turned on by hand (D-28-02): Settings › Actions (`maintenance.manage` +
+ * re-authentication, no default grant, forged POSTs refused), the message on the 503 page, the
+ * login paths still open, signed-in holders of the permission (superadmins always) bypass it with
+ * a banner and nobody else does, a mode turned on
  * by a restore or an update is not turned off from the screen, `php spark app:maintenance`.
  *
  * @internal
@@ -37,19 +38,23 @@ final class MaintenanceScreenTest extends SettingsTestCase
         }
     }
 
-    public function testTurningItOnNeedsSettingsSecurity(): void
+    public function testTurningItOnNeedsMaintenanceManage(): void
     {
-        $this->loginWith('settings.update');
+        // Administrators hold settings.* by default, but not maintenance.manage (D-28-02).
+        $this->createUser('admin@example.com', 'admin');
+        $this->login('admin@example.com');
 
         $this->send('POST', 'backend/settings/actions/maintenance', ['state' => 'on'])->assertStatus(403);
         $this->assertFalse((new MaintenanceMode())->isOn());
         $this->assertStringNotContainsString('actions/maintenance', (string) $this->send('GET', 'backend/settings/actions')->getBody());
+        $this->assertNotContains('maintenance.manage', (array) (setting('AuthGroups.matrix')['admin'] ?? []), 'No default grant.');
     }
 
-    public function testAnAdministratorTurnsItOnWithAMessageAndASuperadminBypassesIt(): void
+    public function testASuperadminTurnsItOnAndOnlyHoldersOfThePermissionBypassIt(): void
     {
-        $this->createUser('admin@example.com', 'admin');
-        $this->login('admin@example.com');
+        $this->createUser('root@example.com', 'superadmin');
+        $this->login('root@example.com');
+        $this->withSessionCookie();
         $this->assertStringContainsString('actions/maintenance', (string) $this->send('GET', 'backend/settings/actions')->getBody());
 
         $this->send('POST', 'backend/settings/actions/maintenance', ['state' => 'on', 'message' => "Back at 10:00\n<b>soon</b>"])->assertRedirectTo(site_url('backend/settings/actions'));
@@ -62,7 +67,17 @@ final class MaintenanceScreenTest extends SettingsTestCase
         $this->assertSame('Back at 10:00 <b>soon</b>', $state['message'], 'One line of plain text.');
         $this->assertCount(1, $this->entries('maintenance_on'));
 
-        // The administrator (not a superadmin) gets the 503 page with the escaped message.
+        // The superadmin keeps using the site with the banner.
+        $actions = (string) $this->send('GET', 'backend/settings/actions')->getBody();
+        $this->assertStringContainsString('data-maintenance', $actions);
+        $this->assertStringContainsString(esc(lang('Core.maintenance.banner')), $actions);
+
+        // An administrator without the permission gets the 503 page with the escaped message.
+        $_SESSION      = [];
+        $this->cookies = [];
+        $this->createUser('admin@example.com', 'admin');
+        $this->login('admin@example.com');
+        $this->withSessionCookie();
         $page = $this->send('GET', 'backend');
         $page->assertStatus(503);
         $this->assertStringContainsString('Back at 10:00 &lt;b&gt;soon&lt;/b&gt;', (string) $page->getBody());
@@ -75,15 +90,11 @@ final class MaintenanceScreenTest extends SettingsTestCase
         $this->send('GET', '/')->assertStatus(503);
         $this->send('GET', 'login')->assertOK();
 
-        // A signed-in superadmin uses the site, sees the banner and turns it off.
-        $this->createUser('root@example.com', 'superadmin');
-        $this->login('root@example.com');
+        // A user given maintenance.manage uses the site and turns it off.
+        $this->createUser('ops@example.com', 'user')->addPermission('maintenance.manage', 'settings.update');
+        $this->login('ops@example.com');
         $this->withSessionCookie();
-        $actions = $this->send('GET', 'backend/settings/actions');
-        $actions->assertOK();
-        $this->assertStringContainsString('data-maintenance', (string) $actions->getBody());
-        $this->assertStringContainsString(esc(lang('Core.maintenance.banner')), (string) $actions->getBody());
-
+        $this->send('GET', 'backend/settings/actions')->assertOK();
         $this->send('POST', 'backend/settings/actions/maintenance', ['state' => 'off'])->assertRedirectTo(site_url('backend/settings/actions'));
         $this->assertFalse($mode->isOn());
         $this->assertCount(1, $this->entries('maintenance_off'));

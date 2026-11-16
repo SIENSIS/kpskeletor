@@ -11,7 +11,7 @@ use Modules\Core\Maintenance\MaintenanceMode;
 /**
  * php spark app:maintenance on|off|status [--message="…"]
  *
- * Turns maintenance mode on by hand (the login paths stay open and signed-in superadmins keep
+ * Turns maintenance mode on by hand (the login paths stay open and signed-in holders of maintenance.manage keep
  * using the site, D-28-02) or off, e.g. after a failed update or restore left it on. Logged.
  */
 final class AppMaintenance extends BaseCommand

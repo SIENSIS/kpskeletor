@@ -14,7 +14,8 @@ use Throwable;
  * overrides it in `themes/<slug>/Views/errors/maintenance.php`, D-28-07).
  *
  * The database may be being replaced (a restore), so nothing may read it: before rendering, the
- * request's settings service is swapped for one without handlers, so every `setting()` answers
+ * request's settings service is swapped (until the page is drawn) for one without handlers, so
+ * every `setting()` answers
  * the file configuration (`Config\Theme`, `Config\Core`…): the public theme of `Config\Theme`,
  * its default options and colours, the default site name. If the theme cannot render, a plain
  * page without styles is returned instead (a broken theme never hides the maintenance notice).
@@ -26,6 +27,8 @@ final class MaintenancePage
      */
     public static function render(string $message = ''): string
     {
+        $previous = service('settings');
+
         try {
             $config           = clone config('Settings');
             $config->handlers = [];
@@ -42,6 +45,10 @@ final class MaintenancePage
             ], ['saveData' => false]);
         } catch (Throwable) {
             return self::plain($message);
+        } finally {
+            // Only this page reads the file configuration; whatever runs next sees the real settings.
+            Services::injectMock('settings', $previous);
+            Services::resetSingle('theme');
         }
     }
 

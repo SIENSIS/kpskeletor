@@ -112,6 +112,7 @@ return [
     'res' => [
         'modules' => 'Modules',
         'notifications' => 'Notifications',
+        'maintenance' => 'Maintenance mode',
         'schedule' => 'Scheduled tasks',
     ],
     'groups' => [
@@ -134,6 +135,7 @@ return [
         'checkOk' => 'Permissions OK: {0} permission(s) in the catalogue, {1} route(s) checked.',
     ],
     'perm' => [
+        'manageMaintenance' => 'Manage maintenance mode and use the site while it is on',
         'list'      => 'List',
         'show'      => 'Show',
         'add'       => 'Add',
@@ -234,7 +236,7 @@ return [
         'skipped' => 'Skipped: maintenance mode is on.',
         'banner'  => 'Maintenance mode is on: visitors see the maintenance page.',
         'manage'  => 'Manage it',
-        'cliOnHand' => 'Maintenance mode is on. Signed-in superadmins can keep using the site.',
+        'cliOnHand' => 'Maintenance mode is on. Users with the maintenance.manage permission (and superadmins) can keep using the site.',
         'cliOff'  => 'Maintenance mode is off.',
         'cliStatusOff' => 'Maintenance mode is off.',
         'cliStatusOn'  => 'Maintenance mode is on since {0} (reason: {1}).',

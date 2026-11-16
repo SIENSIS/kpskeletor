@@ -167,12 +167,14 @@ pages (a theme overrides it in `themes/<slug>/Views/errors/maintenance.php`). It
 reads the database (only the file configuration: `Config\Theme`'s public theme, its default
 options); if the theme fails, a plain HTML page is returned (D-28-07).
 
-**By hand** (D-28-02): Settings › Actions › *Maintenance mode* (`settings.security` +
+**By hand** (D-28-02): Settings › Actions › *Maintenance mode* (`maintenance.manage` +
 re-authentication) or `php spark app:maintenance on|off|status [--message="…"]`. The state file
 then also holds a plain-text message (at most 500 characters, shown escaped on the 503 page and
 in the JSON answer), the login paths (`login`, `login/*`, `logout`, `auth/*`) and the `bypass`
-flag: a request that carries a session cookie of a signed-in **superadmin** passes, with a
-banner in the back office. Nobody else passes, administrators included; turning it on and off is
+flag: a request that carries a session cookie of a signed-in user with **`maintenance.manage`**
+passes, with a banner in the back office. The permission is a Core resource with no default grant
+(superadmins always pass; administrators do not get it through `settings.*`; assign it in the
+permission matrix). Nobody else passes; turning it on and off is
 written to the security log. The screen never turns off a mode turned on by a restore or an
 update.
 

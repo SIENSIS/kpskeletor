@@ -20,8 +20,8 @@ use Throwable;
  * database (MaintenancePage; plain HTML if the theme fails), except
  * the paths the mode allows (MaintenanceMode::allows()). JSON requests get a JSON body.
  *
- * When an administrator turned it on by hand (the state's `bypass` flag, D-28-02), a signed-in
- * superadmin keeps using the site with a banner; the session is only read when the request
+ * When it was turned on by hand (the state's `bypass` flag, D-28-02), a signed-in user with
+ * `maintenance.manage` (superadmins always) keeps using the site with a banner; the session is only read when the request
  * carries a session cookie. A restore or an update never sets the flag, so then nothing reads
  * the session or the database.
  */
@@ -51,7 +51,7 @@ final class Maintenance implements FilterInterface
 
         $state = $mode->state() ?? ['bypass' => false, 'message' => ''];
 
-        if ($state['bypass'] && self::superadminSignedIn($request)) {
+        if ($state['bypass'] && self::mayManage($request)) {
             self::banner();
 
             return null;
@@ -69,7 +69,10 @@ final class Maintenance implements FilterInterface
         return $response->setBody(MaintenancePage::render($state['message']));
     }
 
-    private static function superadminSignedIn(RequestInterface $request): bool
+    /**
+     * A signed-in user with `maintenance.manage` (superadmins always; D-28-02).
+     */
+    private static function mayManage(RequestInterface $request): bool
     {
         $cookie = config('Cookie')->prefix . config('Session')->cookieName;
 
@@ -80,7 +83,7 @@ final class Maintenance implements FilterInterface
         try {
             $user = auth('session')->user();
 
-            return $user instanceof User && Authorization::isSuperadmin($user);
+            return $user instanceof User && Authorization::for($user)->can(MaintenanceMode::PERMISSION);
         } catch (Throwable) {
             return false;
         }

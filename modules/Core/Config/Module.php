@@ -18,7 +18,9 @@ final class Module extends ModuleManifest
      * modules.sync, modules.upload, modules.uninstall and modules.demo.
      * The user's notifications (list page, bell, preferences: `core-notifications.*`, granted to
      * every group; `read` marks them read through `api/v1/notifications`, D-26-01) and the scheduled tasks screen (`schedule.list`, `schedule.show`,
-     * `schedule.run` for "run now").
+     * `schedule.run` for "run now"). `maintenance.manage` turns maintenance mode on and off by
+     * hand and keeps using the site while it is on (D-28-02): no default grant, superadmins always
+     * pass; assign it in the permission matrix when an administrator needs it.
      */
     public array $resources = [
         'modules' => [
@@ -40,6 +42,15 @@ final class Module extends ModuleManifest
             'except' => ['add', 'edit', 'export', 'import', 'trash', 'restore', 'purge'],
             'extra'  => [
                 'read' => 'Core.perm.markRead',
+            ],
+        ],
+        'maintenance' => [
+            'label'  => 'Core.res.maintenance',
+            'type'   => 'crud',
+            'name'   => 'maintenance',
+            'except' => \Modules\Core\Modules\ManifestValidator::CRUD_OPERATIONS,
+            'extra'  => [
+                'manage' => 'Core.perm.manageMaintenance',
             ],
         ],
         'schedule' => [

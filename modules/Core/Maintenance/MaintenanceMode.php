@@ -15,11 +15,15 @@ use CodeIgniter\I18n\Time;
  * database while the mode is on. The Backup module (restores) and the updater turn it on and off
  * through this class; administrators turn it on by hand from Settings › Actions or with
  * `php spark app:maintenance` (`enableByHand()`, D-28-02): then a message can be shown, the
- * login paths stay open and signed-in superadmins keep using the site (the `bypass` flag). A
+ * login paths stay open and signed-in holders of `maintenance.manage` (superadmins always) keep
+ * using the site (the `bypass` flag). A
  * restore or an update never sets `bypass`: the database may be replaced meanwhile.
  */
 final class MaintenanceMode
 {
+    /** Turns it on and off by hand and keeps using the site meanwhile (no default grant; D-28-02). */
+    public const PERMISSION = 'maintenance.manage';
+
     /** The reason recorded when it is turned on by hand. */
     public const REASON_MANUAL = 'manual';
 
@@ -52,7 +56,7 @@ final class MaintenanceMode
      * @param string       $reason Who turned it on (e.g. `backup.restore`), for the logs and the screen
      * @param list<string> $allow   Paths still served (CodeIgniter filter patterns, e.g. `progress/backup/*`)
      * @param string       $message Shown on the maintenance page (plain text, empty = the default text)
-     * @param bool         $bypass  Signed-in superadmins keep using the site (only when the database is not replaced)
+     * @param bool         $bypass  Holders of `maintenance.manage` keep using the site (only when the database is not replaced)
      */
     public function enable(string $reason, array $allow = [], string $message = '', bool $bypass = false): void
     {
@@ -71,7 +75,7 @@ final class MaintenanceMode
     }
 
     /**
-     * Turned on by an administrator: the login paths stay open and superadmins bypass it.
+     * Turned on by hand: the login paths stay open and holders of `maintenance.manage` bypass it.
      */
     public function enableByHand(string $message = ''): void
     {

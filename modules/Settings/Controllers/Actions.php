@@ -24,10 +24,10 @@ use Throwable;
  *   holds the rate limiter's counters;
  * - publish assets (`settings.security` + re-authentication): modules' and themes' assets into
  *   `public/assets/…` and `public/themes/` only (D-00-33), like `php spark assets:publish`;
- * - maintenance mode on/off (`settings.security` + re-authentication; D-28-02): the Core's
+ * - maintenance mode on/off (`maintenance.manage` + re-authentication; D-28-02): the Core's
  *   `MaintenanceMode` turned on by hand (an optional message, the login paths open, signed-in
- *   superadmins keep using the site); a mode turned on by a restore or an update is not turned
- *   off from here.
+ *   holders of `maintenance.manage` keep using the site); a mode turned on by a restore or an
+ *   update is not turned off from here.
  */
 final class Actions extends BackendController
 {
@@ -43,6 +43,7 @@ final class Actions extends BackendController
             'pending'     => $this->pendingEmails(),
             'canPublish'  => $this->can('settings.security'),
             'maintenance' => (new MaintenanceMode())->state(),
+            'canMaintain' => $this->can(MaintenanceMode::PERMISSION),
             'messageMax'  => MaintenanceMode::MESSAGE_MAX,
         ]);
     }

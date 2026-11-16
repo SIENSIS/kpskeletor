@@ -64,7 +64,7 @@ confirmation (`--yes` skips it) and then:
    - *git:* `git fetch --tags <remote>` and `git verify-tag <tag>` (the signer's GPG/SSH key must
      be trusted by git on the server).
    A release that does not verify is refused (security log `release_refused`) and nothing changes.
-3. **Maintenance mode** on (`MaintenanceMode`, reason `updates.update`, no superadmin bypass).
+3. **Maintenance mode** on (`MaintenanceMode`, reason `updates.update`, no bypass for anybody).
 4. **A full backup** with the Backup module (`BackupService::create()`, origin `update`).
 5. **The new code:** archive → the files are copied over the installation except the protected
    paths; replaced and removed files are kept in `writable/updates/previous/<old version>/`;
@@ -111,10 +111,11 @@ updated. A lost or leaked secret key: remove its public key from every installat
 
 ## Maintenance mode by hand
 
-Settings › Actions › *Maintenance mode* (`settings.security` + re-authentication) or
+Settings › Actions › *Maintenance mode* (`maintenance.manage` + re-authentication) or
 `php spark app:maintenance on|off|status [--message="…"]` turns it on by hand with an optional
 plain-text message: visitors and users get the 503 page, the login paths stay open and signed-in
-superadmins keep using the site with a banner. A mode turned on by a restore or an update has
+holders of `maintenance.manage` (superadmins always; no default grant) keep using the site with a
+banner. A mode turned on by a restore or an update has
 no bypass and is not turned off from the screen (`app:maintenance off` from the console).
 See docs/security.md, "Maintenance mode".
 
