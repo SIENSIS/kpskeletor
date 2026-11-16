@@ -106,8 +106,9 @@ remember-me cookie (D-00-14).
   stored in UTC (`Config\App::$appTimezone`).
 - `Core.pwa`, `Core.pwaStart`, `Core.poorMansCron`.
 
-Default and available locales arrive with session 31, maintenance mode with session 28; the
-mail transport stays in `.env` (secrets); the logo is a theme option.
+Default and available locales arrive with session 31; the mail transport stays in `.env`
+(secrets); the logo is a theme option. Maintenance mode is not a stored setting (its state is a
+file, D-27-02): it is turned on and off in Settings › Actions (below).
 
 ## Theme tab
 
@@ -123,6 +124,12 @@ mail transport stays in `.env` (secrets); the logo is a theme option.
   whole cache store (it holds the rate limiter's counters). Activity `caches_cleared`.
 - **Publish assets** (`settings.security` + re-authentication): like `php spark assets:publish`,
   only into `public/assets/…` and `public/themes/` (D-00-33). Security entry `assets_published`.
+- **Maintenance mode** (`settings.security` + re-authentication, `POST
+  backend/settings/actions/maintenance`, D-28-02): on with an optional plain-text message (at most
+  500 characters), or off. Only signed-in superadmins keep using the site meanwhile (an
+  administrator who turns it on loses access until a superadmin or `php spark app:maintenance off`
+  turns it off; the confirmation says so). A mode turned on by a restore or an update is shown but
+  not turned off here. Security entries `maintenance_on` / `maintenance_off`.
 
 ## Storing overrides
 

@@ -241,6 +241,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-27-07 | 27 | `SafeZip` in the Core; what a restore never writes | Accepted (proposal) |
 | D-27-08 | 27 | What the modules' `$backup` declarations mean | Accepted (proposal) |
 | D-27-09 | 27 | `AuthSession` with a session row started on the fly | Accepted (proposal) |
+| D-28-01 | 28 | Updates URLs, default grants, configuration keys and where the check result lives (decide) | Open |
+| D-28-02 | 28 | Maintenance mode by hand: where, who, the message and the superadmin bypass (decide) | Open |
+| D-28-03 | 28 | The release archive: assets, minisign format, keys and rotation | Accepted (proposal) |
+| D-28-04 | 28 | `app:update`: verify before maintenance, protected paths, local changes, recovery | Accepted (proposal) |
+| D-28-05 | 28 | Versions: the installed version, tags, pre-releases and modules' repositories | Accepted (proposal) |
+| D-28-06 | 28 | `OutboundClient` drops credentials on cross-origin redirects | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2499,3 +2505,57 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** —
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Auth/Filters/AuthSession.php`; test `BackupScreensTest::testRestoreFromTheBackOffice`.
+
+## D-28-01 — Updates URLs, default grants, configuration keys and where the check result lives (decide)
+
+- **Where:** specification "Updates" (`updates.view`, `updates.check`, "a page with the installed version, the latest version and its release notes", `Config\Updates`, token in `.env`), plan session 28 (`backend/updates`; "results cached; optional `update_checks`").
+- **Problem:** The specification names the permissions but not the URLs, the default grants, the `.env` keys, nor where the result of a check is kept.
+- **Proposal:** One resource `updates` named `updates` (single-resource module, type page): `updates.view` (page, widget `updates.version`, notification) and the extra `updates.check`. URLs: `backend/updates` (GET) and `backend/updates/check` (POST, `ratelimit:forms`); menu "Updates" in the settings zone. Default grants: admin `updates.view` and `updates.check`. `Config\Updates` keys, overridable from `.env`: `updates.repository` (default empty: no check until it is set), `updates.token`, `updates.publicKeys` (comma separated), `updates.prereleases`, `updates.method` (`auto`/`archive`/`git`), `updates.gitRemote`, `updates.maxArchiveBytes`, `updates.downloadTimeout`, binaries. The check result is a file, `writable/updates/status.json` (0640, not the database nor the cache: it survives "clear caches" and is readable during an update). Daily task at 05:17. The module requires Backup (the update makes a backup).
+- **Alternatives:** A) Only superadmins get `updates.check` (admins see but cannot trigger outbound requests). B) Default repository `github:SIENSIS/kpskeletor` (every site built on the skeleton would check the skeleton's releases). C) A table `update_checks` (history of checks).
+- **Status:** Open
+- **Applied in:** `modules/Updates/Config/{Module,Routes,Updates}.php`, `modules/Updates/Services/UpdateStatus.php`, `env`; tests `UpdatesScreensTest`.
+
+## D-28-02 — Maintenance mode by hand: where, who, the message and the superadmin bypass (decide)
+
+- **Where:** specification "Settings" (site-wide: "maintenance mode (the setting and screen on top of the Core's `MaintenanceMode`)"), D-27-02 (state in a file; session 28 adds "turning it on by hand, a superadmin bypass"), `deploy/28-updates.md`.
+- **Problem:** The state cannot be a stored setting (a restore replaces the database), the filter must not read the database during a restore or an update, and a bypass needs to know who is signed in.
+- **Proposal:** No stored setting: a card in **Settings › Actions** (`POST backend/settings/actions/maintenance`, `settings.security` + re-authentication) and the command `php spark app:maintenance on|off|status [--message="…"]` turn it on by hand (`MaintenanceMode::enableByHand()`). The file then holds a plain-text message (one line, at most 500 characters, escaped on the 503 page and in the JSON answer), the login paths (`login`, `login/*`, `logout`, `auth/*`, so a superadmin can sign in) and `bypass: true`. Only then the `maintenance` filter reads the session, and only when the request carries a session cookie: a signed-in **superadmin** passes with a banner in the back office; administrators do not (the confirmation says so; `app:maintenance off` or a superadmin turns it off). Restores and updates never set the bypass, and the screen does not turn off a mode they turned on. Turning it on/off is a security log entry.
+- **Alternatives:** A) Every holder of `settings.security` bypasses it (administrators keep working, but then "maintenance" only stops visitors and plain users). B) A secret bypass URL/cookie instead of the session (works without the database, but is a shared secret). C) Put it in a "General" settings field (a setting would be lost by a restore, D-27-02).
+- **Status:** Open
+- **Applied in:** `modules/Core/Maintenance/MaintenanceMode.php`, `modules/Core/Filters/Maintenance.php`, `modules/Core/Views/{maintenance_banner,errors/maintenance}.php`, `modules/Core/Commands/AppMaintenance.php`, `modules/Settings/{Config/Routes,Controllers/Actions,Views/actions}.php`, `docs/security.md`, `docs/settings.md`; tests `MaintenanceScreenTest`, `MaintenanceModeTest`.
+
+## D-28-03 — The release archive: assets, minisign format, keys and rotation
+
+- **Where:** specification "Updates" (SHA-256 **and** Ed25519 signature, minisign-compatible, public key in `Config\Updates`), D-00-48.
+- **Problem:** The specification does not say how the archive, its checksum and its signature are published, which minisign variant is accepted, nor how keys rotate.
+- **Proposal:** A release publishes `<name>.zip` (one top-level folder with the application), `<name>.zip.sha256` (`sha256sum` output) and `<name>.zip.minisig`. Both minisign algorithms are accepted (`ED`, pre-hashed with BLAKE2b-512, minisign's default, and legacy `Ed`); the key id must be one of `updates.publicKeys` and both the file signature and the global signature over the trusted comment must verify. Several keys may be trusted at once (rotation); no key = every archive update refused. The archive is extracted only after both checks, through `SafeZip`. Git installs use `git verify-tag` (GPG/SSH keys trusted by git).
+- **Alternatives:** A) Only `ED`. B) A `SHA256SUMS` file for every asset (one more file to parse).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Updates/Services/{SignatureVerifier,Release,Updater}.php`, `docs/updates.md`; tests `SignatureVerifierTest`, `AppUpdateTest`.
+
+## D-28-04 — `app:update`: verify before maintenance, protected paths, local changes, recovery
+
+- **Where:** specification "Updates" (order: local changes, maintenance, backup, code, verify before applying, composer, sync, caches; on failure keep maintenance and explain the restore).
+- **Problem:** Downloading during maintenance mode lengthens the downtime; an archive update must not overwrite what belongs to the installation; "local changes" has no meaning for an archive install that was never updated by the tool.
+- **Proposal:** The archive is downloaded and verified (or the tag fetched and verified) **before** maintenance mode, so a refused release changes nothing; then maintenance, a full backup (origin `update`), the code, `composer install --no-dev`, `modules:sync` and `app:cache-clear` in new processes, maintenance off. An archive update never writes or deletes `.env`, `.git/`, `writable/`, `vendor/`, `public/uploads/`, `public/assets/modules/`, `node_modules/`; replaced and removed files are kept in `writable/updates/previous/<old version>/`; the files written are recorded with their SHA-256 in `writable/updates/files.json`, and the next update refuses when any of them changed. Before the first archive update the check is impossible and only a warning is shown. The git method uses `git merge --ff-only refs/tags/<tag>` (a diverged checkout is refused by git). A failure after maintenance mode started keeps it on (security entry `update_failed`) and names the backup and the folder of replaced files.
+- **Alternatives:** A) Download inside maintenance mode (the spec's literal order). B) Refuse the first archive update without a file list (every first update would need a manual step). C) Roll the files back automatically on failure (the database may already be migrated).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Updates/Services/Updater.php`, `modules/Updates/Commands/AppUpdate.php`, `modules/Backup/Services/BackupRepository.php` (`update` source); tests `AppUpdateTest`.
+
+## D-28-05 — Versions: the installed version, tags, pre-releases and modules' repositories
+
+- **Where:** specification "Updates" ("tags following semantic versioning"; "modules may declare their own `$repository`").
+- **Problem:** Which version is "installed", how tags compare, and what happens with modules' repositories.
+- **Proposal:** The application's installed version is `Modules\Core\Config\Version::CORE`; the newest release is the highest semantic version among the tags (`v` prefix optional, semver precedence, build metadata ignored); drafts, GitLab upcoming releases, other tags and pre-releases (unless `updates.prereleases`) are ignored. Modules that declare `$repository` are checked against their manifest version and shown (page, widget, notification); installing them is `modules:install` (session 29). Each new version is notified once.
+- **Alternatives:** A) Use GitHub's "latest release" endpoint (it ignores semver and pre-release rules).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Updates/Services/{VersionComparator,ReleaseSource,ReleaseChecker}.php`; tests `VersionComparatorTest`, `ReleaseSourceTest`, `UpdatesScreensTest`.
+
+## D-28-06 — `OutboundClient` drops credentials on cross-origin redirects
+
+- **Where:** `modules/Core/Http/OutboundClient.php` (session 08), specification "Outbound requests".
+- **Problem:** Redirects were followed with every header, so a token sent to `api.github.com` would also reach the storage host a release download redirects to. Found while building authenticated downloads (earlier gap, blocks this session).
+- **Proposal:** On a redirect to another origin (scheme, host or port) `Authorization`, `Proxy-Authorization`, `Cookie`, `PRIVATE-TOKEN` and `JOB-TOKEN` are removed. The archive download uses a copy of `Config\Outbound` with a larger size limit and timeout (`updates.maxArchiveBytes`, `updates.downloadTimeout`); every other check is unchanged.
+- **Alternatives:** A) Never follow redirects for authenticated requests (GitHub asset downloads always redirect).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Http/OutboundClient.php`, `docs/outbound-requests.md`; tests `OutboundClientTest::testCredentialsAreNotSentToAnotherOrigin`, `ReleaseSourceTest::testPrivateRepositoriesUseTheTokenAndTheApiForDownloads`.
