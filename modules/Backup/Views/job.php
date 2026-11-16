@@ -51,7 +51,9 @@ $secrets = is_array($job['secrets'] ?? null) ? $job['secrets'] : [];
             </div>
         <?php endif ?>
         <?php $body = (string) ob_get_clean() ?>
-        <?= theme_component('card', ['title' => lang('Backup.page.job'), 'icon' => 'bi bi-arrow-counterclockwise', 'body' => $body]) ?>
+        <?= theme_component('card', ['title' => lang('Backup.page.' . match ($status) {
+            'done' => 'jobDone', 'failed' => 'jobFailed', default => 'job'
+        }), 'icon' => 'bi bi-arrow-counterclockwise', 'body' => $body]) ?>
     </div>
 </div>
 <?= $this->endSection() ?>

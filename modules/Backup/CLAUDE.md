@@ -12,7 +12,7 @@ Full description: `docs/backup-restore.md`.
 - Default grants: admin `backup.list`, `backup.show`, `backup.create`; the rest only superadmin
   (D-27-01, Open).
 - URLs: `backend/backups` (kpcrudy list), `create`, `verify/<id>`, `download/<id>`,
-  `restore/<id>`, `upload`, `jobs/<job>`; `progress/backup/<job>` (JSON, no session/database,
+  `recover/<id>` (restore; `restore/<id>` is kpcrudy's trash URL), `upload`, `jobs/<job>`; `progress/backup/<job>` (JSON, no session/database,
   reachable in maintenance mode). Masked ids use the context `backups`.
 - Menu: "Backups" in the `settings` zone (order 86).
 - Settings: `Backup.scheduled`, `scheduledType`, `keepDaily`, `keepWeekly`, `keepMonthly`.

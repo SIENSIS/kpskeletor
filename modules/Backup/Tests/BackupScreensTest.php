@@ -37,7 +37,7 @@ final class BackupScreensTest extends BackupTestCase
         $this->send('POST', 'backend/backups/create', $this->createForm())->assertStatus(403);
         $this->send('POST', "backend/backups/verify/{$code}", ['password' => self::PASSWORD])->assertStatus(403);
         $this->send('GET', "backend/backups/download/{$code}")->assertStatus(403);
-        $this->send('POST', "backend/backups/restore/{$code}", $this->restoreForm($file))->assertStatus(403);
+        $this->send('POST', "backend/backups/recover/{$code}", $this->restoreForm($file))->assertStatus(403);
         $this->send('POST', 'backend/backups/upload')->assertStatus(403);
         $this->assertCount(1, $this->service()->repository()->files());
 
@@ -50,10 +50,10 @@ final class BackupScreensTest extends BackupTestCase
         $list = $this->body('GET', 'backend/backups');
         $this->assertStringContainsString('backend/backups/create', $list);
         $this->assertStringNotContainsString('backend/backups/download/', $list);
-        $this->assertStringNotContainsString('backend/backups/restore/', $list);
+        $this->assertStringNotContainsString('backend/backups/recover/', $list);
         $this->send('GET', "backend/backups/download/{$code}")->assertStatus(403);
-        $this->send('GET', "backend/backups/restore/{$code}")->assertStatus(403);
-        $this->send('POST', "backend/backups/restore/{$code}", $this->restoreForm($file))->assertStatus(403);
+        $this->send('GET', "backend/backups/recover/{$code}")->assertStatus(403);
+        $this->send('POST', "backend/backups/recover/{$code}", $this->restoreForm($file))->assertStatus(403);
         $this->send('POST', "backend/backups/delete/{$code}");
         $this->assertFileExists($this->backupPath($file), 'Administrators cannot delete backups.');
     }
@@ -93,8 +93,8 @@ final class BackupScreensTest extends BackupTestCase
 
         Time::setTestNow(Time::now()->addMinutes(16));
         $this->send('GET', "backend/backups/download/{$code}")->assertRedirectTo(site_url('auth/reauth'));
-        $this->send('GET', "backend/backups/restore/{$code}")->assertRedirectTo(site_url('auth/reauth'));
-        $this->send('POST', "backend/backups/restore/{$code}", $this->restoreForm($file))->assertRedirectTo(site_url('auth/reauth'));
+        $this->send('GET', "backend/backups/recover/{$code}")->assertRedirectTo(site_url('auth/reauth'));
+        $this->send('POST', "backend/backups/recover/{$code}", $this->restoreForm($file))->assertRedirectTo(site_url('auth/reauth'));
         $this->assertCount(1, $this->securityEntries('download'));
     }
 
@@ -108,13 +108,16 @@ final class BackupScreensTest extends BackupTestCase
         file_put_contents($this->root . '/.env', "app.baseURL = 'https://here.example.com/'\nencryption.key = hex2bin:" . str_repeat('dd', 32) . "\n");
         $this->login('root@example.com');
 
-        $this->assertStringContainsString(lang('Backup.form.typeConfirm', [$file]), $this->body('GET', "backend/backups/restore/{$code}"));
-        $this->assertStringContainsString(lang('Backup.error.confirm'), $this->body('POST', "backend/backups/restore/{$code}", $this->restoreForm('wrong-name')));
-        $this->assertStringContainsString(lang('Backup.error.password'), $this->body('POST', "backend/backups/restore/{$code}", $this->restoreForm($file, 'wrong-password-123')));
+        $list = $this->body('GET', 'backend/backups');
+        $this->assertStringContainsString("backend/backups/recover/{$code}", $list, 'The superadmin gets the restore button…');
+        $this->assertStringContainsString('backend/backups/upload', $list, '…and the upload button.');
+        $this->assertStringContainsString(lang('Backup.form.typeConfirm', [$file]), $this->body('GET', "backend/backups/recover/{$code}"));
+        $this->assertStringContainsString(lang('Backup.error.confirm'), $this->body('POST', "backend/backups/recover/{$code}", $this->restoreForm('wrong-name')));
+        $this->assertStringContainsString(lang('Backup.error.password'), $this->body('POST', "backend/backups/recover/{$code}", $this->restoreForm($file, 'wrong-password-123')));
         $this->assertCount(1, $this->securityEntries('restore_refused'));
         $this->assertSame(1, db_connect()->table('users')->where('username', 'later')->countAllResults(), 'Nothing restored yet.');
 
-        $page = $this->body('POST', "backend/backups/restore/{$code}", $this->restoreForm($file));
+        $page = $this->body('POST', "backend/backups/recover/{$code}", $this->restoreForm($file));
 
         $this->assertSame(0, db_connect()->table('users')->where('username', 'later')->countAllResults(), 'Restored.');
         $this->assertStringContainsString(lang('Backup.msg.restored'), $page);

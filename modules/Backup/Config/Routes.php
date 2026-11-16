@@ -10,9 +10,9 @@ use Modules\Core\Crud\CrudFactory;
  *
  * - `backend/backups`: the list (kpcrudy, `backup.list`; delete `backup.delete`);
  * - `backend/backups/create` (`backup.create`), `verify/<id>` (`backup.list`),
- *   `download/<id>` (`backup.download` + `reauth`), `restore/<id>` and `upload`
+ *   `download/<id>` (`backup.download` + `reauth`), `recover/<id>` (restore) and `upload`
  *   (`backup.restore` + `reauth`), `jobs/<job>` (the result of a restore, `backup.restore`);
- *   registered before the CRUD so `restore/…` is not taken as kpcrudy's trash operation;
+ *   registered before the CRUD; not `restore/<id>`, which is kpcrudy's own trash URL;
  * - `progress/backup/<job>`: the progress of a running restore as JSON (step, percentage, status;
  *   the job id, 128 random bits, is the capability). Outside `backend/` because the database and
  *   the session may be replaced while it runs: `progress/*` paths run no filter that reads the
@@ -30,8 +30,8 @@ $routes->group('backend/backups', ['namespace' => 'Modules\Backup\Controllers'],
     $routes->get('verify/(:segment)', 'Backups::verifyForm/$1', $list);
     $routes->post('verify/(:segment)', 'Backups::verify/$1', ['filter' => ['can:backup.list', 'ratelimit:forms']]);
     $routes->get('download/(:segment)', 'Backups::download/$1', ['filter' => ['can:backup.download', 'reauth']]);
-    $routes->get('restore/(:segment)', 'Backups::restoreForm/$1', $restore);
-    $routes->post('restore/(:segment)', 'Backups::restore/$1', ['filter' => ['can:backup.restore', 'reauth', 'ratelimit:forms']]);
+    $routes->get('recover/(:segment)', 'Backups::restoreForm/$1', $restore);
+    $routes->post('recover/(:segment)', 'Backups::restore/$1', ['filter' => ['can:backup.restore', 'reauth', 'ratelimit:forms']]);
     $routes->get('upload', 'Backups::uploadForm', $restore + ['as' => 'backup-upload']);
     $routes->post('upload', 'Backups::upload', ['filter' => ['can:backup.restore', 'reauth', 'ratelimit:uploads']]);
     $routes->get('jobs/(:segment)', 'Backups::job/$1', ['filter' => 'can:backup.restore']);

@@ -26,6 +26,8 @@ return [
         'restore' => 'Restaurar una còpia',
         'upload'  => 'Pujar un fitxer de còpia',
         'job'     => 'Restauració en curs',
+        'jobDone' => 'Restauració acabada',
+        'jobFailed' => 'Restauració fallida',
     ],
     'action'        => [
         'create'   => 'Crear còpia',

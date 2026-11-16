@@ -26,6 +26,8 @@ return [
         'restore' => 'Restore a backup',
         'upload'  => 'Upload a backup file',
         'job'     => 'Restore in progress',
+        'jobDone' => 'Restore finished',
+        'jobFailed' => 'Restore failed',
     ],
     'action'        => [
         'create'   => 'Create backup',
