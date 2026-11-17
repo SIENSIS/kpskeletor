@@ -95,7 +95,7 @@ class Services extends BaseService
     }
 
     /**
-     * The calendar API (`publish()` / `unpublish()`, docs/calendar-api.md): the class of
+     * The calendar API (`publish()` / `unpublish()`, docs/calendar.md): the class of
      * `Config\Calendars::$publisher` (the Events module's service), else a `NullCalendar`.
      */
     public static function calendar(bool $getShared = true): CalendarPublisher

@@ -20,7 +20,7 @@ use Modules\Events\Tests\Support\EnrolledPolicy;
 use Modules\Events\Tests\Support\LessonsSource;
 
 /**
- * The calendar API (docs/calendar-api.md): publish/unpublish (idempotent, SEQUENCE, audiences,
+ * The calendar API (docs/calendar.md): publish/unpublish (idempotent, SEQUENCE, audiences,
  * locked in the administration), calendars with permissions and access policies, providers
  * filtered by user, disabled modules, calendar toggles, resync, purge and the CodeIgniter events.
  *

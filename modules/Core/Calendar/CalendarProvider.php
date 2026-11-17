@@ -9,7 +9,7 @@ use DateTimeInterface;
 
 /**
  * A source of calendar events computed on the fly (pull mode; nothing is stored), declared in the
- * manifest's `$calendarProviders` (docs/calendar-api.md). Examples: task deadlines, holidays,
+ * manifest's `$calendarProviders` (docs/calendar.md). Examples: task deadlines, holidays,
  * birthdays (`Modules\Users\Calendar\BirthdaysProvider`).
  *
  * Providers must return **only the events the user may see**, each with a stable `key` (its iCal

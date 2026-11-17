@@ -14,7 +14,7 @@ use Throwable;
  *
  * Asks the module's calendar sources (`CalendarSource::all()`, declared as `'source'` in its
  * `$calendars`) for every event again, publishes them and unpublishes the published events they no
- * longer return (docs/calendar-api.md, "Consistency").
+ * longer return (docs/calendar.md, "Consistency").
  */
 final class CalendarResync extends BaseCommand
 {

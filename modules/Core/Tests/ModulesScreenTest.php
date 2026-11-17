@@ -11,7 +11,7 @@ use Modules\Dashboard\Tests\DashboardTestCase;
 use ZipArchive;
 
 /**
- * The Modules screen (`backend/modules`, docs/packages.md): permissions and forged POSTs,
+ * The Modules screen (`backend/modules`, docs/installing-modules.md): permissions and forged POSTs,
  * re-authentication for uploads and uninstall requests, enable/disable with dependencies
  * (acceptance criterion 3: a disabled module's routes answer 404 and come back when enabled),
  * the packages tab, the themes tab and nothing written into the code folders.

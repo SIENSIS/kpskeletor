@@ -6,7 +6,7 @@ namespace Modules\Core\Packages;
 
 /**
  * Verifies the minisign signature (`<package>.zip.minisig`) of a module or theme package against
- * the trusted publisher keys of `Config\Packages::$publicKeys` (docs/packages.md).
+ * the trusted publisher keys of `Config\Packages::$publicKeys` (docs/installing-modules.md).
  *
  * Same format as release archives (docs/updates.md): an Ed25519 signature of the file (`Ed`) or
  * of its BLAKE2b-512 hash (`ED`, minisign's default) plus the global signature of the trusted

@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Events of the Backup module (discovered by CodeIgniter, also while the module is disabled, so
  * the listener checks it):
  *
- * - `packageBackup` (the Core's PackageInstaller and Uninstaller, docs/packages.md): a full backup
+ * - `packageBackup` (the Core's PackageInstaller and Uninstaller, docs/installing-modules.md): a full backup
  *   (origin `package`) before a module or theme is installed, upgraded or uninstalled, with the
  *   operator's password or the configured one (`backup.password`, `BACKUP_PASSWORD`).
  */

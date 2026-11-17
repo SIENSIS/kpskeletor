@@ -16,7 +16,7 @@ use Modules\Core\Packages\StagedPackages;
  * php spark modules:install <file.zip|url> [--enable] [--force] [--demo] [--yes] [--no-backup] [--password] [--signature=<file>]
  * php spark modules:install --pending [--no-backup] [--password]
  *
- * See docs/packages.md. `--pending` runs the operations approved in the Modules screen (staged
+ * See docs/installing-modules.md. `--pending` runs the operations approved in the Modules screen (staged
  * installs and uninstalls); run it as a user that may write `modules/` and `themes/` (by hand or
  * from its own cron line).
  */

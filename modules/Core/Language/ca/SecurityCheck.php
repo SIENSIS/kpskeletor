@@ -164,7 +164,7 @@ return [
         'title' => 'Paquets de mòduls i temes',
         'ok' => 'Signatures obligatòries ({0} claus de confiança).',
         'unsigned' => 'S\'accepten paquets sense signar (packages.requireSignature està desactivat o packages.publicKeys és buit).',
-        'fix' => 'Definiu a packages.publicKeys les claus minisign dels vostres publicadors i packages.requireSignature = true (docs/packages.md).',
+        'fix' => 'Definiu a packages.publicKeys les claus minisign dels vostres publicadors i packages.requireSignature = true (docs/installing-modules.md).',
         'autoEnableTitle' => 'Mòduls trobats per modules:sync',
         'autoEnable' => 'packages.autoEnable està activat: una carpeta de mòdul copiada a mà s\'activa amb la sincronització següent.',
         'fixAutoEnable' => 'Deixeu packages.autoEnable desactivat en producció (D-29-02).',

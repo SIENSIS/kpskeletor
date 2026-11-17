@@ -16,7 +16,7 @@ use Modules\Core\Modules\CacheInvalidator;
 use Modules\Core\Security\HtmlSanitizer;
 
 /**
- * The calendar API of the Events module (`service('calendar')`, docs/calendar-api.md, "Publish"):
+ * The calendar API of the Events module (`service('calendar')`, docs/calendar.md, "Publish"):
  * other modules store their events in `events` with `source_module` + `source_key`.
  *
  * - `publish()` is idempotent: the same data changes nothing (no new `SEQUENCE`), different data

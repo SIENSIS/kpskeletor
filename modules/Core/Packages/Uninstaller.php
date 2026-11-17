@@ -27,7 +27,7 @@ use Throwable;
 
 /**
  * Removes a module or a theme (`modules:uninstall`, `themes:uninstall`, pending uninstalls;
- * docs/packages.md).
+ * docs/installing-modules.md).
  *
  * A module: backup, maintenance mode, disable, roll back its migrations (unless `keepData`), the
  * calendar entries (`service('calendar')->purgeModule()`), the `moduleUninstalling` event (other

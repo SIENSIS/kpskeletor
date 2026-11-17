@@ -97,7 +97,7 @@ A **notice** may have an event date (`event_starts_at`, optional `event_ends_at`
 `event_all_day`; the end may not be before the start). While the notice is published and readable
 (not scheduled, not expired, not in the trash) and has a date, it is published to the calendar
 `news.notices` ("Notices", red) through the calendar API (`Services/NoticeCalendar.php`,
-`docs/calendar-api.md`) with the notice's audience: `public` → public, `private` → private,
+`docs/calendar.md`) with the notice's audience: `public` → public, `private` → private,
 `groups` → restricted to its groups (D-00-41; the calendar declares no permission). The event
 links back to the reader page (`backend/news/read/{code}`) and allows reminders. Every write of
 the CRUDs, publish/unpublish (single and bulk), the release of scheduled notices and the expiry

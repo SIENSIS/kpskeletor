@@ -273,6 +273,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-32-03 | 32 | The public request form always asks for a captcha (its own image URL) | Accepted (proposal) |
 | D-32-04 | 32 | Attachments of to-do tasks: a picker field with up to 5 keys + a `task_attachments` index | Accepted (proposal) |
 | D-32-05 | 32 | Generator templates stay in `modules/Core/Modules/Templates`; no packager option for `CLAUDE.md` yet | Accepted (proposal) |
+| D-33-01 | 33 | Documents renamed to the specification's names (`permissions.md`, `calendar.md`, `installing-modules.md`) | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2781,3 +2782,10 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** Move every template to the plan's path.
 - **Status:** Accepted (proposal)
 
+## D-33-01 — Documents renamed to the specification's names (`permissions.md`, `calendar.md`, `installing-modules.md`)
+
+- **Where:** specification "Documentation (English)" (`docs/permissions.md`, `docs/calendar.md`, `docs/installing-modules.md`); earlier sessions wrote `docs/rbac.md`, `docs/calendar-api.md` and `docs/packages.md` with the same content, and `CLAUDE.md`, code comments, language files and module `CLAUDE.md` files point at them.
+- **Problem:** Two names for one document invite drift; the specification's list is what acceptance criterion 13 checks.
+- **Proposal:** Rename the three files (`git mv`) to the specification's names, update every reference (code comments, language lines, tests, `CLAUDE.md` files, docs), and leave a three-line stub at each old path ("moved to …") so the historical records (`docs/decisions.md`, `docs/progress.md`, `deploy/`, `deploy-status/`, released migrations) keep working links. `tests/unit/Docs/DocumentationTest.php` checks that every `docs/….md` named in the docs exists.
+- **Alternatives:** A) Keep the old files and add the specification's names as short index pages. B) Keep the old names and record the difference.
+- **Status:** Accepted (proposal)

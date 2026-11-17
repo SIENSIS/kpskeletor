@@ -17,7 +17,7 @@ use Throwable;
 
 /**
  * Events computed on the fly by the `CalendarProvider`s of enabled modules (pull mode,
- * docs/calendar-api.md, "Providers"): nothing is stored. Only for signed-in users (never on the
+ * docs/calendar.md, "Providers"): nothing is stored. Only for signed-in users (never on the
  * public site or in public feeds), only for calendars the user may see, cached per user and range
  * for `Config\Calendar::$providerCacheSeconds`.
  *

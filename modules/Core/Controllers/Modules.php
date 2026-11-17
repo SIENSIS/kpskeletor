@@ -21,7 +21,7 @@ use Modules\Core\Packages\StagedPackages;
 use Throwable;
 
 /**
- * The Modules screen (`backend/modules`, docs/packages.md):
+ * The Modules screen (`backend/modules`, docs/installing-modules.md):
  *
  * - list (`modules.list`): every module with versions, status, dependencies and dependants;
  * - enable / disable (`modules.toggle`), offering to enable disabled dependencies too;

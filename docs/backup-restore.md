@@ -142,4 +142,4 @@ module packages) and `Modules\Core\Maintenance\MaintenanceMode`.
 Installing, upgrading or uninstalling a module or theme (`modules:install`, `modules:uninstall`,
 `themes:*`, staged operations) asks for a full backup through the Core event `packageBackup`;
 this module answers it (origin `package`, password from `backup.password`/`BACKUP_PASSWORD` or
-`--password`). See `docs/packages.md`.
+`--password`). See `docs/installing-modules.md`.

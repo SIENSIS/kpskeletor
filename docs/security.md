@@ -200,7 +200,7 @@ through `SafeZip`, an extension allow-list (no `phtml`, `phar`, `.htaccess`…),
 and ratio limits, and optionally a minisign signature by a trusted publisher key
 (`packages.requireSignature`). Every refusal is a security log entry (`package_refused`). In
 production a module copied by hand or installed without `--enable` stays disabled until an
-administrator enables it (D-29-02). See `docs/packages.md`.
+administrator enables it (D-29-02). See `docs/installing-modules.md`.
 
 ## Backups
 

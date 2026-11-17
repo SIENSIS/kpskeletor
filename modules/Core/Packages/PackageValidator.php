@@ -17,7 +17,7 @@ use Modules\Core\Theme\ThemeRegistry;
 use ZipArchive;
 
 /**
- * Validates a module or theme package (a ZIP) before anything is installed (docs/packages.md):
+ * Validates a module or theme package (a ZIP) before anything is installed (docs/installing-modules.md):
  *
  * - size of the ZIP, and its signature (`.minisig`, publisher keys of `Config\Packages`;
  *   required when `requireSignature` is on);

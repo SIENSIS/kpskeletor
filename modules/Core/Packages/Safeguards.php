@@ -9,7 +9,7 @@ use CodeIgniter\Events\Events;
 use Modules\Core\Maintenance\MaintenanceMode;
 
 /**
- * What surrounds every install, upgrade and uninstall (docs/packages.md): a backup through the
+ * What surrounds every install, upgrade and uninstall (docs/installing-modules.md): a backup through the
  * `packageBackup` extension point (the Backup module) and maintenance mode while the code
  * changes. Maintenance mode is left as it was found: an operator who had turned it on keeps it.
  */

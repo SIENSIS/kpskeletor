@@ -7,7 +7,7 @@ namespace Modules\Core\Config;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Module and theme package options (decision D-00-05; docs/packages.md): demo data in production,
+ * Module and theme package options (decision D-00-05; docs/installing-modules.md): demo data in production,
  * new modules found by `modules:sync`, the limits and signatures of ZIP packages
  * (`modules:install`, `themes:install`, staged uploads in the Modules screen).
  *

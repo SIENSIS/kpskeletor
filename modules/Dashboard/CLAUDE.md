@@ -33,7 +33,7 @@ D-16-01 (names, URLs, login landing) decided by the owner as proposed; D-16-02 â
 
 ## Open tasks
 
-- Done in session 29: `Config/Events.php` answers `moduleUninstalling`: removes the module's widgets from the group layouts. (`docs/packages.md`)
+- Done in session 29: `Config/Events.php` answers `moduleUninstalling`: removes the module's widgets from the group layouts. (`docs/installing-modules.md`)
 - Widgets of later modules (News, Events, Updates, Backup, Security status) are added by their
   sessions; the tutorial widgets by sessions 32â€“34.
 - Rate limit of the async URL is the Core's `widgets` limit; no per-widget limit.

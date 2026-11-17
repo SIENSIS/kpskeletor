@@ -145,7 +145,7 @@ final class Module extends ModuleManifest
         'birthdaysadmin' => ['label' => 'Users.birthdays.adminCalendar', 'color' => '#6f42c1', 'permission' => 'users-users.birthdate', 'hidden' => true],
     ];
 
-    /** Events computed on the fly, never stored (docs/calendar-api.md, "Providers"). */
+    /** Events computed on the fly, never stored (docs/calendar.md, "Providers"). */
     public array $calendarProviders = [\Modules\Users\Calendar\BirthdaysProvider::class, \Modules\Users\Calendar\AdminBirthdaysProvider::class];
 
     /** Its only table, `group_birthday_audiences`, is backed up with the database (no files). */

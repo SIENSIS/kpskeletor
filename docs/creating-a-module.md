@@ -75,4 +75,4 @@ vendor/bin/phpunit modules/Books
 `--standalone` also writes `composer.json` (`type: kpskeletor-module`, PSR-4 `Modules\Books\`),
 `README.md` (installing and developing) and a `CLAUDE.md` that summarises the skeleton's rules
 and the checklist. Commit only inside `modules/Books/` (it can be a git submodule of your
-checkout). Packages are installed with `php spark modules:install` (`docs/packages.md`).
+checkout). Packages are installed with `php spark modules:install` (`docs/installing-modules.md`).

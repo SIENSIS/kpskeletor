@@ -60,7 +60,7 @@ final class InstallationCheck implements SecurityCheck
     }
 
     /**
-     * Module and theme packages (docs/packages.md): signatures required and trusted keys set
+     * Module and theme packages (docs/installing-modules.md): signatures required and trusted keys set
      * (warning otherwise), and whether modules found by `modules:sync` are enabled (information).
      */
     private function packages(SecurityReport $report): void

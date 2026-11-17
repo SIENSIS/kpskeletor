@@ -216,4 +216,4 @@ A theme packaged as a ZIP (`<slug>/Theme.php` …) is installed with `php spark 
 themes with their screenshot (`Assets/img/screenshot.png`, optional) and colours and switches the
 theme of the back office or of the public site with one click (`modules.toggle`); the options stay
 in Settings › Theme. `php spark themes:uninstall <slug>` removes a theme that is not active, not
-the fallback and not a parent. See `docs/packages.md`.
+the fallback and not a parent. See `docs/installing-modules.md`.

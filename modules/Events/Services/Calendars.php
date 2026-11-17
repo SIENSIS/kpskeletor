@@ -11,7 +11,7 @@ use Modules\Core\Permissions\Authorization;
 use Modules\Core\Registry\DeclarationRegistry;
 
 /**
- * The calendars of the calendar view and the feeds (docs/calendar-api.md, "Calendars"):
+ * The calendars of the calendar view and the feeds (docs/calendar.md, "Calendars"):
  *
  * - `events`: the events created by hand in the administration (`events.calendar` is null);
  * - every calendar declared in the manifest `$calendars` of an **enabled** module, with the id

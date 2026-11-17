@@ -17,7 +17,7 @@ use Modules\Core\Theme\ThemeRegistry;
 use Throwable;
 
 /**
- * Themes tab of the Modules screen (`backend/modules/themes`, docs/packages.md): installed
+ * Themes tab of the Modules screen (`backend/modules/themes`, docs/installing-modules.md): installed
  * themes with a preview (the theme's `Assets/img/screenshot.png` and its colours), the active
  * theme of the back office and of the public site (switch with one click, `modules.toggle`; the
  * same settings as Settings › Theme), and the uninstall request (`modules.uninstall` +
