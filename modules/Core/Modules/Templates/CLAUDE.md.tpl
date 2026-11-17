@@ -14,7 +14,7 @@ written by hand).
 
 - `{{name}}-main` (page: `view`): the module's screen `backend/{{name}}`.{{crudClaude}}{{apiClaude}}
 - Default grants: admin `{{name}}-main.*`{{crudGrantClaude}}.
-- Settings: `{{Name}}.perPage`. Widget `{{name}}.{{name}}` (`Widgets/{{Name}}Widget.php`). Scheduled
+- Settings: `{{Name}}.perPage`. Widget `{{name}}.main` (`Widgets/{{Name}}Widget.php`). Scheduled
   task `Tasks/{{Name}}Task.php`.
 - Tables: `{{table}}` (one migration per table, `down()` implemented).
 
