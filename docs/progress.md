@@ -39,7 +39,7 @@ pull request open), *merged* (in `main`).
 | 29 | Modules screen, ZIP installs and uninstall | merged | `ccr-562a7c0f-4i8vha` | [SIENSIS/kpskeletor#37](https://github.com/SIENSIS/kpskeletor/pull/37) | [`deploy-status/29-module-packages/`](../deploy-status/29-module-packages/README.md) |
 | 30 | security:check and the Security status page | merged | `ccr-f19bfaf6-ek95xk` | [SIENSIS/kpskeletor#38](https://github.com/SIENSIS/kpskeletor/pull/38) | [`deploy-status/30-security-check/`](../deploy-status/30-security-check/README.md) |
 | 31 | Internationalisation pass | merged | `claude/amazing-goldberg-2trmeu` | [SIENSIS/kpskeletor#39](https://github.com/SIENSIS/kpskeletor/pull/39) | [`deploy-status/31-i18n/`](../deploy-status/31-i18n/README.md) |
-| 32 | Tasks tutorial module and AI tooling | done | `ccr-c5a1782e-jvbm6w` | (pull request "Session 32: Tasks tutorial module and AI tooling") | [`deploy-status/32-tasks-module/`](../deploy-status/32-tasks-module/README.md) |
+| 32 | Tasks tutorial module and AI tooling | done | `ccr-c5a1782e-jvbm6w` | [SIENSIS/kpskeletor#40](https://github.com/SIENSIS/kpskeletor/pull/40) | [`deploy-status/32-tasks-module/`](../deploy-status/32-tasks-module/README.md) |
 
 ## MVP review (session 19)
 

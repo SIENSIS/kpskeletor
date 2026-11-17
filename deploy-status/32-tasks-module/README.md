@@ -1,6 +1,6 @@
 # Session 32 — Tasks tutorial module and AI tooling
 
-Branch: `ccr-c5a1782e-jvbm6w` · Pull request: (see `docs/progress.md`) · Date: 2026-11-17
+Branch: `ccr-c5a1782e-jvbm6w` · Pull request: [SIENSIS/kpskeletor#40](https://github.com/SIENSIS/kpskeletor/pull/40) · Date: 2026-11-17
 
 ## What was built
 
