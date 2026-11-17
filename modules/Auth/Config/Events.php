@@ -55,3 +55,9 @@ RecipientLocale::resolveWith(static function (User $user): ?string {
 
     return is_string($locale) ? $locale : null;
 });
+
+// `securityChecks` (the Core's security:check and Security status page): superadmins without 2FA,
+// groups where 2FA is optional, the minimum password length.
+Events::on(\Modules\Core\Security\Check\SecurityChecks::EVENT, static function (\Modules\Core\Security\Check\SecurityChecks $checks): void {
+    $checks->add(new \Modules\Auth\Services\AccountSecurityCheck());
+});

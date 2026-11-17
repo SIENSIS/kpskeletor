@@ -328,4 +328,20 @@ return [
         'totpLater' => 'No s\'ha configurat el 2FA: feu-ho des del perfil després del primer inici de sessió.',
         'recovery' => 'Codis de recuperació (només es mostren ara; guardeu-los en un lloc segur):',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'superadmins' => 'Superadministradors amb autenticació en dos passos',
+        'superadminsOk' => 'Tots els superadministradors fan servir el 2FA.',
+        'superadminsWithout' => '{0} superadministradors sense 2FA: {1}.',
+        'fixSuperadmins' => 'Demaneu-los que l\'activin a Perfil › Autenticació en dos passos, o feu obligatori el 2FA per al grup superadmin (Usuaris › Grups).',
+        'unknown' => 'No s\'ha pogut comprovar (base de dades no disponible).',
+        'groups' => 'Política de dos passos dels grups',
+        'groupsOk' => 'El 2FA és obligatori a tots els grups.',
+        'groupsOptional' => 'El 2FA és opcional a: {0}.',
+        'fixGroups' => 'Feu-lo obligatori per als grups amb accés al back-office a Usuaris › Grups.',
+        'password' => 'Longitud mínima de la contrasenya',
+        'passwordOk' => '{0} caràcters.',
+        'passwordShort' => '{0} caràcters (recomanat: almenys {1}).',
+        'fixPassword' => 'Augmenteu Auth.minimumPasswordLength a {0} o més a Configuració › Seguretat.',
+    ],
 ];

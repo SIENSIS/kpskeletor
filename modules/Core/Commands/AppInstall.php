@@ -10,6 +10,9 @@ use Modules\Core\Install\CliPrompt;
 use Modules\Core\Install\Installer;
 use Modules\Core\Install\InstallException;
 use Modules\Core\Install\InstallOptions;
+use Modules\Core\Security\Check\SecurityChecker;
+use Modules\Core\Security\Check\SecurityStatus;
+use Throwable;
 
 /**
  * php spark app:install [options]
@@ -124,6 +127,8 @@ final class AppInstall extends BaseCommand
         CLI::write('  ' . $result->cronLine, 'yellow');
         CLI::newLine();
         CLI::write(lang('Install.cli.securityCheck'));
+        $this->securitySummary($options->environment);
+        CLI::newLine();
         CLI::write(lang('Install.cli.done', [$result->lockPath]), 'green');
 
         return EXIT_SUCCESS;
@@ -255,5 +260,20 @@ final class AppInstall extends BaseCommand
         }
 
         return $modules;
+    }
+
+    /**
+     * The summary of `security:check` for the installed environment (errors and warnings only);
+     * the results are stored for the Security status page without notifying anybody.
+     */
+    private function securitySummary(string $environment): void
+    {
+        try {
+            $report = (new SecurityChecker(SecurityChecker::defaultChecks($environment)))->run();
+            (new SecurityStatus())->store($report, false);
+            SecurityCheck::print($report, false);
+        } catch (Throwable $e) {
+            CLI::write(lang('Install.cli.securityCheckFailed', [$e->getMessage()]), 'yellow');
+        }
     }
 }

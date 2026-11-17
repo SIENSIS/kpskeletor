@@ -1764,6 +1764,17 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   status, explanation and fix, plus the effective CSP and headers. A dashboard widget
   "Security status" (admins) shows the summary and links to the page. Results are cached and
   refreshed daily by a scheduled task, which notifies superadmins when a check turns red.
+* **Names:** the page is `backend/security` (`POST backend/security/refresh` "check again",
+  `GET|POST backend/security/probe` with re-authentication; the probe always targets the
+  configured base URL), permission `security.check` (granted to admin), menu "Security status"
+  in the settings zone, widget `core.security-status`. Modules add their own checks from the Core
+  event `securityChecks` (a `Modules\Core\Security\Check\SecurityCheck` class, result ids
+  `<group>.<what>`); the Core never names them. Options in `Config\ProductionCheck` (`.env`
+  `productioncheck.*`: `webUser`, `composer`, `auditMaxAgeDays`, `probeTimeout`,
+  `probeLoginPath`, `probeLoginAttempts`, `writablePaths`, `readOnlyPaths`). `php spark
+  security:audit [--from=<file>]` runs `composer audit` (or stores CI's JSON output) for the
+  dependencies check. Results are files in `writable/security/` (`status.json`, `probe.json`,
+  `composer-audit.json`).
 * Documented in `docs/security.md` (production checklist) and `docs/commands.md`.
 
 ## Installer and CLI
@@ -1791,7 +1802,7 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
 * **Commands** (all documented in `docs/commands.md`):
   * modules and themes: `modules:sync|list|status|enable|disable|install|uninstall|demo`,
     `themes:install|uninstall`, `make:module`, `make:theme`, `assets:publish [--watch]`;
-  * permissions and security: `permissions:list|check`, `security:check`;
+  * permissions and security: `permissions:list|check`, `security:check`, `security:audit`;
   * scheduler: `schedule:run|list`;
   * backups and updates: `backup:create|list|restore|verify|prune`, `updates:check`,
     `app:update`;

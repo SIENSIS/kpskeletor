@@ -225,7 +225,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-25-07 | 25 | The birthdays calendar: off by default, day and month only | Accepted (proposal) |
 | D-25-08 | 25 | Who sees whose birthday: consent, permission, group table and an administrative calendar (decide) | Applied (decided) |
 | D-25-09 | 25 | Birthday greetings as notifications (decide) | Applied (decided) |
-| D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Decided |
+| D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Applied (decided) |
 | D-26-01 | 26 | Core API permission names and URLs (decide) | Applied (decided) |
 | D-26-02 | 26 | Public API endpoints: GET only, no permission resolver, public records only | Accepted (proposal) |
 | D-26-03 | 26 | Read markers in the API are not written to the activity log | Accepted (proposal) |
@@ -257,6 +257,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-29-07 | 29 | Themes tab: preview image and colours, switching with `modules.toggle` | Accepted (proposal) |
 | D-29-08 | 29 | What an uninstall removes, and `--keep-data` | Accepted (proposal) |
 | D-29-09 | 29 | Package signatures (minisign) and the allowed files | Accepted (proposal) |
+| D-30-01 | 30 | Security status URLs, the `securityChecks` event, `Config\ProductionCheck` keys and `security:audit` (decide) | Decided |
+| D-30-02 | 30 | What is an error, a warning or information in `security:check` | Accepted (proposal) |
+| D-30-03 | 30 | What `--probe` sends, and the login throttling probe | Accepted (proposal) |
+| D-30-04 | 30 | "The web server writes only …" checked from the console and from the page | Accepted (proposal) |
+| D-30-05 | 30 | Stored results, the daily task and the notification to superadmins | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2643,5 +2648,41 @@ questions") and from each session's report; they are answered with `deploy/decid
 
 - **Where:** specification "Package validation" ("optional signature check… required when a setting asks for it"), D-28-03.
 - **Proposal:** The same minisign format as releases: `<package>.zip.minisig` next to the file (or `--signature`, or downloaded from `<url>.minisig`, or uploaded with the package), checked by `Modules\Core\Packages\SignatureCheck` against `Packages.publicKeys`; refused when `Packages.requireSignature` is on and there is none. (The Core cannot use the Updates module's verifier: the two copies are merged in session 35.) Allowed files: the extensions of `Packages.extensions` (no `phtml`, `phar`, `htaccess`, `env`…), plus `LICENSE`, `README`, `CHANGELOG`, `NOTICE`, `AUTHORS`, `COPYING` and `.gitkeep`.
+- **Status:** Accepted (proposal)
+
+## D-30-01 — Security status URLs, the `securityChecks` event, `Config\ProductionCheck` keys and `security:audit` (decide)
+
+- **Where:** specification "Security status page and `security:check`" (permission `security.check` given; URLs, configuration keys, how modules add checks and where `composer audit` is stored are not), `CLAUDE.md` ("never hard-code a module in the Core"; the Core asks modules through events).
+- **Problem:** The page, its actions and the extension point for modules are new public conventions. Some checks belong to modules (`backup.password`, 2FA of superadmins, password length, CORS of the API, personal tokens), and the Core may not name them.
+- **Proposal:** Core resource `security` (name `security`, no CRUD operations, extra `check`): permission `security.check`, default grant admin (superadmin always). URLs: `backend/security` (page, `security-status`), `POST backend/security/refresh` ("Check again", `ratelimit:forms`), `GET|POST backend/security/probe` ("Run external probe", `reauth` + `ratelimit:forms`; always the configured base URL, never a URL from the request). Menu "Security status" in the settings zone (order 84). Core event `securityChecks` (`Modules\Core\Security\Check\SecurityChecks`): modules add `SecurityCheck` objects (Auth: `accounts.*`; Api: `configuration.cors`, `accounts.personalTokens`; Backup: `secrets.backupPassword`, `installation.backups`; Updates: `dependencies.updates`). Config `Config\ProductionCheck` (`.env` `productioncheck.*`: `path`, `webUser`, `writablePaths`, `readOnlyPaths`, `composer`, `auditMaxAgeDays` 7, `maxScannedFiles`, `probeTimeout`, `probeLoginPath`, `probeLoginAttempts`). New command `security:audit [--from=<file>]` (runs or imports `composer audit`). Widget `core.security-status`, task `SecurityCheckTask` (daily 04:43), notification `SecurityCheckFailed`. Results in `writable/security/`.
+- **Alternatives:** A) A `$securityChecks` manifest key instead of the event (a new manifest key, validated by `modules:sync`). B) The page under Settings (`backend/settings/security-status`, `settings.security`) instead of its own permission. C) `composer audit` only in CI, with no server-side command (the check would always say "never checked" on a server).
+- **Status:** Applied (decided)
+- **Decision (2026-11-17):** «Com s'ha construït (recomanada)». Everything stays as built: the page `backend/security` (`refresh`, `probe` with re-authentication), permission `security.check` granted to admin, the Core event `securityChecks` for module checks, `Config\ProductionCheck` (`productioncheck.*` in `.env`), the command `security:audit [--from=<file>]` and the results in `writable/security/`. **Must change:** `docs/specification.md` ("Security status page and `security:check`") to name them; no code change.
+- **Applied in:** `docs/specification.md` ("Security status page and `security:check`": names; "Installer and CLI": `security:audit`); code and tests as built in session 30 (`SecurityStatusScreenTest`, `SecurityCheckTest`).
+
+## D-30-02 — What is an error, a warning or information in `security:check`
+
+- **Where:** specification "Security status page and `security:check`" (the levels of the accounts checks are given; the others are not), acceptance criterion 12 ("a fresh production install passes with no errors").
+- **Proposal:** Errors: anything that exposes data or code on a production site (environment, debug output, HTTPS, cookies, an `http://` base URL, CSP disabled/report-only/unsafe, missing keys, a readable `.env`, secrets in tracked files, the web installer open, demo data, the web server able to write code, scripts in `public/`, readable `maintenance.json` or backups, `composer audit` advisories, changed vendored files, CORS `*`, no `backup.password` with scheduled backups). Warnings: what a fresh install cannot fix by itself or what is a hardening step (`writable/` modes from a git checkout, the web user unknown from the console, HSTS disabled, a local/example base URL, no `.env` file, superadmins without 2FA, password length below 12, audit never run/stale/failed, unsigned packages accepted, `public/uploads/.htaccess` missing, an update repository without signing keys). Information: optional-2FA groups, tokens without expiry, the outbound allow-list, not a git checkout, PHP's local development server (HTTPS and `Secure` cookies are not forced there, D-19-05). A check that throws is an error. Checked by hand: a fresh `app:install --env=production --db=sqlite` reports 0 errors; the same with `CI_ENVIRONMENT=development` reports 4 errors and exit code 1.
+- **Status:** Accepted (proposal)
+
+## D-30-03 — What `--probe` sends, and the login throttling probe
+
+- **Where:** specification ("requests to the site itself, never to third parties, through a dedicated client limited to the configured base URL host and the site's own `allowedHostnames`… the login is throttled").
+- **Proposal:** `Modules\Core\Security\Check\Probe\ProbeClient` (curl, no proxy, no redirects followed, timeout, 1 MB): only `https://` URLs of the base URL host or `allowedHostnames` (plain `http://` only for the redirect check), never credentials in the URL. Paths that must not be served: `.env`, `writable/install.lock`, `writable/logs/`, `writable/packages/`, `writable/backups/`, `modules/Core/Config/Module.php`, `app/Config/App.php`, `vendor/autoload.php`, `composer.json`, `.git/config` (an answer 200 is an error). The uploads probe writes `public/uploads/kp-security-probe-<random>.php` printing a random marker (built with `strrev`, so the file itself does not contain it) and always removes it. Open redirect: `?return=https://kp-security-probe.invalid/` on `/`, `login` and `backend` (no request ever goes to that host). Login: up to `probeLoginAttempts` (12) wrong passwords for `security-check-<random>@example.invalid`, each with a fresh CSRF token; a 429 passes. `progress/*`: each GET route with a random id; keys containing pass/secret/token/key/hash/email/path/file are an error (D-27-02).
+- **Alternatives:** A) Skip the login probe (it adds a few failed attempts to the server's own address). B) Probe the login through the API's `auth/token` instead.
+- **Status:** Accepted (proposal)
+
+## D-30-04 — "The web server writes only …" checked from the console and from the page
+
+- **Where:** specification ("the web server user can write only `writable/`, `public/assets/modules`, `public/assets/core`, `public/themes` and `public/uploads`").
+- **Problem:** The console usually runs as the deploy user (or root), not as the web server user, so `is_writable()` there says nothing about the web server.
+- **Proposal:** `FileAccess`: with `productioncheck.webUser` the console computes it from the owner, group (and supplementary groups) and mode of each path (POSIX); on a web request (the page) the process is the web user, so `is_writable()`; otherwise only a world-writable path is known (error) and the check is a warning asking for `webUser`. Checked paths: the project root, `.env`, `app`, `modules`, `themes`, `vendor`, `public`, `public/index.php`, `public/.htaccess` (`readOnlyPaths`).
+- **Status:** Accepted (proposal)
+
+## D-30-05 — Stored results, the daily task and the notification to superadmins
+
+- **Where:** specification ("Results are cached and refreshed daily by a scheduled task, which notifies superadmins when a check turns red"; "the last `composer audit` result… stores the result with its date").
+- **Proposal:** Files, not the cache nor the database (they survive "clear caches" and a restore): `writable/security/status.json` (full runs: the daily task, `security:check` without `--only`, "Check again", `app:install`, the first visit of the page), `probe.json` (last probe), `composer-audit.json`. The dashboard widget only reads them. A check "turns red" when its id is in error and was not in the previous stored run; the superadmins (group `superadmin`) get one `SecurityCheckFailed` notification per such run. `app:install` stores without notifying. The task succeeds even with errors (its output lists them): otherwise the scheduler's own "task failed" notification would repeat every day.
 - **Status:** Accepted (proposal)
 

@@ -25,10 +25,22 @@ abstract class DashboardTestCase extends SettingsTestCase
      */
     protected array $widgetModules = ['Core', 'Dashboard', 'Users'];
 
+    /**
+     * Widgets left out although their module is listed: Core widgets added after the Dashboard
+     * tests were written (their own tests set this to []).
+     *
+     * @var list<class-string>
+     */
+    protected array $hiddenWidgets = [\Modules\Core\Widgets\SecurityStatus::class];
+
     protected function setUp(): void
     {
         parent::setUp();
         db_connect()->table('module_declarations')->where('kind', 'widget')->whereNotIn('module', $this->widgetModules)->delete();
+
+        if ($this->hiddenWidgets !== []) {
+            db_connect()->table('module_declarations')->where('kind', 'widget')->whereIn('key', $this->hiddenWidgets)->delete();
+        }
         CountingWidget::$calls = 0;
         CountingWidget::$fail  = false;
         (new CoreCache())->invalidate('widgets');

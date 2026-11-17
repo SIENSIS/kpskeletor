@@ -1,0 +1,13 @@
+{
+    "baseURL": "http://localhost:8080",
+    "outDir": "deploy-status/30-security-check/screenshots",
+    "deviceScaleFactor": 2,
+    "login": { "url": "/login", "user": "root@example.org", "password": "Very-long-Passw0rd!x", "userField": "input[name=email]", "passwordField": "input[name=password]", "submit": "button[type=submit]", "waitFor": "/backend" },
+    "shots": [
+        { "url": "/backend/security", "name": "01-security-status", "fullPage": true },
+        { "url": "/backend/security", "name": "02-security-status-phone", "width": 390, "height": 844 },
+        { "url": "/backend/security", "name": "03-security-status-dark", "dark": true },
+        { "url": "/backend/security/probe", "name": "04-probe-confirmation" },
+        { "url": "/backend", "name": "05-dashboard-widget" }
+    ]
+}

@@ -171,6 +171,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - Secrets only in `.env`; never commit real values, keys, passwords or tokens.
 - Write security-relevant changes to the activity log, and add a test for every security rule
   you touch.
+- Production readiness: `php spark security:check` and Settings › Security status (`docs/security.md`,
+  "Production checklist"); a module adds its own checks from the Core event `securityChecks`
+  (a `SecurityCheck` class, ids `<group>.<what>`), never by changing the Core.
 
 ## Workflow
 

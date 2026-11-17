@@ -55,6 +55,9 @@ as re-authentication, decided by the owner).
 ## Open tasks
 
 - Session 10: kpapy 2FA providers reading `TwoFactor::method()` and the TOTP secret.
+- Done in session 30: `Services/AccountSecurityCheck.php` (event `securityChecks`): superadmins
+  without 2FA (warning), optional-2FA groups (info), minimum password length below 12 (warning);
+  test `Tests/AccountSecurityCheckTest.php`.
 - Done in session 14: the `Auth.*` settings are in Settings › Security (`security.*` groups; the `two_factor_policy` rule was removed in session 15).
 - Done in session 15: the 2FA reset row operation (Users), the policy in the Core `groups`
   table (`AuthPolicy::twoFactorPolicy()` reads `AuthGroups.groups`), impersonation

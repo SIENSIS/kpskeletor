@@ -63,7 +63,8 @@ return [
         'demoLoaded' => 'Datos de demostración cargados: {0}.',
         'superadmin' => 'Primer superadministrador: {0} <{1}>.',
         'cron' => 'Añada esta línea al crontab del usuario del servidor web (tareas programadas, correos en cola):',
-        'securityCheck' => 'Antes de ponerlo en marcha, ejecute php spark security:check (disponible a partir de la sesión 30) y lea docs/security.md.',
+        'securityCheck' => 'Comprobación de seguridad (php spark security:check; errores y avisos, detalles en el Estado de seguridad del back-office):',
+        'securityCheckFailed' => 'No se ha podido hacer la comprobación de seguridad: {0}',
         'done' => 'Instalación completada. Archivo de bloqueo: {0}.',
     ],
     'error' => [

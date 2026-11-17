@@ -215,4 +215,18 @@ return [
         'envReplaced'    => 'S\'ha substituït el .env pel de la còpia.',
         'envKept'        => 'S\'ha conservat el .env: les dades xifrades amb la clau de la còpia no es poden llegir fins que no es combinin els secrets.',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'password' => 'Contrasenya de les còpies programades',
+        'notScheduled' => 'Les còpies programades estan desactivades: no cal contrasenya.',
+        'passwordMissing' => 'Les còpies programades estan activades però backup.password no està definida: no es poden fer.',
+        'passwordOk' => 'backup.password està definida.',
+        'fixPassword' => 'Definiu backup.password a .env (una contrasenya llarga i aleatòria, desada també fora del servidor).',
+        'folder' => 'Carpeta de les còpies',
+        'folderOk' => 'writable/backups és fora de public/ i els altres usuaris no en poden llegir els fitxers.',
+        'folderPublic' => '{0} és dins de public/: les còpies es podrien descarregar.',
+        'folderReadable' => 'Llegibles per altres usuaris: {0}.',
+        'fixFolder' => 'Mantingueu Config\\Backup::$path dins de writable/.',
+        'fixReadable' => 'chmod 750 writable/backups && chmod 640 writable/backups/*',
+    ],
 ];

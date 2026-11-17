@@ -43,4 +43,4 @@ D-16-01 (names, URLs, login landing) decided by the owner as proposed; D-16-02 â
 `vendor/bin/phpunit modules/Dashboard` (base `Tests/DashboardTestCase.php`: Auth fixture,
 declarations, `addTestWidgets()` with a failing and an async counting widget, `cards()`,
 `postJson()`; only the widgets of `$widgetModules` (Core, Dashboard, Users) are declared, so a new
-module's widgets do not change the counts: its own tests extend the list, e.g. News); `modules/Core/Tests/WidgetsTest.php` for the framework.
+module's widgets do not change the counts: its own tests extend the list, e.g. News; Core widgets added later are listed in `$hiddenWidgets`, e.g. `core.security-status`); `modules/Core/Tests/WidgetsTest.php` for the framework.

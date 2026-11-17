@@ -63,7 +63,8 @@ return [
         'demoLoaded' => 'Demo data loaded: {0}.',
         'superadmin' => 'First superadmin: {0} <{1}>.',
         'cron' => 'Add this line to the crontab of the web server user (scheduled tasks, queued emails):',
-        'securityCheck' => 'Before going live, run php spark security:check (available from session 30) and read docs/security.md.',
+        'securityCheck' => 'Security check (php spark security:check; errors and warnings, details on the Security status page):',
+        'securityCheckFailed' => 'The security check could not run: {0}',
         'done' => 'Installation complete. Lock file: {0}.',
     ],
     'error' => [

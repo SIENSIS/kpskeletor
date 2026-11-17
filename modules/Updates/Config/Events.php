@@ -30,3 +30,11 @@ Events::on(ModuleVersions::EVENT, static function (ModuleVersions $versions): vo
         }
     }
 });
+
+// `securityChecks` (the Core's security:check and Security status page): a release repository
+// without trusted signing keys.
+Events::on(\Modules\Core\Security\Check\SecurityChecks::EVENT, static function (\Modules\Core\Security\Check\SecurityChecks $checks): void {
+    if ((new ModuleState())->isEnabled('Updates')) {
+        $checks->add(new \Modules\Updates\Services\UpdatesSecurityCheck());
+    }
+});
