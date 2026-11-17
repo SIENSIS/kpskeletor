@@ -9,8 +9,8 @@ does not have, such as JavaScript components and an asynchronous widget.
 
 Related guides: [`cruds.md`](cruds.md) (kpcrudy screens), [`api.md`](api.md) (kpapy resources),
 [`permissions.md`](permissions.md), [`menus.md`](menus.md), [`settings.md`](settings.md),
-[`widgets.md`](widgets.md#a-new-widget) (tutorial "A new widget"),
-[`frontend.md`](frontend.md#a-new-view-with-javascript) (tutorial "A new view with JavaScript"),
+[`widgets.md`](widgets.md#tutorial-a-new-widget) (tutorial "A new widget"),
+[`frontend.md`](frontend.md#tutorial-a-new-view-with-javascript) (tutorial "A new view with JavaScript"),
 [`scheduler.md`](scheduler.md), [`notifications.md`](notifications.md),
 [`calendar.md`](calendar.md), [`i18n.md`](i18n.md), [`commands.md`](commands.md) (every command
 and option).

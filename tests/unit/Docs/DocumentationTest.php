@@ -97,11 +97,15 @@ final class DocumentationTest extends CIUnitTestCase
                     continue; // external URL, mailto: or an anchor in the same page
                 }
 
-                $path = explode('#', $target, 2)[0];
-                $path = rawurldecode(explode('?', $path, 2)[0]);
+                [$path, $anchor] = array_pad(explode('#', $target, 2), 2, '');
+                $path            = rawurldecode(explode('?', $path, 2)[0]);
+                $resolved        = dirname(ROOTPATH . $file) . '/' . $path;
 
-                if (! file_exists(dirname(ROOTPATH . $file) . '/' . $path)) {
+                if (! file_exists($resolved)) {
                     $broken[] = $file . ': ' . $target;
+                } elseif ($anchor !== '' && str_ends_with($path, '.md')
+                    && ! in_array($anchor, $this->anchors((string) file_get_contents($resolved)), true)) {
+                    $broken[] = $file . ': ' . $target . ' (no such heading)';
                 }
             }
         }
@@ -201,7 +205,11 @@ final class DocumentationTest extends CIUnitTestCase
             [['modules:sync', ' --demo=News'], ['permissions:check', '']],
             $this->sparkCalls("Run `php spark modules:sync --demo=News` and\n`php spark permissions:check`."),
         );
-        $this->assertSame(['--demo', '--prune'], $this->optionsIn('`modules:sync [--prune] [--demo[=<A>]]`'));
+        $this->assertSame(
+            ['tutorial-a-new-view-with-javascript', 'the-boardjs-module', 'steps', 'steps-1', 'catàleg-i-permisos'],
+            $this->anchors("# Tutorial: a new view with JavaScript\n## The `board.js` module\n## Steps\n```\n# not a heading\n```\n## Steps\n## Catàleg i permisos"),
+        );
+                $this->assertSame(['--demo', '--prune'], $this->optionsIn('`modules:sync [--prune] [--demo[=<A>]]`'));
     }
 
     /**
@@ -248,6 +256,31 @@ final class DocumentationTest extends CIUnitTestCase
             static fn (string $path): string => $folder . '/' . basename($path),
             glob(ROOTPATH . $folder . '/' . $pattern) ?: [],
         );
+    }
+
+    /**
+     * GitHub's heading anchors of a Markdown text (lower case, punctuation removed, spaces as
+     * hyphens, `-1`, `-2`… for repeated headings).
+     *
+     * @return list<string>
+     */
+    private function anchors(string $text): array
+    {
+        $anchors = [];
+        $seen    = [];
+
+        preg_match_all('/^#{1,6}\s+(.+?)\s*#*\s*$/m', $this->withoutFencedCode($text), $m);
+
+        foreach ($m[1] as $heading) {
+            $slug = mb_strtolower(trim($heading));
+            $slug = (string) preg_replace('/[^\p{L}\p{N}\s_-]/u', '', $slug);
+            $slug = str_replace(' ', '-', $slug);
+
+            $anchors[]   = isset($seen[$slug]) ? $slug . '-' . $seen[$slug] : $slug;
+            $seen[$slug] = ($seen[$slug] ?? 0) + 1;
+        }
+
+        return $anchors;
     }
 
     private function withoutFencedCode(string $text): string
