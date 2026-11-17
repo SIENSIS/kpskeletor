@@ -1,6 +1,6 @@
 # Session 33 — Documentation
 
-Branch: `claude/vibrant-hypatia-t0pedc` · Pull request: see `docs/progress.md` · Date: 2026-11-17
+Branch: `claude/vibrant-hypatia-t0pedc` · Pull request: [SIENSIS/kpskeletor#41](https://github.com/SIENSIS/kpskeletor/pull/41) · Date: 2026-11-17
 
 ## What was built
 
