@@ -47,7 +47,7 @@ The skeleton ships these modules:
 | `Events` | Event calendar with administration, calendar views, iCal feed and a widget |
 | `Updates` | Shows when a new version of the core (or of a module) is available; updating is a console command |
 | `Backup` | Backup and restore of the whole application, from the console and from the UI |
-| `Tasks` | **Tutorial module**, disabled by default: holds the working code of every tutorial in `docs/tutorials/` |
+| `Tasks` | **Tutorial module**, disabled by default (`$enabledByDefault = false` in its manifest): holds the working code of every tutorial in `docs/tutorials/` |
 
 ## Technical baseline
 
@@ -248,6 +248,7 @@ final class Module extends ModuleManifest
     public array  $requires    = ['Core' => '^1.0'];          // module dependencies
     public string $description = 'News.module.description';   // optional: language key or text
     public string $author      = 'ACME';                      // optional: a package may only replace a module of the same author
+    public bool   $enabledByDefault = true;                   // optional: false = modules:sync installs it disabled, also on the first sync (e.g. Tasks)
 
     /** Optional: where Updates looks for new versions of this module (see Updates) */
     public ?string $repository = null;                        // e.g. 'github:acme/news-module'

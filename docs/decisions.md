@@ -268,7 +268,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-31-04 | 31 | Semantics of the `translated` setting type | Accepted (proposal) |
 | D-31-05 | 31 | Guests get the browser's language; no language switcher | Accepted (proposal) |
 | D-31-06 | 31 | File names of the language service and the key test | Accepted (proposal) |
-| D-32-01 | 32 | Manifest key `$enabledByDefault` for modules installed disabled (decide) | Open |
+| D-32-01 | 32 | Manifest key `$enabledByDefault` for modules installed disabled (decide) | Applied (decided) |
 | D-32-02 | 32 | Tasks API reuses the CRUD resources; paths `tasks/tasks` and `tasks/projects` | Accepted (proposal) |
 | D-32-03 | 32 | The public request form always asks for a captcha (its own image URL) | Accepted (proposal) |
 | D-32-04 | 32 | Attachments of to-do tasks: a picker field with up to 5 keys + a `task_attachments` index | Accepted (proposal) |
@@ -2745,8 +2745,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Nothing in the manifest or in `modules:sync` could install a module disabled: the first sync of an installation (and every sync outside production) enables every new module, so `Tasks` would be on in every fresh install. A new manifest key is a public convention.
 - **Proposal (built):** `ModuleManifest::$enabledByDefault` (bool, default `true`). `ModuleSynchronizer` inserts a module found for the first time with `enabled = 0` when its manifest says `false`, also on the first sync (Core is always enabled). Once enabled by hand (Modules screen, `modules:enable`), later syncs keep it. `modules:install --enable` still enables it. `Tasks` sets it to `false`; the tests enable every module as before.
 - **Alternatives:** A) A list in `Config\Modules` / a setting (`Modules.disabledOnInstall = ['Tasks']`): no new manifest key, but the Core config names a module. B) Leave `Tasks` enabled and say "disable it" in the docs (contradicts the specification).
-- **Status:** Open (decide)
-- **Applied in (as built):** `modules/Core/Config/ModuleManifest.php`, `modules/Core/Modules/ModuleSynchronizer.php`, `modules/Tasks/Config/Module.php`; test `PackagesTest::testAModuleDisabledByDefaultIsInstalledDisabledEvenOnTheFirstSync`, `TasksModuleTest::testManifestIsValidAndTheModuleIsInstalledDisabled`; `docs/creating-a-module.md`.
+- **Decision (2026-11-17):** «A) Clau del manifest (recomanada)». Keep the manifest key `ModuleManifest::$enabledByDefault` as built (default `true`; `false` installs the module disabled, also on the first sync; once enabled by hand it stays enabled). **Must change:** nothing in the code; the specification's manifest example, `CLAUDE.md` and the docs mention the key.
+- **Status:** Applied (decided)
+- **Applied in:** `modules/Core/Config/ModuleManifest.php`, `modules/Core/Modules/ModuleSynchronizer.php`, `modules/Tasks/Config/Module.php`; tests `PackagesTest::testAModuleDisabledByDefaultIsInstalledDisabledEvenOnTheFirstSync`, `TasksModuleTest::testManifestIsValidAndTheModuleIsInstalledDisabled`; `docs/specification.md` ("The module contract", modules table), `CLAUDE.md`, `docs/creating-a-module.md`, `docs/tasks.md`, `modules/Tasks/CLAUDE.md`.
 
 ## D-32-02 — Tasks API reuses the CRUD resources; paths `tasks/tasks` and `tasks/projects`
 

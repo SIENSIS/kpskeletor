@@ -43,7 +43,7 @@ Branch: `ccr-c5a1782e-jvbm6w` · Pull request: [SIENSIS/kpskeletor#40](https://g
   - Claude Code commands `.claude/commands/new-module.md` (`/new-module`) and
     `.claude/commands/check-module.md` (`/check-module`);
   - `docs/creating-a-module.md` (first version; session 33 completes it).
-- **Core:** manifest key `$enabledByDefault` (**D-32-01, Open (decide)**): `modules:sync` installs
+- **Core:** manifest key `$enabledByDefault` (**D-32-01**, decided by the owner as built): `modules:sync` installs
   such a module disabled, also on the first sync.
 
 ## How it was built
@@ -73,8 +73,7 @@ Branch: `ccr-c5a1782e-jvbm6w` · Pull request: [SIENSIS/kpskeletor#40](https://g
 
 ## Decisions and deviations
 
-- **D-32-01 (decide, Open):** manifest key `$enabledByDefault` (built so it can still be replaced
-  by a config list).
+- **D-32-01 (decide):** manifest key `$enabledByDefault`; decided by the owner as built (option A).
 - D-32-02 (accepted): the API reuses the CRUD resources; paths `tasks/tasks`, `tasks/projects`.
 - D-32-03 (accepted): the public form always asks for a captcha (own image URL), whatever
   `Auth.captcha` says.
@@ -215,7 +214,6 @@ Taken with Playwright (`deploy-status/screenshot.mjs`) against `php spark serve`
 
 ## Known issues
 
-- D-32-01 is open: if the owner prefers a config list, `Tasks` and `ModuleSynchronizer` change.
 - Removing the Tasks demo data leaves the calendar events of the demo to-do tasks until
   `php spark calendar:resync Tasks`.
 - The board's JavaScript redraw shows due dates as `YYYY-MM-DD` (the server-drawn page uses

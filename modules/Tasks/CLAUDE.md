@@ -66,7 +66,7 @@ scheduler's jobs. Never just "task" in texts or docs. The folder `Tasks/` holds 
 
 ## Decisions
 
-D-32-01 (`$enabledByDefault` manifest key, **Open (decide)**), D-32-02 … D-32-05 (accepted;
+D-32-01 (`$enabledByDefault` manifest key, decided by the owner as built), D-32-02 … D-32-05 (accepted;
 `docs/decisions.md`); D-00-56 (naming), D-00-32 (`themes/tasks-demo`).
 
 ## Open tasks
