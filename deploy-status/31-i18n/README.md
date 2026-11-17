@@ -85,7 +85,7 @@ Branch: `claude/amazing-goldberg-2trmeu` · Pull request: [SIENSIS/kpskeletor#39
 ## How to try it
 
 ```bash
-INSTALL_ADMIN_PASSWORD='Very-long-Passw0rd!x' php spark app:install --env=development \
+INSTALL_ADMIN_PASSWORD='<a long password>' php spark app:install --env=development \
   --url=http://localhost:8080/ --db=sqlite --email=root@example.org --2fa=none --demo --no-interaction
 php spark serve
 ```

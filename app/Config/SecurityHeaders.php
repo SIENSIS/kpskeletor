@@ -11,7 +11,7 @@ use CodeIgniter\Config\BaseConfig;
  * (Modules\Core\Filters\SecurityHeaders), which replaces CodeIgniter's `secureheaders` filter
  * (decision D-00-28: it hard-codes other values; never use both). See docs/security.md.
  *
- * Every scalar can be overridden from `.env` (e.g. `securityHeaders.frameOptions = SAMEORIGIN`).
+ * Every scalar can be overridden from `.env` (lower-case prefix, e.g. `securityheaders.frameOptions = SAMEORIGIN`).
  * A header a controller already set on its response is left as it is.
  */
 class SecurityHeaders extends BaseConfig

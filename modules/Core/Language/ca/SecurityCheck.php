@@ -84,7 +84,7 @@ return [
     'hsts' => [
         'title'   => 'Strict-Transport-Security (HSTS)',
         'missing' => 'No s\'envia: els navegadors encara poden fer servir HTTP sense xifrar.',
-        'fix'     => 'Traieu securityHeaders.hsts = false de .env quan el lloc se serveixi per HTTPS.',
+        'fix'     => 'Traieu securityheaders.hsts = false de .env quan el lloc se serveixi per HTTPS.',
     ],
     'headers' => [
         'title'   => 'Capçaleres de seguretat',

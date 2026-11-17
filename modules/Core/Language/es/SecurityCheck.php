@@ -84,7 +84,7 @@ return [
     'hsts' => [
         'title'   => 'Strict-Transport-Security (HSTS)',
         'missing' => 'No se envía: los navegadores aún pueden usar HTTP sin cifrar.',
-        'fix'     => 'Quite securityHeaders.hsts = false de .env cuando el sitio se sirva por HTTPS.',
+        'fix'     => 'Quite securityheaders.hsts = false de .env cuando el sitio se sirva por HTTPS.',
     ],
     'headers' => [
         'title'   => 'Cabeceras de seguridad',

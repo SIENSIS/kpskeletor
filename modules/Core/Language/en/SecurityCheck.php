@@ -84,7 +84,7 @@ return [
     'hsts' => [
         'title'   => 'Strict-Transport-Security (HSTS)',
         'missing' => 'Not sent: browsers may still use plain HTTP.',
-        'fix'     => 'Remove securityHeaders.hsts = false from .env once the site is served over HTTPS.',
+        'fix'     => 'Remove securityheaders.hsts = false from .env once the site is served over HTTPS.',
     ],
     'headers' => [
         'title'   => 'Security headers',
