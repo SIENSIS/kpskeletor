@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Dashboard module (ca).
  */
 return [
+    'module' => [
+        'name' => 'Tauler',
+    ],
     'res'  => ['dashboard' => 'Tauler'],
     'perm' => ['configure' => 'Configurar les disposicions dels grups'],
     'menu' => [

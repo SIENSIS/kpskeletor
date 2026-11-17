@@ -6,6 +6,9 @@ declare(strict_types=1);
  * News module (en).
  */
 return [
+    'module' => [
+        'name' => 'News',
+    ],
     'title' => 'News',
     'res'   => [
         'posts'      => 'News posts',

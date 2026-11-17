@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'module' => [
+        'name' => 'Events',
+    ],
     'title'           => 'Events',
     'event'           => 'event',
     'events'          => 'Events',

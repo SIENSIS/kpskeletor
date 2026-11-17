@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Dashboard module (es).
  */
 return [
+    'module' => [
+        'name' => 'Panel',
+    ],
     'res'  => ['dashboard' => 'Panel'],
     'perm' => ['configure' => 'Configurar las disposiciones de los grupos'],
     'menu' => [

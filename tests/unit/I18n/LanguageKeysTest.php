@@ -151,6 +151,11 @@ final class LanguageKeysTest extends CIUnitTestCase
                 $strings[] = $v;
             });
 
+            // A module with settings has its own tab, named `<Module>.module.name` (Settings).
+            if ($manifest->settings !== [] && $name !== 'Core') {
+                $strings[] = $name . '.module.name';
+            }
+
             foreach ($strings as $value) {
                 if (! is_string($value) || preg_match('/^([A-Z][A-Za-z]+)\.[A-Za-z0-9_.]+$/', $value, $m) !== 1 || ! isset($files[$m[1]])) {
                     continue;

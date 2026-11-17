@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'module' => [
+        'name' => 'Fitxers',
+    ],
     'res'      => ['files' => 'Fitxers'],
     'perm'     => [
         'upload'  => 'Pujar fitxers (on els permisos de la carpeta ho permetin)',

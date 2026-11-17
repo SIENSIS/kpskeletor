@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'module' => [
+        'name' => 'Files',
+    ],
     'res'      => ['files' => 'Files'],
     'perm'     => [
         'upload'  => 'Upload files (where the folder permissions allow it)',

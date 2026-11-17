@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Mòdul Notícies (ca).
  */
 return [
+    'module' => [
+        'name' => 'Notícies',
+    ],
     'title' => 'Notícies',
     'res'   => [
         'posts'      => 'Publicacions de notícies',

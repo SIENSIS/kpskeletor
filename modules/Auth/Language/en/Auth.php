@@ -8,6 +8,9 @@ declare(strict_types=1);
  * the first keys translate the Shield messages the module shows (Shield has no Catalan file).
  */
 return [
+    'module' => [
+        'name' => 'Authentication',
+    ],
     'bannedUser'                => 'Can not log you in as you are currently banned.',
     'logOutBannedUser'          => 'You have been logged out because you have been banned.',
     'magicLinkDisabled'         => 'Use of MagicLink is currently not allowed.',

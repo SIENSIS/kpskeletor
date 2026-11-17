@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Texts of the Users module.
  */
 return [
+    'module' => [
+        'name' => 'Usuarios',
+    ],
     'res' => [
         'users' => 'Usuarios',
         'groups' => 'Grupos',
