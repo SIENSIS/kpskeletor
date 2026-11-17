@@ -30,6 +30,8 @@ final class SecurityStatusScreenTest extends DashboardTestCase
 {
     use StreamFilterTrait;
 
+    protected array $hiddenWidgets = [];
+
     private string $dir = '';
 
     protected function setUp(): void
