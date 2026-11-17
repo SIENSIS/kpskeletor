@@ -1,6 +1,6 @@
 # Session 30 — security:check and the Security status page
 
-Branch: `ccr-f19bfaf6-ek95xk` · Pull request: see `docs/progress.md` · Date: 2026-11-17
+Branch: `ccr-f19bfaf6-ek95xk` · Pull request: [SIENSIS/kpskeletor#38](https://github.com/SIENSIS/kpskeletor/pull/38) · Date: 2026-11-17
 
 ## What was built
 
