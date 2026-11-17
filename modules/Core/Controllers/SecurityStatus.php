@@ -46,7 +46,6 @@ final class SecurityStatus extends BackendController
 
     public function refresh(): RedirectResponse
     {
-        @set_time_limit(120);
         $report = (new SecurityChecker())->run();
         (new Status())->store($report);
         activity_log('Core', 'security_check', ['resource' => 'security', 'changes' => $report->counts()]);
@@ -70,7 +69,10 @@ final class SecurityStatus extends BackendController
 
     public function probe(): RedirectResponse
     {
-        @set_time_limit(180);
+        if (! is_cli()) {
+            @set_time_limit(180); // a dozen requests with their timeouts (never the CLI test runner)
+        }
+
         // Always the configured base URL: a request value never chooses where the server sends requests.
         $url    = rtrim(config(App::class)->baseURL, '/') . '/';
         $report = (new SecurityChecker([]))->run('probe', new SiteProbe($url));
