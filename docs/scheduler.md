@@ -67,7 +67,7 @@ Then `php spark modules:sync` (it stores the declaration) and `php spark schedul
   run (60 KB at most) and shown in the back office: never put secrets in it.
 - A thrown exception is a failure. Failures are logged, notified to the users holding
   `schedule.list` (notification "A scheduled task failed") and never stop the other tasks.
-- External calls only through `OutboundClient` (docs/outbound-requests.md).
+- External calls only through `OutboundClient` ([`outbound-requests.md`](outbound-requests.md)).
 
 ## Schedules
 
@@ -106,6 +106,34 @@ Tasks of disabled modules (and classes that no longer load) are marked inactive 
 Every run goes to `task_runs` (the latest 50 per task): start, duration, result, output and who
 started it (schedule, "run now", the fallback without cron).
 
+## Logs
+
+| Where | What |
+|---|---|
+| `task_runs` (Settings › Scheduled tasks, detail view) | Every run: start, duration, result, output, source (`cron`, `manual` for "run now", `web` for the fallback without cron); the latest 50 per task |
+| Activity log (`Core`) | `task_run` for every "run now" from the back office (who and the result); `task_failed` for every failure, with the first 500 characters of the output |
+| `writable/logs/` | Failures (`Scheduled task … failed`) and classes that cannot be loaded |
+| Notifications | `ScheduledTaskFailed` to the holders of `schedule.list` ([`notifications.md`](notifications.md)) |
+
+`php spark schedule:run` also prints one line per run (result, duration, name) for the cron
+mail or a log file: redirect its output instead of `/dev/null` to keep it
+(`>> writable/logs/cron.log 2>&1`).
+
+## Scheduled tasks of the skeleton
+
+| Class | Module | Schedule | |
+|---|---|---|---|
+| `SendQueuedEmails` | Core | every minute | Sends the queued notification emails (below) |
+| `PurgeActivityLog` | Core | daily 03:17 | Deletes activity log entries older than the retention setting |
+| `SecurityCheckTask` | Core | daily 04:43 | Runs the security checks; notifies superadmins when one turns red |
+| `ScheduledBackup` | Backup | daily 02:41 | Scheduled backup when enabled ([`backup-restore.md`](backup-restore.md)) |
+| `PruneBackups` | Backup | daily 04:13 | Applies the backup retention |
+| `CheckUpdates` | Updates | daily 05:17 | Checks for new releases ([`updates.md`](updates.md)) |
+| `ExpireNotices` | News | every 5 minutes | Publishes the posts whose date has come and marks expired notices |
+| `SendReminders` | Events | every 5 minutes | Event reminders |
+| `SendBirthdayGreetings` | Users | daily (setting) | Birthday greetings |
+| `OverdueReminder` | Tasks | daily 07:30 | Reminds the assignees of overdue to-do tasks (tutorial module) |
+
 ## Commands and screen
 
 | | |
@@ -114,6 +142,8 @@ started it (schedule, "run now", the fallback without cron).
 | `php spark schedule:run --task=<name>` | Only that one, if it is due (class or short class name) |
 | `php spark schedule:run --task=<name> --force` | Runs it now, due or not (the lock still applies) |
 | `php spark schedule:list` | Every scheduled task: schedule, next run, last result, notes |
+
+Details and output examples: [`commands.md`](commands.md).
 
 Back office › Settings › **Scheduled tasks** (`backend/schedule`, kpcrudy): every task with its
 schedule, next and last run, result and duration (`schedule.list`); the detail view lists the
@@ -137,7 +167,7 @@ A real cron entry is always more reliable.
 
 The Core's own scheduled task **Send the queued notification emails** (`SendQueuedEmails`, every
 minute, without overlapping) sends the email channel of the notifications
-(docs/notifications.md): 50 emails per run, retried up to 5 times with growing waits; sent and
+([`notifications.md`](notifications.md)): 50 emails per run, retried up to 5 times with growing waits; sent and
 failed emails are deleted after 30 days. Without cron (or the fallback) notification emails are
 never sent.
 
@@ -150,3 +180,9 @@ never sent.
 - **Always "skipped":** a previous run still holds the lock (or died: it expires after the
   `withoutOverlapping()` minutes).
 - **Tables missing:** run `php spark modules:sync`.
+- **"Skipped: maintenance mode is on.":** `schedule:run` does nothing while maintenance mode is on
+  (a restore may be replacing the database); turn it off with `php spark app:maintenance off`
+  or Settings › Actions.
+- **Notification emails not arriving:** check `mail_queue` (`status`, `attempts`, `last_error`) and
+  the output of "Send the queued notification emails"; the SMTP host must be in the outbound
+  allow-list.

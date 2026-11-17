@@ -1,4 +1,4 @@
-# Calendar API for modules
+# Calendar
 
 Other modules (courses, bookings, tasks, HR…) put their dates in the calendar of the Events module
 and get, for free, the same views, permissions, iCal feeds and reminders (specification "Events" ›
@@ -9,6 +9,9 @@ and get, for free, the same views, permissions, iCal feeds and reminders (specif
 | How | `service('calendar')->publish()` stores the event in `events` | A `CalendarProvider` returns events on the fly for a range |
 | For | Events created at a moment: a course session, a booking | Dates already in the module's data: deadlines, holidays, birthdays |
 | Example | News notices with an event date (`modules/News/Services/NoticeCalendar.php`) | Birthdays (`modules/Users/Calendar/BirthdaysProvider.php`) |
+
+The user-facing calendar (views, administration, reminders, iCal feeds) is the Events module:
+[`events.md`](events.md). This page is for module developers.
 
 The contracts live in the Core (`modules/Core/Calendar/`), so a module never depends on Events:
 without it, `service('calendar')` is a `NullCalendar` and publishing does nothing.
@@ -49,6 +52,8 @@ service('calendar')->publish('Courses', "session-{$id}", new CalendarEvent(
     visibility: 'restricted', groups: ['students'], users: [$teacherId],
     url: '/backend/courses/sessions/' . $code,       // "Edit in Courses" link
     reminders: true,                                 // users may ask for a reminder
+    status: 'confirmed',                             // or 'tentative', 'cancelled'
+    color: null,                                     // null: the calendar's colour
 ));
 
 service('calendar')->unpublish('Courses', "session-{$id}");   // deleted or cancelled
@@ -57,10 +62,12 @@ service('calendar')->unpublish('Courses', "session-{$id}");   // deleted or canc
 - **Call it on every change** of the source record: it is idempotent per module + key. Equal data
   changes nothing; different data updates the event and bumps its iCal `SEQUENCE`; an unpublished
   event comes back. Both return whether the calendar changed.
+- `end` is optional (one hour, or one day for `allDay`; all-day ends are inclusive); times are
+  stored in UTC.
 - `unpublish()` soft-deletes: iCal clients receive the event as `STATUS:CANCELLED` for
-  `Config\Calendar::$icalGraceDays` (30) days.
+  `Modules\Events\Config\Calendar::$icalGraceDays` (30) days.
 - `purgeModule(<Module>)` deletes every event of a module for good; only the Core's uninstaller
-  calls it (`modules:uninstall` without `--keep-data`, docs/installing-modules.md).
+  calls it (`modules:uninstall` without `--keep-data`, [`installing-modules.md`](installing-modules.md)).
 - Visibility `public`, `private` (signed-in users) or `restricted` (group **names** and user ids;
   unknown groups throw `InvalidArgumentException`, unknown users are dropped).
 - Published events are **locked** in the calendar administration: badge "Managed by Courses" and
@@ -108,16 +115,45 @@ reminders and feeds; guests never pass it.
 ## 5. Consistency
 
 - Events and providers of a **disabled** module are hidden (they come back when it is enabled).
-- **Uninstalling** a module must delete its events: `(new CalendarService())->purgeModule('Courses')`
-  (called by the uninstaller of session 29).
+- **Uninstalling** a module deletes its events: the Core's `Uninstaller` calls
+  `service('calendar')->purgeModule('<Module>')` unless `--keep-data` is given
+  ([`installing-modules.md`](installing-modules.md)); a module never calls it itself.
 - `php spark calendar:resync <Module>` asks the module's `CalendarSource`s (`all(): key => event`)
-  for every event again, publishes them and unpublishes the published events of those calendars
-  they no longer return (`docs/commands.md`).
+  for every event again (section 6; [`commands.md`](commands.md)).
 - CodeIgniter events after every change: `calendar.created`, `calendar.updated`, `calendar.deleted`
   with `['id' => <events.id>, 'module' => …, 'key' => …]` (module and key are null for events
   created by hand).
 
-## 6. Testing
+## 6. Resync
+
+A module that publishes should declare a `source` (`Modules\Core\Calendar\CalendarSource`) for
+each published calendar: `all()` returns every event the calendar should hold, as
+`key => CalendarEvent`. `php spark calendar:resync <Module>` (or `CalendarService::resync()`)
+publishes each one again (unchanged events change nothing), unpublishes the published events of
+those calendars it no longer returns, prints the counts and writes `calendar_resync` to the
+activity log. Use it after restoring a backup, after a failed publish or when the module's data
+was changed outside its code. Calendars without a source (providers) need no resync. Examples:
+`modules/News/Services/NoticeCalendar.php`, `modules/Tasks/Calendar/DueDates.php`.
+
+## 7. iCal feeds
+
+Published and provided events reach iCal clients without extra code; the details are in
+[`events.md`](events.md) (section "iCal (RFC 5545)"):
+
+- **One-off export** (`…/export.ics`): a static copy of one event.
+- **Personal feed** (`ical/user/<secret>.ics`, user menu › Calendar subscription): every event
+  the user may see **now**, other modules' calendars and providers included, evaluated with
+  their current permissions and the calendars' policies on every request; filters by calendars
+  and categories; the user's reminders as `VALARM`. The secret is shown once, created with
+  re-authentication and can be revoked.
+- **Public feeds** (`ical/public/all.ics`, `ical/public/<category>.ics`): public events only,
+  never providers, while `publicCalendar` and `publicFeeds` are on.
+- **What a module controls:** the `UID` (`<module>-<key>@host` for published events,
+  `<calendar>-<key>@host` for provided ones, so keys must be stable), `SEQUENCE` (grows on each
+  real change), `STATUS:CANCELLED` (`status: 'cancelled'` or `unpublish()`, kept for
+  `icalGraceDays`), and the plain-text description.
+
+## 8. Testing
 
 Copy `modules/Events/Tests/CalendarApiTest.php` (a fake module declared in
 `module_declarations`, a policy, a provider and a source in `modules/Events/Tests/Support/`) and

@@ -24,7 +24,7 @@ namespace Modules\Core\Notifications;
  *     }
  * }
  *
- * notifyPermission('news-notices.list', new NewNotice(['id' => 7, 'title' => 'Closed on Monday']));
+ * notifyPermission('news-read.view', new NewNotice(['id' => 7, 'title' => 'Closed on Monday']));
  * ```
  *
  * The data is stored as JSON and the text is rendered when it is shown, in the reader's language:
