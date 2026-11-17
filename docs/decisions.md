@@ -276,6 +276,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-33-01 | 33 | Documents renamed to the specification's names (`permissions.md`, `calendar.md`, `installing-modules.md`) | Accepted (proposal) |
 | D-33-02 | 33 | The JavaScript and widget tutorials describe the Tasks code as built | Accepted (proposal) |
 | D-33-03 | 33 | Extra operation names in lower case only (manifest validation) | Accepted (proposal) |
+| D-34-01 | 34 | Tutorial 13's release: Tasks 0.2.0 adds `tasks.started_at` | Accepted (proposal) |
+| D-34-02 | 34 | Tutorials 3 and 4 summarise and link the tutorials of `frontend.md` and `widgets.md` | Accepted (proposal) |
+| D-34-03 | 34 | Tutorials 1 and 11 are followed in a scratch module `Tasks2`; the finished code differs where later tutorials change it | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2806,4 +2809,28 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Found while documenting permissions: a camel-case extra operation passed validation, but its permission was refused to everyone, superadmins included (fails closed, no module uses one).
 - **Proposal:** The validator accepts only `^[a-z][a-z0-9]*$` for extra operations, so the mistake stops `modules:sync` with a clear error (`ManifestValidatorTest`, case "extra operation in camel case"). `docs/permissions.md` and `docs/creating-a-module.md` say so.
 - **Alternatives:** Lower-case the names when building the catalogue (two spellings for one permission).
+- **Status:** Accepted (proposal)
+
+## D-34-01 — Tutorial 13's release: Tasks 0.2.0 adds `tasks.started_at`
+
+- **Where:** specification "Tutorials" (13: "a schema-change migration, bumping the version, building (and signing) the ZIP, installing it with `modules:install`, and how the update notice appears"); `modules/Tasks`.
+- **Problem:** Tutorial 13 needs a real new version of the tutorial module, and the specification does not say what changes.
+- **Proposal:** Tasks 0.2.0 adds a nullable `tasks.started_at` (when a to-do task left "To do") in a new migration `AddStartedAtToTasks` that also fills it in for to-do tasks already started (`COALESCE(updated_at, created_at)`), with `down()` dropping it. The rule lives in `TaskRepository::statusDates()` (also `completed_at`), shared by the CRUD, `setStatus()` (board, `complete`, bulk action) and the API; read-only in the CRUD details and export and in the API. A module `CHANGELOG.md`. The ZIP is built by hand (no packager command, D-32-05); the module declares no `$repository`, so the update notice is described, not triggered. Checked: a site installed at 0.1.0 with demo data upgraded with `modules:install Tasks-0.2.0.zip` (session 34 report).
+- **Alternatives:** A) A schema change without code (an index): shows less of a real release. B) A `modules:package` command (a new command and convention: needs the owner).
+- **Status:** Accepted (proposal)
+
+## D-34-02 — Tutorials 3 and 4 summarise and link the tutorials of `frontend.md` and `widgets.md`
+
+- **Where:** specification "Tutorials" (3 and 4: "see `docs/frontend.md`/`docs/widgets.md`, linked from here"); D-33-02.
+- **Problem:** The full walk-throughs already exist (session 33); copying them would make two texts to keep in step.
+- **Proposal:** `docs/tutorials/03-…` and `04-…` give the files, a summary of each step linked to its section, how to follow it on a fresh install and the tests; the code excerpts stay in `frontend.md` and `widgets.md`. The board was not extended with confirm/toast or a refreshing chart (D-33-02 allowed it, nothing in the tutorials needs it).
+- **Alternatives:** Move the walk-throughs into `docs/tutorials/` and leave links in the area documents.
+- **Status:** Accepted (proposal)
+
+## D-34-03 — Tutorials 1 and 11 are followed in a scratch module `Tasks2`
+
+- **Where:** specification "Tutorials" (1: `make:module Tasks`; 11: `make:module --api`); `docs/plan.md` session 34 (risk).
+- **Problem:** `modules/Tasks` exists, so its tutorials cannot start with `make:module Tasks`; `--api` works only together with `--crud` on a new module; `make:module --crud` migrates its example table at once.
+- **Proposal:** Tutorial 1 builds `Tasks2` (`make:module Tasks2 --crud=tasks2_tasks`, then `migrate:rollback -f` of the example table, three migrations, a project `setRelation()`; the finished module uses a select of translated names, tutorial 2). Tutorial 11 shows `make:module … --api` for a new module and, for an existing one, `kpapy:make` with the options the generator passes (the route is appended to the module's `Routes.php`; the controller is then made `final` with `strict_types`). Both were followed on a fresh SQLite install (scratch module tests, `permissions:check`, the API with tokens and curl).
+- **Alternatives:** A `--api` option for existing modules in `make:module` (a Core change: needs the owner).
 - **Status:** Accepted (proposal)

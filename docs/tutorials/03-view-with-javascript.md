@@ -61,8 +61,8 @@ php spark serve
 
 Sign in as `admin` (the password you gave the installer) and open `backend/tasks`:
 
-- the board shows the demo to-do tasks in three columns; the project pills filter it
-  (`?project=<id>`);
+- the board shows the demo to-do tasks in three columns; the "Project" select and **Filter**
+  narrow it to one project;
 - drag a card to another column (or use its *Move* form): the card moves without a reload and
   `GET backend/tasks/board/data` redraws it; the details of the to-do task now show the new status
   and, when it left "To do", its start date;
