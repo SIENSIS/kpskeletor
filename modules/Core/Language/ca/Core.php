@@ -606,6 +606,8 @@ return [
         'throttled' => 'Límit de peticions superat',
         'maintenance_on' => 'Mode de manteniment activat',
         'maintenance_off' => 'Mode de manteniment desactivat',
+        'security_check' => 'Comprovacions de seguretat executades de nou',
+        'security_probe' => 'Sonda de seguretat externa executada',
         'outbound' => 'Petició externa',
         'outbound_refused' => 'Petició externa refusada',
         'preferences_saved' => 'Preferències de notificacions desades',

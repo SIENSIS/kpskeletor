@@ -84,3 +84,14 @@ $routes->group('backend/modules', ['namespace' => 'Modules\Core\Controllers'], s
     $routes->get('themes/uninstall/(:segment)', 'Themes::uninstallForm/$1', $uninstall);
     $routes->post('themes/uninstall/(:segment)', 'Themes::uninstall/$1', ['filter' => ['can:modules.uninstall', 'reauth', 'ratelimit:forms']]);
 });
+
+/*
+ * The Security status page (docs/security.md, "Production checklist"): the cached results of
+ * `security:check`, "check again" and the external probe (a deliberate action: re-authentication).
+ */
+$routes->group('backend/security', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
+    $routes->get('/', 'SecurityStatus::index', ['as' => 'security-status', 'filter' => 'can:security.check']);
+    $routes->post('refresh', 'SecurityStatus::refresh', ['filter' => ['can:security.check', 'ratelimit:forms']]);
+    $routes->get('probe', 'SecurityStatus::probeForm', ['filter' => ['can:security.check', 'reauth']]);
+    $routes->post('probe', 'SecurityStatus::probe', ['filter' => ['can:security.check', 'reauth', 'ratelimit:forms']]);
+});

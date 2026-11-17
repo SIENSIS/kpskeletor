@@ -55,6 +55,18 @@ final class Module extends ModuleManifest
                 'manage' => 'Core.perm.manageMaintenance',
             ],
         ],
+        // The Security status page (`backend/security`; docs/security.md, "Production checklist"):
+        // `security.check` shows the checks, runs them again and (with re-authentication) the
+        // external probe. Superadmin and admin by default.
+        'security' => [
+            'label'  => 'SecurityCheck.res.security',
+            'type'   => 'crud',
+            'name'   => 'security',
+            'except' => \Modules\Core\Modules\ManifestValidator::CRUD_OPERATIONS,
+            'extra'  => [
+                'check' => 'SecurityCheck.perm.check',
+            ],
+        ],
         'schedule' => [
             'label'  => 'Core.res.schedule',
             'type'   => 'crud',
@@ -69,6 +81,7 @@ final class Module extends ModuleManifest
     public array $menu = [
         ['resource' => 'modules', 'label' => 'Core.menu.modules', 'icon' => 'bi bi-boxes', 'order' => 80, 'zone' => 'settings'],
         ['resource' => 'notifications', 'label' => 'Core.menu.notifications', 'icon' => 'bi bi-bell', 'order' => 15, 'zone' => 'user'],
+        ['route' => 'security-status', 'permission' => 'security.check', 'label' => 'SecurityCheck.menu', 'icon' => 'bi bi-shield-check', 'order' => 84, 'zone' => 'settings'],
         ['resource' => 'schedule', 'label' => 'Core.menu.schedule', 'icon' => 'bi bi-clock-history', 'order' => 85, 'zone' => 'settings'],
     ];
 
@@ -76,18 +89,21 @@ final class Module extends ModuleManifest
     public array $tasks = [
         \Modules\Core\Tasks\SendQueuedEmails::class,
         \Modules\Core\Tasks\PurgeActivityLog::class,
+        \Modules\Core\Tasks\SecurityCheckTask::class,
     ];
 
     /** @var list<string> Dashboard widgets (docs/widgets.md): failing scheduled tasks, shortcuts per group */
     public array $widgets = [
         \Modules\Core\Widgets\ScheduledTasks::class,
         \Modules\Core\Widgets\QuickLinks::class,
+        \Modules\Core\Widgets\SecurityStatus::class,
     ];
 
     /** @var list<string> */
     public array $notifications = [
         \Modules\Core\Notifications\Types\ScheduledTaskFailed::class,
         \Modules\Core\Notifications\Types\PackageProcessed::class,
+        \Modules\Core\Notifications\Types\SecurityCheckFailed::class,
     ];
 
     /**
@@ -314,7 +330,7 @@ final class Module extends ModuleManifest
 
     public array $defaultGrants = [
         'superadmin' => ['core-notifications.*'],
-        'admin'      => ['modules.list', 'modules.toggle', 'modules.sync', 'core-notifications.*', 'schedule.*'],
+        'admin'      => ['modules.list', 'modules.toggle', 'modules.sync', 'core-notifications.*', 'schedule.*', 'security.check'],
         'editor'     => ['core-notifications.*'],
         'user'       => ['core-notifications.*'],
     ];

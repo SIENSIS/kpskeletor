@@ -606,6 +606,8 @@ return [
         'throttled' => 'Rate limit reached',
         'maintenance_on' => 'Maintenance mode turned on',
         'maintenance_off' => 'Maintenance mode turned off',
+        'security_check' => 'Security checks run again',
+        'security_probe' => 'External security probe run',
         'outbound' => 'Outbound request',
         'outbound_refused' => 'Outbound request refused',
         'preferences_saved' => 'Notification preferences saved',
