@@ -160,6 +160,20 @@ return [
         'error' => 'Found: {0}.',
         'fix'   => 'Remove them: public/ holds index.php, assets, themes and uploads only.',
     ],
+    'packages' => [
+        'title' => 'Module and theme packages',
+        'ok' => 'Signatures required ({0} trusted keys).',
+        'unsigned' => 'Unsigned packages are accepted (packages.requireSignature is off or packages.publicKeys is empty).',
+        'fix' => 'Set packages.publicKeys to your publishers\' minisign keys and packages.requireSignature = true (docs/packages.md).',
+        'autoEnableTitle' => 'Modules found by modules:sync',
+        'autoEnable' => 'packages.autoEnable is on: a module folder copied by hand is enabled by the next sync.',
+        'fixAutoEnable' => 'Leave packages.autoEnable off in production (D-29-02).',
+    ],
+    'uploadsHtaccess' => [
+        'title' => 'public/uploads/.htaccess',
+        'missing' => 'Missing: Apache could run scripts placed in public/uploads.',
+        'fix' => 'Restore it from the release, or forbid scripts in uploads/ in the web server (docs/web-server.md).',
+    ],
     'audit' => [
         'title'         => 'composer audit',
         'ok'            => 'No known vulnerabilities (last checked on {0}).',

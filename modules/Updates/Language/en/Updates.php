@@ -120,4 +120,12 @@ return [
         'release_refused' => 'Release refused (not verified)',
         'notify_failed'   => 'Update notification failed',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'title' => 'Signed updates',
+        'noRepository' => 'No release repository configured (updates.repository): updates are not checked.',
+        'noKeys' => '{0} is checked for updates, but no signing key is trusted (updates.publicKeys): app:update refuses every archive.',
+        'ok' => '{0}, {1} trusted signing keys.',
+        'fix' => 'Set updates.publicKeys to the publisher\'s minisign public key (docs/updates.md).',
+    ],
 ];

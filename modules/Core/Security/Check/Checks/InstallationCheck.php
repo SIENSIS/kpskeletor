@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Security\Check\Checks;
 
 use FilesystemIterator;
+use Modules\Core\Config\Packages;
 use Modules\Core\Config\ProductionCheck;
 use Modules\Core\Demo\DemoDataManager;
 use Modules\Core\Security\Check\FileAccess;
@@ -37,6 +38,7 @@ final class InstallationCheck implements SecurityCheck
         private readonly ?ProductionCheck $config = null,
         private readonly ?FileAccess $access = null,
         private readonly ?\Closure $demoModules = null,
+        private readonly ?Packages $packages = null,
     ) {
     }
 
@@ -54,6 +56,27 @@ final class InstallationCheck implements SecurityCheck
         $this->writableModes($report, $config);
         $this->webWritable($report, $config);
         $this->publicFolder($report);
+        $this->packages($report);
+    }
+
+    /**
+     * Module and theme packages (docs/packages.md): signatures required and trusted keys set
+     * (warning otherwise), and whether modules found by `modules:sync` are enabled (information).
+     */
+    private function packages(SecurityReport $report): void
+    {
+        $packages = $this->packages ?? config(Packages::class);
+        $title    = lang('SecurityCheck.packages.title');
+
+        if (! $packages->requireSignature || $packages->publicKeys === []) {
+            $report->warning(self::GROUP, 'installation.packages', $title, lang('SecurityCheck.packages.unsigned'), lang('SecurityCheck.packages.fix'));
+        } else {
+            $report->ok(self::GROUP, 'installation.packages', $title, lang('SecurityCheck.packages.ok', [count($packages->publicKeys)]));
+        }
+
+        if ($packages->autoEnable) {
+            $report->info(self::GROUP, 'installation.autoEnable', lang('SecurityCheck.packages.autoEnableTitle'), lang('SecurityCheck.packages.autoEnable'), lang('SecurityCheck.packages.fixAutoEnable'));
+        }
     }
 
     private function installLock(SecurityReport $report): void
@@ -181,6 +204,10 @@ final class InstallationCheck implements SecurityCheck
             }
         } catch (Throwable) {
             // unreadable
+        }
+
+        if (is_dir($base . '/uploads') && ! is_file($base . '/uploads/.htaccess')) {
+            $report->warning(self::GROUP, 'installation.uploadsHtaccess', lang('SecurityCheck.uploadsHtaccess.title'), lang('SecurityCheck.uploadsHtaccess.missing'), lang('SecurityCheck.uploadsHtaccess.fix'));
         }
 
         if ($found === []) {

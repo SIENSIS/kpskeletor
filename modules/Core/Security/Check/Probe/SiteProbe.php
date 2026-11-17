@@ -25,7 +25,7 @@ final class SiteProbe implements SecurityCheck
     private const GROUP = 'probe';
 
     /** Paths that must never be served (relative to the site root). */
-    public const HIDDEN = ['.env', 'writable/install.lock', 'writable/logs/', 'modules/Core/Config/Module.php', 'app/Config/App.php', 'vendor/autoload.php', 'composer.json', '.git/config'];
+    public const HIDDEN = ['.env', 'writable/install.lock', 'writable/logs/', 'writable/packages/', 'writable/backups/', 'modules/Core/Config/Module.php', 'app/Config/App.php', 'vendor/autoload.php', 'composer.json', '.git/config'];
 
     /** Keys that must not appear in a `progress/*` answer. */
     private const SECRET_KEYS = '/"[^"]*(?:pass|secret|token|key|hash|email|path|file)[^"]*"\s*:/i';

@@ -160,6 +160,20 @@ return [
         'error' => 'Encontrado: {0}.',
         'fix'   => 'Elimínelos: public/ solo contiene index.php, assets, themes y uploads.',
     ],
+    'packages' => [
+        'title' => 'Paquetes de módulos y temas',
+        'ok' => 'Firmas obligatorias ({0} claves de confianza).',
+        'unsigned' => 'Se aceptan paquetes sin firmar (packages.requireSignature está desactivado o packages.publicKeys está vacío).',
+        'fix' => 'Defina en packages.publicKeys las claves minisign de sus publicadores y packages.requireSignature = true (docs/packages.md).',
+        'autoEnableTitle' => 'Módulos encontrados por modules:sync',
+        'autoEnable' => 'packages.autoEnable está activado: una carpeta de módulo copiada a mano se activa con la siguiente sincronización.',
+        'fixAutoEnable' => 'Deje packages.autoEnable desactivado en producción (D-29-02).',
+    ],
+    'uploadsHtaccess' => [
+        'title' => 'public/uploads/.htaccess',
+        'missing' => 'Falta: Apache podría ejecutar scripts guardados en public/uploads.',
+        'fix' => 'Restáurelo desde la versión publicada, o prohíba los scripts en uploads/ en el servidor web (docs/web-server.md).',
+    ],
     'audit' => [
         'title'         => 'composer audit',
         'ok'            => 'Ninguna vulnerabilidad conocida (última comprobación el {0}).',

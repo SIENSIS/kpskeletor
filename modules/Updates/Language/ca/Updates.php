@@ -120,4 +120,12 @@ return [
         'release_refused' => 'Versió refusada (no verificada)',
         'notify_failed'   => 'Ha fallat l\'avís d\'actualització',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'title' => 'Actualitzacions signades',
+        'noRepository' => 'No hi ha cap repositori de versions configurat (updates.repository): no es comproven les actualitzacions.',
+        'noKeys' => 'Es comproven les actualitzacions de {0}, però no hi ha cap clau de signatura de confiança (updates.publicKeys): app:update rebutja tots els arxius.',
+        'ok' => '{0}, {1} claus de signatura de confiança.',
+        'fix' => 'Definiu a updates.publicKeys la clau pública minisign del publicador (docs/updates.md).',
+    ],
 ];

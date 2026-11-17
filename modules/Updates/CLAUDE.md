@@ -36,8 +36,8 @@ D-00-48 (Ed25519, owner's key), D-28-01 … D-28-07 (`docs/decisions.md`).
 - Done in session 29: `Config/Events.php` answers the Core's `moduleVersions` event (latest versions from the last check) for the Modules screen. (`docs/packages.md`)
 - Session 29: module packages (`modules:install`) may reuse `SignatureVerifier`, `ReleaseSource`
   for modules with `$repository`.
-- Session 30 left it out (not required by the specification): a `securityChecks` listener could
-  warn when `updates.repository` is set without `updates.publicKeys`.
+- Done in session 30: `Services/UpdatesSecurityCheck.php` (event `securityChecks`): warning when
+  `updates.repository` is set without `updates.publicKeys`; test `Tests/UpdatesSecurityCheckTest.php`.
 - Session 36: the release procedure (archive, `.sha256`, `.minisig`, signed tag).
 
 ## How to test

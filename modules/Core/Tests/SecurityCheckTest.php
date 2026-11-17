@@ -9,6 +9,7 @@ use Config\App;
 use Config\ContentSecurityPolicy as CspConfig;
 use Config\Cookie;
 use Config\SecurityHeaders as SecurityHeadersConfig;
+use Modules\Core\Config\Packages;
 use Modules\Core\Config\ProductionCheck;
 use Modules\Core\Security\Check\Checks\ConfigurationCheck;
 use Modules\Core\Security\Check\Checks\DependenciesCheck;
@@ -71,6 +72,8 @@ final class SecurityCheckTest extends CIUnitTestCase
         $this->assertSame('warning', $statuses['installation.writableModes']);
         $this->assertSame('warning', $statuses['dependencies.audit']);
         $this->assertSame('warning', $statuses['configuration.hsts']);
+        $this->assertSame('warning', $statuses['installation.packages'], 'Unsigned packages accepted.');
+        $this->assertSame('warning', $statuses['installation.uploadsHtaccess']);
     }
 
     public function testPassesOnAHardenedConfiguration(): void
@@ -257,7 +260,7 @@ final class SecurityCheckTest extends CIUnitTestCase
         return [
             new ConfigurationCheck('development', $app, $cookie, $csp, new EffectivePolicy($csp, $headers, [], [], 'development'), true, true),
             new SecretsCheck('', '', '', '', $root, ['app/Config/Secrets.php:3 (private key)']),
-            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $this->config(), new FileAccess('', static fn (string $path): bool => true), static fn (): array => ['News']),
+            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $this->config(), new FileAccess('', static fn (string $path): bool => true), static fn (): array => ['News'], new Packages()),
             new DependenciesCheck(new ComposerAudit($this->config()), $root . 'missing-vendor', $this->config()),
             new OutboundCheck([], []),
         ];
@@ -284,7 +287,7 @@ final class SecurityCheckTest extends CIUnitTestCase
         return [
             new ConfigurationCheck('production', $app, $cookie, $csp, new EffectivePolicy($csp, $headers, [], [], 'production'), false, false),
             new SecretsCheck('hex2bin:' . str_repeat('ab', 32), self::MASK, self::MASK, self::MASK, $root, []),
-            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $config, new FileAccess('', static fn (string $path): bool => str_starts_with($path, $root . 'writable')), static fn (): array => []),
+            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $config, new FileAccess('', static fn (string $path): bool => str_starts_with($path, $root . 'writable')), static fn (): array => [], $this->signedPackages()),
             new DependenciesCheck(new ComposerAudit($config), $this->vendorFixture(), $config),
             new OutboundCheck(['api.github.com'], ['Updates' => ['api.github.com']]),
         ];
@@ -310,6 +313,7 @@ final class SecurityCheckTest extends CIUnitTestCase
             chmod($root . 'writable/cache', 0700);
             chmod($root . 'writable/cache/data', 0600);
             chmod($root . 'writable/install.lock', 0640);
+            file_put_contents($root . 'public/uploads/.htaccess', 'Require all denied');
         } else {
             chmod($root . '.env', 0644);
             chmod($root . 'writable', 0755);
@@ -318,6 +322,15 @@ final class SecurityCheckTest extends CIUnitTestCase
         }
 
         return $root;
+    }
+
+    private function signedPackages(): Packages
+    {
+        $packages                   = new Packages();
+        $packages->requireSignature = true;
+        $packages->publicKeys       = ['RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'];
+
+        return $packages;
     }
 
     private function config(): ProductionCheck

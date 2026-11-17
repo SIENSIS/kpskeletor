@@ -120,4 +120,12 @@ return [
         'release_refused' => 'Versión rechazada (no verificada)',
         'notify_failed'   => 'Ha fallado el aviso de actualización',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'title' => 'Actualizaciones firmadas',
+        'noRepository' => 'No hay ningún repositorio de versiones configurado (updates.repository): no se comprueban las actualizaciones.',
+        'noKeys' => 'Se comprueban las actualizaciones de {0}, pero no hay ninguna clave de firma de confianza (updates.publicKeys): app:update rechaza todos los archivos.',
+        'ok' => '{0}, {1} claves de firma de confianza.',
+        'fix' => 'Defina en updates.publicKeys la clave pública minisign del publicador (docs/updates.md).',
+    ],
 ];

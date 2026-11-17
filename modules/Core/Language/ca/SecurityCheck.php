@@ -160,6 +160,20 @@ return [
         'error' => 'S\'ha trobat: {0}.',
         'fix'   => 'Traieu-los: public/ només conté index.php, assets, themes i uploads.',
     ],
+    'packages' => [
+        'title' => 'Paquets de mòduls i temes',
+        'ok' => 'Signatures obligatòries ({0} claus de confiança).',
+        'unsigned' => 'S\'accepten paquets sense signar (packages.requireSignature està desactivat o packages.publicKeys és buit).',
+        'fix' => 'Definiu a packages.publicKeys les claus minisign dels vostres publicadors i packages.requireSignature = true (docs/packages.md).',
+        'autoEnableTitle' => 'Mòduls trobats per modules:sync',
+        'autoEnable' => 'packages.autoEnable està activat: una carpeta de mòdul copiada a mà s\'activa amb la sincronització següent.',
+        'fixAutoEnable' => 'Deixeu packages.autoEnable desactivat en producció (D-29-02).',
+    ],
+    'uploadsHtaccess' => [
+        'title' => 'public/uploads/.htaccess',
+        'missing' => 'Falta: Apache podria executar scripts desats a public/uploads.',
+        'fix' => 'Restaureu-lo des de la versió publicada, o prohibiu els scripts a uploads/ al servidor web (docs/web-server.md).',
+    ],
     'audit' => [
         'title'         => 'composer audit',
         'ok'            => 'Cap vulnerabilitat coneguda (darrera comprovació el {0}).',
