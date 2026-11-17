@@ -1,6 +1,6 @@
 # Session 34 — Tutorials
 
-Branch: `claude/fervent-gauss-9ng4h3` · Pull request: (see `docs/progress.md`) · Date: 2026-11-17
+Branch: `claude/fervent-gauss-9ng4h3` · Pull request: [SIENSIS/kpskeletor#42](https://github.com/SIENSIS/kpskeletor/pull/42) · Date: 2026-11-17
 
 ## What was built
 
