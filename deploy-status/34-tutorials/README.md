@@ -113,7 +113,18 @@ vendor/bin/phpunit modules/Tasks tests/unit/Docs
 
 ## Tests and checks
 
-RESULTS
+Full suite (`vendor/bin/phpunit`): `OK (1305 tests, 17612 assertions)` in 9:31 (session 33: 1288
+tests; new: `TutorialsTest` 5, `TasksModuleTest` 2; the Tasks settings and API tests extended).
+
+```
+vendor/bin/phpunit modules/Tasks       OK (51 tests) before the extensions; all pass in the suite
+vendor/bin/phpunit tests/unit/Docs     OK (13 tests, 320 assertions)
+scratch Tasks2: phpunit modules/Tasks2 OK (7 tests, 22 assertions)
+```
+
+PHPStan (level 6): `[OK] No errors`. php-cs-fixer: `Found 0 of 996 files that can be fixed`.
+`php spark csp:check`: no inline scripts, handlers or styles. `php spark permissions:check`
+(scratch install with Tasks2 and Tasks3): `Permissions OK: 198 permissions, 382 routes checked`.
 
 ## Screenshots
 
