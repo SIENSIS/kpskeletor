@@ -1,0 +1,39 @@
+/*
+ * Theme "Tasks Demo" (tutorial 9): loaded after the parent theme's stylesheets. The primary colour
+ * comes from the option `primaryColor` (Theme.php); here only the theme's own touches, through
+ * CSS custom properties so light and dark mode both work.
+ */
+:root {
+    --tasks-demo-accent: #6f42c1;
+    --tasks-demo-column-todo: var(--bs-secondary-bg);
+    --tasks-demo-column-doing: var(--bs-primary-bg-subtle);
+    --tasks-demo-column-done: var(--bs-success-bg-subtle);
+}
+
+.brand-logo {
+    height: 2rem;
+    width: auto;
+}
+
+.tasks-demo-hero {
+    border-left: 0.35rem solid var(--tasks-demo-accent);
+    padding-left: 1rem;
+}
+
+.tasks-demo-column {
+    border-radius: var(--bs-border-radius-lg);
+    padding: 0.75rem;
+    height: 100%;
+}
+
+.tasks-demo-column-todo {
+    background-color: var(--tasks-demo-column-todo);
+}
+
+.tasks-demo-column-doing {
+    background-color: var(--tasks-demo-column-doing);
+}
+
+.tasks-demo-column-done {
+    background-color: var(--tasks-demo-column-done);
+}

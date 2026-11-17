@@ -268,6 +268,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-31-04 | 31 | Semantics of the `translated` setting type | Accepted (proposal) |
 | D-31-05 | 31 | Guests get the browser's language; no language switcher | Accepted (proposal) |
 | D-31-06 | 31 | File names of the language service and the key test | Accepted (proposal) |
+| D-32-01 | 32 | Manifest key `$enabledByDefault` for modules installed disabled (decide) | Applied (decided) |
+| D-32-02 | 32 | Tasks API reuses the CRUD resources; paths `tasks/tasks` and `tasks/projects` | Accepted (proposal) |
+| D-32-03 | 32 | The public request form always asks for a captcha (its own image URL) | Accepted (proposal) |
+| D-32-04 | 32 | Attachments of to-do tasks: a picker field with up to 5 keys + a `task_attachments` index | Accepted (proposal) |
+| D-32-05 | 32 | Generator templates stay in `modules/Core/Modules/Templates`; no packager option for `CLAUDE.md` yet | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2733,3 +2738,46 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Where:** plan session 31 (`modules/Core/Language/Language.php`, `tests/unit/I18n/LanguageKeysTest.php`).
 - **Proposal:** The service is `modules/Core/I18n/Language.php` next to `Locales`, `LocaleNegotiator` and `LocaleRules` (`modules/Core/Language/` only holds language folders, which the discovery and the key checks glob). The key test is `tests/unit/I18n/LanguageKeysTest.php` and replaces `modules/Core/Tests/LanguageFilesTest.php` (Core and themes only). No `lang:check` command: the test is the check.
 - **Status:** Accepted (proposal)
+
+## D-32-01 — Manifest key `$enabledByDefault` for modules installed disabled (decide)
+
+- **Where:** specification "Tutorials" ("the module is disabled by default and enabled from the Modules screen"); `deploy/32-tasks-module.md` ("`Tasks` module (disabled by default)"); D-29-02 (new modules enabled on the first sync and outside production).
+- **Problem:** Nothing in the manifest or in `modules:sync` could install a module disabled: the first sync of an installation (and every sync outside production) enables every new module, so `Tasks` would be on in every fresh install. A new manifest key is a public convention.
+- **Proposal (built):** `ModuleManifest::$enabledByDefault` (bool, default `true`). `ModuleSynchronizer` inserts a module found for the first time with `enabled = 0` when its manifest says `false`, also on the first sync (Core is always enabled). Once enabled by hand (Modules screen, `modules:enable`), later syncs keep it. `modules:install --enable` still enables it. `Tasks` sets it to `false`; the tests enable every module as before.
+- **Alternatives:** A) A list in `Config\Modules` / a setting (`Modules.disabledOnInstall = ['Tasks']`): no new manifest key, but the Core config names a module. B) Leave `Tasks` enabled and say "disable it" in the docs (contradicts the specification).
+- **Decision (2026-11-17):** «A) Clau del manifest (recomanada)». Keep the manifest key `ModuleManifest::$enabledByDefault` as built (default `true`; `false` installs the module disabled, also on the first sync; once enabled by hand it stays enabled). **Must change:** nothing in the code; the specification's manifest example, `CLAUDE.md` and the docs mention the key.
+- **Status:** Applied (decided)
+- **Applied in:** `modules/Core/Config/ModuleManifest.php`, `modules/Core/Modules/ModuleSynchronizer.php`, `modules/Tasks/Config/Module.php`; tests `PackagesTest::testAModuleDisabledByDefaultIsInstalledDisabledEvenOnTheFirstSync`, `TasksModuleTest::testManifestIsValidAndTheModuleIsInstalledDisabled`; `docs/specification.md` ("The module contract", modules table), `CLAUDE.md`, `docs/creating-a-module.md`, `docs/tasks.md`, `modules/Tasks/CLAUDE.md`.
+
+## D-32-02 — Tasks API reuses the CRUD resources; paths `tasks/tasks` and `tasks/projects`
+
+- **Where:** specification "Tutorials" 11 ("the same permissions as the CRUD"); D-17-01 (News has a separate `news-api` resource because its readers are not its editors).
+- **Problem:** Whether the to-do task API gets its own resource (like News) or the CRUD's, and its paths (`api/v1/tasks` would collide with `api/v1/tasks/{id}` for the projects).
+- **Proposal:** `setResource('tasks-tasks')` and `setResource('tasks-projects')` (the tutorial's point: one permission set for the back office and the API, narrowed by the token's scopes); paths `api/v1/tasks/tasks` and `api/v1/tasks/projects`, the `make:module --api` convention `<module>/<key>`. The estimate is hidden without `tasks-tasks.estimates` in both. Attachments are read-only in the API (`files`, signed private URLs).
+- **Alternatives:** A) A `tasks-api` resource as in News. B) `api/v1/tasks` for the to-do tasks and `api/v1/task-projects`.
+- **Status:** Accepted (proposal)
+
+## D-32-03 — The public request form always asks for a captcha (its own image URL)
+
+- **Where:** specification "Tutorials" 12 ("a public form … with captcha"), "Pitfalls" ("captchas skipped in development"); Auth's captcha answers 404 while `Auth.captcha` (login captcha) is off.
+- **Problem:** Reusing Auth's captcha image ties the public form to the login setting; with it off the form would have no captcha.
+- **Proposal:** the form always checks Auth's local captcha (`Modules\Auth\Services\Captcha::verify()`, single use), with its image served by the module at `GET tasks/request/captcha` while the form is on; the route `POST tasks/request` has `ratelimit:forms`; the whole form is a 404 while `Tasks.publicRequests` is off. The confirmation email to the visitor (not a user) goes through the Core's `MailQueue` in the visitor's language; reviewers get the `TaskRequested` notification.
+- **Alternatives:** A) Follow `Auth.captcha` (no captcha by default). B) A captcha service in the Core (later, if more modules need one).
+- **Status:** Accepted (proposal)
+
+## D-32-04 — Attachments of to-do tasks: a picker field with up to 5 keys + a `task_attachments` index
+
+- **Where:** specification "Tutorials" 10 (file picker, private disk, `FileAccessPolicy` following the task's visibility); plan table list (`task_attachments`).
+- **Problem:** The Core's picker stores keys in one column (comma separated); the policy needs to find the to-do task of a file quickly.
+- **Proposal:** `tasks.attachments` (the picker's value, up to 5 keys, private disk, folder `modules/tasks`) mirrored after every write into `task_attachments` (`task_id`, `file_key`). `AttachmentPolicy` (first real `FileAccessPolicy`): public to-do task not in the trash → anyone; private → `tasks-tasks.show`, its creator or an assignee; not attached yet → its uploader; else 404. Registered in `modules/Tasks/Config/Events.php`; Files is in `$requires`.
+- **Alternatives:** A) Only the junction table, with a custom upload screen. B) Files on the public disk for public to-do tasks.
+- **Status:** Accepted (proposal)
+
+## D-32-05 — Generator templates stay in `modules/Core/Modules/Templates`; no packager option for `CLAUDE.md` yet
+
+- **Where:** plan session 32 (`modules/Core/Commands/Generators/Views/module/CLAUDE.md.tpl`); specification "AI-assisted module development" ("excluded from module ZIP packages only if the author chooses so (option of the packager)").
+- **Problem:** The existing templates live in `modules/Core/Modules/Templates`; there is no packaging command yet (tutorial 13, session 34).
+- **Proposal:** `CLAUDE.md.tpl` and the `--standalone` templates (`standalone/{composer.json,README.md,CLAUDE.md}.tpl`) next to the other templates. Packages keep `CLAUDE.md` (`.md` is an allowed extension); the "exclude `CLAUDE.md`" option belongs to the packager when it is written (session 34, tutorial 13).
+- **Alternatives:** Move every template to the plan's path.
+- **Status:** Accepted (proposal)
+

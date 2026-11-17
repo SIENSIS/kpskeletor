@@ -23,6 +23,7 @@ return [
     'Modules\News' => __DIR__ . '/../../modules/News',
     'Modules\Pages' => __DIR__ . '/../../modules/Pages',
     'Modules\Settings' => __DIR__ . '/../../modules/Settings',
+    'Modules\Tasks' => __DIR__ . '/../../modules/Tasks',
     'Modules\Updates' => __DIR__ . '/../../modules/Updates',
     'Modules\Users' => __DIR__ . '/../../modules/Users',
 ];

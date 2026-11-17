@@ -50,7 +50,7 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 
 - Everything lives in **modules** (`modules/<Name>/`), described by a typed manifest
   `Config/Module.php` (resources, menus, settings, widgets, tasks, notifications, api, csp,
-  outboundHosts). Never hard-code a module in the Core.
+  outboundHosts, `enabledByDefault`). Never hard-code a module in the Core.
 - Loading only through CodeIgniter discovery; never `require` route files; `Routes.php` never
   queries the database. Each module has its own namespace (`Modules\News` → `modules/News`) listed
   in the generated `app/Config/ModuleNamespaces.php` (written by `make:module`, `modules:sync` and

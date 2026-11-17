@@ -116,7 +116,7 @@ final class ModuleSynchronizer
                 $registry->insert([
                     'name'         => $name,
                     'version'      => $manifest->version,
-                    'enabled'      => $enable || $name === 'Core' ? 1 : 0,
+                    'enabled'      => ($enable && $manifest->enabledByDefault) || $name === 'Core' ? 1 : 0,
                     'installed_at' => $now,
                     'updated_at'   => $now,
                 ]);

@@ -38,6 +38,17 @@ final class ModuleGenerator
         'Task.php.tpl'        => 'Tasks/{{Name}}Task.php',
         'Test.php.tpl'        => 'Tests/{{Name}}ModuleTest.php',
         'component.js.tpl'    => 'Assets/js/{{name}}.js',
+        'CLAUDE.md.tpl'       => 'CLAUDE.md',
+    ];
+
+    /**
+     * Extra files of `make:module <Name> --standalone` (a module developed in its own repository):
+     * the standalone `CLAUDE.md` (with a summary of the skeleton's rules) replaces the plain one.
+     */
+    private const STANDALONE_FILES = [
+        'standalone/composer.json.tpl' => 'composer.json',
+        'standalone/README.md.tpl'     => 'README.md',
+        'standalone/CLAUDE.md.tpl'     => 'CLAUDE.md',
     ];
 
     /** Empty folders kept with a .gitkeep file. */
@@ -77,7 +88,7 @@ final class ModuleGenerator
      *
      * @throws \InvalidArgumentException when the name is invalid or the module exists
      */
-    public function generate(string $name, ?string $crudTable = null, bool $api = false): string
+    public function generate(string $name, ?string $crudTable = null, bool $api = false, bool $standalone = false): string
     {
         $error = $this->nameError($name) ?? ($crudTable !== null ? CrudScaffold::tableError($crudTable) : null);
 
@@ -102,11 +113,14 @@ final class ModuleGenerator
             '{{migrationClass}}' => 'Create' . ($crudTable === null ? $name . 'Items' : str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))),
             ...CrudScaffold::templateValues($name, $crudTable),
             ...ApiScaffold::templateValues($name, $api ? $crudTable : null),
+            ...self::claudeValues($name, $crudTable, $api),
+            '{{vendor}}'         => 'your-vendor',
         ];
 
-        $path = $this->root . '/' . $name;
+        $path  = $this->root . '/' . $name;
+        $files = $standalone ? [...self::FILES, ...self::STANDALONE_FILES] : self::FILES;
 
-        foreach (self::FILES as $template => $target) {
+        foreach ($files as $template => $target) {
             $content = (string) file_get_contents(__DIR__ . '/Templates/' . $template);
             $this->write($path . '/' . strtr($target, $replace), strtr($content, $replace));
         }
@@ -121,6 +135,29 @@ final class ModuleGenerator
         }
 
         return $path;
+    }
+
+    /**
+     * The lines of the module's `CLAUDE.md` that depend on `--crud` / `--api`.
+     *
+     * @return array<string, string>
+     */
+    private static function claudeValues(string $name, ?string $crudTable, bool $api): array
+    {
+        if ($crudTable === null) {
+            return ['{{crudClaude}}' => '', '{{apiClaude}}' => '', '{{crudGrantClaude}}' => '', '{{apiRouteClaude}}' => ''];
+        }
+
+        $resource = CrudScaffold::resource($name, $crudTable);
+        $key      = CrudScaffold::resourceKey($name, $crudTable);
+        $lower    = strtolower($name);
+
+        return [
+            '{{crudClaude}}'      => "\n- `{$resource}` (crud − `import`): the kpcrudy CRUD of `{$crudTable}`, `backend/{$lower}/{$key}`.",
+            '{{apiClaude}}'       => $api ? "\n- API: `api/v1/" . ApiScaffold::path($name, $crudTable) . "` (kpapy, same resource `{$resource}`; scopes = its permissions)." : '',
+            '{{crudGrantClaude}}' => ", `{$resource}.*`",
+            '{{apiRouteClaude}}'  => $api ? '; the API route has the `kpapy` filter' : '',
+        ];
     }
 
     private function write(string $file, string $content): void

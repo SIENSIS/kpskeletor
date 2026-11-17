@@ -13,7 +13,12 @@ use Modules\Core\Modules\ModuleGenerator;
 use Modules\Core\Modules\NamespaceFile;
 
 /**
- * php spark make:module <Name> [--crud=<table>] [--api]
+ * php spark make:module <Name> [--crud=<table>] [--api] [--standalone]
+ *
+ * Every module gets its own `CLAUDE.md` (purpose, resources and permissions, decisions, open tasks,
+ * how to test). With `--standalone` (a module developed in its own repository, inside a checkout
+ * of the skeleton) it also gets a `composer.json`, a `README.md`, and its `CLAUDE.md` summarises
+ * the skeleton's rules.
  *
  * With `--crud`, the migration creates that table, the manifest declares its `crud` resource
  * (`<module>-<key>`), the table is migrated and `php spark kpcrudy:make` writes the controller and
@@ -30,7 +35,7 @@ final class MakeModule extends BaseCommand
     protected $group       = 'Modules';
     protected $name        = 'make:module';
     protected $description = 'Generates a module in modules/<Name> (optionally with a kpcrudy CRUD) and registers its namespace.';
-    protected $usage       = 'make:module <Name> [--crud=<table>] [--api]';
+    protected $usage       = 'make:module <Name> [--crud=<table>] [--api] [--standalone]';
 
     /** @var array<string, string> */
     protected $arguments = [
@@ -39,8 +44,9 @@ final class MakeModule extends BaseCommand
 
     /** @var array<string, string> */
     protected $options = [
-        '--crud' => 'Table of a kpcrudy CRUD to generate (e.g. news_posts): migration, resource, controller and route',
-        '--api'  => 'With --crud: also the kpapy API resource of the table (api/v1/<module>/<key>), its $api entry and a scope test',
+        '--crud'       => 'Table of a kpcrudy CRUD to generate (e.g. news_posts): migration, resource, controller and route',
+        '--api'        => 'With --crud: also the kpapy API resource of the table (api/v1/<module>/<key>), its $api entry and a scope test',
+        '--standalone' => 'For a module kept in its own repository: also composer.json, README.md and a CLAUDE.md with the skeleton\'s rules',
     ];
 
     /**
@@ -59,7 +65,8 @@ final class MakeModule extends BaseCommand
         $crud  = ModulesSync::option($params, 'crud');
         $table = is_string($crud) ? trim($crud) : null;
 
-        $api       = ModulesSync::option($params, 'api') !== null;
+        $api        = ModulesSync::option($params, 'api') !== null;
+        $standalone = ModulesSync::option($params, 'standalone') !== null;
         $generator = new ModuleGenerator();
         $error     = $generator->nameError($name) ?? ($table !== null ? CrudScaffold::tableError($table) : null);
 
@@ -73,7 +80,7 @@ final class MakeModule extends BaseCommand
             return EXIT_ERROR;
         }
 
-        $path = $generator->generate($name, $table, $api);
+        $path = $generator->generate($name, $table, $api, $standalone);
         (new NamespaceFile())->write((new ModuleDiscovery())->folders());
 
         CLI::write(lang('Core.make.created', [$name, clean_path($path)]), 'green');

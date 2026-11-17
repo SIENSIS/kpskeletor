@@ -81,6 +81,61 @@ final class ModuleGeneratorTest extends CIUnitTestCase
         $this->assertStringContainsString("data-component=\"{$lower}/{$lower}\"", (string) file_get_contents($path . '/Views/index.php'));
         $this->assertStringContainsString('export function mount(root, options)', (string) file_get_contents($path . "/Assets/js/{$lower}.js"));
         $this->assertStringContainsString('extends AuthTestCase', (string) file_get_contents($path . "/Tests/{$name}ModuleTest.php"));
+
+        // Criterion 2: the module's CLAUDE.md (purpose, resources and permissions, decisions, open tasks, how to test).
+        $claude = (string) file_get_contents($path . '/CLAUDE.md');
+        $this->assertStringStartsWith("# {$name} module", $claude);
+
+        foreach (['**Purpose:**', '## Resources and permissions', '## Decisions', '## Open tasks', '## How to test', "`{$lower}-main`", "vendor/bin/phpunit modules/{$name}", "/check-module {$name}"] as $text) {
+            $this->assertStringContainsString($text, $claude);
+        }
+
+        $this->assertStringNotContainsString('{{', $claude);
+        $this->assertFileDoesNotExist($path . '/composer.json');
+        $this->assertFileDoesNotExist($path . '/README.md');
+    }
+
+    public function testTheModuleClaudeFileDescribesItsCrudAndApi(): void
+    {
+        $name   = $this->uniqueModuleName();
+        $lower  = strtolower($name);
+        $path   = (new ModuleGenerator($this->tempRoot()))->generate($name, $lower . '_books', true);
+        $claude = (string) file_get_contents($path . '/CLAUDE.md');
+
+        $this->assertStringContainsString("`{$lower}-books` (crud", $claude);
+        $this->assertStringContainsString("`api/v1/{$lower}/books`", $claude);
+        $this->assertStringContainsString("`{$lower}-books.*`", $claude);
+        $this->assertStringNotContainsString('{{', $claude);
+    }
+
+    public function testStandaloneModulesGetComposerReadmeAndTheSkeletonRules(): void
+    {
+        $name  = $this->uniqueModuleName();
+        $lower = strtolower($name);
+        $path  = (new ModuleGenerator($this->tempRoot()))->generate($name, standalone: true);
+
+        $composer = json_decode((string) file_get_contents($path . '/composer.json'), true);
+        $this->assertIsArray($composer);
+        $this->assertSame("your-vendor/{$lower}-module", $composer['name']);
+        $this->assertSame(['Modules\\' . $name . '\\' => ''], $composer['autoload']['psr-4']);
+        $this->assertSame($name, $composer['extra']['kpskeletor']['module']);
+
+        $this->assertStringContainsString("modules:install {$name}.zip", (string) file_get_contents($path . '/README.md'));
+
+        $claude = (string) file_get_contents($path . '/CLAUDE.md');
+        $this->assertStringContainsString('standalone repository', $claude);
+        $this->assertStringContainsString("git clone <this repository> modules/{$name}", $claude);
+        $this->assertStringContainsString('## The skeleton\'s rules', $claude);
+        $this->assertStringContainsString('## Module checklist', $claude);
+
+        foreach ([$path . '/composer.json', $path . '/README.md', $path . '/CLAUDE.md'] as $file) {
+            $this->assertStringNotContainsString('{{', (string) file_get_contents($file));
+        }
+
+        // Still a valid module.
+        service('autoloader')->addNamespace('Modules\\' . $name, $path);
+        $class = "Modules\\{$name}\\Config\\Module";
+        $this->assertSame([], (new ManifestValidator())->validate(new $class(), $path));
     }
 
     public function testRefusesInvalidReservedAndExistingNames(): void

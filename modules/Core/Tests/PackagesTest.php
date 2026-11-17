@@ -346,6 +346,27 @@ final class PackagesTest extends CIUnitTestCase
         $this->assertTrue(model(ModuleModel::class, false)->allByName()[$name]['enabled'], 'The first sync of an installation enables every module.');
     }
 
+    public function testAModuleDisabledByDefaultIsInstalledDisabledEvenOnTheFirstSync(): void
+    {
+        $name = $this->fixtureModule('public bool $enabledByDefault = false;');
+        $sync = fn (): \Modules\Core\Modules\SyncReport => (new ModuleSynchronizer(
+            $this->discovery(),
+            new \Modules\Core\Modules\NamespaceFile($this->tempRoot() . '/ModuleNamespaces.php'),
+            assets: new \Modules\Core\Frontend\AssetPublisher(WRITEPATH . 'tests/public-' . md5($this->tempRoot())),
+            autoEnable: true,
+        ))->sync();
+
+        $sync();
+        $modules = model(ModuleModel::class, false)->allByName();
+        $this->assertFalse($modules[$name]['enabled'], 'D-32-01: installed, disabled.');
+        $this->assertTrue($modules['Core']['enabled']);
+
+        // Enabled by hand, a later sync keeps it enabled.
+        model(ModuleModel::class, false)->update($modules[$name]['id'], ['enabled' => 1]);
+        $sync();
+        $this->assertTrue(model(ModuleModel::class, false)->allByName()[$name]['enabled']);
+    }
+
     // ---------------------------------------------------------------- uninstall
 
     public function testUninstallRemovesTheModuleAndItsData(): void
