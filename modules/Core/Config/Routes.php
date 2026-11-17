@@ -55,3 +55,32 @@ CrudFactory::routes($routes, 'core-notifications', 'backend/notifications', '\Mo
 
 // Scheduled tasks (schedule.list / schedule.show / schedule.run for "run now").
 CrudFactory::routes($routes, 'schedule', 'backend/schedule', '\Modules\Core\Controllers\Schedule::index');
+
+/*
+ * The Modules screen (docs/packages.md). Uploads, approvals and uninstall requests need a recent
+ * re-authentication; the installs run from the console (`php spark modules:install --pending`).
+ */
+$routes->group('backend/modules', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
+    $list      = ['filter' => 'can:modules.list'];
+    $toggle    = ['filter' => 'can:modules.toggle'];
+    $upload    = ['filter' => ['can:modules.upload', 'reauth']];
+    $uninstall = ['filter' => ['can:modules.uninstall', 'reauth']];
+
+    $routes->get('/', 'Modules::index', $list + ['as' => 'modules']);
+    $routes->post('enable/(:segment)', 'Modules::enable/$1', $toggle);
+    $routes->post('disable/(:segment)', 'Modules::disable/$1', $toggle);
+    $routes->post('demo/(:segment)', 'Modules::demo/$1', ['filter' => ['can:modules.demo', 'ratelimit:forms']]);
+    $routes->post('sync', 'Modules::sync', ['filter' => ['can:modules.sync', 'ratelimit:forms']]);
+    $routes->get('packages', 'Modules::packages', $list + ['as' => 'modules-packages']);
+    $routes->get('packages/upload', 'Modules::uploadForm', $upload);
+    $routes->post('packages/upload', 'Modules::upload', ['filter' => ['can:modules.upload', 'reauth', 'ratelimit:uploads']]);
+    $routes->get('packages/(:num)', 'Modules::package/$1', $list);
+    $routes->post('packages/(:num)/approve', 'Modules::approve/$1', ['filter' => ['can:modules.upload', 'reauth', 'ratelimit:forms']]);
+    $routes->post('packages/(:num)/discard', 'Modules::discard/$1', ['filter' => ['can:modules.upload,modules.uninstall', 'ratelimit:forms']]);
+    $routes->get('uninstall/(:segment)', 'Modules::uninstallForm/$1', $uninstall);
+    $routes->post('uninstall/(:segment)', 'Modules::uninstall/$1', ['filter' => ['can:modules.uninstall', 'reauth', 'ratelimit:forms']]);
+    $routes->get('themes', 'Themes::index', $list + ['as' => 'modules-themes']);
+    $routes->post('themes/activate', 'Themes::activate', $toggle);
+    $routes->get('themes/uninstall/(:segment)', 'Themes::uninstallForm/$1', $uninstall);
+    $routes->post('themes/uninstall/(:segment)', 'Themes::uninstall/$1', ['filter' => ['can:modules.uninstall', 'reauth', 'ratelimit:forms']]);
+});

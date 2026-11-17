@@ -24,6 +24,18 @@ abstract class ModuleManifest
     public string $icon = 'bi bi-box';
 
     /**
+     * One-line description shown on the Modules screen and by a package before it is installed:
+     * a language key (`<Module>.module.description`) or plain text (D-29-01).
+     */
+    public string $description = '';
+
+    /**
+     * Author or vendor (plain text). A package may only replace an installed module of the same
+     * author (`modules:install`; D-29-01).
+     */
+    public string $author = '';
+
+    /**
      * Module dependencies: name => version constraint (e.g. ['Core' => '^1.0']).
      *
      * @var array<string, string>

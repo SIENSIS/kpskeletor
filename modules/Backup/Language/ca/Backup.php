@@ -68,6 +68,7 @@ return [
         'schedule' => 'Programada',
         'safety'   => 'De seguretat (abans d\'una restauració)',
         'update'   => 'De seguretat (abans d\'una actualització)',
+        'package'  => 'De seguretat (abans d\'un canvi de mòdul)',
         'upload'   => 'Pujada',
         'found'    => 'Trobada a la carpeta',
     ],

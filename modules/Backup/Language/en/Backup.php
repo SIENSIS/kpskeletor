@@ -68,6 +68,7 @@ return [
         'schedule' => 'Scheduled',
         'safety'   => 'Safety (before a restore)',
         'update'   => 'Safety (before an update)',
+        'package'  => 'Safety (before a module change)',
         'upload'   => 'Uploaded',
         'found'    => 'Found in the folder',
     ],

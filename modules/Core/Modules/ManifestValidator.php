@@ -71,6 +71,8 @@ final class ManifestValidator
         $this->checkVersion();
         $this->checkRequires();
         $this->checkRepository();
+        $this->checkText('description');
+        $this->checkText('author');
         $this->checkResources();
         $this->checkDefaultGrants();
         $this->checkMenu();
@@ -134,6 +136,18 @@ final class ManifestValidator
             if (! is_string($constraint) || ! SemVer::isConstraint($constraint)) {
                 $this->error($key, 'constraint', [is_string($constraint) ? $constraint : get_debug_type($constraint)]);
             }
+        }
+    }
+
+    /**
+     * Optional one-line texts (description, author): at most 255 characters, no control characters.
+     */
+    private function checkText(string $key): void
+    {
+        $value = $this->raw[$key] ?? '';
+
+        if (! is_string($value) || mb_strlen($value) > 255 || preg_match('/[\x00-\x1F\x7F]/', $value) === 1) {
+            $this->error($key, 'text');
         }
     }
 

@@ -248,6 +248,15 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-28-05 | 28 | Versions: the installed version, tags, pre-releases and modules' repositories | Accepted (proposal) |
 | D-28-06 | 28 | `OutboundClient` drops credentials on cross-origin redirects | Accepted (proposal) |
 | D-28-07 | 28 | The maintenance page drawn by the theme without the database | Accepted (proposal) |
+| D-29-01 | 29 | Modules screen URLs, manifest `description`/`author`, `Config\Packages` keys, command options and Core events (decide) | Applied (decided) |
+| D-29-02 | 29 | Modules found by `modules:sync`: enabled automatically only outside production (decide) | Applied (decided) |
+| D-29-03 | 29 | Packages are read without running their code; `modules:sync` in a new process | Accepted (proposal) |
+| D-29-04 | 29 | One table `module_packages` for staged installs and uninstall requests | Accepted (proposal) |
+| D-29-05 | 29 | What the web server does with packages: validation, `php -l`, no code folders | Accepted (proposal) |
+| D-29-06 | 29 | Backups, uninstall clean-up and latest versions through Core events | Accepted (proposal) |
+| D-29-07 | 29 | Themes tab: preview image and colours, switching with `modules.toggle` | Accepted (proposal) |
+| D-29-08 | 29 | What an uninstall removes, and `--keep-data` | Accepted (proposal) |
+| D-29-09 | 29 | Package signatures (minisign) and the allowed files | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2571,3 +2580,68 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Read the stored theme when the mode was turned on by hand (the database is intact then), file configuration only during restores and updates (two looks for the same page). B) Copy the active theme's slug into `maintenance.json` when the mode is turned on.
 - **Status:** Accepted (proposal)
 - **Applied in:** `modules/Core/Maintenance/MaintenancePage.php`, `modules/Core/Filters/Maintenance.php`, `modules/Core/Views/errors/maintenance.php`, `themes/default/Assets/css/theme.css`, `docs/themes.md`, `docs/security.md`; tests `MaintenanceModeTest`, `MaintenanceScreenTest::testThePageIsThemedWithoutReadingStoredSettings`.
+
+## D-29-01 — Modules screen URLs, manifest `description`/`author`, `Config\Packages` keys, command options and Core events (decide)
+
+- **Where:** specification "Modules screen (back office)", "Installing and uninstalling modules and themes" (package validation, staged installs, signatures "listed in `Modules\Core\Config\Packages`"), D-02-05 (`modules.*`), D-00-05, plan session 29.
+- **Problem:** The specification names the permissions but not the URLs, which permission each action needs, how a module describes itself (the list shows a "description", a package its "author", and a package may not replace a module "from another vendor"), the configuration keys of packages, nor the options of the commands.
+- **Proposal:** URLs under `backend/modules`: `/` (list, `modules.list`), `POST enable/<Name>`, `POST disable/<Name>` (`modules.toggle`), `POST demo/<Name>` (`modules.demo`, field `action` = load/reload/remove), `POST sync` (`modules.sync`), `packages` (list, `modules.list`), `packages/upload` (GET/POST, `modules.upload` + `reauth`, `ratelimit:uploads`), `packages/<id>` (details, `modules.list`), `POST packages/<id>/approve` (`modules.upload` + `reauth`), `POST packages/<id>/discard` (`modules.upload` for installs, `modules.uninstall` for uninstalls), `uninstall/<Name>` (GET/POST, `modules.uninstall` + `reauth`), `themes` (`modules.list`), `POST themes/activate` (`modules.toggle`), `themes/uninstall/<slug>` (GET/POST, `modules.uninstall` + `reauth`); menu "Modules" in the settings zone. Two new optional manifest keys: `$description` (language key or text) and `$author` (plain text; a package can only replace an installed module with the same author). `Config\Packages` (and `.env` `packages.*`): `autoEnable` (D-29-02), `publicKeys`, `requireSignature`, `maxPackageBytes` (20 MB), `maxUncompressedBytes` (100 MB), `maxFiles` (5000), `maxRatio` (100), `extensions`, `pendingDays` (7), `lintTimeout`, `phpBinary`. Commands: `modules:install <zip|url> [--enable] [--force] [--demo] [--yes] [--no-backup] [--password] [--signature=<file>]`, `modules:install --pending` (runs the approved installs **and** the uninstall requests), `modules:uninstall <Name> [--keep-data] [--yes] [--no-backup] [--password]`, `themes:install` and `themes:uninstall` with the same options. Core events `packageBackup`, `moduleUninstalling`, `moduleVersions` (D-29-06); backup origin `package`.
+- **Alternatives:** A) Separate permissions for approving (`modules.approve`) and for themes (`modules.themes`). B) A `vendor` key instead of `author`. C) `modules:uninstall --pending` for the uninstall requests.
+- **Status:** Applied (decided)
+- **Decision (2026-11-17):** «Com s'ha construït (recomanada)». The URLs under `backend/modules`, the permission of each action (upload and approve: `modules.upload` + re-authentication; theme switching: `modules.toggle`; uninstall requests: `modules.uninstall` + re-authentication), the optional manifest keys `$description` and `$author`, the `packages.*` configuration keys, the command options (`--pending` also runs uninstall requests) and the Core events `packageBackup`, `moduleUninstalling`, `moduleVersions` stay as built. **Must change:** specification ("Modules screen", "Installing and uninstalling", "The module contract"); no code.
+- **Applied in:** `docs/specification.md` ("The module contract": `$description`, `$author`; "Modules screen": permissions per action and URLs; "Installing and uninstalling": command options, `--pending`, author check, `Config\Packages` keys, Core events); code unchanged.
+
+## D-29-02 — Modules found by `modules:sync`: enabled automatically only outside production (decide)
+
+- **Where:** specification "Installing and uninstalling modules and themes" ("New modules are detected and listed as *installed, disabled* until an admin enables them (setting: enable automatically)"), acceptance criterion 2 (`make:module` + `modules:sync` shows the new module's menu), `modules:install [--enable]`.
+- **Problem:** Until now `modules:sync` enabled every new module. The specification wants new modules disabled until an administrator enables them, but then `make:module` + `modules:sync` would no longer show the new module during development, and a fresh installation would start with every module disabled.
+- **Proposal:** A module registered for the first time is **enabled** when it is the first sync of the installation (empty registry: `app:install`), when the environment is not production (development, testing: `make:module` keeps working), or when `Packages.autoEnable` is true (`.env` `packages.autoEnable`, default false). In production a copied folder or a package installed without `--enable` is listed as *installed, disabled*. `modules:install --enable` (and the Modules screen) enable it with its disabled dependencies.
+- **Alternatives:** A) Keep enabling every new module (`autoEnable` default true). B) Disabled in every environment (developers run `modules:enable` after `make:module`; acceptance criterion 2 changes).
+- **Status:** Applied (decided)
+- **Decision (2026-11-17):** «Desactivat només en producció (recomanada)». A module registered for the first time is enabled on the first sync of an installation and in every environment but production; in production it stays *installed, disabled* unless `packages.autoEnable = true` or `modules:install --enable`. Stays as built. **Must change:** specification ("Installing and uninstalling", "Module lifecycle"); no code.
+- **Applied in:** `docs/specification.md` ("Module lifecycle" step 3, "Installing and uninstalling" way 1); code unchanged (`ModuleSynchronizer::enablesNewModules()`, `Config\Packages::$autoEnable`; test `PackagesTest::testNewModulesStayDisabledInProductionUnlessAutoEnabled`).
+
+## D-29-03 — Packages are read without running their code; `modules:sync` in a new process
+
+- **Where:** specification "Package validation" ("a valid manifest… whose name matches the folder"), staged installs (the screen shows the manifest before approval).
+- **Problem:** Loading `Config/Module.php` of an uploaded package runs its code (with the web server's user before the approval); and the console process of an upgrade has usually loaded the installed version's manifest class, which PHP cannot unload.
+- **Proposal:** `ManifestReader` tokenises the manifest and evaluates only literal property values (strings, numbers, booleans, arrays, `X::class`); the class must be `Modules\<Name>\Config\Module` extending `ModuleManifest` (themes: `Themes\<Studly>\Theme`), the name must match the folder and the version must be a literal semantic version. What it adds (permissions through `CatalogueBuilder`, menus, widgets, tasks) is computed from a shadow manifest of those literals. The full validation (`ManifestValidator`, dependencies, routes) is `modules:sync`, which the installer runs in a **new PHP process** (`SparkSync`) after moving the folder; when it fails the previous folder is put back and sync runs again.
+- **Status:** Accepted (proposal)
+
+## D-29-04 — One table `module_packages` for staged installs and uninstall requests
+
+- **Where:** plan session 29 (tables `module_packages` and `pending_uninstalls`).
+- **Proposal:** One table with `action` (`install`/`uninstall`), `type` (`module`/`theme`), name, version, stored file (random name in `writable/packages/`, 0640) and SHA-256, the validated manifest (JSON), `keep_data`, status (`uploaded` → `pending` → `installing` → `installed`/`failed`; `discarded`; `expired`), who uploaded/approved and when, `expires_at` (`Packages.pendingDays`) and the log of the run. The file is checked against its SHA-256 again when approved and when installed. The approver is notified (`PackageProcessed`) when the console ran it.
+- **Status:** Accepted (proposal)
+
+## D-29-05 — What the web server does with packages: validation, `php -l`, no code folders
+
+- **Where:** specification "Installing and uninstalling modules and themes", D-00-33.
+- **Proposal:** The web server validates an uploaded ZIP (SafeZip, extensions, manifest) and, when `proc_open` is available, extracts it to a private temporary folder under `writable/packages/` and runs `php -l` on its PHP files (syntax only, no code is run); otherwise the check happens at install time. It never writes `modules/`, `themes/` nor `app/Config/`: approving makes the package pending, uninstalling creates a request, and the "Sync" button stops with a message to run `php spark modules:sync` when the generated namespaces file is not writable. Enabling a module still publishes its assets (D-00-33).
+- **Status:** Accepted (proposal)
+
+## D-29-06 — Backups, uninstall clean-up and latest versions through Core events
+
+- **Where:** specification ("makes a backup (Backup module)", "removes … menu customisations, widgets", "the latest available version, if Updates knows it"), D-25 (`CalendarService::purgeModule()`), `CLAUDE.md` ("never hard-code a module in the Core").
+- **Proposal:** The Core triggers `packageBackup` (`PackageBackup`: the Backup module makes a full backup with the operator's password or `backup.password`, origin `package`), `moduleUninstalling` (`ModuleUninstalling`: Menus removes the customisations of its entries and the public items of its link types, Dashboard its widgets in the group layouts) and `moduleVersions` (Updates fills the latest versions from its last check, no outbound request). Without an answer to `packageBackup` an install or uninstall stops unless `--no-backup`.
+- The calendar entries are deleted through the Core's calendar contract (`CalendarPublisher::purgeModule()`, added; `NullCalendar` returns 0): the Events module cannot ship a `Config/Events.php` listener file (D-00-04).
+- **Status:** Accepted (proposal)
+
+## D-29-07 — Themes tab: preview image and colours, switching with `modules.toggle`
+
+- **Where:** specification "Modules screen" ("Themes tab… switch with one click, with a preview, and the theme options").
+- **Proposal:** Each theme card shows the theme's `Assets/img/screenshot.(png|webp|jpg)` when it ships one and its colour options (disabled colour inputs: no inline styles), the areas it is active for, and buttons to use it for the back office or the public site (`modules.toggle`; the same `Theme.backend`/`Theme.public` settings as Settings › Theme, logged as `theme_activated`). The options stay in Settings › Theme (link shown with `settings.core`). The theme preview pages (`theme-preview`) stay a development tool.
+- **Status:** Accepted (proposal)
+
+## D-29-08 — What an uninstall removes, and `--keep-data`
+
+- **Where:** specification "Uninstalling".
+- **Proposal:** Always: the module is disabled, its permissions, the group and user grants naming them (or their wildcards), its settings (class `<Name>` or `Modules\<Name>\…`), scheduled tasks, notification preferences, declarations, registry row, folder and published assets (through `modules:sync`), plus what the `moduleUninstalling` listeners remove. Unless `--keep-data`: its migrations are rolled back, and its notifications and demo records are deleted. With `--keep-data` the migrations stay applied, so a later install does not create the tables again (its seeder runs again as on any first install). Core modules and modules that another installed module requires cannot be uninstalled; a theme cannot be uninstalled while it is active, the fallback or a parent.
+- **Status:** Accepted (proposal)
+
+## D-29-09 — Package signatures (minisign) and the allowed files
+
+- **Where:** specification "Package validation" ("optional signature check… required when a setting asks for it"), D-28-03.
+- **Proposal:** The same minisign format as releases: `<package>.zip.minisig` next to the file (or `--signature`, or downloaded from `<url>.minisig`, or uploaded with the package), checked by `Modules\Core\Packages\SignatureCheck` against `Packages.publicKeys`; refused when `Packages.requireSignature` is on and there is none. (The Core cannot use the Updates module's verifier: the two copies are merged in session 35.) Allowed files: the extensions of `Packages.extensions` (no `phtml`, `phar`, `htaccess`, `env`…), plus `LICENSE`, `README`, `CHANGELOG`, `NOTICE`, `AUTHORS`, `COPYING` and `.gitkeep`.
+- **Status:** Accepted (proposal)
+

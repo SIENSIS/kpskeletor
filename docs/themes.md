@@ -207,3 +207,13 @@ In development, with `theme.preview = true` in `.env`, `/theme-preview/<layout>`
 layout (`backend`, `public`, `auth`, `blank`, `print`) and `errors-403|404|500` with sample
 content; `?theme=<slug>` previews another theme. In any other environment, or with the option
 off (the default), the pages answer 404 (D-03-05).
+
+## Installing, switching and removing themes
+
+A theme packaged as a ZIP (`<slug>/Theme.php` …) is installed with `php spark themes:install
+<file.zip|url>` (same validation, backup and maintenance as module packages) or uploaded in
+**Modules › Packages** and installed from the console. **Modules › Themes** lists the installed
+themes with their screenshot (`Assets/img/screenshot.png`, optional) and colours and switches the
+theme of the back office or of the public site with one click (`modules.toggle`); the options stay
+in Settings › Theme. `php spark themes:uninstall <slug>` removes a theme that is not active, not
+the fallback and not a parent. See `docs/packages.md`.

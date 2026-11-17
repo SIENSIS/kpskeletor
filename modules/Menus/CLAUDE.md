@@ -38,6 +38,7 @@ D-21-01 (names, URLs, Core contracts) decided by the owner as built (Decisions 2
 
 ## Open tasks
 
+- Done in session 29: `Config/Events.php` answers `moduleUninstalling`: deletes the customisations of the module's back-office entries and the public items of its link types. (`docs/packages.md`)
 - Session 26: menus in the API (if wanted). Session 31: language negotiation (guests see `en`).
 - Themes other than the default need their own `partials/public_menu` if they want another look.
 

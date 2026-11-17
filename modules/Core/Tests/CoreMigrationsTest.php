@@ -31,7 +31,7 @@ final class CoreMigrationsTest extends CIUnitTestCase
     private const TABLES = [
         'modules', 'permissions', 'group_permissions', 'module_declarations', 'demo_records',
         'notifications', 'notification_preferences', 'mail_queue', 'scheduled_tasks', 'task_runs',
-        'activity_log', 'stored_files', 'groups',
+        'activity_log', 'stored_files', 'groups', 'module_packages',
     ];
 
     private const MIGRATIONS = [
@@ -49,6 +49,7 @@ final class CoreMigrationsTest extends CIUnitTestCase
         '2026-11-07-000001_CreateActivityLog',
         '2026-11-08-000001_CreateStoredFiles',
         '2026-11-09-000001_CreateGroups',
+        '2026-11-16-000001_CreateModulePackages',
     ];
 
     public function testUpDownUp(): void

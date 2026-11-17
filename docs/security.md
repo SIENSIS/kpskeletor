@@ -188,6 +188,20 @@ compression ratio of each entry are limited before anything is extracted; sizes 
 while copying, and each file is written by the class itself with the given permissions. A restore
 never writes server code or server configuration into a public disk.
 
+## Module and theme packages
+
+Modules and themes are code: the web server never writes `modules/`, `themes/` nor `app/Config/`.
+An uploaded package (`modules.upload`, superadmin only by default, with a recent
+re-authentication) is validated without running it (`ManifestReader`), syntax-checked with
+`php -l` in a private folder, stored with a random name in `writable/packages/` (0640, never
+served) and installed only from the console (`php spark modules:install --pending`) after a
+superadmin approved it; its SHA-256 is checked again at approval and at install time. Packages go
+through `SafeZip`, an extension allow-list (no `phtml`, `phar`, `.htaccess`…), size, file-count
+and ratio limits, and optionally a minisign signature by a trusted publisher key
+(`packages.requireSignature`). Every refusal is a security log entry (`package_refused`). In
+production a module copied by hand or installed without `--enable` stays disabled until an
+administrator enables it (D-29-02). See `docs/packages.md`.
+
 ## Backups
 
 Backups contain `.env` and every secret, so they are always encrypted with a password of at least

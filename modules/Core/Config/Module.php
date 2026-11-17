@@ -13,6 +13,8 @@ final class Module extends ModuleManifest
     public string $version = Version::CORE;
     public string $icon    = 'bi bi-cpu';
 
+    public string $description = 'Core.module.description';
+
     /**
      * The Modules screen (session 29) and the module commands: modules.list, modules.toggle,
      * modules.sync, modules.upload, modules.uninstall and modules.demo.
@@ -65,6 +67,7 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
+        ['resource' => 'modules', 'label' => 'Core.menu.modules', 'icon' => 'bi bi-boxes', 'order' => 80, 'zone' => 'settings'],
         ['resource' => 'notifications', 'label' => 'Core.menu.notifications', 'icon' => 'bi bi-bell', 'order' => 15, 'zone' => 'user'],
         ['resource' => 'schedule', 'label' => 'Core.menu.schedule', 'icon' => 'bi bi-clock-history', 'order' => 85, 'zone' => 'settings'],
     ];
@@ -84,6 +87,7 @@ final class Module extends ModuleManifest
     /** @var list<string> */
     public array $notifications = [
         \Modules\Core\Notifications\Types\ScheduledTaskFailed::class,
+        \Modules\Core\Notifications\Types\PackageProcessed::class,
     ];
 
     /**

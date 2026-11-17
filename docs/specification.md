@@ -244,6 +244,8 @@ final class Module extends ModuleManifest
     public string $version     = '1.0.0';
     public string $icon        = 'bi bi-newspaper';
     public array  $requires    = ['Core' => '^1.0'];          // module dependencies
+    public string $description = 'News.module.description';   // optional: language key or text
+    public string $author      = 'ACME';                      // optional: a package may only replace a module of the same author
 
     /** Optional: where Updates looks for new versions of this module (see Updates) */
     public ?string $repository = null;                        // e.g. 'github:acme/news-module'
@@ -431,7 +433,10 @@ translations, even in modules with multilingual content (only the Catalan row is
    rewrite `app/Config/ModuleNamespaces.php` when the set of modules changed.
 2. Run pending migrations (first those of Shield, Settings and kpapy, then per module namespace),
    and the seeder on first install.
-3. Upsert the module registry (`modules`: name, version, enabled, installed_at, updated_at).
+3. Upsert the module registry (`modules`: name, version, enabled, installed_at, updated_at). A
+   module registered for the first time is enabled on the first sync of an installation and in
+   every environment but production; in production it stays *installed, disabled* until an
+   administrator enables it, unless `packages.autoEnable` is true.
 4. Generate and upsert the permission catalogue from the manifests' `resources`
    (`permissions`: module, resource, operation, name, description), honouring a resource's
    `'name'` and refusing duplicate names. Remove permissions of deleted modules or resources only
@@ -481,8 +486,15 @@ A hand-written screen in Core (`modules.*` permissions) to manage modules withou
   **uninstall** (creates a pending uninstall), as described below.
 * **Themes** tab: installed themes, the active theme for the back office and for the public site
   (switch with one click, with a preview), and the theme options.
-* Permissions: `modules.list`, `modules.toggle`, `modules.sync`, `modules.upload` and
-  `modules.uninstall` (the last two superadmin only by default).
+* Permissions: `modules.list`, `modules.toggle`, `modules.sync`, `modules.upload`,
+  `modules.uninstall` and `modules.demo` (the last three superadmin only by default). Upload and
+  approval need `modules.upload`, discarding an uninstall request `modules.uninstall`, switching
+  the active theme `modules.toggle`; uploads, approvals and uninstall requests need a recent
+  re-authentication.
+* URLs: `backend/modules` (list; `POST enable/<Name>`, `disable/<Name>`, `demo/<Name>`, `sync`),
+  `backend/modules/packages` (staged operations; `upload`, `<id>`, `POST <id>/approve`,
+  `<id>/discard`), `backend/modules/uninstall/<Name>`, `backend/modules/themes` (`POST activate`,
+  `uninstall/<slug>`). Full description: `docs/packages.md`.
 
 ### Installing and uninstalling modules and themes
 
@@ -495,11 +507,14 @@ from the console. `docs/security.md` documents the risk of published JavaScript 
 `modules:sync`:
 
 1. **Copy the folder** (the usual way): upload `modules/<Name>/` or `themes/<name>/` (SFTP, git,
-   deployment) and run `php spark modules:sync`, or press "Sync" in the Modules screen. New
-   modules are detected and listed as *installed, disabled* until an admin enables them
-   (setting: enable automatically).
-2. **ZIP from the console:** `php spark modules:install <file.zip|url> [--enable] [--force]`
-   (themes: `themes:install`). It:
+   deployment) and run `php spark modules:sync`, or press "Sync" in the Modules screen. In
+   production new modules are detected and listed as *installed, disabled* until an admin
+   enables them (`packages.autoEnable = true` enables them automatically); the first sync of an
+   installation and the other environments enable them (so `make:module` + `modules:sync` works
+   in development).
+2. **ZIP from the console:** `php spark modules:install <file.zip|url> [--enable] [--force]
+   [--demo] [--yes] [--no-backup] [--password] [--signature=<file>]` (themes: `themes:install`).
+   It:
    * validates the package (see below) and shows what it contains;
    * checks dependencies and the core version, and refuses a downgrade unless `--force`;
    * makes a backup (Backup module), enters maintenance mode, extracts to a temporary folder,
@@ -511,22 +526,29 @@ from the console. `docs/security.md` documents the risk of published JavaScript 
    * the package is validated and the screen shows its manifest: name, version, author,
      dependencies, the permissions, menus, widgets and tasks it will add, and its file list;
    * the superadmin approves it, and it becomes **pending**; it is installed by
-     `php spark modules:install --pending`, run by an operator or by the scheduler with a system
+     `php spark modules:install --pending` (which also runs the pending uninstall requests), run
+     by an operator or by the scheduler with a system
      user that can write into the code folders (documented cron line, separate from
      `schedule:run` if the web user cannot write code); the UI shows the status
      (pending, installed, failed with the log) and notifies the superadmin;
    * pending packages can be discarded; they expire after a configurable time.
 
 **Package validation** (shared by 2 and 3): a ZIP with a single top folder; a valid manifest
-(`Config/Module.php` or the theme manifest) whose name matches the folder and does not clash
-with an existing module from another vendor; no absolute paths, `..` segments or symbolic links
+(`Config/Module.php` or the theme manifest), read without running its code, whose name matches
+the folder and does not clash with an installed module of another `$author`; no absolute paths, `..` segments or symbolic links
 (zip-slip protection); allowed file extensions only; maximum size and number of files, and a
 maximum **uncompressed** size and compression ratio (zip bombs); a `<url>` source is only
 downloaded over HTTPS from an allowed host (see "Outbound requests"); PHP files
 syntax-checked (`php -l`) before installing; optional **signature check** (packages signed by a
 trusted publisher key listed in `Modules\Core\Config\Packages`, overridable by
 `app/Config/Packages.php` and `.env`; CodeIgniter's own `Config\Modules` is never extended),
-required when a setting asks for it. Reserved module names (`Security`, `Update`) are refused.
+required when `packages.requireSignature` is on. Reserved module names (`Security`, `Update`)
+and the core modules are refused. Limits and lists are `Config\Packages` keys (`.env`
+`packages.*`: `maxPackageBytes`, `maxUncompressedBytes`, `maxFiles`, `maxRatio`, `extensions`,
+`pendingDays`, `publicKeys`, `requireSignature`, `autoEnable`). The Core asks other modules
+through events: `packageBackup` (the Backup module makes the backup), `moduleUninstalling`
+(modules remove what they keep about the uninstalled module) and `moduleVersions` (Updates
+gives the latest versions).
 
 **Uninstalling:** `php spark modules:uninstall <Name> [--keep-data]` (and a button that creates
 a pending uninstall, like staged installs): makes a backup, disables the module, rolls back its

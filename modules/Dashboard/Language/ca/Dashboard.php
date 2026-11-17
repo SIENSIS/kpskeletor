@@ -72,4 +72,7 @@ return [
         'group_layout_saved' => 'Disposició del tauler d’un grup desada',
         'widget_forbidden'   => 'Dades d’un giny denegades',
     ],
+    'uninstall' => [
+        'removed' => 'Tauler: {0} ginys trets de les disposicions dels grups.',
+    ],
 ];

@@ -23,7 +23,7 @@ final class BackupRepository
 
     public const TYPES = ['full', 'db', 'files'];
 
-    public const SOURCES = ['console', 'ui', 'schedule', 'safety', 'update', 'upload', 'found'];
+    public const SOURCES = ['console', 'ui', 'schedule', 'safety', 'update', 'package', 'upload', 'found'];
 
     private readonly BackupConfig $config;
 

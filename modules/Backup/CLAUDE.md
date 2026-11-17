@@ -45,7 +45,7 @@ D-27-04, D-27-06 … D-27-09 accepted; D-00-45, D-00-46, D-00-47, D-00-39.
 
 - Done in session 28: maintenance mode by hand (Settings › Actions, `app:maintenance`) on top of
   `MaintenanceMode`; `app:update` calls `BackupService::create()` (origin `update`) before updating.
-- Session 29: module packages use `SafeZip`; installing/uninstalling makes a backup.
+- Done in session 29: `Config/Events.php` answers the Core's `packageBackup` event (full backup, origin `package`) before a module or theme is installed, upgraded or uninstalled (`docs/packages.md`).
 - Session 30: `security:check` checks `backup.password` when scheduled backups are on and the
   permissions of `writable/backups`.
 
