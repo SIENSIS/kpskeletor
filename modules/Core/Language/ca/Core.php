@@ -451,7 +451,7 @@ return [
         'defaultLocaleHelp' => 'Idioma dels visitants el navegador dels quals no demana cap dels idiomes disponibles, dels usuaris nous i dels correus als usuaris sense idioma.',
         'defaultLocaleConfig' => 'El de la configuració (català)',
         'locales' => 'Idiomes disponibles',
-        'localesHelp' => 'Codis d’idioma, un per línia (ca, es, en). Buit: tots. Els usuaris i els visitants només poden fer servir aquests.',
+        'localesHelp' => 'Els usuaris i els visitants només poden fer servir els idiomes marcats (com a mínim un).',
         'pwa'             => 'Aplicació web instal·lable (PWA)',
         'pwaHelp'         => 'Publica un manifest d\'aplicació web i icones perquè els mòbils puguin afegir el lloc a la pantalla d\'inici. No es desa res fora de línia.',
         'pwaStart'        => 'Pàgina que obre l\'aplicació instal·lada',

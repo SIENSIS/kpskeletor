@@ -79,7 +79,9 @@ The skeleton ships these modules:
     `Language` service (configurable chain in `Config\App` / a setting) used for every module
     and for kpcrudy's texts.
   * Supported locales `ca`, `es`, `en`, negotiated from the user's profile, then the browser,
-    then the default; the site can restrict the available ones (setting).
+    then the default; the site can restrict the available ones: settings `Core.defaultLocale`
+    (empty = `Config\App::$defaultLocale`) and `Core.locales` (checkboxes, at least one; the
+    default is always one of the available locales).
 * **Every module shipped with the skeleton (Core included) is complete in Catalan, Spanish and
   English:**
   * language files (`Language/en|ca|es/<Name>.php`) with the same keys in the three languages;
@@ -883,7 +885,8 @@ granularity instead of collapsing it into read/create/update/delete.
     `settings.news`), required to change that module's tab. Security settings (headers, CSP,
     outbound hosts, password length, 2FA policy) need `settings.security` and a re-authentication.
 * **Site-wide settings** (Core): site name (`Core.siteName`, empty = the default name), logo
-  (theme option), default locale, available locales, time zone (`Core.timezone`, the zone dates
+  (theme option), default locale (`Core.defaultLocale`), available locales (`Core.locales`,
+  checkboxes: setting type `multiselect`), time zone (`Core.timezone`, the zone dates
   are shown in; they are stored in UTC), maintenance mode (turned on and off by hand in Settings › Actions or `php spark app:maintenance`
   with the Core permission `maintenance.manage`, no default grant, whose holders keep using the site
   meanwhile; on top of the

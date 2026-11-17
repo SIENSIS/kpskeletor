@@ -451,7 +451,7 @@ return [
         'defaultLocaleHelp' => 'Language of visitors whose browser asks for none of the available languages, of new users and of emails to users without a language.',
         'defaultLocaleConfig' => 'As configured (Catalan)',
         'locales' => 'Available languages',
-        'localesHelp' => 'Language codes, one per line (ca, es, en). Empty: all of them. Users and visitors can only use these.',
+        'localesHelp' => 'Users and visitors can only use the checked languages (at least one).',
         'pwa'             => 'Installable web app (PWA)',
         'pwaHelp'         => 'Publishes a web app manifest and icons so phones can add the site to the home screen. Nothing is cached offline.',
         'pwaStart'        => 'Page the installed app opens',

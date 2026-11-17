@@ -102,13 +102,28 @@ final class TranslatedSettingsTest extends SettingsTestCase
         $this->loginWith('settings.update', 'settings.core');
         $form = ['Core-siteName' => '', 'Core-timezone' => 'UTC', 'Core-pwaStart' => 'public', 'Core-widgetMaxLinks' => '20'];
 
-        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es', 'Core-locales' => "es\nca\nfr"])->assertStatus(422);
+        // Checkboxes (D-31-01): every language checked by default, at least one required.
+        $page = $this->send('GET', 'backend/settings/core');
+        $body = (string) $page->response()->getBody();
+        $this->assertSame(3, substr_count($body, 'name="Core-locales[]"'));
+        $this->assertSame(3, preg_match_all('/name="Core-locales\[\]" value="(?:ca|es|en)" checked/', $body));
+
+        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es'])->assertStatus(422);
+        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es', 'Core-locales' => 'es'])->assertStatus(422);
+        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es', 'Core-locales' => ['fr', 'xx']])->assertStatus(422);
         $this->assertSame(0, $this->storedCount('Core', 'locales'));
 
-        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es', 'Core-locales' => "es\nca"])
+        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es', 'Core-locales' => ['es', 'ca', 'fr', ['x']]])
             ->assertRedirectTo(site_url('backend/settings/core'));
 
-        $this->assertSame(['ca', 'es'], Locales::available(), 'In the order of the supported locales.');
+        $this->assertSame(['ca', 'es'], setting('Core.locales'), 'Unknown values dropped, in the order of the options.');
+        $this->assertSame(['ca', 'es'], Locales::available());
         $this->assertSame('es', Locales::default());
+
+        $page = $this->send('GET', 'backend/settings/core');
+        $this->assertStringContainsString('value="en">', (string) $page->response()->getBody(), 'English is shown unchecked.');
+
+        $this->send('POST', 'backend/settings/core', $form + ['Core-defaultLocale' => 'es', 'Core-locales' => ['ca', 'es', 'en']]);
+        $this->assertSame(0, $this->storedCount('Core', 'locales'), 'Every language checked again: the default, nothing stored.');
     }
 }

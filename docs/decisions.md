@@ -262,7 +262,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-30-03 | 30 | What `--probe` sends, and the login throttling probe | Accepted (proposal) |
 | D-30-04 | 30 | "The web server writes only …" checked from the console and from the page | Accepted (proposal) |
 | D-30-05 | 30 | Stored results, the daily task and the notification to superadmins | Accepted (proposal) |
-| D-31-01 | 31 | Settings `Core.defaultLocale` and `Core.locales` (decide) | Open |
+| D-31-01 | 31 | Settings `Core.defaultLocale` and `Core.locales` (decide) | Applied (decided) |
 | D-31-02 | 31 | The tests run with English as the configured default locale | Accepted (proposal) |
 | D-31-03 | 31 | Catalan copies only of the system files users see; Shield's Catalan texts in `app/Language/ca` | Accepted (proposal) |
 | D-31-04 | 31 | Semantics of the `translated` setting type | Accepted (proposal) |
@@ -2698,7 +2698,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The specification asks for the two settings but does not name them nor say how they relate to `Config\App::$defaultLocale` / `$supportedLocales`. Setting names are a public convention.
 - **Proposal (built):** `Core.defaultLocale` (type `select`: empty = "As configured", the value of `Config\App::$defaultLocale`, Catalan; or `ca`/`es`/`en`) and `Core.locales` (type `list`, one code per line, rule `supported_locales`; empty = every supported locale), both in Settings › General (`settings.core`). The default is always one of the available locales (else the first available). Read only through `Modules\Core\I18n\Locales`. Not security settings (no re-authentication).
 - **Alternatives:** A) One `json` setting `Core.locales` with the default as its first entry. B) Checkboxes (a new `multiselect` setting type) instead of a list of codes.
-- **Status:** Open
+- **Decision (2026-11-17):** «B) Caselles en lloc de codis». Keep the two settings `Core.defaultLocale` and `Core.locales`, but "Available languages" is edited with checkboxes: the Settings module gets a new setting type `multiselect` (fixed `options` or an `optionsProvider`, stored as a list of the chosen values). **Must change:** the Settings module (type, form view, validation), `ManifestValidator`, the Core manifest (`Core.locales` as `multiselect`, default every supported locale, at least one), tests, `docs/settings.md`, `docs/i18n.md`, the specification.
+- **Status:** Applied (decided)
+- **Applied in:** `modules/Core/Modules/ManifestValidator.php`, `modules/Core/Settings/SettingCaster.php`, `modules/Settings/Forms/{Field,FormGenerator}.php`, `modules/Settings/Views/fields/multiselect.php`, `modules/Core/Config/Module.php` (`Core.locales`: `multiselect`, default `ca`/`es`/`en`, `required|supported_locales`), `Core.settings.localesHelp`; tests `TranslatedSettingsTest::testTheGeneralTabSavesTheLanguagesAndRefusesUnsupportedOnes`, `SettingsScreensTest`, `ManifestValidatorTest`; `docs/settings.md`, `docs/i18n.md`, `docs/specification.md` ("Languages", "Site-wide settings"), `modules/Settings/CLAUDE.md`.
 
 ## D-31-02 — The tests run with English as the configured default locale
 

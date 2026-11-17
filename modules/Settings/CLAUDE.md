@@ -41,7 +41,8 @@ D-14-03 … D-14-06 accepted (`docs/decisions.md`).
 
 - Done in session 28: maintenance mode on/off in Settings › Actions (`maintenance.manage` +
   `reauth`, D-28-02; tests `Tests/MaintenanceScreenTest.php`). Session 30: show the final CSP read-only in the Security status
-  page. Session 31: `Core.defaultLocale`/`Core.locales` in the General tab and the `translated`
+  page. Session 31: `Core.defaultLocale`/`Core.locales` in the General tab, the `multiselect`
+  field type (checkboxes, `Views/fields/multiselect.php`, D-31-01) and the `translated`
   field type (`Views/fields/translated.php`, one input per available locale; tests
   `Tests/TranslatedSettingsTest.php`).
 

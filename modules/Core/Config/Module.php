@@ -132,7 +132,7 @@ final class Module extends ModuleManifest
             'group'   => 'general',
         ],
         // Languages (docs/i18n.md): the site's default (empty: Config\App::$defaultLocale, Catalan) and
-        // the available ones (empty: every supported locale); Modules\Core\I18n\Locales.
+        // the available ones (checkboxes, D-31-01; at least one); Modules\Core\I18n\Locales.
         'defaultLocale' => [
             'type'    => 'select',
             'default' => '',
@@ -147,9 +147,14 @@ final class Module extends ModuleManifest
             'group'   => 'general',
         ],
         'locales' => [
-            'type'    => 'list',
-            'default' => [],
-            'rules'   => 'supported_locales',
+            'type'    => 'multiselect',
+            'default' => ['ca', 'es', 'en'],
+            'rules'   => 'required|supported_locales',
+            'options' => [
+                'ca' => 'Core.locales.ca',
+                'es' => 'Core.locales.es',
+                'en' => 'Core.locales.en',
+            ],
             'label'   => 'Core.settings.locales',
             'help'    => 'Core.settings.localesHelp',
             'group'   => 'general',

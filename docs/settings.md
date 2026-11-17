@@ -38,6 +38,10 @@ public array $settings = [
   of `Config\News` when that class has one, `.env` included).
 - `list` is a list of strings, edited one per line (`SettingCaster::cast('list', …)`); `json`
   is edited as JSON text (`valid_json` is added automatically).
+- `multiselect` (D-31-01) is a list of values chosen with checkboxes, one per option (fixed
+  `options` or an `optionsProvider`, like `select`; `options` required). Stored like `list`, in the
+  order of the options; values that are not options are dropped; the declared rules check the
+  chosen values joined with commas (e.g. `required` = at least one). Example: `Core.locales`.
 - `translated` (D-25-10, session 31) is one text per language of the site, stored as one JSON
   map `locale => text` (`SettingCaster::cast('translated', …)`: locale-like keys, trimmed,
   empty texts dropped, keys sorted). Its `default` is a **language key** (its text in every

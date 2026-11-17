@@ -451,7 +451,7 @@ return [
         'defaultLocaleHelp' => 'Idioma de los visitantes cuyo navegador no pide ninguno de los idiomas disponibles, de los usuarios nuevos y de los correos a usuarios sin idioma.',
         'defaultLocaleConfig' => 'El de la configuración (catalán)',
         'locales' => 'Idiomas disponibles',
-        'localesHelp' => 'Códigos de idioma, uno por línea (ca, es, en). Vacío: todos. Los usuarios y los visitantes solo pueden usar estos.',
+        'localesHelp' => 'Los usuarios y los visitantes solo pueden usar los idiomas marcados (como mínimo uno).',
         'pwa'             => 'Aplicación web instalable (PWA)',
         'pwaHelp'         => 'Publica un manifiesto de aplicación web e iconos para que los móviles puedan añadir el sitio a la pantalla de inicio. No se guarda nada sin conexión.',
         'pwaStart'        => 'Página que abre la aplicación instalada',

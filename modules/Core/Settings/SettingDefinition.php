@@ -10,7 +10,7 @@ namespace Modules\Core\Settings;
 final class SettingDefinition
 {
     /**
-     * @param array<array-key, mixed> $options         Fixed choices of a 'select' setting (value => language key)
+     * @param array<array-key, mixed> $options         Fixed choices of a 'select' or 'multiselect' setting (value => language key)
      * @param string|null             $optionsProvider A SettingOptionsProvider class computing the choices at run time
      */
     public function __construct(

@@ -111,6 +111,13 @@ final class Field
             return SettingCaster::cast('translated', [...$kept, ...(is_array($posted) ? $posted : [])]);
         }
 
+        if ($this->type === 'multiselect') {
+            // The checked values, in the order of the options; anything else is dropped.
+            $chosen = SettingCaster::cast('list', is_array($posted) ? $posted : (is_scalar($posted) ? (string) $posted : ''));
+
+            return array_values(array_filter(array_map('strval', array_keys($this->options)), static fn (string $option): bool => in_array($option, $chosen, true)));
+        }
+
         if ($this->type === 'bool') {
             return $posted === '1' || $posted === 1 || $posted === true;
         }
@@ -135,7 +142,7 @@ final class Field
     {
         return match (true) {
             $type === 'bool'                       => $value === true ? '1' : '0',
-            $type === 'list' && is_array($value)   => implode("\n", array_map(static fn ($v): string => is_scalar($v) ? (string) $v : '', $value)),
+            in_array($type, ['list', 'multiselect'], true) && is_array($value) => implode("\n", array_map(static fn ($v): string => is_scalar($v) ? (string) $v : '', $value)),
             $type === 'json'                       => $value === [] || $value === null ? '' : (string) json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             $type === 'translated'                 => (string) json_encode(SettingCaster::cast('translated', $value ?? []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             is_scalar($value)                      => (string) $value,

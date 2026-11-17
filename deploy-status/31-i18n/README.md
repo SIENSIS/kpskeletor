@@ -70,8 +70,8 @@ Branch: `claude/amazing-goldberg-2trmeu` · Pull request: [SIENSIS/kpskeletor#39
 
 ## Decisions and deviations
 
-- **D-31-01 (Open, decide):** names and meaning of `Core.defaultLocale` / `Core.locales`. Built
-  so they can still change (read only through `Locales`).
+- **D-31-01 (decided by the owner, Decisions 31):** the two settings `Core.defaultLocale` /
+  `Core.locales`, "Available languages" edited with checkboxes (new setting type `multiselect`).
 - D-31-02 (tests run with English as the configured default), D-31-03 (Catalan copies only of the
   system files users see; Shield's in `app/Language/ca/Auth.php`), D-31-04 (semantics of the
   `translated` type), D-31-05 (browser negotiation, no guest language switcher), D-31-06 (file
@@ -93,7 +93,7 @@ php spark serve
 - `http://localhost:8080/login` with a Catalan, Spanish or English browser: the page follows the
   browser; any other language gets Catalan.
 - Log in as `root@example.org` / `Very-long-Passw0rd!x`: Settings › General › "Idioma per
-  defecte" / "Idiomes disponibles" (e.g. `ca` and `es` only: English disappears from the profile
+  defecte" / "Idiomes disponibles" (checkboxes; e.g. only `ca` and `es`: English disappears from the profile
   selector, and an English browser gets the default). Settings › Usuaris › "Felicitació": one text
   per available language.
 - Profile › Idioma: the back office follows it.
@@ -142,4 +142,4 @@ Taken with `node deploy-status/screenshot.mjs deploy-status/31-i18n/screenshots.
 - Read the site's languages only through `Modules\Core\I18n\Locales`; per-language settings use
   type `translated` and `TranslatedText::get()`.
 - Feature tests run in English (`app.defaultLocale=en`); test the languages explicitly.
-- D-31-01 is Open (decide): run `deploy/decide.md`.
+- D-31-01 decided: `Core.locales` is a `multiselect` (checkboxes, at least one).
