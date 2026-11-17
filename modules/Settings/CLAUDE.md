@@ -26,7 +26,7 @@ Full description: `docs/settings.md`.
 - `Services/ThemeSettings.php`: `Theme.backend`/`Theme.public` and a theme's options (context
   `theme:<slug>`).
 - `Services/SettingsTabs.php`: the tab bar.
-- `Forms/Field.php` (type rules, casting, display text), `Forms/FormGenerator.php` (views
+- `Forms/Field.php` (type rules, casting, display text; `translated`: one text per locale), `Forms/FormGenerator.php` (views
   `Views/fields/*`, validation).
 - `Controllers/Settings.php` (tabs, saving, logging), `Controllers/Actions.php`.
 - Rules that refuse weakening values live in the Core (`Modules\Core\Settings\SecurityRules`),
@@ -41,7 +41,9 @@ D-14-03 … D-14-06 accepted (`docs/decisions.md`).
 
 - Done in session 28: maintenance mode on/off in Settings › Actions (`maintenance.manage` +
   `reauth`, D-28-02; tests `Tests/MaintenanceScreenTest.php`). Session 30: show the final CSP read-only in the Security status
-  page; session 31: default/available locales in the General tab.
+  page. Session 31: `Core.defaultLocale`/`Core.locales` in the General tab and the `translated`
+  field type (`Views/fields/translated.php`, one input per available locale; tests
+  `Tests/TranslatedSettingsTest.php`).
 
 ## How to test
 

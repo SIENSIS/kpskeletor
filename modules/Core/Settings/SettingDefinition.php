@@ -32,13 +32,18 @@ final class SettingDefinition
      */
     public static function fromArray(string $module, string $key, array $definition): self
     {
-        $type = is_string($definition['type'] ?? null) ? $definition['type'] : 'string';
+        $type    = is_string($definition['type'] ?? null) ? $definition['type'] : 'string';
+        $default = $definition['default'] ?? null;
+
+        if ($type === 'translated' && is_string($default)) {
+            $default = TranslatedText::defaults($default); // a language key: its text in every supported locale
+        }
 
         return new self(
             $module,
             $key,
             $type,
-            SettingCaster::cast($type, $definition['default'] ?? null),
+            SettingCaster::cast($type, $default),
             is_string($definition['label'] ?? null) ? $definition['label'] : $module . '.settings.' . $key,
             is_string($definition['rules'] ?? null) ? $definition['rules'] : '',
             is_string($definition['help'] ?? null) ? $definition['help'] : null,

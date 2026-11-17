@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Settings\Forms;
 
+use Modules\Core\I18n\Locales;
 use Modules\Core\Settings\SettingCaster;
 use Modules\Core\Settings\SettingDefinition;
 
@@ -98,10 +99,18 @@ final class Field
     }
 
     /**
-     * The typed value of the posted text (a missing checkbox is false).
+     * The typed value of the posted text (a missing checkbox is false). A `translated` field
+     * posts locale => text for the site's available locales; the stored texts of the other
+     * locales are kept.
      */
     public function cast(mixed $posted): mixed
     {
+        if ($this->type === 'translated') {
+            $kept = array_diff_key(is_array($this->value) ? $this->value : [], array_flip(Locales::available()));
+
+            return SettingCaster::cast('translated', [...$kept, ...(is_array($posted) ? $posted : [])]);
+        }
+
         if ($this->type === 'bool') {
             return $posted === '1' || $posted === 1 || $posted === true;
         }
@@ -128,6 +137,7 @@ final class Field
             $type === 'bool'                       => $value === true ? '1' : '0',
             $type === 'list' && is_array($value)   => implode("\n", array_map(static fn ($v): string => is_scalar($v) ? (string) $v : '', $value)),
             $type === 'json'                       => $value === [] || $value === null ? '' : (string) json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $type === 'translated'                 => (string) json_encode(SettingCaster::cast('translated', $value ?? []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             is_scalar($value)                      => (string) $value,
             default                                => '',
         };
@@ -141,6 +151,17 @@ final class Field
     public function defaultText(): string
     {
         return self::text($this->type, $this->default);
+    }
+
+    /**
+     * The text of one locale of a `translated` field (its value, else its default).
+     */
+    public function translation(string $locale): string
+    {
+        $value    = is_array($this->value) ? $this->value : [];
+        $defaults = is_array($this->default) ? $this->default : [];
+
+        return (string) ($value[$locale] ?? $defaults[$locale] ?? '');
     }
 
     /** Whether the value differs from what applies when nothing is stored. */

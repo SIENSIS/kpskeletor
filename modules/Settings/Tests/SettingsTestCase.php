@@ -19,6 +19,7 @@ abstract class SettingsTestCase extends AuthTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        \Config\Services::resetSingle('renderer'); // the shared view renderer keeps an earlier test's sections
 
         $manifests = [];
 

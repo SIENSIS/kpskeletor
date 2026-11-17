@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Settings\Forms;
 
+use Modules\Core\I18n\Locales;
+
 /**
  * Generates the settings forms from field definitions and checks the posted values.
  *
  * - render(): one view per kind of field (`Views/fields/…`, overridable by a theme): text-like
- *   inputs, textarea (`text`, `json`, `list`), switch (`bool`) and select; grouped under
- *   headings; read-only fields are disabled.
+ *   inputs, textarea (`text`, `json`, `list`), switch (`bool`), select and one input per
+ *   available locale (`translated`); grouped under headings; read-only fields are disabled.
  * - validate(): the field's rules (declared + type, Field::validationRules()) through
  *   CodeIgniter's validation, then the posted text cast to the setting's type.
  */
@@ -47,8 +49,28 @@ final class FormGenerator
             'bool'                   => 'checkbox',
             'select'                 => 'select',
             'text', 'json', 'list'   => 'textarea',
+            'translated'             => 'translated',
             default                  => 'input',
         };
+
+        if ($field->type === 'translated') {
+            $posted = $old[$field->name] ?? null;
+            $texts  = [];
+            $locErr = [];
+
+            foreach (Locales::available() as $locale) {
+                $texts[$locale]  = is_array($posted) ? (is_scalar($posted[$locale] ?? null) ? (string) $posted[$locale] : '') : $field->translation($locale);
+                $locErr[$locale] = $errors[$field->name . '.' . $locale] ?? null;
+            }
+
+            return theme_view('Modules\Settings\Views\fields\translated', [
+                'field'  => $field,
+                'id'     => 'setting-' . $field->name,
+                'texts'  => $texts,
+                'errors' => $locErr,
+                'error'  => $errors[$field->name] ?? null,
+            ], ['debug' => false]);
+        }
 
         $value = array_key_exists($field->name, $old) && is_scalar($old[$field->name]) ? (string) $old[$field->name] : $field->formValue();
 
@@ -86,6 +108,20 @@ final class FormGenerator
             }
 
             $raw = $post[$field->name] ?? ($field->type === 'bool' ? '0' : '');
+
+            if ($field->type === 'translated') {
+                // One text per available locale; anything else posted is ignored.
+                $raw = is_array($raw) ? $raw : [];
+                $data[$field->name] = [];
+
+                foreach (Locales::available() as $locale) {
+                    $data[$field->name][$locale]       = is_scalar($raw[$locale] ?? null) ? (string) $raw[$locale] : '';
+                    $rules[$field->name . '.' . $locale] = ['label' => lang($field->label) . ' (' . Locales::name($locale) . ')', 'rules' => $field->validationRules()];
+                }
+
+                continue;
+            }
+
             $raw = is_array($raw) ? '' : $raw; // a field is never an array: forged input is emptied
 
             $data[$field->name]  = $raw;
