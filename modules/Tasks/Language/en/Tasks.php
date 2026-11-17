@@ -148,6 +148,10 @@ return [
         'publicRequests'        => 'Public request form',
         'publicRequestsHelp'    => 'Visitors can request a to-do task from tasks/request (with a captcha).',
     ],
+    'settingGroups' => [
+        'reminders' => 'Reminders',
+        'public'    => 'Public site',
+    ],
     'notifications' => [
         'assigned'        => 'To-do task assigned to you',
         'assignedHelp'    => 'When someone assigns you a to-do task.',

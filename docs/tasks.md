@@ -1,8 +1,8 @@
 # Tasks module (tutorial module)
 
 The `Tasks` module is a small manager of **to-do tasks**: projects, to-do tasks, assignees, due
-dates and labels. It holds the finished code of every tutorial in `docs/tutorials/` (texts written
-in session 34), so each feature of the skeleton has a small, working example. Its own notes, with a
+dates and labels. It holds the finished code of every [tutorial](tutorials/README.md), so each
+feature of the skeleton has a small, working example. Its own notes, with a
 table "tutorial → files", are in `modules/Tasks/CLAUDE.md`.
 
 > Wording (D-00-56): "to-do task" is a record of this module; "scheduled task" is a job of the
@@ -27,7 +27,8 @@ dates" and "Project deadlines"), the public page `tasks`, the form `tasks/reques
 
 | Piece | Where |
 |---|---|
-| Tables | `task_projects`, `task_project_translations`, `tasks`, `task_assignees`, `task_attachments`, `task_requests` (one migration each) |
+| Version | 0.2.0 ([`CHANGELOG.md`](../modules/Tasks/CHANGELOG.md); tutorial 13 added `tasks.started_at`) |
+| Tables | `task_projects`, `task_project_translations`, `tasks`, `task_assignees`, `task_attachments`, `task_requests` (one migration each; `tasks.started_at` added by a 0.2.0 migration) |
 | CRUDs (kpcrudy) | `tasks-tasks` (`backend/tasks/tasks`), `tasks-projects` (`backend/tasks/projects`), `tasks-requests` (`backend/tasks/requests`) |
 | Board | `tasks-board.view`: `backend/tasks`, `GET backend/tasks/board/data`, `POST backend/tasks/board/{code}/move`; `Assets/js/board.js` |
 | Widgets | `tasks.pending` (server, `tasks-board.view`), `tasks.activity` (asynchronous SVG chart, `tasks-tasks.list`) |

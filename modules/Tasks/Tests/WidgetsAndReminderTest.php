@@ -109,7 +109,7 @@ final class WidgetsAndReminderTest extends TasksTestCase
         setting()->forget('Tasks.reminderGraceDays');
     }
 
-    public function testTheSettingsAreValidatedInTheSettingsScreen(): void
+    public function testTheSettingsAreShownAndValidatedInTheSettingsScreen(): void
     {
         $this->createUser('boss@example.com', 'admin');
         $this->login('boss@example.com');
@@ -117,5 +117,14 @@ final class WidgetsAndReminderTest extends TasksTestCase
         $page = $this->body('GET', 'backend/settings/tasks');
         $this->assertStringContainsString(lang('Tasks.settings.reminderGraceDays'), $page);
         $this->assertStringContainsString(lang('Tasks.settings.publicRequests'), $page);
+        $this->assertStringContainsString(lang('Tasks.settingGroups.reminders'), $page, 'The group headings are translated.');
+
+        // The manifest's rules: 0–30 days. An invalid value is refused and nothing is stored.
+        $this->send('POST', 'backend/settings/tasks', ['Tasks-reminderGraceDays' => '99', 'Tasks-publicRequests' => '1'])->assertStatus(422);
+        $this->assertSame(0, (int) setting('Tasks.reminderGraceDays'));
+
+        $this->send('POST', 'backend/settings/tasks', ['Tasks-reminderGraceDays' => '3', 'Tasks-publicRequests' => '1'])->assertRedirectTo(site_url('backend/settings/tasks'));
+        $this->assertSame(3, setting('Tasks.reminderGraceDays'), 'Stored and cast to an integer.');
+        setting()->forget('Tasks.reminderGraceDays');
     }
 }

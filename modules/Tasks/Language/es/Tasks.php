@@ -148,6 +148,10 @@ return [
         'publicRequests'        => 'Formulario público de solicitudes',
         'publicRequestsHelp'    => 'Los visitantes pueden solicitar una tarea desde tasks/request (con captcha).',
     ],
+    'settingGroups' => [
+        'reminders' => 'Recordatorios',
+        'public'    => 'Sitio público',
+    ],
     'notifications' => [
         'assigned'        => 'Tarea asignada',
         'assignedHelp'    => 'Cuando alguien os asigna una tarea.',

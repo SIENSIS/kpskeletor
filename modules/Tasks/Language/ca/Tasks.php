@@ -148,6 +148,10 @@ return [
         'publicRequests'        => 'Formulari públic de sol·licituds',
         'publicRequestsHelp'    => 'Els visitants poden sol·licitar una tasca des de tasks/request (amb captcha).',
     ],
+    'settingGroups' => [
+        'reminders' => 'Recordatoris',
+        'public'    => 'Lloc públic',
+    ],
     'notifications' => [
         'assigned'        => 'Tasca assignada',
         'assignedHelp'    => 'Quan algú us assigna una tasca.',

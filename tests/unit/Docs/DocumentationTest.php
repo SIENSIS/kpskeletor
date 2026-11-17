@@ -46,7 +46,11 @@ final class DocumentationTest extends CIUnitTestCase
     /**
      * URLs of hypothetical modules used as examples.
      */
-    private const EXAMPLE_URLS = ['api/v1/library/books'];
+    private const EXAMPLE_URLS = [
+        'api/v1/library/books', 'api/v1/books/items',
+        // The scratch module the tutorials build (docs/tutorials/README.md, "Two ways to follow a tutorial").
+        'backend/tasks2/tasks', 'backend/tasks2/projects', 'api/v1/tasks2/tasks',
+    ];
 
     /**
      * Options every command accepts (CodeIgniter's own).
