@@ -11,7 +11,7 @@ declare(strict_types=1);
  *   then filtered by its permission by the Core;
  * - `publicMenu` (the helper `menu('<location>')`, `PublicMenu`): the items of the menu placed in
  *   the location, for the visitor;
- * - `moduleUninstalling` (the Core's Uninstaller, docs/packages.md): the customisations of the
+ * - `moduleUninstalling` (the Core's Uninstaller, docs/installing-modules.md): the customisations of the
  *   uninstalled module's back-office entries and the public menu items of its link types are
  *   deleted (their children move up one level). Runs while Menus is disabled too.
  */

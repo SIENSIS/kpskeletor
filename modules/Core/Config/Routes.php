@@ -57,7 +57,7 @@ CrudFactory::routes($routes, 'core-notifications', 'backend/notifications', '\Mo
 CrudFactory::routes($routes, 'schedule', 'backend/schedule', '\Modules\Core\Controllers\Schedule::index');
 
 /*
- * The Modules screen (docs/packages.md). Uploads, approvals and uninstall requests need a recent
+ * The Modules screen (docs/installing-modules.md). Uploads, approvals and uninstall requests need a recent
  * re-authentication; the installs run from the console (`php spark modules:install --pending`).
  */
 $routes->group('backend/modules', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {

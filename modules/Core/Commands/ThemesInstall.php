@@ -11,7 +11,7 @@ use Modules\Core\Packages\PackageInfo;
  * php spark themes:install <file.zip|url> [--force] [--yes] [--no-backup] [--password] [--signature=<file>]
  *
  * Installs or upgrades a theme from a ZIP package with the same validation as modules
- * (docs/packages.md). Choosing the active theme is a setting (Modules › Themes, Settings › Theme).
+ * (docs/installing-modules.md). Choosing the active theme is a setting (Modules › Themes, Settings › Theme).
  */
 final class ThemesInstall extends BaseCommand
 {

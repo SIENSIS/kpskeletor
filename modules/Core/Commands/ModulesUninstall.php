@@ -13,7 +13,7 @@ use Modules\Core\Packages\Uninstaller;
  * php spark modules:uninstall <Name> [--keep-data] [--yes] [--no-backup] [--password]
  *
  * Backup, disable, roll back the migrations (unless --keep-data), remove permissions, grants,
- * settings, menu customisations, widgets, tasks and assets, delete the folder (docs/packages.md).
+ * settings, menu customisations, widgets, tasks and assets, delete the folder (docs/installing-modules.md).
  */
 final class ModulesUninstall extends BaseCommand
 {

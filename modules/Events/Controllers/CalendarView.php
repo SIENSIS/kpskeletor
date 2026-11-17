@@ -34,7 +34,7 @@ use Modules\Events\Services\Reminders;
  * - `POST backend/calendar/calendars`: the calendars the user shows or hides (`calendars[]`, or
  *   `only=<id>` to show one calendar, or `all` to show every calendar).
  *
- * Events of other modules' calendars and providers are included (docs/calendar-api.md).
+ * Events of other modules' calendars and providers are included (docs/calendar.md).
  */
 final class CalendarView extends BackendController
 {

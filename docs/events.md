@@ -3,7 +3,7 @@
 `modules/Events` is the calendar of the skeleton (specification "Modules" › "Events (calendar)").
 Session 24 built the events, their audiences, the administration, the calendar views, reminders,
 the *Upcoming events* widget and the "Calendar" menu link type; session 25 added iCal (exports,
-subscribable feeds) and the calendar API for other modules (`docs/calendar-api.md`).
+subscribable feeds) and the calendar API for other modules (`docs/calendar.md`).
 
 ## What it does
 
@@ -11,7 +11,7 @@ subscribable feeds) and the calendar API for other modules (`docs/calendar-api.m
   required, Spanish and English optional): start and optional end (stored in UTC, edited and
   shown in the site's time zone), all day, location, organiser, category, colour, link, status
   (`confirmed`, `tentative`, `cancelled`), visibility, recurrence. Events published by
-  other modules (`docs/calendar-api.md`) have `calendar`, `source_module`, `source_key`,
+  other modules (`docs/calendar.md`) have `calendar`, `source_module`, `source_key`,
   `source_url` and are never editable here; `sequence` grows on every change (iCal);
   `allow_reminders` (session 25) says whether users may ask for a reminder.
 - **Categories** (`event_categories` + `event_category_translations`): name, description, colour,
@@ -129,7 +129,7 @@ calendar's colour, an "only this one" button on each and "Show all" (D-25-08); e
 is saved (`event_calendar_preferences`) and works without JavaScript too. Calendars declared
 `'hidden' => true` (e.g. *Birthdays (administration)*) start hidden until the user shows them. Events published by another module show
 "Managed by <module>" and "Edit in <module>" in the administration and the details. How modules
-use it: `docs/calendar-api.md`.
+use it: `docs/calendar.md`.
 
 ## Configuration
 

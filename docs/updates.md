@@ -80,8 +80,43 @@ first with `php spark app:maintenance off`), or restore: `php spark backup:resto
 the files back from `writable/updates/previous/<version>/` (or `git checkout` the old tag), then
 `php spark app:maintenance off`.
 
+### Rolling back
+
+An update can be undone with what `app:update` left behind:
+
+1. `php spark app:maintenance on` (if it is not on already).
+2. **Code:** archive method → copy the files back from `writable/updates/previous/<old version>/`
+   (the replaced and removed files) and delete the files the release added; git method →
+   `git checkout v<old version>` (or `git reset --hard` to the old tag on the branch).
+   Then `composer install --no-dev --optimize-autoloader`.
+3. **Data:** `php spark backup:restore <file> --password` with the backup made in step 4 of the
+   update (origin `update`, listed by `php spark backup:list`). Needed whenever the new version
+   ran migrations: the database must go back to the state the old code expects. Restore after
+   putting the old code back (the restore checks the backup's versions against the code).
+4. `php spark modules:sync`, `php spark app:cache-clear`, `php spark app:maintenance off`.
+
+There is no automatic rollback command: the update is designed so that every step before
+applying the code refuses and changes nothing, and the backup is always made first.
+
 `git`, `composer` and `php` are the documented exceptions to "every outbound request goes
-through `OutboundClient`" (docs/outbound-requests.md): they run only from the console.
+through `OutboundClient`" ([`outbound-requests.md`](outbound-requests.md)): they run only from the console.
+
+## Release process (the owner)
+
+1. **Version:** semantic versioning. Raise `Modules\Core\Config\Version::CORE`, note the
+   changes (Keep a Changelog style: Added, Changed, Fixed, Security) and merge to `main`.
+2. **Tag:** `git tag -s v1.2.0` (signed, needed by git installs) and push the tag. Only tags
+   that are a semantic version (`v1.2.3` or `1.2.3`, optionally `-rc.1`) are offered;
+   pre-release tags only reach installations with `updates.prereleases`.
+3. **Release notes:** create the GitHub/GitLab release for the tag; its description (Markdown) is
+   what the page `backend/updates` shows, as safe HTML (`ReleaseNotes`: escaped, headings, lists,
+   bold, code and https links only, then HTMLPurifier). Mark the most important changes and
+   anything that needs action (new `.env` keys, PHP version).
+4. **Archive:** build, checksum and sign it as below and upload the three files (`.zip`,
+   `.zip.sha256`, `.zip.minisig`) to the release. The archive update uses the first `.zip` asset
+   that has both companions; a release without them is refused by the archive method.
+5. Check from a test installation: `php spark updates:check`, then
+   `php spark app:update --dry-run`.
 
 ## Signing releases (the owner)
 
@@ -102,7 +137,6 @@ minisign -S -s ~/.minisign/kpskeletor.key -m kpskeletor-1.2.0.zip -t "kpskeletor
 
 Publish the second line of `minisign.pub` (it starts with `RW`) in the installations'
 `.env` (`updates.publicKeys = RW…`). For git installs, sign the tag too: `git tag -s v1.2.0`.
-Session 36 documents the release procedure step by step.
 
 **Key rotation:** generate the new pair, set `updates.publicKeys = RW<old>,RW<new>` everywhere,
 sign the next releases with the new key, and remove the old key once every installation has
@@ -117,7 +151,7 @@ plain-text message: visitors and users get the 503 page, the login paths stay op
 holders of `maintenance.manage` (superadmins always; no default grant) keep using the site with a
 banner. A mode turned on by a restore or an update has
 no bypass and is not turned off from the screen (`app:maintenance off` from the console).
-See docs/security.md, "Maintenance mode".
+See [`security.md`](security.md), "Maintenance mode".
 
 ## Files
 

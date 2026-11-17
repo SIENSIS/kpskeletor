@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * Events of the Dashboard module (discovered by CodeIgniter, also while the module is disabled):
  *
- * - `moduleUninstalling` (the Core's Uninstaller, docs/packages.md): the uninstalled module's
+ * - `moduleUninstalling` (the Core's Uninstaller, docs/installing-modules.md): the uninstalled module's
  *   widgets leave the group layouts (users' own layouts drop unknown widgets when read).
  */
 

@@ -84,7 +84,7 @@ return [
     'hsts' => [
         'title'   => 'Strict-Transport-Security (HSTS)',
         'missing' => 'No s\'envia: els navegadors encara poden fer servir HTTP sense xifrar.',
-        'fix'     => 'Traieu securityHeaders.hsts = false de .env quan el lloc se serveixi per HTTPS.',
+        'fix'     => 'Traieu securityheaders.hsts = false de .env quan el lloc se serveixi per HTTPS.',
     ],
     'headers' => [
         'title'   => 'Capçaleres de seguretat',
@@ -164,7 +164,7 @@ return [
         'title' => 'Paquets de mòduls i temes',
         'ok' => 'Signatures obligatòries ({0} claus de confiança).',
         'unsigned' => 'S\'accepten paquets sense signar (packages.requireSignature està desactivat o packages.publicKeys és buit).',
-        'fix' => 'Definiu a packages.publicKeys les claus minisign dels vostres publicadors i packages.requireSignature = true (docs/packages.md).',
+        'fix' => 'Definiu a packages.publicKeys les claus minisign dels vostres publicadors i packages.requireSignature = true (docs/installing-modules.md).',
         'autoEnableTitle' => 'Mòduls trobats per modules:sync',
         'autoEnable' => 'packages.autoEnable està activat: una carpeta de mòdul copiada a mà s\'activa amb la sincronització següent.',
         'fixAutoEnable' => 'Deixeu packages.autoEnable desactivat en producció (D-29-02).',

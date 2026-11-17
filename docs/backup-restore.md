@@ -43,6 +43,24 @@ asks with a hidden prompt (a value would stay in the shell history and the proce
 Keep the password in a password manager. Without it the backup cannot be restored; with the file
 and the password anyone gets every secret of the site.
 
+### Keys
+
+The secrets that matter on restore are `encryption.key`, `app.maskKey` and `backup.password`
+(`Modules\Backup\Services\EnvFile::SECRETS`):
+
+- `encryption.key` encrypts data in the database (authenticator secrets, among others): restored
+  rows are unreadable with another key;
+- `app.maskKey` builds the masked ids of the back office and the API: with another key, links,
+  bookmarks and API clients' stored ids stop matching;
+- `backup.password` is the password of scheduled backups.
+
+They travel inside the backup (`env/.env`), encrypted with its password. A console restore
+offers to **merge only these three** into the current `.env` (the new server keeps its own
+database credentials, base URL and mail settings); `--with-env` replaces the whole file. Keep a
+copy of the production `.env` (or at least these three values) apart from the backups, in the
+password manager: rotating any of them later ([`security.md`](security.md), "Incident response") makes older
+backups restore with the old values.
+
 ## Console
 
 ```bash
@@ -124,6 +142,34 @@ result and size, and the next scheduled run.
 3. `php spark backup:restore <file> --password` and accept merging the secrets (the new server's
    database credentials and base URL stay).
 
+## Disaster recovery checklist
+
+Before anything goes wrong:
+
+- [ ] `Backup.scheduled` on, with `backup.password` in `.env`; the cron line runs
+      `php spark schedule:run` ([`scheduler.md`](scheduler.md)), and the `BackupResult`
+      notification reaches someone.
+- [ ] Backups leave the server: `Config\Backup::$copyDisk`, or an external job that copies
+      `writable/backups` elsewhere (the files are encrypted).
+- [ ] The backup password and the three keys are in a password manager, apart from the server.
+- [ ] A restore was **tested** on another machine (`backup:verify`, then `backup:restore`) after
+      the last major upgrade.
+
+When the server is lost or the data is damaged:
+
+1. Put the site in maintenance mode if it still runs (`php spark app:maintenance on`) and keep the
+   damaged state for later analysis if needed (a copy of `writable/` and the database).
+2. Pick the backup: `php spark backup:list`, then `php spark backup:verify <file> --password`.
+3. On a new server: install the same or a newer version (`php spark app:install`, [`README.md`](../README.md)),
+   copy the backup into `writable/backups`, run
+   `php spark backup:restore <file> --password` and accept merging the secrets.
+4. On the same server: `php spark backup:restore <file> --password`; a safety backup of the
+   current state is made first.
+5. Check: sign in, Settings › Security status, `php spark security:check`, `php spark schedule:list`,
+   a few files and masked links.
+6. If the incident was a compromise, follow "Incident response" in [`security.md`](security.md)
+   (revoke tokens and sessions, rotate keys) **after** restoring, then make a new backup.
+
 ## Activity log
 
 `Backup.activity.*`: `create`, `create_failed`, `verify`, `upload`, `restore`, `prune`; security
@@ -142,4 +188,4 @@ module packages) and `Modules\Core\Maintenance\MaintenanceMode`.
 Installing, upgrading or uninstalling a module or theme (`modules:install`, `modules:uninstall`,
 `themes:*`, staged operations) asks for a full backup through the Core event `packageBackup`;
 this module answers it (origin `package`, password from `backup.password`/`BACKUP_PASSWORD` or
-`--password`). See `docs/packages.md`.
+`--password`). See [`installing-modules.md`](installing-modules.md).

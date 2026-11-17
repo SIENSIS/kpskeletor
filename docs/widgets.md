@@ -1,9 +1,9 @@
 # Dashboard widgets
 
 How the back-office home works and how a module adds a widget (specification: "Dashboard
-widgets", "Modules" › "Dashboard"; decisions D-16-01 … D-16-05). The step-by-step tutorial
-"A new widget" (the `Tasks` module's *My pending tasks* and *Task activity chart*) is written in
-sessions 32–34; this page is the reference.
+widgets", "Modules" › "Dashboard"; decisions D-16-01 … D-16-05). This page is the
+reference; the step-by-step tutorial ["A new widget"](#tutorial-a-new-widget) at the end builds
+the two widgets of the `Tasks` tutorial module.
 
 ## The pieces
 
@@ -155,10 +155,16 @@ final class UsersSummary extends AsyncWidget
 - The response is cached in the Core cache scope `widgets` (`CacheInvalidator` clears it) per
   user, language and options. Permissions and group layouts are checked on every request, before
   the cache is read, so a revoked permission takes effect at once.
-- A widget that draws its data itself returns its own `component()` and reuses the loader:
+- The default component `core/ui/widget` shows the `html` of the response (parsed in an inert
+  document, never with `innerHTML`), a spinner while loading (`Core.widgets.loading`, the view
+  `widgets/loading`), "The widget could not be loaded." (`Core.js.widget.error`) or the 403 text
+  on errors, and reloads every `refreshSeconds()` while the page is visible.
+- A widget that draws its data itself in the browser returns its own `component()` and reuses
+  the loader (a pattern: no shipped widget does this yet; `<module>/<name>` is the component of
+  `modules/<Name>/Assets/js/<name>.js`):
 
   ```js
-  // modules/Tasks/Assets/js/activity-chart.js  →  component "tasks/activity-chart"
+  // modules/<Name>/Assets/js/activity-chart.js  →  component "<module>/activity-chart"
   import { load } from 'core/ui/widget.js';
 
   export function mount(root) {
@@ -170,10 +176,12 @@ final class UsersSummary extends AsyncWidget
 
 ## Failures
 
-A widget that throws in `title()`, `render()` or `data()` never breaks the dashboard: the error
+A widget that throws in `render()` or `data()` never breaks the dashboard: the error
 (class, message, file and line) goes to the application log and the card shows "This widget
 could not be shown" (`Core.widgets.failed`); the async URL answers 500 with the same generic
-message. Nothing of the exception reaches the browser.
+message (`{"error": …}`; the card then shows `Core.js.widget.error`). A `title()` or `icon()` that
+throws falls back to the widget's id and the default icon. Nothing of the exception reaches the
+browser.
 
 ## Group layouts (administrators)
 
@@ -212,3 +220,283 @@ widgets they lose disappear from it.
 `modules/Core/Tests/WidgetsTest.php`. `DashboardTestCase::addTestWidgets()` declares a failing
 widget and an async counting widget; copy its tests for a module's widget: hidden without the
 permission, hidden when its group disables it, async URL 403, failure card.
+
+## Tutorial: a new widget
+
+This tutorial builds the two widgets of the `Tasks` tutorial module (`modules/Tasks/Widgets/`):
+*My pending to-do tasks*, drawn on the server, and *To-do task activity*, loaded asynchronously.
+The code is real and finished; the excerpts below are copied from it.
+
+| Piece | Server-side widget | Asynchronous widget |
+|---|---|---|
+| Class | `Widgets/MyPendingTasks.php` (extends `Widget`) | `Widgets/TaskActivityChart.php` (extends `AsyncWidget`) |
+| Id | `tasks.pending` | `tasks.activity` |
+| Permission | `tasks-board.view` (every group) | `tasks-tasks.list` (admin, editor) |
+| View | `Views/widgets/pending.php` | `Views/widgets/activity.php` (an SVG bar chart) |
+| Option | `limit` (1–20, default 5) | `days` (7–60, default 14) |
+| Texts | `Tasks.widgets.limit`, `Tasks.widgets.pending.*` | `Tasks.widgets.activity.*` |
+| Test | `Tests/WidgetsAndReminderTest.php` | same file |
+
+To see them: `php spark modules:enable Tasks`, `php spark modules:demo Auth`,
+`php spark modules:demo Tasks`, then open the dashboard (`backend`).
+
+### 1. A server-side widget: the class
+
+A widget extends `Modules\Core\Widgets\Widget` (which implements `WidgetInterface` and gives
+defaults for `icon()`, `permission()`, `sizes()` and `settings()`) and implements at least `id()`,
+`title()` and `render()`:
+
+```php
+final class MyPendingTasks extends Widget
+{
+    public function id(): string
+    {
+        return 'tasks.pending';
+    }
+
+    public function title(): string
+    {
+        return lang('Tasks.widgets.pending.title');
+    }
+
+    public function icon(): string
+    {
+        return 'bi bi-check2-square';
+    }
+
+    public function permission(): string
+    {
+        return 'tasks-board.view';
+    }
+
+    public function settings(): array
+    {
+        return [
+            'limit' => [
+                'type'    => 'int',
+                'default' => 5,
+                'min'     => 1,
+                'max'     => 20,
+                'label'   => 'Tasks.widgets.limit',
+            ],
+        ];
+    }
+```
+
+- `id()`: `<module>.<name>` in lower case, unique.
+- `title()` and the option `label` come from the language files (`Tasks.widgets.pending.title`
+  is "My pending to-do tasks" in English and "Les meves tasques pendents" in Catalan; keep ca, es
+  and en in step).
+- `permission()`: a permission of the module's manifest. The widget is shown only to users who
+  hold it **and** whose group enables the widget.
+- `sizes()`: not overridden here, so the widget offers the base class's
+  `medium` (default), `small`, `large`, `full`; the asynchronous widget below narrows the list.
+- `settings()`: the options an administrator sets per group ("Number of to-do tasks").
+
+`render()` receives the validated options and returns the card **body**; the renderer adds the
+card, its header (icon and title) and the grid column:
+
+```php
+public function render(array $options): string
+{
+    $user = auth()->user();
+
+    if (! $user instanceof User) {
+        return '';
+    }
+
+    $repository = new TaskRepository();
+    $rows       = $repository->pendingFor((int) $user->id, (int) $options['limit']);
+
+    if ($rows === []) {
+        return $this->empty(lang('Tasks.widgets.pending.empty'), 'bi bi-check2-all');
+    }
+    // … $items built from $rows
+    return $this->view('Modules\Tasks\Views\widgets\pending', [
+        'items' => $items,
+        'total' => $repository->pendingCount((int) $user->id),
+        'url'   => site_url('backend/tasks'),
+    ]);
+}
+```
+
+`$this->empty()` renders the standard `empty_state` component; `$this->view()` renders through the
+theme, so a theme can override the view in
+`themes/<slug>/Views/overrides/Tasks/widgets/pending.php`. The view escapes everything and uses
+the standard helpers (`ui_date()`, `ui_badge()`); no inline script or style. The widget only reads
+the user's own to-do tasks, so it shows data the user may see.
+
+### 2. Declaring it and configuring it per group
+
+```php
+/** Dashboard widgets (tutorial 4): one server-side, one asynchronous. */
+public array $widgets = [
+    \Modules\Tasks\Widgets\MyPendingTasks::class,
+    \Modules\Tasks\Widgets\TaskActivityChart::class,
+];
+```
+
+Run `php spark modules:sync`: it checks that every class exists and implements
+`WidgetInterface` and stores the manifest; the registry then lists the widgets of **enabled**
+modules. From then on:
+
+- with no stored row, a widget is enabled for every group with its defaults, so *My pending to-do
+  tasks* appears on the dashboard of every user (they all hold `tasks-board.view`) and the chart
+  for admins and editors (`tasks-tasks.list`);
+- Settings › *Dashboard widgets* (`backend/dashboard/groups`, `dashboard.configure`) shows one
+  card per widget in each group's tab: *enabled*, *position*, *size* (only the widget's sizes)
+  and its options (`limit`, `days`), and warns when the group lacks the widget's permission;
+- each user can move, resize or hide the widgets the group gives them (**Customise**).
+
+Disabling the module hides both widgets at once.
+
+### 3. An asynchronous widget
+
+For data that is slower to compute, extend `AsyncWidget`: the dashboard prints a placeholder at
+once and the browser loads the data afterwards.
+
+```php
+final class TaskActivityChart extends AsyncWidget
+{
+    // id() 'tasks.activity', title(), icon() 'bi bi-bar-chart', permission() 'tasks-tasks.list'
+
+    public function sizes(): array
+    {
+        return [WidgetSizes::MEDIUM, WidgetSizes::LARGE, WidgetSizes::FULL];
+    }
+
+    public function cacheSeconds(): int
+    {
+        return 300;
+    }
+
+    public function data(array $options): array
+    {
+        $days = (new TaskRepository())->activity(max(7, min(60, (int) ($options['days'] ?? 14))));
+
+        return [
+            'days'      => $days,
+            'created'   => array_sum(array_column($days, 'created')),
+            'completed' => array_sum(array_column($days, 'completed')),
+        ];
+    }
+
+    public function renderData(array $data, array $options): string
+    {
+        // … $days and $max from $data
+        return $this->view('Modules\Tasks\Views\widgets\activity', [ /* days, max, created, completed */ ]);
+    }
+}
+```
+
+How it runs:
+
+1. The dashboard renders `render()` — by default the Core's spinner view `widgets/loading`
+   ("Loading…") — inside `<div data-component="core/ui/widget" data-url="…" data-refresh="0">`
+   (`component()` and `refreshSeconds()` keep the base class's defaults here).
+2. `core/ui/widget.js` requests `backend/dashboard/widgets/tasks.activity/data` with
+   `core/http.js` (`aria-busy` while it loads).
+3. The endpoint checks `dashboard.view` (route filter, plus the `widgets` rate limit), then the
+   widget: it must be async, the user must hold `tasks-tasks.list` and one of their groups must
+   enable it — otherwise **403** and a `widget_forbidden` security entry. These checks run on
+   every request, before the cache.
+4. It answers `{"widget": "tasks.activity", "data": {…}, "html": "<svg …>"}` with
+   `Cache-Control: no-store, private`. `data` is `data()`; `html` is `renderData()`.
+5. The component shows `html` (parsed in an inert document, without `innerHTML`); on an error it
+   shows "The widget could not be loaded." or, on a 403, the forbidden text.
+
+**Per-user cache.** `data()` and `renderData()` run at most once per `cacheSeconds()` (300 here)
+for each user, language and set of options: the key is
+`data.<id>.<user id>.<locale>.<hash of the options>` in the Core cache scope `widgets`
+(`CacheInvalidator` clears the scope). Return `0` to disable the cache. Since the permission and
+group checks run before the cache, a revoked permission takes effect on the next request.
+
+**The chart.** This widget draws the chart **on the server**: `Views/widgets/activity.php` is an
+`<svg role="img" aria-label="…">` with two `<rect>` per day whose sizes are SVG attributes and
+whose colours are Bootstrap classes with `fill="currentColor"` (never `style=""`), plus a
+`<title>` per day. It needs no JavaScript of its own: the Core's component shows the HTML. A widget
+that must draw in the browser returns its own `component()` and reuses `load()` from
+`core/ui/widget.js` (see "Async widgets" above); its ES module goes in
+`modules/<Name>/Assets/js/` and is published like any other asset.
+
+### 4. Translations
+
+Titles, option labels, empty texts and the chart's legend and accessible summary are keys of
+`modules/Tasks/Language/{ca,es,en}/Tasks.php`:
+
+```php
+'widgets' => [
+    'limit'   => 'Number of to-do tasks',
+    'pending' => [
+        'title' => 'My pending to-do tasks',
+        'empty' => 'Nothing pending. Well done!',
+        'all'   => 'Open the board ({0} pending)',
+    ],
+    'activity' => [
+        'title'     => 'To-do task activity',
+        'days'      => 'Days shown',
+        'created'   => '{0} created',
+        'completed' => '{0} completed',
+        'summary'   => 'Last {0} days: {1} to-do tasks created, {2} completed.',
+    ],
+],
+```
+
+The cached HTML is per language, so each user gets the chart in theirs.
+`tests/unit/I18n/LanguageKeysTest.php` fails if a language lacks a key.
+
+### 5. Failures are isolated
+
+If `render()` throws, the dashboard still renders: the error (class, message, file, line) goes
+to the application log and the card body says "This widget could not be shown. The error has been
+logged." (`Core.widgets.failed`). A `title()` or `icon()` that throws falls back to the widget's id
+and the default icon. If `data()` or `renderData()` throws, the data URL answers 500 with the same generic
+message and the card shows "The widget could not be loaded.". Nothing of the exception reaches
+the browser, and the other widgets are not affected.
+
+### 6. Publishing assets
+
+These two widgets have no assets of their own. A widget with its own ES module or CSS puts them in
+`modules/<Name>/Assets/` and publishes them with `php spark assets:publish` (also run by
+`php spark modules:sync`; `--watch` or `assets.devRefresh` while developing). See
+[`frontend.md`](frontend.md) ("Tutorial: a new view with JavaScript", step 8).
+
+### 7. The test
+
+`modules/Tasks/Tests/WidgetsAndReminderTest.php` (base `TasksTestCase`, which extends the
+Dashboard's `DashboardTestCase` and its helpers `cards()` and `setGroupWidget()`):
+
+```php
+public function testTheActivityChartIsAsynchronousAndNeedsItsPermission(): void
+{
+    $this->task('Creada avui');
+    $this->task('Feta avui', ['status' => 'done', 'completed_at' => Time::now()->toDateTimeString()]);
+
+    $this->createUser('pau@example.com', 'user');
+    $this->login('pau@example.com');
+    $this->send('GET', 'backend/dashboard/widgets/tasks.activity/data')->assertStatus(403);
+
+    $this->send('POST', 'logout');
+    $this->createUser('boss@example.com', 'admin');
+    $this->login('boss@example.com');
+    $this->assertContains('tasks.activity', $this->cards($this->send('GET', 'backend')));
+
+    $json = json_decode((string) $this->send('GET', 'backend/dashboard/widgets/tasks.activity/data')->response()->getBody(), true);
+    $this->assertSame(2, $json['data']['created']);
+    $this->assertSame(1, $json['data']['completed']);
+    $this->assertCount(14, $json['data']['days']);
+    $this->assertStringContainsString('<svg', $json['html']);
+    $this->assertStringNotContainsString('style=', $json['html']);
+
+    // Hidden for the group: neither the card nor its data.
+    $this->setGroupWidget('admin', 'tasks.activity', false);
+    $this->assertNotContains('tasks.activity', $this->cards($this->send('GET', 'backend')));
+    $this->send('GET', 'backend/dashboard/widgets/tasks.activity/data')->assertStatus(403);
+}
+```
+
+`testMyPendingToDoTasksShowsOnlyTheUsersOpenToDoTasks` checks the server-side widget: a `user`
+sees the `tasks.pending` card but not `tasks.activity` (no `tasks-tasks.list`), and the card lists
+only their open to-do tasks. The failure card is tested once for every widget in
+`modules/Dashboard/Tests/` (`DashboardTestCase::addTestWidgets()` declares a failing widget).
+Run `vendor/bin/phpunit modules/Tasks/Tests/WidgetsAndReminderTest.php`.

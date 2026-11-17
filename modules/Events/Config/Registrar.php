@@ -8,7 +8,7 @@ use Modules\Events\Services\CalendarService;
 
 /**
  * Configuration the Events module contributes (CodeIgniter registrar): `service('calendar')`
- * becomes its `CalendarService` (the Core's `NullCalendar` otherwise; docs/calendar-api.md).
+ * becomes its `CalendarService` (the Core's `NullCalendar` otherwise; docs/calendar.md).
  */
 final class Registrar
 {

@@ -33,7 +33,7 @@ D-00-48 (Ed25519, owner's key), D-28-01 … D-28-07 (`docs/decisions.md`).
 
 ## Open tasks
 
-- Done in session 29: `Config/Events.php` answers the Core's `moduleVersions` event (latest versions from the last check) for the Modules screen. (`docs/packages.md`)
+- Done in session 29: `Config/Events.php` answers the Core's `moduleVersions` event (latest versions from the last check) for the Modules screen. (`docs/installing-modules.md`)
 - Session 29: module packages (`modules:install`) may reuse `SignatureVerifier`, `ReleaseSource`
   for modules with `$repository`.
 - Done in session 30: `Services/UpdatesSecurityCheck.php` (event `securityChecks`): warning when

@@ -84,7 +84,7 @@ return [
     'hsts' => [
         'title'   => 'Strict-Transport-Security (HSTS)',
         'missing' => 'Not sent: browsers may still use plain HTTP.',
-        'fix'     => 'Remove securityHeaders.hsts = false from .env once the site is served over HTTPS.',
+        'fix'     => 'Remove securityheaders.hsts = false from .env once the site is served over HTTPS.',
     ],
     'headers' => [
         'title'   => 'Security headers',
@@ -164,7 +164,7 @@ return [
         'title' => 'Module and theme packages',
         'ok' => 'Signatures required ({0} trusted keys).',
         'unsigned' => 'Unsigned packages are accepted (packages.requireSignature is off or packages.publicKeys is empty).',
-        'fix' => 'Set packages.publicKeys to your publishers\' minisign keys and packages.requireSignature = true (docs/packages.md).',
+        'fix' => 'Set packages.publicKeys to your publishers\' minisign keys and packages.requireSignature = true (docs/installing-modules.md).',
         'autoEnableTitle' => 'Modules found by modules:sync',
         'autoEnable' => 'packages.autoEnable is on: a module folder copied by hand is enabled by the next sync.',
         'fixAutoEnable' => 'Leave packages.autoEnable off in production (D-29-02).',

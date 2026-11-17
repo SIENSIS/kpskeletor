@@ -9,7 +9,7 @@ use DateTimeInterface;
 use InvalidArgumentException;
 
 /**
- * One event of the calendar API (docs/calendar-api.md): what a module publishes with
+ * One event of the calendar API (docs/calendar.md): what a module publishes with
  * `service('calendar')->publish()` or returns from a `CalendarProvider`.
  *
  * - `title` and `description`: a text, or texts per language (`['ca' => …, 'es' => …]`; Catalan

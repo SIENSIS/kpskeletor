@@ -46,7 +46,7 @@ final class EventVisibility
     }
 
     /**
-     * Only events of calendars the user may see (docs/calendar-api.md): events created by hand
+     * Only events of calendars the user may see (docs/calendar.md): events created by hand
      * (no calendar) and events of the calendars of **enabled** modules whose permission, if they
      * declare one, the user holds. Events of a disabled module are therefore hidden.
      *

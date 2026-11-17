@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Calendar;
 
 /**
- * The calendar's publishing API (`service('calendar')`, docs/calendar-api.md). Both calls are
+ * The calendar's publishing API (`service('calendar')`, docs/calendar.md). Both calls are
  * idempotent per module and key: call `publish()` on every change of the source record and
  * `unpublish()` when it is deleted or should no longer be in the calendar.
  *
@@ -28,7 +28,7 @@ interface CalendarPublisher
     public function unpublish(string $module, string $key): bool;
 
     /**
-     * Deletes every event of `$module` for good (the module is being uninstalled; docs/packages.md).
+     * Deletes every event of `$module` for good (the module is being uninstalled; docs/installing-modules.md).
      *
      * @return int how many events were deleted
      */

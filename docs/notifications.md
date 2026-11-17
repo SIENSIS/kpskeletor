@@ -70,7 +70,7 @@ Rules:
 ```php
 notify($user, new NewNotice(['id' => 7, 'title' => 'Closed on Monday']));   // User, id or a list
 notifyGroup('admin', new NewNotice([...]));                                   // or ['admin', 'editor']
-notifyPermission('news-notices.list', new NewNotice([...]));                  // every holder
+notifyPermission('news-read.view', new NewNotice([...]));                  // every holder
 ```
 
 - They return the number of users reached and never throw: delivery problems are logged.
@@ -84,7 +84,7 @@ notifyPermission('news-notices.list', new NewNotice([...]));                  //
 - **`database`**: a row in `notifications` (the bell and the list page).
 - **`email`**: rendered in the recipient's language (their profile's language, registered by the
   Auth module through `RecipientLocale`) and **queued** in `mail_queue`; the scheduled task
-  "Send the queued notification emails" sends it within a minute (docs/scheduler.md), through the
+  "Send the queued notification emails" sends it within a minute ([`scheduler.md`](scheduler.md)), through the
   `email` service and the outbound allow-list for SMTP. Never sent inline in the request.
 
 Security emails (magic links, password resets, 2FA codes, new-device notices) are **not**
@@ -111,7 +111,7 @@ user's own notifications.
 | `POST backend/notifications/read-all` | Marks everything as read (JSON for the bell, otherwise back to the list) |
 | `backend/profile/notifications` | Preferences (GET form, POST save) |
 
-The API (`docs/api.md`, session 26): `GET api/v1/notifications[/{id}]` (the user's own, rendered in
+The API ([`api.md`](api.md)): `GET api/v1/notifications[/{id}]` (the user's own, rendered in
 the request's language), `GET api/v1/notifications/unread`, `POST api/v1/notifications/{id}/read`
 and `POST api/v1/notifications/read-all` (`core-notifications.read`, every group, D-26-01);
 `Modules\Core\Controllers\Api\Notifications` on top of the same table as `Inbox`.
@@ -121,7 +121,15 @@ and `POST api/v1/notifications/read-all` (`core-notifications.read`, every group
 | Type | Module | Sent to | |
 |---|---|---|---|
 | `ScheduledTaskFailed` | Core | holders of `schedule.list` | A scheduled task failed |
+| `SecurityCheckFailed` | Core | the `superadmin` group | A security check turned red ([`security.md`](security.md)) |
+| `PackageProcessed` | Core | the user who approved the package | A staged module or theme package was processed ([`installing-modules.md`](installing-modules.md)) |
 | `TwoFactorReset` | Auth | the user | Mandatory: an administrator reset their 2FA |
+| `BackupResult` | Backup | holders of `backup.list` | Result of the scheduled backup ([`backup-restore.md`](backup-restore.md)) |
+| `NewVersion` | Updates | holders of `updates.view` | A new release is available ([`updates.md`](updates.md)) |
+| `NewNotice` | News | the notice's groups, or holders of `news-read.view` for private notices | A notice was published |
+| `EventReminder` | Events | the user who asked for the reminder | An event is about to start |
+| `BirthdayGreeting` | Users | the user | Birthday greeting (default channel `database` only) |
+| `TaskAssigned`, `TaskOverdue`, `TaskRequested` | Tasks | assignees; holders of `tasks-requests.list` | Tutorial module `Tasks` |
 
 ## Testing
 

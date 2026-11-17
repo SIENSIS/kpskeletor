@@ -26,7 +26,7 @@ use Modules\Core\Packages\Uninstaller;
 use ZipArchive;
 
 /**
- * Module and theme packages (acceptance criterion 3, docs/packages.md): validation (zip-slip,
+ * Module and theme packages (acceptance criterion 3, docs/installing-modules.md): validation (zip-slip,
  * links, manifest, extensions, zip bombs, `php -l`, signatures), install, upgrade, rollback,
  * uninstall (with and without data), staged operations and the auto-enable rule of modules:sync.
  *

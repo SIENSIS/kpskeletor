@@ -11,7 +11,7 @@ A module for the kpskeletor application skeleton (CodeIgniter 4). TODO: describe
 
 - **As a package:** build the ZIP of this folder (a single top-level folder `{{Name}}/`) and install it
   on the site with `php spark modules:install {{Name}}.zip`, or upload it in Modules › Packages and run
-  `php spark modules:install --pending` (docs/packages.md of the skeleton).
+  `php spark modules:install --pending` (docs/installing-modules.md of the skeleton).
 - **For development:** clone this repository into `modules/{{Name}}/` of a skeleton checkout (or add it
   as a git submodule) and run `php spark modules:sync`.
 

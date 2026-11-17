@@ -18,7 +18,7 @@ use Throwable;
 
 /**
  * Installs or upgrades a validated module or theme package (`modules:install`, `themes:install`,
- * staged installs; docs/packages.md):
+ * staged installs; docs/installing-modules.md):
  *
  * 1. checks dependencies, the Core version, the author of an installed module of the same name
  *    and the version (a downgrade or a reinstall needs `force`);

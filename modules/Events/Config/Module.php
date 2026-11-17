@@ -19,7 +19,7 @@ use Modules\Core\Config\ModuleManifest;
  *   group; `api/v1/public/events` is public (no token, no permission, public events only).
  *
  * Configuration: `Config/Calendar.php` (D-00-04, D-24-05). The calendar API (`service('calendar')`,
- * other modules' `$calendars` and `$calendarProviders`) and the iCal feeds: docs/calendar-api.md,
+ * other modules' `$calendars` and `$calendarProviders`) and the iCal feeds: docs/calendar.md,
  * docs/events.md (session 25). Menu "Calendar subscription" in the user menu.
  */
 final class Module extends ModuleManifest
@@ -96,7 +96,7 @@ final class Module extends ModuleManifest
 
     /**
      * No declared calendar: the events created by hand form the built-in calendar `events`.
-     * Other modules declare theirs (docs/calendar-api.md).
+     * Other modules declare theirs (docs/calendar.md).
      */
     public array $calendars = [];
 

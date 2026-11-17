@@ -11,7 +11,7 @@ use Modules\Core\Theme\ThemeManifest;
  * kept in the repository as tutorial material (D-00-32). It changes the primary colour and the
  * logo through the parent's options, adds its own CSS (`Assets/css/theme.css`) and overrides one
  * view of the Tasks module, the public page (`Views/overrides/Tasks/public/index.php`).
- * Select it in Settings › Appearance or with `theme.public = tasks-demo` in `.env`.
+ * Select it in Settings › Theme or with `theme.public = tasks-demo` in `.env`.
  *
  * Override a module view in Views/overrides/<Module>/<view>.php, a standard view or component in
  * Views/<path>.php (e.g. Views/components/badge.php) and colours in Assets/css/theme.css or by

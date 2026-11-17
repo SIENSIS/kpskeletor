@@ -85,4 +85,4 @@ php spark permissions:check
 
 By hand: `php spark modules:enable Tasks`, `php spark modules:demo Auth`, `php spark modules:demo
 Tasks`, then `backend/tasks` (board), `backend/tasks/tasks`, `tasks` (public page),
-`tasks/request` (form), `api/v1/docs` (API).
+`tasks/request` (form), `backend/api/docs` (API documentation page).

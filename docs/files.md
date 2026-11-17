@@ -1,8 +1,32 @@
 # Files: file manager and folder permissions
 
 The **Files** module (`modules/Files`, session 22) is a file manager over the Core's Storage
-service (`docs/storage.md`) with folder permissions inherited by subfolders (session 22), and the
+service ([`storage.md`](storage.md)) with folder permissions inherited by subfolders (session 22), and the
 backend of the Core's **file picker** with signed upload tokens and avatars (session 23, below).
+
+## Disks and upload rules
+
+Every file is written by the Core's Storage service (`service('storage')->store()`); the Files
+module never touches the disks directly. Details in [`storage.md`](storage.md).
+
+| Disk | Folder | Served by |
+|---|---|---|
+| `public` | `public/uploads` | the web server (`/uploads/…`), never executed; folders `0755`, files `0644` |
+| `private` | `writable/storage` | only `files/private/{key}` after the access rule (below); folders `0750`, files `0640` |
+
+Configured in `app/Config/Storage.php` (`$disks`, `$forbiddenExtensions`, `$maxImagePixels`,
+`$accessRule`, `$pickerBackend`, `$pickerTokenTtl`). Global upload rules are settings in
+Settings › Security, which a field can only narrow:
+
+| Setting | Default | |
+|---|---|---|
+| `Core.uploadTypes` | `jpg,jpeg,png,gif,webp,pdf,txt,csv,odt,ods,odp,doc,docx,xls,xlsx,ppt,pptx` | extensions allowed anywhere |
+| `Core.uploadMaxSize` | `10` (MB) | PHP's `upload_max_filesize` and `post_max_size` must allow it |
+| `Core.uploadAllowSvg` | off | SVG only for fields that list it, sanitised |
+
+Every upload: extension in both lists and never a forbidden one (server code, HTML, executables,
+`.htaccess`…), MIME type detected from the contents and matching the extension, size limit,
+images decoded and re-encoded (metadata dropped), random stored names.
 
 ## Spaces and the virtual folder tree
 
@@ -157,6 +181,16 @@ $old['cover'])` in `beforeInsert` / `beforeUpdate` (News cover, Pages featured i
   a signed URL `?expires&signature`, valid one hour, given to API clients in `me.avatar_url`) and
   only for keys that are someone's current avatar; `Cache-Control: private, max-age=31536000,
   immutable` (the key changes with each new avatar, so the URL is versioned). Guests get a 404.
+
+## Web server rules
+
+The web server must never execute or list anything in `public/uploads` and must never serve
+`writable/` (the private disk is `writable/storage`). The Apache and Nginx configurations, and
+which folders the web server user may write, are in [`web-server.md`](web-server.md);
+`php spark security:check` warns when `public/uploads/.htaccess` is missing, and
+`php spark security:check --probe=https://example.org/` checks over HTTP that a PHP file in `uploads/` is not executed. Access control never relies on file permissions: private
+files are always read through `files/private/{key}` (or the file manager's `download` /
+`preview`), which apply the rules above and answer 404 to anything refused.
 
 ## FileAccessPolicy
 

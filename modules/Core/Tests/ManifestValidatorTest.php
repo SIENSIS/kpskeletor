@@ -111,6 +111,9 @@ final class ManifestValidatorTest extends CIUnitTestCase
         yield 'extra operation' => [static function (ModuleManifest $m): void {
             $m->resources['posts']['extra'] = ['Pub-lish' => 'x'];
         }, "\$resources['posts']['extra'] has an invalid operation name"];
+        yield 'extra operation in camel case' => [static function (ModuleManifest $m): void {
+            $m->resources['posts']['extra'] = ['markRead' => 'x'];
+        }, "\$resources['posts']['extra'] has an invalid operation name \"markRead\""];
         yield 'name override in multi-resource module' => [static function (ModuleManifest $m): void {
             $m->resources['stats']['name'] = 'stats';
         }, "\$resources['stats']['name'] can only be set by Core"];

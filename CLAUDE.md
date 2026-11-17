@@ -63,7 +63,7 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   `kpapy` filter or is declared public. Default deny. `can:a,b` = any, `can:all,a,b` = all; the
   `backend` chain covers `backend/*` by itself. Check permissions only through
   `Authorization::for($user)` / `can()` / `CrudPermissions`, change grants only through
-  `GrantManager` (`docs/rbac.md`); `php spark permissions:check` must pass.
+  `GrantManager` (`docs/permissions.md`); `php spark permissions:check` must pass.
 - **Database:** one migration per table, Forge / Query Builder only, `down()` always implemented,
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.
@@ -80,7 +80,7 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   (`modules/Core/Calendar`): declare `$calendars` (`<module>.<key>`, optional `permission`,
   `policy`, `source`) and publish with `service('calendar')->publish()` / `unpublish()` on every
   change, or declare a `CalendarProvider` in `$calendarProviders`; never write to `events`
-  directly (`docs/calendar-api.md`).
+  directly (`docs/calendar.md`).
 - **Dashboard widgets:** classes in `Widgets/` extending `Modules\Core\Widgets\Widget` (or
   `AsyncWidget`), declared in the manifest `$widgets`, id `<module>.<name>`, a `permission()`;
   shown only with the permission **and** enabled for one of the user's groups (`docs/widgets.md`).
@@ -161,7 +161,7 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - ZIP files from outside (backups, module packages) only through `Modules\Core\Archive\SafeZip`
   (zip-slip and zip-bomb checks).
 - Module and theme packages only through `Modules\Core\Packages` (`PackageValidator`,
-  `PackageInstaller`, `Uninstaller`, `StagedPackages`; `docs/packages.md`): read without running
+  `PackageInstaller`, `Uninstaller`, `StagedPackages`; `docs/installing-modules.md`): read without running
   them, installed and uninstalled only from the console (`modules:install`, `--pending`), never by
   the web server; the Core asks other modules through events (`packageBackup`,
   `moduleUninstalling`, `moduleVersions`), and a module that keeps data about other modules

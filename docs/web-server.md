@@ -114,12 +114,14 @@ root, add `location ~ ^/(app|modules|vendor|writable|tests|deploy)/ { deny all; 
 chown -R deploy:www-data /var/www/kpskeletor
 find /var/www/kpskeletor -type d -exec chmod 0755 {} +
 find /var/www/kpskeletor -type f -exec chmod 0644 {} +
-chmod -R u=rwX,g=rwX,o= /var/www/kpskeletor/writable
+chown -R www-data:www-data /var/www/kpskeletor/writable   # the PHP user owns it
+chmod -R u=rwX,g=rX,o= /var/www/kpskeletor/writable       # 0750 folders, 0640 files
 chmod 0640 /var/www/kpskeletor/.env
 ```
 
 The Storage service creates private folders `0750` and files `0640`, public ones `0755`/`0644`
-(`app/Config/Storage.php`). Access control never relies on these permissions: every private file
+(`app/Config/Storage.php`); `security:check` (`installation.writableModes`) warns about anything
+looser under `writable/`. Access control never relies on these permissions: every private file
 is read through `files/private/{key}`.
 
 ## Check

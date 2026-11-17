@@ -35,7 +35,7 @@ events* widget and the "Calendar" menu link type. Full description: `docs/events
   `EventDetails.php`, `CalendarComponent.php` (component options, feed range), `Reminders.php`.
 - `Controllers/Events.php` (`events-events`), `Categories.php`, `CalendarView.php` (back office),
   `PublicCalendar.php` (public events only). `Assets/js/calendar.js` + `Assets/css/calendar.css`.
-- Calendar API (`docs/calendar-api.md`): `Services/CalendarService.php` (publish/unpublish,
+- Calendar API (`docs/calendar.md`): `Services/CalendarService.php` (publish/unpublish,
   purge, resync, CodeIgniter events), `Calendars.php` (declared calendars, permissions, policies,
   per-user toggles), `ProvidedEvents.php` (providers, cached). Visibility of calendars and policies
   is in `EventVisibility` (`calendars()`, `allowedByPolicy()`).
@@ -51,7 +51,7 @@ API names, decided as built by the owner), D-25-02 … D-25-07 accepted.
 
 ## Open tasks
 
-- Done in session 29: `CalendarService::purgeModule()` is now part of the Core's `CalendarPublisher` contract: the Core's Uninstaller calls it for the uninstalled module (unless `--keep-data`); no `Config/Events.php` (D-00-04). (`docs/packages.md`)
+- Done in session 29: `CalendarService::purgeModule()` is now part of the Core's `CalendarPublisher` contract: the Core's Uninstaller calls it for the uninstalled module (unless `--keep-data`); no `Config/Events.php` (D-00-04). (`docs/installing-modules.md`)
 - Session 29: the module uninstaller must call `CalendarService::purgeModule(<Module>)`.
 - Weekly events whose `recur_days` exclude the start's weekday: iCal counts DTSTART as an
   occurrence, the expansion does not (edge case; the form could normalise it).

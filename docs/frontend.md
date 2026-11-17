@@ -2,6 +2,8 @@
 
 How the browser side of kpskeletor works (specification: "Front-end assets and JavaScript",
 "Themes" › light and dark mode, responsive design, minimal PWA, and "Security baseline" › CSP).
+The step-by-step tutorial ["A new view with JavaScript"](#tutorial-a-new-view-with-javascript)
+at the end builds the `Tasks` module's board.
 
 ## Rule zero: no JavaScript or styles inside the HTML
 
@@ -65,6 +67,9 @@ import { toast } from 'core/ui/toast.js';
 | `core/ui/toast.js` | `toast(text, { type: 'success'\|'danger'\|'warning'\|'info', delay })`. Text only. |
 | `core/ui/modal.js` | `openModal({ title, body, buttons, size })` → value of the button pressed; full-screen on phones. |
 | `core/ui/confirm.js` | `confirm(message, { title, okLabel, variant })` → boolean; `data-confirm="…"` on links, buttons and forms. |
+| `core/ui/flash.js` | Component `core/ui/flash` (theme partial `partials/flash`): shows the session messages as toasts and removes the alerts kept for users without JavaScript. |
+| `core/ui/bell.js` | Notifications bell (`core/ui/bell`, `partials/notifications_bell`): loads the latest notifications, refreshes the unread count, marks all as read. |
+| `core/cookies.js` | `getCookie(name)`, `setCookie(name, value, days)` for the preference cookies (no personal data, SameSite=Lax). |
 | `core/ui/sidebar.js` | Back-office sidebar toggle (icon-only/full), remembered in the `kp_sidebar` cookie. |
 | `core/ui/widget.js` | Async dashboard widget (`data-component="core/ui/widget"`): loads `data-url`, shows `html`, refreshes; `load(root, render)` for widgets with their own component (`docs/widgets.md`). |
 | `core/ui/tabs-memory.js` | Remembers the active tab of each `[data-tabs]` component per page (session storage, URL hash). |
@@ -73,7 +78,7 @@ import { toast } from 'core/ui/toast.js';
 | `core/forms/dirty-guard.js` | `form[data-dirty-guard]` (or `form_layout` with `dirtyGuard`): warns before leaving with unsaved changes. |
 | `core/forms/date.js` | `data-component="core/forms/date"` with `{"min":"today","max":"+1y"}`; `formatDate()`. |
 | `core/forms/editor.js` | Rich-text editor on a `<textarea>` (Quill 2, loaded on demand; see "Rich-text editor"). |
-| `core/forms/file-picker.js` | File picker of module fields (`PickerField::render()`; docs/files.md "File picker"); exports `uploadFile()` and `pickDialog()` for the editor. |
+| `core/forms/file-picker.js` | File picker of module fields (`data-component="core/forms/file-picker"`, rendered by `Modules\Core\Storage\Picker\PickerField::render()`; [`files.md`](files.md) "File picker"): a hidden `[data-picker-value]` input holds the chosen keys; *Upload* sends each file with the field's signed token to `files/picker/upload`, *Choose* lists `files/picker/browse`. Exports `uploadFile(options, file, progress)`, `pickDialog(options, { alt: true })`, `precheck()` and `loadStyle()` for other components (the editor's "Insert image"). |
 | `core/theme-mode.js` | Classic script in `<head>`: resolves `auto` before the first paint. |
 | `core/pwa.js` | Registers (or removes) the service worker. |
 
@@ -126,6 +131,21 @@ The Events module's `events/calendar` component loads the vendored FullCalendar 
 files and only uses the CSSOM, so it needs no CSP exception. Its colours come from Bootstrap's
 variables (`events::css/calendar.css`). See `docs/events.md`.
 
+## Vendored libraries
+
+Third-party front-end libraries are **committed** under `public/assets/vendor/<lib>/` (no CDN, no
+npm build): Bootstrap 5.3.8, Bootstrap Icons 1.13.1, Quill 2.0.3 and FullCalendar 7.1.3 today.
+`public/assets/vendor/vendor.json` records, per library, `version`, `licence`, `source` (an
+`https://` download URL), `homepage` and the SHA-256 of **every** file in its folder.
+`modules/Core/Tests/VendorAssetsTest.php` fails when a file is missing, extra or changed, and
+`php spark security:check` checks the same checksums.
+
+Reference them with `asset('vendor::<lib>/<path>')` (versioned with the checksum) or, in a theme
+manifest, `vendor:<path>`. Libraries that are not ES modules are loaded on demand by the component
+that needs them (the editor and the calendar take the script URLs in their options) instead of on
+every page. A library must work under the CSP (no `eval`, styles through the CSSOM or CSS files).
+How to add or update one (download, licence, checksums): [`dependencies.md`](dependencies.md).
+
 ## Content-Security-Policy
 
 On by default (`Config\App::$CSPEnabled = true`), strict, with nonces, on every response:
@@ -167,18 +187,332 @@ See `docs/themes.md` ("Light and dark mode", "Responsive layout").
 
 ## Minimal PWA
 
-Off by default; enable the setting `Core.pwa` (Settings › General, or
-`service('settings')->set('Core.pwa', true)`). Then:
+The web app manifest, the generated icons and the service worker (which caches nothing) are
+described in [`themes.md`](themes.md) ("PWA manifest"); `core/pwa.js` registers the worker when
+the page links the manifest and unregisters it otherwise.
 
-- `/manifest.webmanifest`: name, start URL (setting `Core.pwaStart`: public home or back
-  office), `display: standalone`, theme colour, icons;
-- `/pwa/icon-192.png`, `/pwa/icon-512.png`: generated with GD from the public theme's `logo`
-  (a local PNG/JPEG/GIF/WebP under `public/`; SVG or remote logos are never read, the default
-  icon is drawn instead) into `writable/pwa/`, and regenerated whenever the logo or the primary
-  colour changes (the file name carries a hash);
-- `/sw.js`: served from the root so it controls the whole site; it **caches nothing** (no Cache
-  API, no `respondWith()`), so authenticated pages and data always come from the network;
-- the layouts add `<link rel="manifest">`, `theme-color` for light and dark and the Apple touch
-  icon; `core/pwa.js` registers the worker, and unregisters it when the PWA is switched off.
+## Tutorial: a new view with JavaScript
 
-All three routes answer 404 while `Core.pwa` is off.
+This tutorial walks through a complete page with JavaScript: the **to-do task board** of the
+`Tasks` tutorial module (`backend/tasks`). The code is real and finished; every excerpt below is
+copied from it. Files:
+
+| Piece | File |
+|---|---|
+| Routes | `modules/Tasks/Config/Routes.php` |
+| Controller | `modules/Tasks/Controllers/Board.php` (`index()`, `data()`, `move()`) |
+| Views | `modules/Tasks/Views/board/index.php`, `modules/Tasks/Views/board/card.php` |
+| Component | `modules/Tasks/Assets/js/board.js` (`data-component="tasks/board"`) |
+| Stylesheet | `modules/Tasks/Assets/css/tasks.css` |
+| Texts | `modules/Tasks/Language/{ca,es,en}/Tasks.php` (`boardTitle`, `board.*`) |
+| Test | `modules/Tasks/Tests/BoardTest.php` |
+
+To try it: `php spark modules:enable Tasks` (the module is installed disabled), `php spark
+modules:demo Auth`, `php spark modules:demo Tasks`, then open `backend/tasks`.
+
+### 1. The permission, the route and the menu entry
+
+The page is a resource of type `page` in the manifest, so the Core generates the permission
+`tasks-board.view`; `$defaultGrants` gives `tasks-board.*` to every group, and `$menu` adds the
+sidebar entry (`['resource' => 'board', 'label' => 'Tasks.menu.board', 'icon' => 'bi bi-kanban', 'order' => 40]`).
+
+```php
+'board' => [
+    'label' => 'Tasks.res.board',
+    'type'  => 'page',
+],
+```
+
+Every route of the page — the page itself, its JSON data and the move endpoint — carries the
+`can:` filter (the `backend` chain adds the login and the rest):
+
+```php
+$routes->group('backend/tasks', ['namespace' => 'Modules\Tasks\Controllers'], static function (RouteCollection $routes): void {
+    $board = ['filter' => 'can:tasks-board.view'];
+
+    $routes->get('/', 'Board::index', $board + ['as' => 'tasks-board']);
+    $routes->get('board/data', 'Board::data', $board);
+    $routes->post('board/(:segment)/move', 'Board::move/$1', $board);
+});
+```
+
+The CRUD routes of `backend/tasks/tasks`, `…/projects` and `…/requests` are registered before
+this group, so `backend/tasks/…` does not swallow them. `php spark permissions:check` fails if a
+`backend/` route has no `can:` filter.
+
+### 2. The controller method and the view
+
+`Board` extends `BackendController`; `render()` resolves the view through the active theme and
+adds the layout, the breadcrumbs and — because the data has a `title` (and an `icon`) — the
+standard page header (`components/page_header`):
+
+```php
+return $this->render('Modules\Tasks\Views\board\index', [
+    'title'    => lang('Tasks.boardTitle'),
+    'icon'     => 'bi bi-kanban',
+    'columns'  => $this->columns($user, $project),
+    // … projects, project, seesAll, canAdd
+    'options'  => [
+        'dataUrl' => site_url('backend/tasks/board/data') . ($project !== null ? '?project=' . $project : ''),
+        'css'     => asset('tasks::css/tasks.css'),
+        'texts'   => [
+            'moved'      => lang('Tasks.board.moved'),
+            'moveTo'     => lang('Tasks.board.moveTo'),
+            'move'       => lang('Tasks.board.move'),
+            'priorities' => Tasks::options('priorities', TaskRepository::PRIORITIES),
+            'empty'      => lang('Tasks.board.emptyColumn'),
+            'statuses'   => Tasks::options('statuses', TaskRepository::STATUSES),
+        ],
+    ],
+]);
+```
+
+The view extends the theme layout and fills `content`; the page header is printed by the layout,
+not by the view:
+
+```php
+<?= $this->extend($layout) ?>
+<?= $this->section('content') ?>
+<div class="tasks-board" data-component="tasks/board" data-options="<?= esc((string) json_encode($options, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 'attr') ?>">
+    …
+</div>
+<?= $this->endSection() ?>
+```
+
+**The page works without JavaScript.** The columns are drawn on the server, and every card the
+user may move has a small form (`<form method="post" … data-board-move>` with `csrf_field()`, a
+status `<select>` and a *Move* button). The component only improves it (drag and drop, no reload).
+Build pages this way: the server decides what is shown and allowed, the script adds comfort.
+
+### 3. The markup: `data-component`, `data-options` and JSON blocks
+
+- `data-component="tasks/board"`: `core/app.js` finds the element, imports `tasks/board.js`
+  through the import map and calls its `mount(element, options)`. The name is
+  `<owner>/<path>` without `.js`; the owner of a module is its name in lower case with hyphens
+  (`Tasks` → `tasks`, `TasksDemo` → `tasks-demo`).
+- `data-options`: a small JSON object, escaped with `esc(…, 'attr')`. The board passes the data
+  URL, its stylesheet URL and its texts.
+- Larger data goes in a JSON data block referenced by `data-options-id`, which is not executable
+  and therefore allowed by the CSP. The board does not need one (its columns come from the
+  server's HTML and from its endpoint); the dashboard does:
+
+  ```php
+  <div class="dashboard" data-component="dashboard/dashboard" data-options-id="dashboard-config">
+  …
+  <script type="application/json" id="dashboard-config"><?= json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+  ```
+
+  (`modules/Dashboard/Views/dashboard.php`; always encode with the `JSON_HEX_*` flags so the data
+  cannot close the `<script>` element.) Any script can also read a block with
+  `jsonData('<id>')` from `core/config.js`.
+- Hooks for the script are `data-*` attributes (`data-board-column`, `data-board-card`,
+  `data-move-url`, `data-board-status`, `data-board-count`), never `id`s shared with styling and
+  never `on*=""` handlers.
+
+### 4. The ES module
+
+`modules/Tasks/Assets/js/board.js` is a native ES module that exports `mount(root, options)`:
+
+```js
+import { get, post } from 'core/http.js';
+
+export function mount(root, options) {
+    const texts = options.texts || {};
+    const status = root.querySelector('[data-board-status]');
+    …
+}
+```
+
+Shared code is imported with the import-map prefixes, never with relative paths (relative URLs
+would not carry the version hash; `modules/Core/Tests/FrontendAssetsTest.php` fails on any
+`./` or `../` import and on any specifier missing from the import map):
+
+| Import | From |
+|---|---|
+| `import { get, post } from 'core/http.js'` | JSON requests with CSRF (used by the board) |
+| `import { confirm } from 'core/ui/confirm.js'` | a confirmation modal (`await confirm(text, { variant: 'danger' })`) |
+| `import { toast } from 'core/ui/toast.js'` | a toast (`toast(text, { type: 'success' })`) |
+| `import { t, jsonData } from 'core/config.js'` | the Core's script texts, JSON data blocks |
+| `import { … } from 'tasks/<file>.js'` | another file of the **same module** (`modules/Tasks/Assets/js/<file>.js`), also by bare specifier |
+
+The board is a single file: it needs no confirmation (a move is reversible) and no toast of its
+own, because `core/http.js` already shows errors as toasts; it announces success in a live region
+instead. A bigger component splits its code into files of its own module and imports them as
+`'<owner>/<path>.js'` (for example a hypothetical `modules/Tasks/Assets/js/board/card.js` would be
+`'tasks/board/card.js'`).
+
+Build the DOM with `createElement` and `textContent`, never `innerHTML` with data: the board's
+`buildCard()` builds the same markup as `Views/board/card.php` with DOM methods when it redraws the
+columns.
+
+### 5. Calling the JSON endpoint
+
+The component turns each move form into a JSON request, then reloads the columns from the data
+endpoint so the server stays the only judge of what the user sees and may move:
+
+```js
+const move = async (url, target) => {
+    try {
+        const result = await post(url, { json: { status: target } });
+        say(result && result.message ? result.message : texts.moved);
+    } catch (error) {
+        // core/http.js already showed the error as a toast.
+    }
+
+    if (options.dataUrl) {
+        try {
+            const data = await get(options.dataUrl, { silent: true });
+
+            if (data && data.columns) {
+                redraw(data.columns);
+            }
+        } catch (error) {
+            window.location.reload();
+        }
+    }
+};
+```
+
+`core/http.js` sends `X-Requested-With` and `Accept: application/json`, adds the CSRF header on
+unsafe methods (from the `csrf-header` / `csrf-token` meta tags of `partials/head`), takes the
+regenerated token from the response and updates the page's forms, refuses other origins, and turns
+a JSON error (`message`, `messages` or `error`) into a danger toast and a thrown `HttpError`
+(`status`, `data`); `silent: true` skips the toast.
+
+On the server, the route filter checks `tasks-board.view` and `move()` checks the record rules
+(`TaskRepository`):
+
+| Case | Answer |
+|---|---|
+| unknown masked id, or a to-do task the user may not see | 404 |
+| visible but neither `tasks-tasks.edit` nor an assignee | 403 JSON `{"message": …}` (or a redirect with an error for a form post) and `security_log('Tasks', 'move_refused', …)` |
+| a status outside `todo`, `doing`, `done` | 422 JSON |
+| allowed | `{"id", "status", "message"}` and `activity_log('Tasks', 'moved', …)` with the change |
+
+The same endpoint serves the no-JavaScript form: it answers JSON when the request accepts JSON or
+is an AJAX request, and redirects to `backend/tasks` with a flash message otherwise. It reads the
+status from a JSON body or from the form field.
+
+### 6. The module's stylesheet
+
+`modules/Tasks/Assets/css/tasks.css` styles the drop targets and the dragged card with
+Bootstrap's CSS variables (so dark mode works):
+
+```css
+.tasks-board-list.is-drop-target {
+    outline: 2px dashed var(--bs-primary);
+    outline-offset: -4px;
+    background-color: var(--bs-primary-bg-subtle);
+}
+```
+
+The layouts have no `head` section, so a page does not add `<link>` tags to `<head>` from its
+view. The controller passes the versioned URL (`'css' => asset('tasks::css/tasks.css')`) in the
+options and the component adds the stylesheet once:
+
+```js
+if (options.css && !document.querySelector('link[data-tasks-css]')) {
+    const link = element('link');
+    link.rel = 'stylesheet';
+    link.href = options.css;
+    link.dataset.tasksCss = '';
+    document.head.append(link);
+}
+```
+
+The Core's editor and file picker and the Events calendar and Files manager load their CSS the
+same way. A stylesheet every page needs belongs in a theme's `$styles` instead.
+
+### 7. Translations for the script
+
+UI texts live only in the language files (ca, es, en, same keys). The board's texts are read with
+`lang()` in the controller and passed in `options.texts` (see step 2):
+
+```php
+'board' => [
+    'help'         => 'Drag a card to another column, or choose its status and press "Move".',
+    'emptyColumn'  => 'No to-do tasks.',
+    'moveTo'       => 'Move to',
+    'move'         => 'Move',
+    'moved'        => 'To-do task moved.',
+    // …
+],
+```
+
+The Core's own script texts (`Core.js.*`: confirmations, HTTP errors, widgets…) reach every page
+in the `kp-config` data block and are read with `t('http.forbidden')` from `core/config.js`. A
+module does not add keys to `Core.js`; it passes its texts in its options or in its own JSON
+data block.
+
+### 8. Syncing assets
+
+The browser never reads `modules/<Name>/Assets/`; it reads the published copies:
+
+| Source | Copy | URL / specifier |
+|---|---|---|
+| `modules/Tasks/Assets/js/board.js` | `public/assets/modules/tasks/js/board.js` | `tasks/board.js` in the import map |
+| `modules/Tasks/Assets/css/tasks.css` | `public/assets/modules/tasks/css/tasks.css` | `asset('tasks::css/tasks.css')` → `…/tasks.css?v=<hash>` |
+
+- After adding or changing a file in `Assets/`, run `php spark assets:publish` (or
+  `php spark modules:sync`, which also publishes). It copies the allowed file types, removes stale
+  copies and rewrites `public/assets/manifest.json` with a SHA-256 prefix per file; that prefix is
+  the `?v=` of every URL and of every import-map entry, so browsers fetch a changed file at once
+  and cache an unchanged one.
+- While developing: `php spark assets:publish --watch` republishes on every change, or rely on
+  `assets.devRefresh` (default `true`, only with `CI_ENVIRONMENT = development`): the first asset
+  lookup of a request republishes when a source is newer than the manifest, so a reload is enough.
+- In CI: `php spark assets:publish --check` fails when a copy is out of date.
+- **Never edit `public/assets/modules/…`**: the next publish overwrites or deletes your change.
+
+### 9. Debugging
+
+- **The import map**: view the page source; before `</body>` the layout prints
+  `<script type="importmap" nonce="…">{"imports":{"core/app.js":"…", "tasks/board.js":"…?v=…", …}}`
+  (`partials/scripts.php`). If your file is not listed, it was not published.
+- **Devtools**: the Console shows the component registry's warnings and CSP reports; the Network
+  tab shows the JSON requests (status, response body, the CSRF header); the Elements tab shows
+  `data-component-mounted="true"` on an element whose `mount()` succeeded.
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `The component tasks/board could not be mounted` with "Failed to resolve module specifier" or a 404 | the file is not published, or the name does not match the file | `php spark assets:publish`; check `data-component` = `<owner>/<path without .js>` |
+| `Invalid component name …` | upper case or a missing prefix in `data-component` | use `tasks/board`, not `Tasks/board` or `board` |
+| `The component … has no mount() function` | the module does not export `mount` | `export function mount(root, options)` |
+| an import fails to resolve | a relative path or a wrong prefix (`core/ui/toast` without `.js`, `Tasks/…`) | bare specifier with the extension: `core/ui/toast.js`, `tasks/…` |
+| `Invalid data-options on component` | the attribute is not valid JSON | build it with `json_encode()` and `esc(…, 'attr')` |
+| "Refused to execute inline script / apply inline style" | inline code, an `on*=` handler or `style=""` in a view | move the code to the ES module; `php spark csp:check` lists them |
+| a POST refused by the CSRF check | the request did not go through `core/http.js` (no CSRF header), or the page has no `csrf-token` meta tag | use `post()` from `core/http.js` |
+| old code still runs | the browser cached a copy published before | republish; the `?v=` hash changes with the content |
+
+### 10. A minimal test
+
+The endpoints are tested with a feature test (`modules/Tasks/Tests/BoardTest.php`, base
+`TasksTestCase`): the page contains the component, the JSON endpoint returns only what the user may
+see, and forged moves are refused.
+
+```php
+public function testAUserSeesOnlyTheToDoTasksAssignedToThem(): void
+{
+    $pau   = $this->createUser('pau@example.com', 'user');
+    $other = $this->createUser('laia@example.com', 'user');
+    $this->task('La meva', [], [(int) $pau->id]);
+    $this->task('D’una altra persona', [], [(int) $other->id]);
+    $this->login('pau@example.com');
+
+    $page = $this->body('GET', 'backend/tasks');
+    $this->assertStringContainsString('La meva', $page);
+    $this->assertStringNotContainsString('D’una altra persona', $page);
+    $this->assertStringContainsString('data-component="tasks/board"', $page);
+
+    $data = json_decode((string) $this->send('GET', 'backend/tasks/board/data')->response()->getBody(), true);
+    $this->assertSame(['La meva'], array_column($data['columns']['todo'], 'title'));
+    $this->assertTrue($data['columns']['todo'][0]['canMove'], 'An assignee may move their to-do task.');
+}
+```
+
+The same file checks 403 without `tasks-board.view` (page and data), a move as JSON and as a form
+post (with the activity log entries), and forged moves: 404 for an invisible to-do task or a bad
+code, 422 for an unknown status, 403 plus a `move_refused` security entry for a reader, and 404
+for a `GET` on the move URL. Run it with `vendor/bin/phpunit modules/Tasks/Tests/BoardTest.php`.
+The skeleton has no JavaScript unit-test runner; `FrontendAssetsTest` checks every module's
+imports, and the Playwright screenshots of each session (`package.json`) exercise the pages.

@@ -4,7 +4,7 @@ The **Users** module (core module, cannot be disabled) administers accounts, gro
 (specification "Modules" › "Users", "RBAC"). It never writes permissions or groups by itself:
 accounts go through Shield, groups through the Core's `GroupRegistry`, group membership through
 Auth's `GroupRules`, and grants through the Core's `GrantManager`, so every escalation rule of
-`EscalationGuard` applies (`docs/rbac.md`).
+`EscalationGuard` applies (`docs/permissions.md`).
 
 ## Screens and permissions
 
@@ -96,7 +96,7 @@ account", sensitive actions refused meanwhile, start and end in the activity log
 
 ## Birthdays calendar
 
-Two calendars computed on the fly (calendar API, pull; `docs/calendar-api.md`; D-25-07, D-25-08):
+Two calendars computed on the fly (calendar API, pull; `docs/calendar.md`; D-25-07, D-25-08):
 all-day events with the day and month only ("<name>'s birthday", never the year or the age; 29
 February shown on 28 February in common years) of active, non-banned users who entered a date of
 birth in their profile (`user_profiles.birth_date`, Auth). Nothing is stored; never on the public

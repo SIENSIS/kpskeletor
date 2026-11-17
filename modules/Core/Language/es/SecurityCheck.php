@@ -84,7 +84,7 @@ return [
     'hsts' => [
         'title'   => 'Strict-Transport-Security (HSTS)',
         'missing' => 'No se envía: los navegadores aún pueden usar HTTP sin cifrar.',
-        'fix'     => 'Quite securityHeaders.hsts = false de .env cuando el sitio se sirva por HTTPS.',
+        'fix'     => 'Quite securityheaders.hsts = false de .env cuando el sitio se sirva por HTTPS.',
     ],
     'headers' => [
         'title'   => 'Cabeceras de seguridad',
@@ -164,7 +164,7 @@ return [
         'title' => 'Paquetes de módulos y temas',
         'ok' => 'Firmas obligatorias ({0} claves de confianza).',
         'unsigned' => 'Se aceptan paquetes sin firmar (packages.requireSignature está desactivado o packages.publicKeys está vacío).',
-        'fix' => 'Defina en packages.publicKeys las claves minisign de sus publicadores y packages.requireSignature = true (docs/packages.md).',
+        'fix' => 'Defina en packages.publicKeys las claves minisign de sus publicadores y packages.requireSignature = true (docs/installing-modules.md).',
         'autoEnableTitle' => 'Módulos encontrados por modules:sync',
         'autoEnable' => 'packages.autoEnable está activado: una carpeta de módulo copiada a mano se activa con la siguiente sincronización.',
         'fixAutoEnable' => 'Deje packages.autoEnable desactivado en producción (D-29-02).',

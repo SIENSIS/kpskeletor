@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use CodeIgniter\Log\Handlers\FileHandler;
 use CodeIgniter\Test\CIUnitTestCase;
 use Config\Logger;
+use Config\SecurityHeaders;
 
 /**
  * Security defaults set at bootstrap (docs/decisions.md D-00-39, D-00-51).
@@ -43,5 +44,25 @@ final class SecurityDefaultsTest extends CIUnitTestCase
         $this->assertStringContainsString('X-Content-Type-Options "nosniff"', $htaccess);
         $this->assertStringContainsString('sandbox', $htaccess);
         $this->assertMatchesRegularExpression('/FilesMatch "[^"]*php[^"]*html\?[^"]*">\s*Require all denied/', $htaccess);
+    }
+
+    /**
+     * The `.env` key documented in `app/Config/SecurityHeaders.php`, `docs/security.md` and the
+     * `hsts` check's fix uses CodeIgniter's lower-case prefix; the camel-case form is ignored.
+     */
+    public function testSecurityHeadersAreOverriddenWithTheLowerCasePrefix(): void
+    {
+        $_ENV['securityheaders.frameOptions'] = 'SAMEORIGIN';
+        $_ENV['securityHeaders.referrerPolicy'] = 'unsafe-url';
+
+        try {
+            $config = new SecurityHeaders();
+
+            $this->assertSame('SAMEORIGIN', $config->frameOptions);
+            $this->assertSame('strict-origin-when-cross-origin', $config->referrerPolicy);
+            $this->assertStringContainsString('securityheaders.hsts = false', lang('SecurityCheck.hsts.fix'));
+        } finally {
+            unset($_ENV['securityheaders.frameOptions'], $_ENV['securityHeaders.referrerPolicy']);
+        }
     }
 }
