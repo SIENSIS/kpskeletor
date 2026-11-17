@@ -29,6 +29,7 @@
 // Every capture fails (non-zero exit) when the page scrolls horizontally (unless the shot sets
 // "allowOverflow": true) or when the browser reports a Content-Security-Policy violation.
 // "click": selectors clicked in order before the capture ("wait": extra milliseconds).
+// "locale": the browser's language for a shot or the whole config (default ca-ES).
 //
 // --shot syntax: "<url>=<name>[@<width>x<height>][:dark][:full][:guest]".
 // Dark mode uses prefers-color-scheme: dark and, for themes with a manual switch, sets
@@ -106,7 +107,8 @@ async function main() {
             const width = shot.width ?? 1440;
             const height = shot.height ?? 900;
             const dark = !!shot.dark;
-            const key = JSON.stringify([useLogin?.user ?? '', dark, width, height]);
+            const locale = shot.locale ?? cfg.locale ?? 'ca-ES';
+            const key = JSON.stringify([useLogin?.user ?? '', dark, width, height, locale]);
 
             let context = contexts.get(key);
             if (!context) {
@@ -116,7 +118,7 @@ async function main() {
                     colorScheme: dark ? 'dark' : 'light',
                     isMobile: width < 768,
                     hasTouch: width < 768,
-                    locale: cfg.locale ?? 'ca-ES',
+                    locale, // browser language (Accept-Language); "locale" per shot or in the config
                 });
                 if (dark) {
                     await context.addInitScript(() => {

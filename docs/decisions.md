@@ -262,6 +262,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-30-03 | 30 | What `--probe` sends, and the login throttling probe | Accepted (proposal) |
 | D-30-04 | 30 | "The web server writes only …" checked from the console and from the page | Accepted (proposal) |
 | D-30-05 | 30 | Stored results, the daily task and the notification to superadmins | Accepted (proposal) |
+| D-31-01 | 31 | Settings `Core.defaultLocale` and `Core.locales` (decide) | Open |
+| D-31-02 | 31 | The tests run with English as the configured default locale | Accepted (proposal) |
+| D-31-03 | 31 | Catalan copies only of the system files users see; Shield's Catalan texts in `app/Language/ca` | Accepted (proposal) |
+| D-31-04 | 31 | Semantics of the `translated` setting type | Accepted (proposal) |
+| D-31-05 | 31 | Guests get the browser's language; no language switcher | Accepted (proposal) |
+| D-31-06 | 31 | File names of the language service and the key test | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2686,3 +2692,42 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** Files, not the cache nor the database (they survive "clear caches" and a restore): `writable/security/status.json` (full runs: the daily task, `security:check` without `--only`, "Check again", `app:install`, the first visit of the page), `probe.json` (last probe), `composer-audit.json`. The dashboard widget only reads them. A check "turns red" when its id is in error and was not in the previous stored run; the superadmins (group `superadmin`) get one `SecurityCheckFailed` notification per such run. `app:install` stores without notifying. The task succeeds even with errors (its output lists them): otherwise the scheduler's own "task failed" notification would repeat every day.
 - **Status:** Accepted (proposal)
 
+## D-31-01 — Settings `Core.defaultLocale` and `Core.locales` (decide)
+
+- **Where:** specification "Technical baseline" › "Languages" ("the site can restrict the available ones (setting)") and "Settings" › "Site-wide settings" ("default locale, available locales"); plan session 31.
+- **Problem:** The specification asks for the two settings but does not name them nor say how they relate to `Config\App::$defaultLocale` / `$supportedLocales`. Setting names are a public convention.
+- **Proposal (built):** `Core.defaultLocale` (type `select`: empty = "As configured", the value of `Config\App::$defaultLocale`, Catalan; or `ca`/`es`/`en`) and `Core.locales` (type `list`, one code per line, rule `supported_locales`; empty = every supported locale), both in Settings › General (`settings.core`). The default is always one of the available locales (else the first available). Read only through `Modules\Core\I18n\Locales`. Not security settings (no re-authentication).
+- **Alternatives:** A) One `json` setting `Core.locales` with the default as its first entry. B) Checkboxes (a new `multiselect` setting type) instead of a list of codes.
+- **Status:** Open
+
+## D-31-02 — The tests run with English as the configured default locale
+
+- **Where:** specification "Languages" (`defaultLocale = 'ca'`); the existing suite (sessions 00–30) asserts English texts.
+- **Problem:** With Catalan as the default, about every feature test asserting a text would fail or would need rewriting into Catalan.
+- **Proposal:** `Config\App::$defaultLocale = 'ca'` in the file; `phpunit.xml.dist` sets `app.defaultLocale=en` for the tests. The I18n tests set the locales they check (`I18nTest` changes `Config\App::$defaultLocale` to `ca` and restores it) and check the file's value.
+- **Status:** Accepted (proposal)
+
+## D-31-03 — Catalan copies only of the system files users see; Shield's Catalan texts in `app/Language/ca`
+
+- **Where:** specification "Languages" ("validation messages (CodeIgniter's own through `codeigniter4/translations`, plus a Catalan file where that package has none)"); plan risk "every system file needs a Catalan copy".
+- **Proposal:** Catalan copies in `app/Language/ca/` of the system files users can see: `Validation`, `Pager`, `Errors`, `Security`, `Number` (and `Time`, since session 05). The others (developer exceptions: Database, Cache, Router…) follow the chain to Spanish. Shield has no Catalan: `app/Language/ca/Auth.php` holds its keys that the Auth module does not define itself (so the two never compete for a key). `LanguageKeysTest` checks both.
+- **Alternatives:** A) Catalan copies of every system file (31 files of developer messages).
+- **Status:** Accepted (proposal)
+
+## D-31-04 — Semantics of the `translated` setting type
+
+- **Where:** D-25-10 ("one setting stored as JSON (`locale => text`), one input per active locale, default from the language file, Catalan fallback").
+- **Proposal:** The manifest `default` is a language key (its text in every supported locale whose files define it) or a map. Stored as a map (codeigniter4/settings serialises the array); empty texts are dropped. The form shows one input per available locale with the stored text, else the default; the declared rules apply to every input; texts stored for locales the site no longer offers are kept on save; a non-array post is refused by the rules (`required`) or stores nothing. Reading (`TranslatedText::get()`): the locale's stored text → the base locale's → the Catalan stored text → the locale's default → the Catalan default. Saving the defaults stores nothing. Migration `MergeBirthdayGreetingSettings` moves stored `Users.birthdayGreetingCa|Es|En` into `Users.birthdayGreeting` (and back in `down()`).
+- **Status:** Accepted (proposal)
+
+## D-31-05 — Guests get the browser's language; no language switcher
+
+- **Where:** specification "Languages" ("negotiated from the user's profile, then the browser, then the default").
+- **Proposal:** A global `locale` filter negotiates for every request (browser, then default) and `authsession` applies the profile; there is no language selector for guests and no language prefix in URLs (D-20-05 kept one URL per page). A theme may add a selector later (it would need a cookie read by the filter).
+- **Status:** Accepted (proposal)
+
+## D-31-06 — File names of the language service and the key test
+
+- **Where:** plan session 31 (`modules/Core/Language/Language.php`, `tests/unit/I18n/LanguageKeysTest.php`).
+- **Proposal:** The service is `modules/Core/I18n/Language.php` next to `Locales`, `LocaleNegotiator` and `LocaleRules` (`modules/Core/Language/` only holds language folders, which the discovery and the key checks glob). The key test is `tests/unit/I18n/LanguageKeysTest.php` and replaces `modules/Core/Tests/LanguageFilesTest.php` (Core and themes only). No `lang:check` command: the test is the check.
+- **Status:** Accepted (proposal)

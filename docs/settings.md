@@ -38,9 +38,28 @@ public array $settings = [
   of `Config\News` when that class has one, `.env` included).
 - `list` is a list of strings, edited one per line (`SettingCaster::cast('list', …)`); `json`
   is edited as JSON text (`valid_json` is added automatically).
+- `translated` (D-25-10, session 31) is one text per language of the site, stored as one JSON
+  map `locale => text` (`SettingCaster::cast('translated', …)`: locale-like keys, trimmed,
+  empty texts dropped, keys sorted). Its `default` is a **language key** (its text in every
+  supported locale, `TranslatedText::defaults()`) or a map. The form shows one input per
+  **available** locale (`Core.locales`, else every supported locale) named `<field>[<locale>]`;
+  the declared rules apply to each input; texts stored for locales the site no longer offers are
+  kept. Read it with `Modules\Core\Settings\TranslatedText::get('<Module>.<key>', $locale)`:
+  the locale's text, else the Catalan one, else the default of the locale, else the Catalan
+  default. Example: `Users.birthdayGreeting`.
+
+  ```php
+  'birthdayGreeting' => [
+      'type'    => 'translated',
+      'default' => 'Users.greetings.defaultMessage',
+      'rules'   => 'required|max_length[300]',
+      'label'   => 'Users.settings.birthdayGreeting',
+  ],
+  ```
 - Each type adds its own rules (`integer`, `decimal`, `valid_email`, `valid_url_strict[https]`,
   colour pattern, `in_list[...]` for selects, `valid_json`); without `required` the field also
-  gets `permit_empty`. A posted array is emptied (forged input).
+  gets `permit_empty`. A posted array is emptied (forged input), except for `translated` fields,
+  where only the available locales' texts are read.
 - Group labels: `<Module>.settingGroups.<group>` (for `security.<sub>`: `<sub>`), else the
   group name.
 
