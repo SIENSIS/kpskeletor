@@ -11,7 +11,7 @@ use Modules\Users\Services\BirthdayGreetings;
 /**
  * "Birthday greeting" (D-25-09): sent by the SendBirthdayGreetings task to a user on their
  * birthday. The text is the administrator's message for the user's language
- * (`Users.birthdayGreeting<Ca|Es|En>`, `{name}` = the user's name). Bell by default; the user can
+ * (translated setting `Users.birthdayGreeting`, `{name}` = the user's name). Bell by default; the user can
  * add email or turn it off in their notification preferences. Data: name.
  */
 final class BirthdayGreeting extends NotificationType

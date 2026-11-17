@@ -44,10 +44,8 @@ return [
         'birthdayGreetingSharedOnlyHelp' => 'Activat: només es felicita qui ha triat «Comparteix el meu aniversari al calendari» al seu perfil (respecta la seva privacitat). Desactivat: tots els membres dels grups felicitats amb data de naixement.',
         'birthdayGreetingTime' => 'Hora de les felicitacions',
         'birthdayGreetingTimeHelp' => 'HH:MM, hora del lloc. La tasca programada passa a aquesta hora en la següent execució.',
-        'birthdayGreetingCa' => 'Felicitació en català',
-        'birthdayGreetingEs' => 'Felicitació en castellà',
-        'birthdayGreetingEn' => 'Felicitació en anglès',
-        'birthdayGreetingHelp' => 'Cada usuari la rep en el seu idioma; {name} se substitueix pel seu nom.',
+        'birthdayGreeting' => 'Felicitació',
+        'birthdayGreetingHelp' => 'Cada usuari la rep en el seu idioma (un text per idioma del lloc); {name} se substitueix pel seu nom. Un idioma sense text fa servir el català.',
     ],
     'settingGroups' => [
         'impersonation' => 'Suplantació',

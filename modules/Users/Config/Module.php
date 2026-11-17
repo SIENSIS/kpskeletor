@@ -125,27 +125,12 @@ final class Module extends ModuleManifest
             'help'    => 'Users.settings.birthdayGreetingTimeHelp',
             'group'   => 'greetings',
         ],
-        'birthdayGreetingCa' => [
-            'type'    => 'string',
-            'default' => 'Per molts anys, {name}! 🎉',
+        // One text per site language (type `translated`, D-25-10); default: Users.greetings.defaultMessage.
+        'birthdayGreeting' => [
+            'type'    => 'translated',
+            'default' => 'Users.greetings.defaultMessage',
             'rules'   => 'required|max_length[300]',
-            'label'   => 'Users.settings.birthdayGreetingCa',
-            'help'    => 'Users.settings.birthdayGreetingHelp',
-            'group'   => 'greetings',
-        ],
-        'birthdayGreetingEs' => [
-            'type'    => 'string',
-            'default' => '¡Feliz cumpleaños, {name}! 🎉',
-            'rules'   => 'required|max_length[300]',
-            'label'   => 'Users.settings.birthdayGreetingEs',
-            'help'    => 'Users.settings.birthdayGreetingHelp',
-            'group'   => 'greetings',
-        ],
-        'birthdayGreetingEn' => [
-            'type'    => 'string',
-            'default' => 'Happy birthday, {name}! 🎉',
-            'rules'   => 'required|max_length[300]',
-            'label'   => 'Users.settings.birthdayGreetingEn',
+            'label'   => 'Users.settings.birthdayGreeting',
             'help'    => 'Users.settings.birthdayGreetingHelp',
             'group'   => 'greetings',
         ],

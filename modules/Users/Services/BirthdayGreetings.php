@@ -7,6 +7,7 @@ namespace Modules\Users\Services;
 use CodeIgniter\I18n\Time;
 use DateTimeImmutable;
 use DateTimeZone;
+use Modules\Core\Settings\TranslatedText;
 use Modules\Users\Calendar\Birthdays;
 use Modules\Users\Notifications\BirthdayGreeting;
 
@@ -19,8 +20,6 @@ use Modules\Users\Notifications\BirthdayGreeting;
  */
 final class BirthdayGreetings
 {
-    public const LOCALES = ['ca', 'es', 'en'];
-
     /**
      * Sends today's greetings. Returns how many users were greeted.
      */
@@ -89,10 +88,10 @@ final class BirthdayGreetings
      */
     public static function message(string $locale, string $name): string
     {
-        $locale  = in_array($locale, self::LOCALES, true) ? $locale : 'ca';
-        $message = setting('Users.birthdayGreeting' . ucfirst($locale));
+        // The administrator's text of that language, else the Catalan one, else the default.
+        $message = TranslatedText::get('Users.birthdayGreeting', $locale);
 
-        if (! is_string($message) || trim($message) === '') {
+        if ($message === '') {
             $message = lang('Users.greetings.defaultMessage', [], $locale);
         }
 
