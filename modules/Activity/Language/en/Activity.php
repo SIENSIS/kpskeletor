@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'module' => [
-        'name' => 'Activity log',
-    ],
     'title' => 'Activity log',
     'mineTitle' => 'My activity',
     'entry' => 'entry',

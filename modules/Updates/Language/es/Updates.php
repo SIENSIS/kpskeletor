@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'module' => [
-        'name' => 'Actualizaciones',
-    ],
     'title'         => 'Actualizaciones',
     'res'           => ['updates' => 'Actualizaciones'],
     'perm'          => ['check' => 'Comprobar ahora si hay actualizaciones'],

@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'module' => [
-        'name' => 'Registre d’activitat',
-    ],
     'title' => 'Registre d\'activitat',
     'mineTitle' => 'La meva activitat',
     'entry' => 'entrada',
