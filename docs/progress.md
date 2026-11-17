@@ -38,7 +38,7 @@ pull request open), *merged* (in `main`).
 | 28 | Updates module and app:update | merged | `ccr-a5d307ea-vyzp92` | [SIENSIS/kpskeletor#36](https://github.com/SIENSIS/kpskeletor/pull/36) | [`deploy-status/28-updates/`](../deploy-status/28-updates/README.md) |
 | 29 | Modules screen, ZIP installs and uninstall | merged | `ccr-562a7c0f-4i8vha` | [SIENSIS/kpskeletor#37](https://github.com/SIENSIS/kpskeletor/pull/37) | [`deploy-status/29-module-packages/`](../deploy-status/29-module-packages/README.md) |
 | 30 | security:check and the Security status page | merged | `ccr-f19bfaf6-ek95xk` | [SIENSIS/kpskeletor#38](https://github.com/SIENSIS/kpskeletor/pull/38) | [`deploy-status/30-security-check/`](../deploy-status/30-security-check/README.md) |
-| 31 | Internationalisation pass | done | `claude/amazing-goldberg-2trmeu` | (pull request link below) | [`deploy-status/31-i18n/`](../deploy-status/31-i18n/README.md) |
+| 31 | Internationalisation pass | done | `claude/amazing-goldberg-2trmeu` | [SIENSIS/kpskeletor#39](https://github.com/SIENSIS/kpskeletor/pull/39) | [`deploy-status/31-i18n/`](../deploy-status/31-i18n/README.md) |
 
 ## MVP review (session 19)
 

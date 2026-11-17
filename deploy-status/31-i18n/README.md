@@ -1,6 +1,6 @@
 # Session 31 — Internationalisation pass
 
-Branch: `claude/amazing-goldberg-2trmeu` · Pull request: see `docs/progress.md` · Date: 2026-11-17
+Branch: `claude/amazing-goldberg-2trmeu` · Pull request: [SIENSIS/kpskeletor#39](https://github.com/SIENSIS/kpskeletor/pull/39) · Date: 2026-11-17
 
 ## What was built
 
