@@ -154,7 +154,6 @@ live.
 
 ## Tests and checks
 
-- `vendor/bin/phpunit`: see "Results" below.
 - New tests: `modules/Core/Tests/SecurityCheckTest.php` (fails on a development configuration,
   passes on a hardened one; `--only`; a throwing check; report round trip; unsafe and report-only
   CSP; the effective CSP with module and Settings origins; file modes; the secret scanner; the
@@ -173,7 +172,15 @@ live.
 
 ### Results
 
-RESULTS_PLACEHOLDER
+- `vendor/bin/phpunit`: **OK (1213 tests, 7387 assertions)**, 9 min 56 s (1188 tests before
+  this session).
+- `vendor/bin/phpstan analyse` (level 6): `[OK] No errors`.
+- `vendor/bin/php-cs-fixer fix --dry-run --diff`: 0 of 929 files to fix.
+- `php spark csp:check`: no inline scripts, handlers or styles.
+- `php spark permissions:check` (temporary install): 144 permissions, 300 routes checked.
+- Fixed during the session: tests that list the Core's permissions, tasks and widgets exactly
+  (`CatalogueBuilderTest`, `RegistrySyncTest`, `ShieldMatrixTest`, `PermissionsCommandsTest`);
+  the Dashboard tests leave the new Core widget out through `$hiddenWidgets`.
 
 ## Screenshots
 
