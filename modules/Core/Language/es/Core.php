@@ -441,7 +441,17 @@ return [
             'error' => 'No se han podido cargar las notificaciones.',
         ],
     ],
+    'locales' => [
+        'ca' => 'Català',
+        'es' => 'Español',
+        'en' => 'English',
+    ],
     'settings' => [
+        'defaultLocale' => 'Idioma por defecto',
+        'defaultLocaleHelp' => 'Idioma de los visitantes cuyo navegador no pide ninguno de los idiomas disponibles, de los usuarios nuevos y de los correos a usuarios sin idioma.',
+        'defaultLocaleConfig' => 'El de la configuración (catalán)',
+        'locales' => 'Idiomas disponibles',
+        'localesHelp' => 'Los usuarios y los visitantes solo pueden usar los idiomas marcados (como mínimo uno).',
         'pwa'             => 'Aplicación web instalable (PWA)',
         'pwaHelp'         => 'Publica un manifiesto de aplicación web e iconos para que los móviles puedan añadir el sitio a la pantalla de inicio. No se guarda nada sin conexión.',
         'pwaStart'        => 'Página que abre la aplicación instalada',
@@ -683,6 +693,7 @@ return [
         'activity' => 'Registro de actividad',
     ],
     'validation' => [
+        'supportedLocales' => '«{0}» no es un idioma admitido: use {1}.',
         'cspSources' => '«{0}» no es un origen permitido: use https://host, https://*.host o wss://host, sin rutas ni palabras clave.',
         'cspScriptSources' => '«{0}» no se permite para scripts o estilos: use un origen https://host completo, sin comodines, rutas ni palabras clave.',
         'outboundHosts' => '«{0}» no es un host permitido: use un nombre como api.example.com o *.example.com (sin direcciones IP, nombres locales, esquemas ni puertos).',

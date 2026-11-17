@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Texts of the Users module.
  */
 return [
+    'module' => [
+        'name' => 'Users',
+    ],
     'res' => [
         'users' => 'Users',
         'groups' => 'Groups',
@@ -44,10 +47,8 @@ return [
         'birthdayGreetingSharedOnlyHelp' => 'On: only users who chose "Share my birthday in the calendar" in their profile are greeted (respects their privacy). Off: every member of the greeted groups with a date of birth.',
         'birthdayGreetingTime' => 'Time of the greetings',
         'birthdayGreetingTimeHelp' => 'HH:MM, site time. The scheduled task moves to this time on its next run.',
-        'birthdayGreetingCa' => 'Greeting in Catalan',
-        'birthdayGreetingEs' => 'Greeting in Spanish',
-        'birthdayGreetingEn' => 'Greeting in English',
-        'birthdayGreetingHelp' => 'Each user receives it in their language; {name} is replaced by their name.',
+        'birthdayGreeting' => 'Greeting',
+        'birthdayGreetingHelp' => 'Each user receives it in their language (one text per language of the site); {name} is replaced by their name. A language without a text uses the Catalan one.',
     ],
     'settingGroups' => [
         'impersonation' => 'Impersonation',

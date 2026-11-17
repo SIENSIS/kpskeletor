@@ -8,6 +8,9 @@ declare(strict_types=1);
  * the first keys translate the Shield messages the module shows (Shield has no Catalan file).
  */
 return [
+    'module' => [
+        'name' => 'Autenticación',
+    ],
     'bannedUser'                => 'No puedes iniciar sesión ya que estás actualmente vetado.',
     'logOutBannedUser'          => 'Se ha cerrado la sesión porque se ha vetado al usuario.',
     'magicLinkDisabled'         => 'El inicio de sesión con enlace mágico no está permitido.',

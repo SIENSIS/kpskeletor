@@ -15,6 +15,8 @@ $default = $field->defaultText();
     <?php if ($field->help !== null): ?><?= esc(lang($field->help)) ?><?php endif ?>
     <?php if ($field->isOverridden()): ?>
         <span class="d-block"><?= ui_badge(lang('Settings.ui.changed'), 'info') ?>
-        <?= esc(lang('Settings.ui.default', [$default === '' ? lang('Settings.ui.empty') : ($field->type === 'bool' ? lang($default === '1' ? 'Settings.ui.on' : 'Settings.ui.off') : str_replace("\n", ', ', $default))])) ?></span>
+        <?php if ($field->type !== 'translated'): // a translated text shows its texts in the inputs ?>
+        <?= esc(lang('Settings.ui.default', [$default === '' ? lang('Settings.ui.empty') : ($field->type === 'bool' ? lang($default === '1' ? 'Settings.ui.on' : 'Settings.ui.off') : str_replace("\n", ', ', $default))])) ?>
+        <?php endif ?></span>
     <?php endif ?>
 </div>

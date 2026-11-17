@@ -110,6 +110,9 @@ class Filters extends BaseFilters
             // The web installer (`install`, only before installation) runs without a database.
             'moduleenabled' => ['except' => ['install', 'install/*', 'progress/*']], // Routes of disabled modules answer 404 (Modules\Core\Filters\ModuleEnabled)
             'cspmodules' => ['except' => ['install', 'install/*', 'progress/*']], // CSP sources declared by enabled modules (Modules\Core\Filters\ContentSecurity)
+            // The request's language: browser or the site's default among the available locales; then
+            // `authsession` applies the user's profile (Modules\Core\Filters\Locale, docs/i18n.md).
+            'locale' => ['except' => ['api/*', 'progress/*']],
             'csrf' => ['except' => ['api/*']], // Every POST except the token-only API (CodeIgniter's CSRF, session based)
             'authsession' => ['except' => ['api/*', 'install', 'install/*', 'progress/*']], // Session hardening (never on the token-only API): lifetimes, remember-me cap, remote logout, idle lock (Modules\Auth\Filters\AuthSession)
             // 'honeypot',

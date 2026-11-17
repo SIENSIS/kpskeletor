@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Backup module texts (ca).
  */
 return [
+    'module' => [
+        'name' => 'Còpies de seguretat',
+    ],
     'title'         => 'Còpies de seguretat',
     'backup'        => 'Còpia de seguretat',
     'demo'          => 'Dades de demostració',

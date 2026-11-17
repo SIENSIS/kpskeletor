@@ -8,6 +8,7 @@ use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use CodeIgniter\CodeIgniter;
 use Modules\Core\Config\Version;
+use Modules\Core\I18n\Locales;
 use Modules\Core\Models\ModuleModel;
 use Modules\Core\Modules\ModuleDiscovery;
 use Throwable;
@@ -49,7 +50,7 @@ final class About extends BaseCommand
             ['encryption.key', $set((string) config('Encryption')->key !== '')],
             ['app.maskKey', $set(trim((string) config('App')->maskKey) !== '')],
             [lang('Install.about.timezone'), $this->setting('Core.timezone', config('App')->appTimezone)],
-            [lang('Install.about.locale'), config('App')->defaultLocale . ' (' . implode(', ', config('App')->supportedLocales) . ')'],
+            [lang('Install.about.locale'), Locales::default() . ' (' . implode(', ', Locales::available()) . ')'],
             [lang('Install.about.cache'), config('Cache')->handler],
             [lang('Install.about.writable'), lang(is_writable(WRITEPATH) ? 'Core.list.yes' : 'Core.list.no')],
         ], [lang('Install.about.item'), lang('Install.about.value')]);

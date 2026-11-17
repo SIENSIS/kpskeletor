@@ -10,7 +10,7 @@ namespace Modules\Core\Settings;
 final class SettingDefinition
 {
     /**
-     * @param array<array-key, mixed> $options         Fixed choices of a 'select' setting (value => language key)
+     * @param array<array-key, mixed> $options         Fixed choices of a 'select' or 'multiselect' setting (value => language key)
      * @param string|null             $optionsProvider A SettingOptionsProvider class computing the choices at run time
      */
     public function __construct(
@@ -32,13 +32,18 @@ final class SettingDefinition
      */
     public static function fromArray(string $module, string $key, array $definition): self
     {
-        $type = is_string($definition['type'] ?? null) ? $definition['type'] : 'string';
+        $type    = is_string($definition['type'] ?? null) ? $definition['type'] : 'string';
+        $default = $definition['default'] ?? null;
+
+        if ($type === 'translated' && is_string($default)) {
+            $default = TranslatedText::defaults($default); // a language key: its text in every supported locale
+        }
 
         return new self(
             $module,
             $key,
             $type,
-            SettingCaster::cast($type, $definition['default'] ?? null),
+            SettingCaster::cast($type, $default),
             is_string($definition['label'] ?? null) ? $definition['label'] : $module . '.settings.' . $key,
             is_string($definition['rules'] ?? null) ? $definition['rules'] : '',
             is_string($definition['help'] ?? null) ? $definition['help'] : null,

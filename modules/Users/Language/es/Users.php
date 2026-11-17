@@ -6,6 +6,9 @@ declare(strict_types=1);
  * Texts of the Users module.
  */
 return [
+    'module' => [
+        'name' => 'Usuarios',
+    ],
     'res' => [
         'users' => 'Usuarios',
         'groups' => 'Grupos',
@@ -44,10 +47,8 @@ return [
         'birthdayGreetingSharedOnlyHelp' => 'Activado: solo se felicita a quien ha elegido «Compartir mi cumpleaños en el calendario» en su perfil (respeta su privacidad). Desactivado: todos los miembros de los grupos felicitados con fecha de nacimiento.',
         'birthdayGreetingTime' => 'Hora de las felicitaciones',
         'birthdayGreetingTimeHelp' => 'HH:MM, hora del sitio. La tarea programada pasa a esta hora en la siguiente ejecución.',
-        'birthdayGreetingCa' => 'Felicitación en catalán',
-        'birthdayGreetingEs' => 'Felicitación en castellano',
-        'birthdayGreetingEn' => 'Felicitación en inglés',
-        'birthdayGreetingHelp' => 'Cada usuario la recibe en su idioma; {name} se sustituye por su nombre.',
+        'birthdayGreeting' => 'Felicitación',
+        'birthdayGreetingHelp' => 'Cada usuario la recibe en su idioma (un texto por idioma del sitio); {name} se sustituye por su nombre. Un idioma sin texto usa el catalán.',
     ],
     'settingGroups' => [
         'impersonation' => 'Suplantación',

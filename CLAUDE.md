@@ -109,7 +109,11 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   modules (languages and fallback, public/private/groups audience, publish workflow, upload
   handler) comes from `Modules\Core\Content` and `CrudUploadHandler`, not copied (`docs/pages.md`).
 - **Languages:** code, comments and docs in English; UI texts only in language files, complete in
-  `ca`, `es` and `en` (same keys; CI checks it). Catalan is the default, Spanish the fallback.
+  `ca`, `es` and `en` (same keys; `tests/unit/I18n/LanguageKeysTest.php` checks it). Catalan is the
+  default, Spanish the fallback (`service('language')` = `Modules\Core\I18n\Language`: requested →
+  base locale → `es` → `en`). The site's locales only through `Modules\Core\I18n\Locales`
+  (`Core.defaultLocale`, `Core.locales`); per-language settings use the type `translated`
+  (`docs/i18n.md`).
 - PHP 8.2+, `declare(strict_types=1)`, typed code, PSR-12.
 
 ## Developing a module

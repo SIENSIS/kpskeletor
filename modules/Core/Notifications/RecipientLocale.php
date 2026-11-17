@@ -6,6 +6,7 @@ namespace Modules\Core\Notifications;
 
 use Closure;
 use CodeIgniter\Shield\Entities\User;
+use Modules\Core\I18n\Locales;
 
 /**
  * The language a user reads notifications in (emails are rendered in it when queued).
@@ -27,10 +28,9 @@ final class RecipientLocale
 
     public static function for(User $user): string
     {
-        $supported = config('App')->supportedLocales;
-        $locale    = self::$resolver !== null ? (self::$resolver)($user) : null;
+        $locale = self::$resolver !== null ? (self::$resolver)($user) : null;
 
-        return is_string($locale) && in_array($locale, $supported, true) ? $locale : config('App')->defaultLocale;
+        return Locales::isAvailable($locale) ? (string) $locale : Locales::default();
     }
 
     /**

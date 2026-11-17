@@ -13,7 +13,7 @@
  */
 ?>
 <!doctype html>
-<html lang="<?= esc(service('request')->getLocale()) ?>">
+<html lang="<?= esc(service('language')->getLocale()) ?>">
 <head><meta charset="utf-8"><title><?= esc($subject) ?></title></head>
 <body>
 <p><?= esc(lang('Auth.mail.hello')) ?></p>

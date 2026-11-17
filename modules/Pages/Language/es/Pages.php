@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'module' => [
+        'name' => 'Páginas',
+    ],
     'page'            => 'Página',
     'pages'           => 'Páginas',
     'res'             => ['pages' => 'Páginas'],

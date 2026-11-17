@@ -131,6 +131,34 @@ final class Module extends ModuleManifest
             'help'    => 'Core.settings.timezoneHelp',
             'group'   => 'general',
         ],
+        // Languages (docs/i18n.md): the site's default (empty: Config\App::$defaultLocale, Catalan) and
+        // the available ones (checkboxes, D-31-01; at least one); Modules\Core\I18n\Locales.
+        'defaultLocale' => [
+            'type'    => 'select',
+            'default' => '',
+            'label'   => 'Core.settings.defaultLocale',
+            'help'    => 'Core.settings.defaultLocaleHelp',
+            'options' => [
+                ''   => 'Core.settings.defaultLocaleConfig',
+                'ca' => 'Core.locales.ca',
+                'es' => 'Core.locales.es',
+                'en' => 'Core.locales.en',
+            ],
+            'group'   => 'general',
+        ],
+        'locales' => [
+            'type'    => 'multiselect',
+            'default' => ['ca', 'es', 'en'],
+            'rules'   => 'required|supported_locales',
+            'options' => [
+                'ca' => 'Core.locales.ca',
+                'es' => 'Core.locales.es',
+                'en' => 'Core.locales.en',
+            ],
+            'label'   => 'Core.settings.locales',
+            'help'    => 'Core.settings.localesHelp',
+            'group'   => 'general',
+        ],
         // Dashboard widgets: most items of a `links` option (the "Quick links" of each group).
         'widgetMaxLinks' => [
             'type'    => 'int',

@@ -1,0 +1,15 @@
+{
+    "baseURL": "http://localhost:8080",
+    "outDir": "deploy-status/31-i18n/screenshots",
+    "deviceScaleFactor": 2,
+    "login": { "url": "/login", "user": "root@example.org", "password": "Very-long-Passw0rd!x", "userField": "input[name=email]", "passwordField": "input[name=password]", "submit": "button[type=submit]", "waitFor": "/backend" },
+    "shots": [
+        { "url": "/backend/settings/core", "name": "01-settings-general-languages", "fullPage": true },
+        { "url": "/backend/settings/users", "name": "02-settings-translated-greeting", "fullPage": true },
+        { "url": "/backend/settings/users", "name": "03-settings-translated-greeting-phone-dark", "width": 390, "height": 844, "dark": true, "fullPage": true },
+        { "url": "/login", "name": "04-login-guest-catalan-default", "login": false },
+        { "url": "/login", "name": "05-login-guest-spanish-browser", "login": false, "locale": "es-ES" },
+        { "url": "/login", "name": "06-login-guest-english-browser-phone", "login": false, "locale": "en-GB", "width": 390, "height": 844 },
+        { "url": "/backend/profile", "name": "07-profile-languages" }
+    ]
+}

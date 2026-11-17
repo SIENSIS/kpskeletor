@@ -67,12 +67,25 @@ final class BirthdayGreetingsTest extends UsersTestCase
 
     public function testTheMessageIsTheAdministratorsInTheUsersLanguage(): void
     {
-        setting('Users.birthdayGreetingCa', 'Molts anys, {name}! Bon dia de part de la direcció.');
+        setting('Users.birthdayGreeting', ['ca' => 'Molts anys, {name}! Bon dia de part de la direcció.', 'es' => '¡Felicidades, {name}!']);
         setting('Users.birthdayGreetingSharedOnly', false);
         (new BirthdayGreetings())->sendToday(new DateTimeImmutable('2027-05-17'));
 
         $this->assertSame('Molts anys, Profe A! Bon dia de part de la direcció.', $this->render((int) $this->teacher->id, 'ca'));
-        $this->assertSame('¡Feliz cumpleaños, Profe B! 🎉', $this->render((int) $this->private->id, 'es'), 'The default of the user\'s language.');
+        $this->assertSame('¡Felicidades, Profe B!', $this->render((int) $this->private->id, 'es'));
+        $this->assertSame('Molts anys, Profe A! Bon dia de part de la direcció.', BirthdayGreetings::message('en', 'Profe A'), 'A language without a text uses the Catalan one.');
+    }
+
+    public function testWithoutAStoredGreetingEachLanguageGetsItsDefault(): void
+    {
+        $this->assertSame('Per molts anys, Profe A! 🎉', BirthdayGreetings::message('ca', 'Profe A'));
+        $this->assertSame('¡Feliz cumpleaños, Profe A! 🎉', BirthdayGreetings::message('es', 'Profe A'));
+        $this->assertSame('Happy birthday, Profe A! 🎉', BirthdayGreetings::message('en', 'Profe A'));
+        $this->assertSame(
+            ['ca' => 'Per molts anys, {name}! 🎉', 'en' => 'Happy birthday, {name}! 🎉', 'es' => '¡Feliz cumpleaños, {name}! 🎉'],
+            setting('Users.birthdayGreeting'),
+            'The default is the language file\'s text in every locale.',
+        );
     }
 
     public function testTheTwentyNinthOfFebruaryIsGreetedOnTheTwentyEighthInCommonYears(): void
@@ -127,6 +140,33 @@ final class BirthdayGreetingsTest extends UsersTestCase
             $db->resetDataCache();
             $this->assertTrue($db->tableExists($table));
         }
+    }
+
+    public function testTheStoredGreetingsAreMergedIntoOneTranslatedSetting(): void
+    {
+        require_once dirname(__DIR__) . '/Database/Migrations/2026-11-17-100001_MergeBirthdayGreetingSettings.php';
+        $migration = new \Modules\Users\Database\Migrations\MergeBirthdayGreetingSettings(\Config\Database::forge('tests'));
+        $db        = db_connect();
+        $now       = date('Y-m-d H:i:s');
+
+        foreach (['birthdayGreetingCa' => 'Molts anys, {name}!', 'birthdayGreetingEn' => 'Cheers, {name}!', 'birthdayGreetingEs' => ''] as $key => $value) {
+            $db->table('settings')->insert(['class' => 'Users', 'key' => $key, 'value' => $value, 'type' => 'string', 'context' => null, 'created_at' => $now, 'updated_at' => $now]);
+        }
+
+        $migration->up();
+        $row = $db->table('settings')->where('class', 'Users')->where('key', 'birthdayGreeting')->get()->getRowArray();
+        $this->assertSame(['ca' => 'Molts anys, {name}!', 'en' => 'Cheers, {name}!'], unserialize((string) $row['value']));
+        $this->assertSame(0, $db->table('settings')->like('key', 'birthdayGreeting', 'after')->where('key !=', 'birthdayGreeting')->where('key !=', 'birthdayGreetingSharedOnly')->where('key !=', 'birthdayGreetingTime')->countAllResults());
+
+        \Config\Services::resetSingle('settings'); // forget the values read before the migration
+        $this->assertSame('Cheers, Profe A!', BirthdayGreetings::message('en', 'Profe A'));
+        $this->assertSame('Molts anys, Profe A!', BirthdayGreetings::message('es', 'Profe A'), 'Spanish had no text: the Catalan one.');
+
+        $migration->down();
+        $this->assertSame(['birthdayGreetingCa', 'birthdayGreetingEn'], array_column($db->table('settings')->whereIn('key', ['birthdayGreetingCa', 'birthdayGreetingEs', 'birthdayGreetingEn', 'birthdayGreeting'])->orderBy('key')->get()->getResultArray(), 'key'));
+
+        $migration->up();
+        $this->assertSame(1, $db->table('settings')->where('key', 'birthdayGreeting')->countAllResults());
     }
 
     private function profile(User $user, string $date, bool $share, string $name, string $locale): void

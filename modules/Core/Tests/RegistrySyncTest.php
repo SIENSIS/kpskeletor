@@ -10,7 +10,6 @@ use Config\Services;
 use Modules\Core\Modules\SyncFailedException;
 use Modules\Core\Permissions\PermissionCatalogue;
 use Modules\Core\Registry\DeclarationRegistry;
-use Modules\Core\Settings\SettingCaster;
 use Modules\Core\Settings\SettingsRegistry;
 
 /**
@@ -146,7 +145,7 @@ final class RegistrySyncTest extends CIUnitTestCase
 
         foreach ($this->discovery()->discover() as $module) {
             foreach ($module->manifest->settings ?? [] as $key => $definition) {
-                $expected = SettingCaster::cast($definition['type'], $definition['default']);
+                $expected = \Modules\Core\Settings\SettingDefinition::fromArray($module->name, $key, $definition)->default; // a `translated` default is a language key
                 $this->assertSame($expected, setting("{$module->name}.{$key}"), "{$module->name}.{$key}");
                 $count++;
             }

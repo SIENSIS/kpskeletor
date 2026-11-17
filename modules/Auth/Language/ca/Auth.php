@@ -8,6 +8,9 @@ declare(strict_types=1);
  * the first keys translate the Shield messages the module shows (Shield has no Catalan file).
  */
 return [
+    'module' => [
+        'name' => 'Autenticació',
+    ],
     'bannedUser'                => 'No pots iniciar la sessió perquè el teu compte està bloquejat.',
     'logOutBannedUser'          => 'S\'ha tancat la sessió perquè el compte ha estat bloquejat.',
     'magicLinkDisabled'         => 'L\'inici de sessió amb enllaç màgic no està permès.',

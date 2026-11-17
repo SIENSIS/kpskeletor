@@ -29,7 +29,7 @@ final class ManifestValidator
 
     public const RESOURCE_TYPES = ['crud', 'page'];
 
-    public const SETTING_TYPES = ['string', 'text', 'int', 'float', 'bool', 'select', 'email', 'url', 'color', 'json', 'list'];
+    public const SETTING_TYPES = ['string', 'text', 'int', 'float', 'bool', 'select', 'email', 'url', 'color', 'json', 'list', 'translated', 'multiselect'];
 
     public const MENU_KEYS = ['resource', 'route', 'permission', 'label', 'icon', 'order', 'zone', 'parent'];
 
@@ -357,7 +357,7 @@ final class ManifestValidator
                 $this->error("{$key}['optionsProvider']", 'mustBe', [SettingOptionsProvider::class]);
             }
 
-            if ($type === 'select' && $provider === null && (! isset($definition['options']) || ! is_array($definition['options']) || $definition['options'] === [])) {
+            if (in_array($type, ['select', 'multiselect'], true) && $provider === null && (! isset($definition['options']) || ! is_array($definition['options']) || $definition['options'] === [])) {
                 $this->error("{$key}['options']", 'required');
             }
         }

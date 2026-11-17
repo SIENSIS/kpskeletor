@@ -140,8 +140,11 @@ person (D-25-09).
   08:00; a new value moves the task on the scheduler's next sync).
 - `Users.birthdayGreetingSharedOnly` (on by default): only users who share their birthday in the
   calendar (privacy); off: every member of the greeted groups with a date of birth.
-- The message per language, `Users.birthdayGreetingCa`, `…Es`, `…En` (`{name}` = the user's name);
-  each user receives the one of their language. Settings › Users › "Birthday greetings".
+- The message, `Users.birthdayGreeting` (type `translated`: one text per language of the site,
+  `{name}` = the user's name; default `Users.greetings.defaultMessage`); each user receives the
+  one of their language, or the Catalan one when their language has none. Settings › Users ›
+  "Birthday greetings". Session 31 merged the former `Users.birthdayGreetingCa|Es|En` (migration
+  `2026-11-17-100001_MergeBirthdayGreetingSettings`, D-25-10).
 - Service `Services/BirthdayGreetings.php`; tests `Tests/BirthdayGreetingsTest.php`.
 
 ## Activity log

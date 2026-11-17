@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\Core\Menus;
 
+use Modules\Core\I18n\Locales;
+
 /**
  * One entry of the generated back-office menu, already filtered for a user.
  *
@@ -63,7 +65,7 @@ final class MenuEntry
         if ($this->labels !== []) {
             $labels = $this->labels;
             $locale = service('request')->getLocale();
-            $text   = $labels[$locale] ?? $labels[config('App')->defaultLocale] ?? reset($labels);
+            $text   = $labels[$locale] ?? $labels[Locales::default()] ?? reset($labels);
 
             if ($text !== '') {
                 return $text;

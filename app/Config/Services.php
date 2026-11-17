@@ -6,6 +6,7 @@ namespace Config;
 
 use CodeIgniter\Config\BaseService;
 use Config\Logger as LoggerConfig;
+use Modules\Core\I18n\Language;
 use Modules\Core\Log\SafeLogger;
 use Modules\Core\Mail\GuardedEmail;
 
@@ -61,6 +62,27 @@ class Services extends BaseService
         $config ??= config(Email::class);
 
         return new GuardedEmail($config);
+    }
+
+    /**
+     * The language service with the application's fallback chain (requested → base locale →
+     * `Config\App::$localeFallbacks` → `en`; Modules\Core\I18n\Language, docs/i18n.md).
+     */
+    public static function language(?string $locale = null, bool $getShared = true): Language
+    {
+        if ($getShared) {
+            $language = static::getSharedInstance('language', $locale);
+
+            if ($language instanceof Language) {
+                return $language->setLocale($locale);
+            }
+        }
+
+        $request = static::get('request');
+        $current = $request instanceof \CodeIgniter\HTTP\IncomingRequest ? $request->getLocale() : \Locale::getDefault();
+        $locale  = in_array($locale, [null, '', '0'], true) ? $current : $locale;
+
+        return new Language($locale);
     }
 
     /*

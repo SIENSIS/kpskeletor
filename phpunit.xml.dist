@@ -49,6 +49,12 @@
         -->
         <!-- Shared mask key of kpcrudy and kpapy for the tests only (never a real value). -->
         <env name="app.maskKey" value="0000000000000000000000000000000000000000000000000000000000test09"/>
+        <!--
+            The site's default language is Catalan (Config\App::$defaultLocale); the tests assert
+            English texts, so they run with English as the configured default. The tests of the
+            languages themselves (modules/Core/Tests/I18n*) set the locales they check.
+        -->
+        <env name="app.defaultLocale" value="en"/>
         <env name="database.tests.DBDriver" value="SQLite3"/>
         <env name="database.tests.database" value=":memory:"/>
         <env name="database.tests.DBPrefix" value="db_"/>

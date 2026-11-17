@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'module' => [
+        'name' => 'Menus',
+    ],
     'edit'       => 'Edit',
     'delete'     => 'Delete',
     'save'       => 'Save',

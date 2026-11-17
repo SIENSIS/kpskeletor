@@ -138,6 +138,9 @@ final class ManifestValidatorTest extends CIUnitTestCase
         yield 'setting select without options' => [static function (ModuleManifest $m): void {
             $m->settings['perPage']['type'] = 'select';
         }, "\$settings['perPage']['options'] is required"];
+        yield 'setting multiselect without options' => [static function (ModuleManifest $m): void {
+            $m->settings['perPage']['type'] = 'multiselect';
+        }, "\$settings['perPage']['options'] is required"];
         yield 'setting options provider' => [static function (ModuleManifest $m): void {
             $m->settings['perPage']['type']            = 'select';
             $m->settings['perPage']['optionsProvider'] = \stdClass::class;

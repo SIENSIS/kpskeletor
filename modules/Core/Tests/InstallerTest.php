@@ -44,6 +44,7 @@ final class InstallerTest extends CIUnitTestCase
         $this->dropAllTables();
         service('language')->setLocale('en');
         Services::resetSingle('settings');
+        Services::resetSingle('storage'); // its upload rules were read from an earlier test's settings
         $this->saveInstallConfig();
     }
 

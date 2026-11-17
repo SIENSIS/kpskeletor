@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'module' => [
+        'name' => 'API',
+    ],
     'res'  => ['api' => 'Tokens de API de todos los usuarios'],
     'perm' => [
         'docs'   => 'Leer la documentación de la API y probarla',
