@@ -16,7 +16,7 @@
                     <?= esc($card['title']) ?>
                 <?php endif ?>
             </h3>
-            <?= ui_badge(lang('Tasks.priorities.' . $card['priority']), ['high' => 'danger', 'normal' => 'secondary', 'low' => 'light'][$card['priority']] ?? 'secondary') ?>
+            <span class="flex-shrink-0 align-self-start"><?= ui_badge(lang('Tasks.priorities.' . $card['priority']), ['high' => 'danger', 'normal' => 'secondary', 'low' => 'light'][$card['priority']] ?? 'secondary') ?></span>
         </div>
         <div class="small text-body-secondary d-flex flex-wrap gap-2">
             <?php if ($card['project'] !== null): ?><span><i class="bi bi-folder2" aria-hidden="true"></i> <?= esc($card['project']) ?></span><?php endif ?>

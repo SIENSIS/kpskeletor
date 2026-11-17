@@ -11,12 +11,13 @@
  * @var list<array{slug: string, name: string, color: string}>   $projects
  * @var string|null                                              $current
  * @var string|null                                              $requestUrl
+ * @var list<array<string, mixed>>                               $breadcrumbs (when given, the layout prints the title)
  */
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-    <h1 class="h2 mb-0"><?= esc($title) ?></h1>
+    <?php if ($breadcrumbs === []): ?><h1 class="h2 mb-0"><?= esc($title) ?></h1><?php else: ?><span></span><?php endif ?>
     <?php if ($requestUrl !== null): ?>
         <a class="btn btn-sm btn-primary" href="<?= esc($requestUrl, 'attr') ?>"><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= esc(lang('Tasks.public.request')) ?></a>
     <?php endif ?>

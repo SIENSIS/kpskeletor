@@ -360,6 +360,8 @@ final class TaskRepository
 
     /**
      * The to-do tasks the user may see on the board (not in the trash).
+     *
+     * @return BaseBuilder<BaseConnection<object|resource, object|resource>>
      */
     private function visibleTo(User $user): BaseBuilder
     {

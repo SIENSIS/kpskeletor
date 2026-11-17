@@ -59,7 +59,9 @@ function buildCard(card, status, texts) {
         title.textContent = card.title;
     }
 
-    head.append(title, element('span', 'badge ' + badgeClass(card.priority), (texts.priorities || {})[card.priority] || card.priority));
+    const priority = element('span', 'flex-shrink-0 align-self-start');
+    priority.append(element('span', 'badge ' + badgeClass(card.priority), (texts.priorities || {})[card.priority] || card.priority));
+    head.append(title, priority);
     body.append(head);
 
     const meta = element('div', 'small text-body-secondary d-flex flex-wrap gap-2');

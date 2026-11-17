@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="32" viewBox="0 0 160 32" role="img" aria-label="Tasks Demo">
+  <rect x="1" y="4" width="24" height="24" rx="5" fill="#6f42c1"/>
+  <path d="M7 16.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="32" y="22" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="#6f42c1">Tasks Demo</text>
+</svg>

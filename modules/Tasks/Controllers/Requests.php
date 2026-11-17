@@ -48,7 +48,7 @@ final class Requests extends BackendController
             ])
             ->defaultOrder('id', 'desc');
 
-        $crud->addOperation('accept', static function (string $id, array $row, Crud $crud): ResponseInterface|string {
+        $crud->addOperation('accept', static function (string $id, array $row, Crud $crud): ResponseInterface {
             $taskId = (new TaskRequests())->accept($row, (int) auth()->id());
 
             if ($taskId === null) {

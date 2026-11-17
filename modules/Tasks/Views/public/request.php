@@ -1,7 +1,7 @@
 <?php
 /**
  * The public form "request a to-do task" (tutorial 12) with the always-on captcha (markup of
- * Auth's `_captcha` partial, image from `tasks/request/captcha`; component `auth/captcha`).
+ * Auth's `_captcha` partial; the layout prints the title with the breadcrumbs, image from `tasks/request/captcha`; component `auth/captcha`).
  *
  * @var string                $layout
  * @var string                $title
@@ -19,7 +19,6 @@ $error = static function (string $name, string $id) use ($errors): string {
 <?= $this->section('content') ?>
 <div class="row justify-content-center">
     <div class="col-12 col-lg-8 col-xl-7">
-        <h1 class="h2"><?= esc($title) ?></h1>
         <p class="text-body-secondary"><?= esc(lang('Tasks.form.intro')) ?></p>
         <?php if ($errors !== []): ?>
             <div class="alert alert-danger" role="alert"><?= esc(lang('Tasks.form.errors')) ?></div>

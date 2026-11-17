@@ -27,7 +27,8 @@
 // }
 //
 // Every capture fails (non-zero exit) when the page scrolls horizontally (unless the shot sets
-// "allowOverflow": true) or when the browser reports a Content-Security-Policy violation.
+// "allowOverflow": true) or when the browser reports a Content-Security-Policy violation (except
+// those of CodeIgniter's development debug toolbar script, `?debugbar`).
 // "click": selectors clicked in order before the capture ("wait": extra milliseconds).
 // "locale": the browser's language for a shot or the whole config (default ca-ES).
 //
@@ -134,6 +135,9 @@ async function main() {
             const target = new URL(shot.url, baseURL).href;
             const violations = [];
             page.on('console', (message) => {
+                // CodeIgniter's development debug toolbar (`?debugbar`) applies inline styles of its own;
+                // it never runs in production, so its violations are not the page's.
+                if (/[?&]debugbar\b/.test(message.location().url ?? '')) return;
                 if (/Content Security Policy|Refused to (execute|load|apply)/i.test(message.text())) violations.push(message.text());
             });
             try {
