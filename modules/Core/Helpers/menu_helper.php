@@ -22,7 +22,7 @@ if (! function_exists('menu')) {
     function menu(string $location): array
     {
         $request = service('request');
-        $locale  = $request instanceof IncomingRequest ? $request->getLocale() : config('App')->defaultLocale;
+        $locale  = $request instanceof IncomingRequest ? $request->getLocale() : \Modules\Core\I18n\Locales::default();
         $menu    = new PublicMenu($location, $locale, current_url());
         Events::trigger(PublicMenu::EVENT, $menu);
 

@@ -19,6 +19,7 @@ use Modules\Auth\Services\SessionTracker;
 use Modules\Core\Activity\ActivityLogger;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Frontend\ThemeMode;
+use Modules\Core\I18n\Locales;
 use Modules\Core\Storage\Picker\PickerField;
 
 /**
@@ -50,7 +51,7 @@ final class ProfileController extends BackendController
                 'error'    => is_array($errors) && isset($errors['avatar']) ? (string) $errors['avatar'] : null,
                 'disabled' => ! $this->can('auth-profile.edit'),
             ]),
-            'locales'   => config('App')->supportedLocales,
+            'locales'   => Locales::available(),
             'timezones' => DateTimeZone::listIdentifiers(),
             'modes'     => ThemeMode::MODES,
             'canEdit'   => $this->can('auth-profile.edit'),
@@ -72,7 +73,7 @@ final class ProfileController extends BackendController
         $rules = [
             'name'       => ['label' => 'Auth.profile.name', 'rules' => 'permit_empty|max_length[150]'],
             'email'      => ['label' => 'Auth.profile.email', 'rules' => 'required|max_length[254]|valid_email'],
-            'locale'     => ['label' => 'Auth.profile.locale', 'rules' => 'required|in_list[' . implode(',', config('App')->supportedLocales) . ']'],
+            'locale'     => ['label' => 'Auth.profile.locale', 'rules' => 'required|in_list[' . implode(',', Locales::available()) . ']'],
             'timezone'   => ['label' => 'Auth.profile.timezone', 'rules' => 'required|timezone'],
             'theme_mode' => ['label' => 'Auth.profile.themeMode', 'rules' => 'required|in_list[' . implode(',', ThemeMode::MODES) . ']'],
             'birth_date' => ['label' => 'Auth.profile.birthDate', 'rules' => 'permit_empty|valid_date[Y-m-d]'],

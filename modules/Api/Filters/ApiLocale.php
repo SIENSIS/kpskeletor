@@ -8,13 +8,13 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Config\App;
+use Modules\Core\I18n\LocaleNegotiator;
 
 /**
  * Language of API responses (`apilocale`, on `api/*` in app/Config/Filters.php): the request's
- * `Accept-Language` among `Config\App::$supportedLocales` (ca, es, en), so problem+json titles,
+ * `Accept-Language` among the site's available locales (Modules\Core\I18n\LocaleNegotiator), so problem+json titles,
  * validation messages and translated fields follow the client; without the header, the
- * application's default. The API has no session, so the web's language choice never applies.
+ * site's default (`Core.defaultLocale`). The API has no session, so the web's language choice never applies.
  */
 final class ApiLocale implements FilterInterface
 {
@@ -23,16 +23,13 @@ final class ApiLocale implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        if (! $request instanceof IncomingRequest || $request->getHeaderLine('Accept-Language') === '') {
+        if (! $request instanceof IncomingRequest) {
             return null;
         }
 
-        $locale = $request->negotiate('language', config(App::class)->supportedLocales);
-
-        if ($locale !== '') {
-            $request->setLocale($locale);
-            service('language')->setLocale($locale);
-        }
+        $locale = (new LocaleNegotiator())->negotiate(null, $request->getHeaderLine('Accept-Language'));
+        $request->setLocale($locale);
+        service('language')->setLocale($locale);
 
         return null;
     }

@@ -94,8 +94,12 @@ class App extends BaseConfig
      * is viewing the site from. It affects the language strings and other
      * strings (like currency markers, numbers, etc), that your program
      * should run under for this request.
+     *
+     * Catalan (docs/specification.md, "Languages"). The site's default locale and its available
+     * locales are the settings `Core.defaultLocale` / `Core.locales` (Modules\Core\I18n\Locales);
+     * this value applies while they are not set (and before installation).
      */
-    public string $defaultLocale = 'en';
+    public string $defaultLocale = 'ca';
 
     /**
      * --------------------------------------------------------------------------
@@ -120,12 +124,27 @@ class App extends BaseConfig
      *
      * IncomingRequest::setLocale() also uses this list.
      *
-     * The three languages of the skeleton (the profile's language uses them); the default
-     * locale and negotiation are set by the internationalisation session (31).
+     * The three languages of the skeleton. Negotiation is the Core's (`locale` filter and
+     * Modules\Core\I18n\LocaleNegotiator: the user's profile, then the browser, then the
+     * default), restricted to the site's available locales (setting `Core.locales`), so
+     * $negotiateLocale stays off.
      *
      * @var list<string>
      */
-    public array $supportedLocales = ['en', 'ca', 'es'];
+    public array $supportedLocales = ['ca', 'es', 'en'];
+
+    /**
+     * --------------------------------------------------------------------------
+     * Fallback chain of the language lines
+     * --------------------------------------------------------------------------
+     *
+     * A line missing in the requested locale (and in the locale without its region) is looked
+     * up in these locales, in order; English is always the last resort
+     * (Modules\Core\I18n\Language). Spanish is the fallback of the skeleton.
+     *
+     * @var list<string>
+     */
+    public array $localeFallbacks = ['es', 'en'];
 
     /**
      * --------------------------------------------------------------------------

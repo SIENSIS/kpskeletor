@@ -441,7 +441,17 @@ return [
             'error' => 'No s\'han pogut carregar les notificacions.',
         ],
     ],
+    'locales' => [
+        'ca' => 'Català',
+        'es' => 'Español',
+        'en' => 'English',
+    ],
     'settings' => [
+        'defaultLocale' => 'Idioma per defecte',
+        'defaultLocaleHelp' => 'Idioma dels visitants el navegador dels quals no demana cap dels idiomes disponibles, dels usuaris nous i dels correus als usuaris sense idioma.',
+        'defaultLocaleConfig' => 'El de la configuració (català)',
+        'locales' => 'Idiomes disponibles',
+        'localesHelp' => 'Codis d’idioma, un per línia (ca, es, en). Buit: tots. Els usuaris i els visitants només poden fer servir aquests.',
         'pwa'             => 'Aplicació web instal·lable (PWA)',
         'pwaHelp'         => 'Publica un manifest d\'aplicació web i icones perquè els mòbils puguin afegir el lloc a la pantalla d\'inici. No es desa res fora de línia.',
         'pwaStart'        => 'Pàgina que obre l\'aplicació instal·lada',
@@ -683,6 +693,7 @@ return [
         'activity' => 'Registre d’activitat',
     ],
     'validation' => [
+        'supportedLocales' => '«{0}» no és un idioma admès: feu servir {1}.',
         'cspSources' => '«{0}» no és un origen permès: feu servir https://host, https://*.host o wss://host, sense camins ni paraules clau.',
         'cspScriptSources' => '«{0}» no es permet per a scripts o estils: feu servir un origen https://host complet, sense comodins, camins ni paraules clau.',
         'outboundHosts' => '«{0}» no és un host permès: feu servir un nom com api.example.com o *.example.com (sense adreces IP, noms locals, esquemes ni ports).',

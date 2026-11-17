@@ -17,6 +17,7 @@ use Modules\Auth\Models\UserProfileModel;
 use Modules\Auth\Services\AuthPolicy;
 use Modules\Auth\Services\Impersonation;
 use Modules\Auth\Services\SessionTracker;
+use Modules\Core\I18n\Locales;
 use Throwable;
 
 /**
@@ -309,7 +310,8 @@ final class AuthSession implements FilterInterface
     {
         $locale = model(UserProfileModel::class)->forUser($userId)['locale'] ?? null;
 
-        if (is_string($locale) && in_array($locale, config('App')->supportedLocales, true)) {
+        // Only a locale the site offers (Core.locales); otherwise the `locale` filter's choice stays.
+        if (Locales::isAvailable(is_string($locale) ? $locale : null)) {
             $request->setLocale($locale);
             service('language')->setLocale($locale);
         }

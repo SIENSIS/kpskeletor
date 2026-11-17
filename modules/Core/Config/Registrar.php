@@ -7,10 +7,12 @@ namespace Modules\Core\Config;
 use Modules\Core\Filters\Can;
 use Modules\Core\Filters\ContentSecurity;
 use Modules\Core\Filters\CsrfTokenHeader;
+use Modules\Core\Filters\Locale;
 use Modules\Core\Filters\Maintenance;
 use Modules\Core\Filters\ModuleEnabled;
 use Modules\Core\Filters\PoorMansCron;
 use Modules\Core\Filters\RateLimit;
+use Modules\Core\I18n\LocaleRules;
 use Modules\Core\Settings\SecurityRules;
 
 /**
@@ -28,6 +30,7 @@ final class Registrar
                 'can'           => Can::class,
                 'cspmodules'    => ContentSecurity::class,
                 'csrftoken'     => CsrfTokenHeader::class,
+                'locale'        => Locale::class,
                 'maintenance'   => Maintenance::class,
                 'moduleenabled' => ModuleEnabled::class,
                 'poormanscron'  => PoorMansCron::class,
@@ -37,12 +40,13 @@ final class Registrar
     }
 
     /**
-     * Rules that refuse values weakening the security baseline (Settings › Security).
+     * Rules that refuse values weakening the security baseline (Settings › Security) and the
+     * check of the available locales (`Core.locales`).
      *
      * @return array<string, mixed>
      */
     public static function Validation(): array
     {
-        return ['ruleSets' => [SecurityRules::class]];
+        return ['ruleSets' => [SecurityRules::class, LocaleRules::class]];
     }
 }

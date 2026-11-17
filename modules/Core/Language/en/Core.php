@@ -441,7 +441,17 @@ return [
             'error' => 'The notifications could not be loaded.',
         ],
     ],
+    'locales' => [
+        'ca' => 'Català',
+        'es' => 'Español',
+        'en' => 'English',
+    ],
     'settings' => [
+        'defaultLocale' => 'Default language',
+        'defaultLocaleHelp' => 'Language of visitors whose browser asks for none of the available languages, of new users and of emails to users without a language.',
+        'defaultLocaleConfig' => 'As configured (Catalan)',
+        'locales' => 'Available languages',
+        'localesHelp' => 'Language codes, one per line (ca, es, en). Empty: all of them. Users and visitors can only use these.',
         'pwa'             => 'Installable web app (PWA)',
         'pwaHelp'         => 'Publishes a web app manifest and icons so phones can add the site to the home screen. Nothing is cached offline.',
         'pwaStart'        => 'Page the installed app opens',
@@ -683,6 +693,7 @@ return [
         'activity' => 'Activity log',
     ],
     'validation' => [
+        'supportedLocales' => '"{0}" is not a supported language: use {1}.',
         'cspSources' => '"{0}" is not an allowed origin: use https://host, https://*.host or wss://host, without paths or keywords.',
         'cspScriptSources' => '"{0}" is not allowed for scripts or styles: use a full https://host origin, without wildcards, paths or keywords.',
         'outboundHosts' => '"{0}" is not an allowed host: use a host name such as api.example.com or *.example.com (no IP addresses, local names, schemes or ports).',
