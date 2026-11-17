@@ -54,7 +54,7 @@ class Packages extends BaseConfig
 
     /**
      * File extensions a package may contain (lower case; files without an extension are refused
-     * except `LICENSE`, `README`, `CHANGELOG`, `NOTICE` and `AUTHORS`).
+     * except `LICENSE`, `README`, `CHANGELOG`, `NOTICE`, `AUTHORS`, `COPYING` and `.gitkeep`).
      *
      * @var list<string>
      */

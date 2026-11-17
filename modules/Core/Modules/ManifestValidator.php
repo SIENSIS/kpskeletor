@@ -222,7 +222,9 @@ final class ManifestValidator
                     $this->error("{$key}['extra']", 'mustBe', ['array<string, string>']);
                 } else {
                     foreach ($extra as $operation => $label) {
-                        if (preg_match('/^[a-z][a-zA-Z0-9]*$/', (string) $operation) !== 1) {
+                        // Lower case only: permission names are compared in lower case, so an
+                        // operation such as `markRead` would be refused to everyone (D-33-03).
+                        if (preg_match('/^[a-z][a-z0-9]*$/', (string) $operation) !== 1) {
                             $this->error("{$key}['extra']", 'operation', [(string) $operation]);
                         }
 

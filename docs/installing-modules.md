@@ -1,4 +1,4 @@
-# Modules screen, packages and uninstalling
+# Installing modules and themes
 
 Modules and themes are **code**: the web server never writes into `modules/`, `themes/` or
 `app/Config/`. They are installed in one of three ways, all ending in the same validation and
@@ -14,6 +14,15 @@ D-29-01 … D-29-09).
 3. **Upload in the screen, install from the console** (staged install): a superadmin uploads
    the ZIP, checks what it contains and approves it; an operator (or a cron line) runs
    `php spark modules:install --pending`.
+
+| Way | Who | Validation | Backup, maintenance |
+|---|---|---|---|
+| Folder + `modules:sync` | whoever deploys the code | the manifest (`ManifestValidator`) on sync; no package checks | no (make one first: `php spark backup:create`) |
+| `modules:install <file or URL>` / `themes:install` | an operator at the console | full package validation and signature | yes |
+| Upload + approve + `--pending` | `modules.upload` holder (web), then the console | at upload, again (SHA-256) at approval and at install | yes |
+
+Writing a module and building its ZIP: [`creating-a-module.md`](creating-a-module.md). Every
+command and option: [`commands.md`](commands.md).
 
 ## The Modules screen
 
@@ -73,6 +82,24 @@ Validation (`Modules\Core\Packages\PackageValidator`), before anything is instal
   `app:update`);
 - every PHP file is syntax-checked with `php -l` (`PhpLint`, in a private folder).
 
+### Signatures
+
+A package is signed with [minisign](https://jedisct1.github.io/minisign/) (Ed25519; both the
+default prehashed `ED` and the legacy `Ed` signatures; the trusted comment is verified too,
+`SignatureCheck`, libsodium). The signature is `<package>.zip.minisig`:
+
+- `modules:install <file.zip>` reads `<file.zip>.minisig` next to the file, or `--signature=<file>`;
+- `modules:install <url>` downloads `<url>.minisig` too (through `OutboundClient`: HTTPS and an
+  allowed host only, [`outbound-requests.md`](outbound-requests.md));
+- the upload form takes the `.minisig` file with the ZIP.
+
+Trusted publisher keys go in `$publicKeys` of `app/Config/Packages.php` (the base64 line of the
+publisher's `.pub` file, or the whole file); a signature by an unknown key, a bad signature or a
+signature with no key configured refuses the package. A package without a signature is accepted
+(and shown as unsigned) unless `packages.requireSignature = true` in `.env`, which production
+sites should set once their publishers sign. How a publisher signs:
+[`creating-a-module.md`](creating-a-module.md) ("Packaging as a ZIP and signing it").
+
 The install (`PackageInstaller`) then checks dependencies and the Core version, refuses a module
 of another **author** (`$author` in the manifest) and a downgrade or the same version unless
 `--force`, and:
@@ -104,6 +131,27 @@ Running modules:sync…
 Glossary 1.0.0 installed.
 ```
 
+### Upgrading
+
+Install the new version's ZIP the same way (console or staged upload). The installer sees the
+module is installed and plans an **upgrade** when the version is higher; the same version
+(reinstall) or a lower one (downgrade) needs `--force`, and a package of another `$author` is
+refused. The previous folder is renamed aside and put back if anything fails (a backup is made
+first). `modules:sync`, in a new process, then:
+
+- runs the new version's migrations (released migrations are never edited, so an upgrade only
+  adds migrations; a downgrade does not roll any back);
+- keeps the module's enabled state, its data, its settings values and its grants;
+- adds the permissions of new resources or operations to the catalogue. `defaultGrants` are
+  applied only at a module's first sync: grant new permissions in the matrix (wildcards such as
+  `news-posts.*` already cover new operations of the resource). Permissions the new version no
+  longer generates are reported as stale and removed with `php spark modules:sync --prune`.
+- publishes the new assets and stores the new declarations (settings, widgets, tasks…).
+
+The Updates module tells administrators when a module that declares `$repository` has a newer
+release; it never installs it ([`updates.md`](updates.md)). The Core itself is updated with
+`php spark app:update`, not as a package.
+
 ### Staged installs
 
 1. *Packages › Upload a package*: the ZIP (and optionally its `.minisig`) is validated, stored
@@ -116,12 +164,21 @@ Glossary 1.0.0 installed.
    log and notifies the approver (`PackageProcessed`). Uploaded and pending entries expire after
    `packages.pendingDays` (7).
 
-Cron line for an operator account that may write the code folders (separate from the web
-server's `schedule:run`):
+### The cron line for pending installs
+
+Approved packages and uninstall requests wait until the console runs them. Run
+`php spark modules:install --pending` by hand, or from a cron line of an operator account that
+may write `modules/`, `themes/` and `app/Config/` (not the web server's user; separate from the
+`schedule:run` line of [`scheduler.md`](scheduler.md)):
 
 ```
 */5 * * * * cd /var/www/site && php spark modules:install --pending >> writable/logs/packages.log 2>&1
 ```
+
+Each run cleans expired entries, then processes the pending ones in order of approval; with
+nothing pending it does nothing. The backup password comes from `backup.password` /
+`BACKUP_PASSWORD` in that account's environment (`--password` asks for it, so it is for runs by
+hand).
 
 ## Uninstalling
 
@@ -139,6 +196,24 @@ request run by `modules:install --pending`):
    row (and, unless `--keep-data`, its notifications and demo records);
 5. its folder is deleted and `modules:sync` removes its namespace and published assets.
 
+### What happens to the data
+
+| | Default | `--keep-data` |
+|---|---|---|
+| Module tables (its migrations) | rolled back: tables dropped | kept, with their migration history |
+| Calendar entries, notifications, demo records | deleted | kept |
+| Permissions, group and user grants naming them | deleted | deleted |
+| Settings values, scheduled tasks, notification preferences, declarations, registry row | deleted | deleted |
+| Menu customisations, public menu items of its link types, its widgets in group layouts | deleted (`moduleUninstalling` listeners) | deleted |
+| Files it stored through the Storage service | kept | kept |
+| Activity log entries | kept (append-only) | kept |
+| Code, namespace, published assets | deleted | deleted |
+
+The backup made first is the way back (`php spark backup:restore`, [`backup-restore.md`](backup-restore.md)).
+Installing the module again later is a first install: its default grants are applied again
+and, after `--keep-data`, its existing tables are used as they are (their migrations already
+ran).
+
 Core modules and modules other installed modules require cannot be uninstalled. Themes:
 `php spark themes:uninstall <slug>`: never the active theme of either area, the fallback theme
 or a parent of another theme; its folder, assets and option values are removed.
@@ -149,7 +224,7 @@ or a parent of another theme; its folder, assets and option values are removed.
 |---|---|---|
 | `allowDemoInProduction` | false | Demo data may be loaded/removed in production |
 | `autoEnable` | false | Enable modules found by `modules:sync` in production too (D-29-02) |
-| `publicKeys` | [] | Trusted publisher keys (minisign public keys) |
+| `publicKeys` | [] | Trusted publisher keys (minisign public keys; an array: set it in `app/Config/Packages.php`) |
 | `requireSignature` | false | Refuse unsigned packages |
 | `maxPackageBytes` | 20 MB | Largest ZIP |
 | `maxUncompressedBytes` | 100 MB | Largest uncompressed total |

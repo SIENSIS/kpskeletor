@@ -274,6 +274,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-32-04 | 32 | Attachments of to-do tasks: a picker field with up to 5 keys + a `task_attachments` index | Accepted (proposal) |
 | D-32-05 | 32 | Generator templates stay in `modules/Core/Modules/Templates`; no packager option for `CLAUDE.md` yet | Accepted (proposal) |
 | D-33-01 | 33 | Documents renamed to the specification's names (`permissions.md`, `calendar.md`, `installing-modules.md`) | Accepted (proposal) |
+| D-33-02 | 33 | The JavaScript and widget tutorials describe the Tasks code as built | Accepted (proposal) |
+| D-33-03 | 33 | Extra operation names in lower case only (manifest validation) | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2788,4 +2790,20 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Two names for one document invite drift; the specification's list is what acceptance criterion 13 checks.
 - **Proposal:** Rename the three files (`git mv`) to the specification's names, update every reference (code comments, language lines, tests, `CLAUDE.md` files, docs), and leave a three-line stub at each old path ("moved to …") so the historical records (`docs/decisions.md`, `docs/progress.md`, `deploy/`, `deploy-status/`, released migrations) keep working links. `tests/unit/Docs/DocumentationTest.php` checks that every `docs/….md` named in the docs exists.
 - **Alternatives:** A) Keep the old files and add the specification's names as short index pages. B) Keep the old names and record the difference.
+- **Status:** Accepted (proposal)
+
+## D-33-02 — The JavaScript and widget tutorials describe the Tasks code as built
+
+- **Where:** specification "Documentation (English)" (`docs/frontend.md` tutorial "A new view with JavaScript", `docs/widgets.md` tutorial "A new widget"); `CLAUDE.md` ("Front end": bare specifiers, never relative paths); `modules/Tasks` (session 32).
+- **Problem:** The specification's tutorials name things the Tasks module does not do: a relative import (`./board/card.js`, which `CLAUDE.md` and `FrontendAssetsTest` forbid), `core/ui/confirm.js`/`core/ui/toast.js` imports in `board.js`, a `<script type="application/json">` block and a `data-i18n` block on the board, a module CSS file loaded through a `head` section (the layouts have none; components add their `<link>` from `data-options`, like the editor and the calendar), a JavaScript unit test (no JS test runner), and an async widget with its own ES module (`tasks/activity-chart`) that refreshes (the chart is drawn on the server and shown by the Core's `core/ui/widget`, `refreshSeconds()` 0).
+- **Proposal:** The documents describe the real code, quote it, and say where the specification differs: bare specifiers (`tasks/<path>.js`) instead of relative paths (the owner's rule in `CLAUDE.md` wins); the Dashboard's JSON block as the example of larger data; texts and the stylesheet URL through `data-options`. Session 34 (tutorials) may extend the Tasks module where a tutorial needs it (confirm/toast on the board, a refreshing chart module); a `head` section in the layouts would be a Core/theme convention change and needs the owner.
+- **Alternatives:** A) Change the Tasks module now (session 34's scope). B) Add a `head` section to every layout (theme convention change).
+- **Status:** Accepted (proposal)
+
+## D-33-03 — Extra operation names in lower case only (manifest validation)
+
+- **Where:** specification "RBAC" (permission names in lower case); `modules/Core/Modules/ManifestValidator.php` (accepted `extra` names such as `markRead`); `Authorization::holds()` lower-cases the asked name and compares it with the catalogue as stored.
+- **Problem:** Found while documenting permissions: a camel-case extra operation passed validation, but its permission was refused to everyone, superadmins included (fails closed, no module uses one).
+- **Proposal:** The validator accepts only `^[a-z][a-z0-9]*$` for extra operations, so the mistake stops `modules:sync` with a clear error (`ManifestValidatorTest`, case "extra operation in camel case"). `docs/permissions.md` and `docs/creating-a-module.md` say so.
+- **Alternatives:** Lower-case the names when building the catalogue (two spellings for one permission).
 - **Status:** Accepted (proposal)

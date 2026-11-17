@@ -52,8 +52,7 @@ class Filters extends BaseFilters
         // (`authsession`). Then the request rate limit per user (`RateLimit`, limit `backend`)
         // and the scheduler fallback for hosts without cron (`PoorMansCron`, after filter, off
         // unless the setting Core.poorMansCron is on).
-        // Maintenance mode is a global filter (`maintenance`, session 27); the activity hook joins
-        // this list in the session that builds it.
+        // Maintenance mode is a global filter (`maintenance`, session 27).
         // Each route adds its own `can:` filter.
         'backend' => [
             SessionAuth::class,
