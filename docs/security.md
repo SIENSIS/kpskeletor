@@ -1,8 +1,8 @@
 # Security baseline
 
 What is on by default (docs/specification.md, "Security baseline"). Production is the default
-environment; never weaken a default to make something work. `php spark security:check`
-(session 30) reports the configuration.
+environment; never weaken a default to make something work. `php spark security:check` and the
+Security status page check it (see "Production checklist" at the end).
 
 ## HTTPS and cookies
 
@@ -208,4 +208,49 @@ Backups contain `.env` and every secret, so they are always encrypted with a pas
 12 characters that is never stored (Argon2id + libsodium secretstream), created `0640` in
 `writable/backups` (never served) and downloaded or restored only after re-authentication;
 restore is superadmin-only by default. See `docs/backup-restore.md`.
+
+## Production checklist
+
+`php spark security:check` (console) and **Settings › Security status** (`backend/security`,
+permission `security.check`: superadmin and admin by default) run the same read-only checks, each
+with its status (ok, info, warning, error), what it means and how to fix it. The command exits
+with code 1 when a check is in error, so a deployment pipeline can stop on it; `--only=<group>`
+runs one group and `--json` prints JSON. Before going live:
+
+1. `php spark app:install` (it ends with this summary), then fix every **error**.
+2. `chmod 640 .env`; `find writable -type d -exec chmod 750 {} +` and
+   `find writable -type f -exec chmod 640 {} +` (stricter modes are accepted).
+3. Give the code to a deploy user and let the web server write only `writable/`,
+   `public/assets/modules`, `public/assets/core`, `public/themes` and `public/uploads`; tell the
+   console which user that is with `productioncheck.webUser = www-data` in `.env` (the page,
+   which runs as the web user, checks it directly).
+4. `php spark security:audit` (or let the daily task run it).
+5. `php spark security:check --probe=https://<your site>/` from the server.
+
+| Group | Checks (error unless noted) |
+|---|---|
+| `configuration` | `CI_ENVIRONMENT=production`; no `CI_DEBUG` nor `display_errors`; `forceGlobalSecureRequests`; cookies `Secure`, `HttpOnly`, `SameSite` Lax/Strict; an `https://` base URL (a local or example host is a warning); CSP enabled, enforced (not report-only) and without `unsafe-*` (nor `*`, `http:`, `https:`, `data:` for scripts, styles, objects and the default); HSTS sent (warning); the other security headers (warning); CORS of the API never `*` (Api module) |
+| `secrets` | `encryption.key` set (32 bytes or more); `app.maskKey` set and the same for kpcrudy and kpapy; `.env` not readable by other users (no `.env`: warning); no secret in the files git tracks (private keys, GitHub/GitLab/AWS/Slack/Stripe tokens, `.env` secrets with a value; placeholders and lines marked `security-check: ignore` are skipped; not a git checkout: info); `backup.password` set when `Backup.scheduled` is on (Backup module) |
+| `installation` | `writable/install.lock` present; no demo data loaded; `writable/` folders `0750` and files `0640` or stricter (warning); `writable/maintenance.json` not readable by others; what the web server user may write (unknown from the console without `productioncheck.webUser`: warning); `public/` holds no `.env`, `writable`, `.git` nor script other than `index.php`; backup files not readable by others and their folder outside `public/` (Backup module, D-27-05) |
+| `accounts` | superadmins without 2FA (warning); groups where 2FA is optional (info); `Auth.minimumPasswordLength` below 12 (warning); personal API tokens without expiry (info) |
+| `dependencies` | the last `composer audit` (advisories: error; never run, failed or older than 7 days: warning); the SHA-256 checksums of `public/assets/vendor/vendor.json` |
+| `outbound` | the allow-list and the hosts each module adds (info) |
+| `probe` | with `--probe=<url>` or "Run external probe" (re-authentication): the security headers on `/`; `/.env`, `writable/`, `modules/`, `app/`, `vendor/`, `composer.json`, `.git/config` not served; a harmless PHP file written to `public/uploads` is not executed (and is removed); `?return=https://…invalid/` is not followed on `/`, `login` and `backend`; the login answers 429 after at most `productioncheck.probeLoginAttempts` wrong passwords for a made-up `example.invalid` address (they count towards the server's own login limit for a while; `productioncheck.probeLoginPath = ""` skips it); plain HTTP redirects to HTTPS (or is not answered); the `progress/*` routes answer no secret-looking keys (D-27-02). The probe uses its own client: requests only to the base URL host and `app.allowedHostnames`, HTTPS (HTTP only for the redirect check), no redirects followed, never through the OutboundClient nor to third parties. |
+
+- The page shows the results of the last run (the daily task "Security checks and composer audit"
+  at 04:43, `security:check` or "Check again"; the first visit runs them), the last probe and the
+  **effective** Content-Security-Policy and security headers (configuration + modules' `$csp` +
+  Settings › Security origins). The dashboard widget "Security status" (`core.security-status`,
+  `security.check`) shows the summary from the stored results. When a check turns red the
+  superadmins get the notification "Security check failed" once (until it recovers).
+- On PHP's development server answering this computer (D-19-05) HTTPS and `Secure` cookies are
+  shown as information: run the command on the real server.
+- Results are kept in `writable/security/` (`status.json`, `probe.json`, `composer-audit.json`,
+  0640). Options: `Config\ProductionCheck` (`productioncheck.*` in `.env`: `webUser`, `composer`,
+  `auditMaxAgeDays`, `probeTimeout`, `probeLoginPath`, `probeLoginAttempts`, `writablePaths`,
+  `readOnlyPaths`).
+- A module adds its own checks from the Core event `securityChecks`: a class implementing
+  `Modules\Core\Security\Check\SecurityCheck` (`groups()`, `run(SecurityReport $report)`, results
+  with stable ids `<group>.<what>` and texts in its language files), added in its
+  `Config/Events.php` when the module is enabled (see `modules/Backup/Config/Events.php`).
 
