@@ -1,0 +1,22 @@
+/* Tasks tutorial module: the board (tutorial 3). Colours come from Bootstrap's CSS variables. */
+.tasks-board-list {
+    min-height: 6rem;
+}
+
+.tasks-board-list.is-drop-target {
+    outline: 2px dashed var(--bs-primary);
+    outline-offset: -4px;
+    background-color: var(--bs-primary-bg-subtle);
+}
+
+.tasks-board-card[draggable="true"] {
+    cursor: grab;
+}
+
+.tasks-board-card.is-dragging {
+    opacity: 0.5;
+}
+
+.tasks-board-card.is-overdue {
+    border-left: 4px solid var(--bs-danger);
+}
