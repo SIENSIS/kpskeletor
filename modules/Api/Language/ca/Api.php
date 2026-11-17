@@ -95,4 +95,16 @@ return [
     'settingGroups' => [
         'api' => 'API',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'cors' => 'CORS de l\'API',
+        'corsClosed' => 'Tancat: cap altre lloc pot cridar l\'API des d\'un navegador.',
+        'corsOrigins' => 'Orígens permesos: {0}.',
+        'corsOpen' => 'L\'API accepta peticions de navegador de qualsevol origen (*).',
+        'fixCors' => 'Indiqueu els orígens exactes a Configuració › Seguretat (Api.corsOrigins) i traieu * de Config\\Cors.',
+        'tokens' => 'Tokens personals de l\'API sense caducitat',
+        'tokensOk' => 'Tots els tokens personals tenen data de caducitat.',
+        'tokensNoExpiry' => '{0} tokens personals no caduquen mai.',
+        'fixTokens' => 'Demaneu als propietaris que els substitueixin per tokens que caduquin (Perfil › Tokens de l\'API), o revoqueu-los a API › Tokens.',
+    ],
 ];

@@ -95,4 +95,16 @@ return [
     'settingGroups' => [
         'api' => 'API',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'cors' => 'CORS de la API',
+        'corsClosed' => 'Cerrado: ningún otro sitio puede llamar a la API desde un navegador.',
+        'corsOrigins' => 'Orígenes permitidos: {0}.',
+        'corsOpen' => 'La API acepta peticiones de navegador de cualquier origen (*).',
+        'fixCors' => 'Indique los orígenes exactos en Configuración › Seguridad (Api.corsOrigins) y quite * de Config\\Cors.',
+        'tokens' => 'Tokens personales de la API sin caducidad',
+        'tokensOk' => 'Todos los tokens personales tienen fecha de caducidad.',
+        'tokensNoExpiry' => '{0} tokens personales no caducan nunca.',
+        'fixTokens' => 'Pida a sus propietarios que los sustituyan por tokens que caduquen (Perfil › Tokens de la API), o revóquelos en API › Tokens.',
+    ],
 ];

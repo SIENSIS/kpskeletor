@@ -37,3 +37,11 @@ Events::on(PackageBackup::EVENT, static function (PackageBackup $request): void 
         $request->failed($e->getMessage());
     }
 });
+
+// `securityChecks` (the Core's security:check and Security status page): `backup.password` when
+// scheduled backups are on, `writable/backups` outside `public/` and not readable by others.
+Events::on(\Modules\Core\Security\Check\SecurityChecks::EVENT, static function (\Modules\Core\Security\Check\SecurityChecks $checks): void {
+    if ((new ModuleState())->isEnabled('Backup')) {
+        $checks->add(new \Modules\Backup\Services\BackupSecurityCheck());
+    }
+});

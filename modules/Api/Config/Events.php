@@ -55,3 +55,9 @@ Events::on('kpapy.auth.failed', static function (array $data) use ($apiUserId): 
 Events::on('kpapy.auth.denied', static function (array $data) use ($apiUserId): void {
     security_log('Api', 'api_login_denied', ['user_id' => $apiUserId($data), 'resource' => 'api', 'record_id' => isset($data['challenge']) ? (string) $data['challenge'] : null]);
 });
+
+// `securityChecks` (the Core's security:check and Security status page): CORS of the API not
+// open to `*`, personal tokens without expiry.
+Events::on(\Modules\Core\Security\Check\SecurityChecks::EVENT, static function (\Modules\Core\Security\Check\SecurityChecks $checks): void {
+    $checks->add(new \Modules\Api\Services\ApiSecurityCheck());
+});

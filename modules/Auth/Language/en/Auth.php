@@ -328,4 +328,20 @@ return [
         'totpLater' => '2FA not set up: do it from your profile after the first login.',
         'recovery' => 'Recovery codes (shown only once; keep them in a safe place):',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'superadmins' => 'Superadmins with two-factor authentication',
+        'superadminsOk' => 'Every superadmin uses 2FA.',
+        'superadminsWithout' => '{0} superadmins without 2FA: {1}.',
+        'fixSuperadmins' => 'Ask them to set it up in Profile › Two-factor authentication, or make 2FA required for the superadmin group (Users › Groups).',
+        'unknown' => 'Could not be checked (database not available).',
+        'groups' => 'Two-factor policy of the groups',
+        'groupsOk' => '2FA is required in every group.',
+        'groupsOptional' => '2FA is optional in: {0}.',
+        'fixGroups' => 'Require it for the groups with back-office access in Users › Groups.',
+        'password' => 'Minimum password length',
+        'passwordOk' => '{0} characters.',
+        'passwordShort' => '{0} characters (recommended: at least {1}).',
+        'fixPassword' => 'Raise Auth.minimumPasswordLength to {0} or more in Settings › Security.',
+    ],
 ];

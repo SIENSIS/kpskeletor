@@ -215,4 +215,18 @@ return [
         'envReplaced'    => 'Se ha sustituido el .env por el de la copia.',
         'envKept'        => 'Se ha conservado el .env: los datos cifrados con la clave de la copia no se pueden leer hasta que se combinen los secretos.',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'password' => 'Contraseña de las copias programadas',
+        'notScheduled' => 'Las copias programadas están desactivadas: no hace falta contraseña.',
+        'passwordMissing' => 'Las copias programadas están activadas pero backup.password no está definida: no se pueden hacer.',
+        'passwordOk' => 'backup.password está definida.',
+        'fixPassword' => 'Defina backup.password en .env (una contraseña larga y aleatoria, guardada también fuera del servidor).',
+        'folder' => 'Carpeta de las copias',
+        'folderOk' => 'writable/backups está fuera de public/ y los demás usuarios no pueden leer sus archivos.',
+        'folderPublic' => '{0} está dentro de public/: las copias se podrían descargar.',
+        'folderReadable' => 'Legibles por otros usuarios: {0}.',
+        'fixFolder' => 'Mantenga Config\\Backup::$path dentro de writable/.',
+        'fixReadable' => 'chmod 750 writable/backups && chmod 640 writable/backups/*',
+    ],
 ];

@@ -215,4 +215,18 @@ return [
         'envReplaced'    => '.env replaced with the backup\'s.',
         'envKept'        => '.env kept: data encrypted with the backup\'s key cannot be read until the secrets are merged.',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'password' => 'Password of scheduled backups',
+        'notScheduled' => 'Scheduled backups are off: no password needed.',
+        'passwordMissing' => 'Scheduled backups are on but backup.password is not set: they cannot run.',
+        'passwordOk' => 'backup.password is set.',
+        'fixPassword' => 'Set backup.password in .env (a long random password, kept also outside the server).',
+        'folder' => 'Backup folder',
+        'folderOk' => 'writable/backups is outside public/ and its files are not readable by other users.',
+        'folderPublic' => '{0} is inside public/: backups could be downloaded.',
+        'folderReadable' => 'Readable by other users: {0}.',
+        'fixFolder' => 'Keep Config\\Backup::$path under writable/.',
+        'fixReadable' => 'chmod 750 writable/backups && chmod 640 writable/backups/*',
+    ],
 ];

@@ -41,6 +41,9 @@ D-10-01 … D-10-05 in `docs/decisions.md`.
 
 - Done in session 14: `Api.*` are in Settings › Security (`group` `security.api`; `corsOrigins` is a `list` validated by `cors_origins`).
 - Session 23: `avatar_url` in `me`.
+- Done in session 30: `Services/ApiSecurityCheck.php` (event `securityChecks`): `configuration.cors`
+  (never `*`) and `accounts.personalTokens` (personal tokens without expiry, info); test
+  `Tests/ApiSecurityCheckTest.php`.
 - Done in session 26: Core endpoints (in their modules: News, Events, Core notifications; public
   ones), `ApiAuditor` in `permissions:check`, the OpenAPI copy on `modules:sync`, `GET me` in the
   OpenAPI document (`openapi` route option).

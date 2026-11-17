@@ -95,4 +95,16 @@ return [
     'settingGroups' => [
         'api' => 'API',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'cors' => 'CORS of the API',
+        'corsClosed' => 'Closed: no other site may call the API from a browser.',
+        'corsOrigins' => 'Allowed origins: {0}.',
+        'corsOpen' => 'The API accepts browser requests from any origin (*).',
+        'fixCors' => 'List the exact origins in Settings › Security (Api.corsOrigins) and remove * from Config\\Cors.',
+        'tokens' => 'Personal API tokens without expiry',
+        'tokensOk' => 'Every personal token has an expiry date.',
+        'tokensNoExpiry' => '{0} personal tokens never expire.',
+        'fixTokens' => 'Ask their owners to replace them with tokens that expire (Profile › API tokens), or revoke them in API › Tokens.',
+    ],
 ];

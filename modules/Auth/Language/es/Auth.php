@@ -328,4 +328,20 @@ return [
         'totpLater' => 'No se ha configurado el 2FA: hágalo desde el perfil después del primer inicio de sesión.',
         'recovery' => 'Códigos de recuperación (solo se muestran ahora; guárdelos en un lugar seguro):',
     ],
+    // security:check (event securityChecks)
+    'securityCheck' => [
+        'superadmins' => 'Superadministradores con autenticación en dos pasos',
+        'superadminsOk' => 'Todos los superadministradores usan el 2FA.',
+        'superadminsWithout' => '{0} superadministradores sin 2FA: {1}.',
+        'fixSuperadmins' => 'Pídales que lo activen en Perfil › Autenticación en dos pasos, o haga obligatorio el 2FA para el grupo superadmin (Usuarios › Grupos).',
+        'unknown' => 'No se ha podido comprobar (base de datos no disponible).',
+        'groups' => 'Política de dos pasos de los grupos',
+        'groupsOk' => 'El 2FA es obligatorio en todos los grupos.',
+        'groupsOptional' => 'El 2FA es opcional en: {0}.',
+        'fixGroups' => 'Hágalo obligatorio para los grupos con acceso al back-office en Usuarios › Grupos.',
+        'password' => 'Longitud mínima de la contraseña',
+        'passwordOk' => '{0} caracteres.',
+        'passwordShort' => '{0} caracteres (recomendado: al menos {1}).',
+        'fixPassword' => 'Aumente Auth.minimumPasswordLength a {0} o más en Configuración › Seguridad.',
+    ],
 ];
