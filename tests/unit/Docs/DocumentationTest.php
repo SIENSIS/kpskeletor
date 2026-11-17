@@ -209,7 +209,7 @@ final class DocumentationTest extends CIUnitTestCase
             ['tutorial-a-new-view-with-javascript', 'the-boardjs-module', 'steps', 'steps-1', 'catàleg-i-permisos'],
             $this->anchors("# Tutorial: a new view with JavaScript\n## The `board.js` module\n## Steps\n```\n# not a heading\n```\n## Steps\n## Catàleg i permisos"),
         );
-                $this->assertSame(['--demo', '--prune'], $this->optionsIn('`modules:sync [--prune] [--demo[=<A>]]`'));
+        $this->assertSame(['--demo', '--prune'], $this->optionsIn('`modules:sync [--prune] [--demo[=<A>]]`'));
     }
 
     /**
