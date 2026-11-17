@@ -38,6 +38,42 @@ per request). `modules:sync` validates every theme (`ThemeValidator`: version, l
 files, regions, menu locations, asset paths, option types, CSS properties) and publishes the
 themes' assets; any error stops the sync.
 
+The two themes in the repository are `themes/default` (standalone: all five layouts, the
+partials, `css/theme.css` and the options listed below) and `themes/tasks-demo` (a child of
+`default`, the finished theme of the Tasks tutorial; see "Child themes").
+
+## Layouts
+
+Every theme chain provides the five layouts of `ThemeManifest::LAYOUTS`; a view extends one with
+`$this->extend($layout)` (given by `BackendController::render()` / `FrontendController::render()`)
+or `$this->extend(theme_layout('<name>'))`, and fills the section `content`.
+
+| Layout | Used for (default theme) | Regions |
+|---|---|---|
+| `backend` | the back office: sidebar (generated menu), top bar with the notifications bell, theme switch and user menu, page header or breadcrumbs, session messages, footer; kpcrudy screens too | `sidebar`, `topbar`, `footer` |
+| `public` | the public site: header with the logo and the `primary` menu location, optional sidebar column, footer with the `footer` menu location, SEO meta (`$meta`), cookie notice | `header`, `sidebar`, `footer`, `home` |
+| `auth` | login, registration, 2FA, password reset: a centred card with the logo | `footer` |
+| `blank` | the theme's styles and scripts around `content` only (error pages, embeds, pop-ups) | — |
+| `print` | no navigation and no scripts, always light; site name and title on top, print date at the bottom | — |
+
+The layouts only provide the section `content`: there is no `head` section. Page-specific
+stylesheets are loaded by the page's component from a URL passed in its options (see the
+tutorial in [`frontend.md`](frontend.md)); site-wide ones go in the theme's `$styles`.
+
+## Regions and menu locations
+
+**Regions** are named slots of a layout, declared per layout in `$regions` and printed with
+`theme_region('<layout>', '<region>')`. Code fills them with already-escaped HTML
+(`service('theme')->regions()->add('sidebar', $html, $order)`, or `FrontendController::region()`);
+a region the active theme does not declare prints nothing (the public layout shows its sidebar
+column only when `theme()->hasRegion('public', 'sidebar')` and something was added).
+
+**Menu locations** are the public menus a theme prints, declared in `$menuLocations` (key →
+label key; the default theme: `primary`, `footer`, `social`). The Menus module edits one menu per
+location and the layout prints it with `menu('<location>')` through the partial
+`partials/public_menu` (`primary` as the navbar with dropdowns, any other location as a list of
+links). See [`menus.md`](menus.md).
+
 ## Which theme is active
 
 `setting('Theme.backend')` and `setting('Theme.public')` (defaults in `Modules\Core\Config\Theme`,
@@ -168,6 +204,31 @@ an icon-only bar from 768 to 1199 px and a full sidebar from 1200 px; the top-ba
 `<span class="nav-text">` so the icon-only bar can hide it. On phones long breadcrumbs keep their
 last two items, modals are full-screen and, on touch screens, targets are at least 44 × 44 px.
 
+## PWA manifest (minimal PWA)
+
+Off by default; enable the setting `Core.pwa` (Settings › General, group "Web app", or
+`service('settings')->set('Core.pwa', true)`). Then (`Modules\Core\Controllers\Pwa`,
+`Modules\Core\Frontend\Pwa`):
+
+- `/manifest.webmanifest` (`application/manifest+json`): `name` and `short_name` (the site name,
+  12 characters), `lang`, `start_url` (setting `Core.pwaStart`: `public` home or `backend`),
+  `scope` (the site root), `display: standalone`, `background_color` `#ffffff`, `theme_color`
+  (the public theme's `primaryColor`) and the two icons;
+- `/pwa/icon-192.png`, `/pwa/icon-512.png`: generated with GD from the public theme's `logo`
+  (a local PNG/JPEG/GIF/WebP under `public/`; SVG or remote logos are never read, the default
+  icon is drawn instead) into `writable/pwa/`, and regenerated whenever the logo or the primary
+  colour changes (the file name and the `?v=` of the manifest carry a hash);
+- `/sw.js` (`modules/Core/Assets/pwa/sw.js`, header `Service-Worker-Allowed: /`): served from the
+  root so it controls the whole site; it **caches nothing** (no Cache API, no `respondWith()`), so
+  authenticated pages and data always come from the network;
+- the theme's `partials/head.php` adds, when `pwa_enabled()`, `<link rel="manifest">`, the Apple
+  touch icon (`pwa_icon_url(192)`) and a `theme-color` per colour scheme (`pwa_theme_colors()`:
+  the primary colour in light mode, `#212529` in dark mode); `core/pwa.js` registers the worker,
+  and unregisters it when the PWA is switched off.
+
+All three routes answer 404 while `Core.pwa` is off (`modules/Core/Tests/PwaTest.php`). A layout
+written from scratch keeps these links by including `partials/head`.
+
 ## Assets
 
 Bootstrap 5.3 and Bootstrap Icons are vendored in `public/assets/vendor/` with
@@ -186,11 +247,67 @@ the `make:theme --parent=none` layout template).
 All colours are CSS custom properties: a child theme changes colours by overriding variables
 (`:root { --kp-sidebar-bg: #312e81; }`) or option defaults, without copying the parent's CSS.
 
-## Creating a child theme
+## View overrides
+
+A theme replaces a view without touching the module or the Core:
+
+| To replace | Put the file in |
+|---|---|
+| a module view `Modules\<Module>\Views\<path>` | `themes/<slug>/Views/overrides/<Module>/<path>.php` |
+| a standard view or component (`components/page_header`, `errors/404`, `widgets/…`) | `themes/<slug>/Views/<path>.php` |
+| a partial of the parent (`partials/brand`, `partials/head`…) | `themes/<slug>/Views/partials/<name>.php` |
+| a layout | `themes/<slug>/Views/layouts/<name>.php` (and list it in `$layouts`) |
+
+The override receives the same data as the original view (copy its `@var` docblock), extends
+`$layout` like it and must follow the same rules (escaping, no inline code: `php spark csp:check`
+also reads `themes/*/Views`). Overrides are looked up along the chain, so a child's override wins
+over its parent's.
+
+## Child themes
+
+A child theme (`$parent = '<slug>'`) inherits the parent's layouts, partials, components,
+options, page templates and assets; it declares only what changes. Its `$styles` and `$scripts`
+load after the parent's, a redeclared option changes only that option's default, and its views
+win over the parent's. A parent cannot be uninstalled while a child uses it.
+
+**The real example, `themes/tasks-demo`** (child of `default`, tutorial 9 of the Tasks module):
+
+```
+themes/tasks-demo/
+├── Theme.php                                   Themes\TasksDemo\Theme, $parent = 'default', $layouts = []
+├── Assets/css/theme.css                        its own touches, through CSS custom properties
+├── Assets/img/logo.svg
+├── Views/overrides/Tasks/public/index.php      the Tasks public page as coloured columns
+└── Language/ca|es|en/ThemeTasksDemo.php
+```
+
+```php
+public ?string $parent = 'default';
+public array $layouts  = [];                    // every layout comes from the parent
+public array $styles   = ['css/theme.css'];     // loaded after the parent's stylesheets
+public array $options  = [
+    'primaryColor' => ['default' => '#6f42c1'],
+    'logo'         => ['default' => 'themes/tasks-demo/img/logo.svg'],
+];
+```
+
+`modules/Tasks/Tests/ChildThemeTest.php` checks it: the chain is `['tasks-demo', 'default']`,
+there is no `Views/layouts/public.php` of its own, `GET tasks` renders the theme's override with
+`--bs-primary: #6f42c1;`, the logo and both stylesheets (`themes/default/css/theme.css` then
+`themes/tasks-demo/css/theme.css`), `tasks/request` (not overridden) keeps the module's view, and
+the page has no inline script, handler or `style` attribute.
+
+### Creating a child theme
 
 ```bash
 php spark make:theme Corporate              # child of default (--parent=<slug>, or --parent=none)
 ```
+
+`make:theme` writes `themes/<slug>/` (`Corporate` → `corporate`, `TasksDemo` → `tasks-demo`):
+the manifest, `Assets/css/theme.css`, empty `Views/overrides`, `Views/components` and
+`Views/partials`, and the ca/es/en language files; with `--parent=none`, a standalone theme with a
+minimal file per layout. It validates the theme and publishes its assets (see
+[`commands.md`](commands.md)).
 
 Then override what you need, e.g. one colour in `Theme.php` (`'primaryColor' => ['default' => '#6f42c1']`)
 and one view in `themes/corporate/Views/components/page_header.php`, run `php spark modules:sync`
