@@ -31,7 +31,7 @@ Branch: `ccr-562a7c0f-4i8vha` · Pull request: [SIENSIS/kpskeletor#37](https://g
   signatures, reserved and core module names, another author, downgrades without `--force`;
   every refusal is a security log entry.
 - In production a module found by `modules:sync` stays **installed, disabled** until an
-  administrator enables it (`packages.autoEnable`; D-29-02, Open).
+  administrator enables it (`packages.autoEnable`; D-29-02, decided as built).
 
 ## How it was built
 
@@ -58,10 +58,10 @@ Routes (all under the `backend` chain): `backend/modules` (`modules.list`), `POS
 
 ## Decisions and deviations
 
-- **Open (decide):** D-29-01 (URLs, which permission each action needs, manifest `description`
+- **Decided as built (Decisions 29, 2026-11-17):** D-29-01 (URLs, which permission each action needs, manifest `description`
   and `author`, `Config\Packages` keys, command options, Core events) and D-29-02 (new modules
   disabled in production unless `packages.autoEnable`; enabled on the first sync and outside
-  production). Built so both can still change.
+  production).
 - Accepted: D-29-03 (packages read without running them; sync in a new process), D-29-04 (one
   table `module_packages`), D-29-05 (what the web server does), D-29-06 (Core events instead of
   naming modules), D-29-07 (themes tab: screenshot + colours, `modules.toggle`), D-29-08 (what an
@@ -263,6 +263,6 @@ through the real UI (`screenshots.mjs`).
 - Session 30 (`security:check`): check that `modules/`, `themes/` and `app/Config/` are not
   writable by the web user and `writable/packages` is not served; warn when `packages.requireSignature`
   is off or `packages.publicKeys` is empty in production, and report `packages.autoEnable`.
-- D-29-01 and D-29-02 are **Open (decide)**: run `deploy/decide.md`.
+- D-29-01 and D-29-02 were decided as built (Decisions 29) and applied to the specification.
 - A module that keeps data about other modules answers `moduleUninstalling` in its
   `Config/Events.php` (see Menus, Dashboard); calendar entries go through `service('calendar')->purgeModule()`.
