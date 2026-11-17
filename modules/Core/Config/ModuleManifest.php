@@ -42,6 +42,13 @@ abstract class ModuleManifest
      */
     public array $requires = [];
 
+    /**
+     * Whether `modules:sync` enables the module when it finds it for the first time (D-32-01).
+     * `false` (e.g. the `Tasks` tutorial module) installs it disabled, also on the first sync of a
+     * new installation; it is then enabled from the Modules screen or `modules:enable`.
+     */
+    public bool $enabledByDefault = true;
+
     /** Where Updates looks for new versions (e.g. "github:acme/news-module"). */
     public ?string $repository = null;
 
