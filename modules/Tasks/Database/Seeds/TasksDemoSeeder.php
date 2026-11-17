@@ -60,6 +60,7 @@ final class TasksDemoSeeder extends DemoSeeder
                 'estimate_hours' => $task['estimate'] ?? null,
                 'visibility'     => $task['visibility'],
                 'created_by'     => $task['by'],
+                'started_at'     => $task['status'] === 'todo' ? null : $created->addDays(1)->toDateTimeString(),
                 'completed_at'   => isset($task['done']) ? $task['done']->toDateTimeString() : null,
                 'created_at'     => $created->toDateTimeString(),
                 'updated_at'     => $created->toDateTimeString(),

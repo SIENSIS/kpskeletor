@@ -299,7 +299,8 @@ final class TaskRepository
     }
 
     /**
-     * Changes the status of a to-do task (`completed_at` follows `done`) and its calendar event.
+     * Changes the status of a to-do task (`started_at` and `completed_at` follow it, see
+     * `statusDates()`) and its calendar event.
      */
     public function setStatus(int $id, string $status, ?Time $now = null): void
     {
@@ -308,13 +309,45 @@ final class TaskRepository
         }
 
         $now ??= Time::now();
-        $this->db()->table('tasks')->where('id', $id)->update([
-            'status'       => $status,
-            'completed_at' => $status === 'done' ? $now->toDateTimeString() : null,
-            'updated_at'   => $now->toDateTimeString(),
-        ]);
+        $old = $this->db()->table('tasks')->select('status, started_at, completed_at')->where('id', $id)->get()->getRowArray();
+
+        $this->db()->table('tasks')->where('id', $id)->update(['status' => $status, 'updated_at' => $now->toDateTimeString()] + self::statusDates($status, is_array($old) ? $old : [], $now));
 
         DueDates::sync($id);
+    }
+
+    /**
+     * The dates that follow a status change, shared by the CRUD, the board and the API:
+     *
+     * - `started_at` (version 0.2.0, tutorial 13): set the first time the to-do task leaves
+     *   `todo`, kept while it is `doing` or `done`, cleared when it goes back to `todo`;
+     * - `completed_at`: set when it becomes `done`, cleared when it leaves `done`.
+     *
+     * Only the columns that change are returned.
+     *
+     * @param array<string, mixed> $old the row before the change (empty for a new to-do task)
+     *
+     * @return array<string, string|null>
+     */
+    public static function statusDates(string $status, array $old, ?Time $now = null): array
+    {
+        $now ??= Time::now();
+        $dates  = [];
+        $before = (string) ($old['status'] ?? '');
+
+        if ($status === 'todo') {
+            $dates['started_at'] = null;
+        } elseif (($old['started_at'] ?? null) === null) {
+            $dates['started_at'] = $now->toDateTimeString();
+        }
+
+        if ($status !== 'done') {
+            $dates['completed_at'] = null;
+        } elseif ($before !== 'done') {
+            $dates['completed_at'] = $now->toDateTimeString();
+        }
+
+        return $dates;
     }
 
     /**

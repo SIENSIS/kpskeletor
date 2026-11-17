@@ -49,6 +49,7 @@ return [
         'visibility'     => 'Visibility',
         'attachments'    => 'Attachments',
         'created_by'     => 'Created by',
+        'started_at'     => 'Started on',
         'completed_at'   => 'Completed on',
         'created_at'     => 'Created',
         'updated_at'     => 'Updated',

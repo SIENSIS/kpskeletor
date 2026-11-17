@@ -52,10 +52,11 @@ final class Tasks extends Controller
             ->fieldType('labels', 'multiselect', ['options' => TasksCrud::options('labels', TaskRepository::LABELS)])
             ->fieldType('due_on', 'date')
             ->fieldType('estimate_hours', 'decimal', ['scale' => 2])
+            ->fieldType('started_at', 'datetime')
             ->fieldType('completed_at', 'datetime')
             ->fieldType('files', 'virtual')
             ->callbackField('files', static fn ($value, array $row): array => AttachmentUploads::files(is_string($row['attachments'] ?? null) ? $row['attachments'] : null))
-            ->fields(['id', 'title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'files', 'completed_at', 'created_at', 'updated_at'])
+            ->fields(['id', 'title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'files', 'started_at', 'completed_at', 'created_at', 'updated_at'])
             ->listFields(['id', 'title', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'visibility', 'completed_at'])
             ->writeFields(['title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility'])
             ->requiredFields(['title'])
@@ -102,7 +103,7 @@ final class Tasks extends Controller
     }
 
     /**
-     * `completed_at` follows the status, like the CRUD.
+     * `started_at` and `completed_at` follow the status, like the CRUD.
      *
      * @param array<string, mixed>      $data
      * @param array<string, mixed>|null $old
@@ -111,12 +112,8 @@ final class Tasks extends Controller
      */
     private static function completion(array $data, ?array $old): array
     {
-        if (array_key_exists('status', $data)) {
-            if ($data['status'] === 'done' && ($old['status'] ?? '') !== 'done') {
-                $data['completed_at'] = date('Y-m-d H:i:s');
-            } elseif ($data['status'] !== 'done') {
-                $data['completed_at'] = null;
-            }
+        if (array_key_exists('status', $data) && is_string($data['status'])) {
+            $data = TaskRepository::statusDates($data['status'], $old ?? []) + $data;
         }
 
         return $data;

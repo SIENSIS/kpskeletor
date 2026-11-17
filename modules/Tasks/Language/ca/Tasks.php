@@ -49,6 +49,7 @@ return [
         'visibility'     => 'Visibilitat',
         'attachments'    => 'Adjunts',
         'created_by'     => 'Creada per',
+        'started_at'     => 'Començada el',
         'completed_at'   => 'Completada el',
         'created_at'     => 'Creació',
         'updated_at'     => 'Actualització',

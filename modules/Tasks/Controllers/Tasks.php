@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Tasks\Controllers;
 
 use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\I18n\Time;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Crud\AuditedCrud;
 use Modules\Tasks\Calendar\DueDates;
@@ -52,6 +51,7 @@ final class Tasks extends BackendController
             ->fieldType('description', 'textarea', ['attrs' => ['rows' => 5]])
             ->fieldType('due_on', 'date')
             ->fieldType('estimate_hours', 'decimal', ['attrs' => ['min' => 0, 'step' => '0.25']])
+            ->fieldType('started_at', 'readonly')
             ->fieldType('completed_at', 'readonly')
             ->callbackField('attachments', static fn ($value, ?array $row, array $field): string => AttachmentUploads::renderPicker('attachments', $value, $field))
             ->callbackColumn('attachments', static fn ($value): string => self::attachmentLinks(is_string($value) ? $value : null))
@@ -61,8 +61,8 @@ final class Tasks extends BackendController
             ->callbackExport('due_on', static fn ($value): string => (string) $value)
             ->columns(['title', 'project_id', 'status', 'priority', 'due_on', 'assignees', 'labels'])
             ->fields(['title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'attachments'])
-            ->showFields(['title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'attachments', 'created_by', 'completed_at', 'created_at', 'updated_at'])
-            ->exportColumns(['title', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'completed_at'])
+            ->showFields(['title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'attachments', 'created_by', 'started_at', 'completed_at', 'created_at', 'updated_at'])
+            ->exportColumns(['title', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'started_at', 'completed_at'])
             ->searchFields(['title', 'description'])
             ->filters(['project_id', 'status', 'priority', 'labels', 'assignees', 'visibility'])
             ->setRules([
@@ -129,7 +129,7 @@ final class Tasks extends BackendController
     }
 
     /**
-     * The creator of new to-do tasks, `completed_at` following the status, the attachments
+     * The creator of new to-do tasks, `started_at` and `completed_at` following the status, the attachments
      * checked, and the assignees before an update remembered for the notification.
      *
      * @param array<string, mixed> $data
@@ -148,15 +148,8 @@ final class Tasks extends BackendController
             }
         }
 
-        if (array_key_exists('status', $data)) {
-            $wasDone = ($old['status'] ?? '') === 'done';
-            $isDone  = $data['status'] === 'done';
-
-            if ($isDone && ! $wasDone) {
-                $data['completed_at'] = Time::now()->toDateTimeString();
-            } elseif (! $isDone) {
-                $data['completed_at'] = null;
-            }
+        if (array_key_exists('status', $data) && is_string($data['status'])) {
+            $data = TaskRepository::statusDates($data['status'], $old) + $data;
         }
 
         if ($id === null) {
@@ -200,7 +193,7 @@ final class Tasks extends BackendController
     {
         $labels = [];
 
-        foreach (['title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'attachments', 'created_by', 'completed_at', 'created_at', 'updated_at'] as $field) {
+        foreach (['title', 'description', 'project_id', 'status', 'priority', 'labels', 'due_on', 'assignees', 'estimate_hours', 'visibility', 'attachments', 'created_by', 'started_at', 'completed_at', 'created_at', 'updated_at'] as $field) {
             $labels[$field] = lang('Tasks.fields.' . $field);
         }
 
