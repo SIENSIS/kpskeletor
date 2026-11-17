@@ -225,7 +225,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-25-07 | 25 | The birthdays calendar: off by default, day and month only | Accepted (proposal) |
 | D-25-08 | 25 | Who sees whose birthday: consent, permission, group table and an administrative calendar (decide) | Applied (decided) |
 | D-25-09 | 25 | Birthday greetings as notifications (decide) | Applied (decided) |
-| D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Decided |
+| D-25-10 | 25 | Per-language settings that follow the site's languages (decide) | Applied (decided) |
 | D-26-01 | 26 | Core API permission names and URLs (decide) | Applied (decided) |
 | D-26-02 | 26 | Public API endpoints: GET only, no permission resolver, public records only | Accepted (proposal) |
 | D-26-03 | 26 | Read markers in the API are not written to the activity log | Accepted (proposal) |
@@ -257,7 +257,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-29-07 | 29 | Themes tab: preview image and colours, switching with `modules.toggle` | Accepted (proposal) |
 | D-29-08 | 29 | What an uninstall removes, and `--keep-data` | Accepted (proposal) |
 | D-29-09 | 29 | Package signatures (minisign) and the allowed files | Accepted (proposal) |
-| D-30-01 | 30 | Security status URLs, the `securityChecks` event, `Config\ProductionCheck` keys and `security:audit` (decide) | Open |
+| D-30-01 | 30 | Security status URLs, the `securityChecks` event, `Config\ProductionCheck` keys and `security:audit` (decide) | Decided |
 | D-30-02 | 30 | What is an error, a warning or information in `security:check` | Accepted (proposal) |
 | D-30-03 | 30 | What `--probe` sends, and the login throttling probe | Accepted (proposal) |
 | D-30-04 | 30 | "The web server writes only …" checked from the console and from the page | Accepted (proposal) |
@@ -2656,7 +2656,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** The page, its actions and the extension point for modules are new public conventions. Some checks belong to modules (`backup.password`, 2FA of superadmins, password length, CORS of the API, personal tokens), and the Core may not name them.
 - **Proposal:** Core resource `security` (name `security`, no CRUD operations, extra `check`): permission `security.check`, default grant admin (superadmin always). URLs: `backend/security` (page, `security-status`), `POST backend/security/refresh` ("Check again", `ratelimit:forms`), `GET|POST backend/security/probe` ("Run external probe", `reauth` + `ratelimit:forms`; always the configured base URL, never a URL from the request). Menu "Security status" in the settings zone (order 84). Core event `securityChecks` (`Modules\Core\Security\Check\SecurityChecks`): modules add `SecurityCheck` objects (Auth: `accounts.*`; Api: `configuration.cors`, `accounts.personalTokens`; Backup: `secrets.backupPassword`, `installation.backups`; Updates: `dependencies.updates`). Config `Config\ProductionCheck` (`.env` `productioncheck.*`: `path`, `webUser`, `writablePaths`, `readOnlyPaths`, `composer`, `auditMaxAgeDays` 7, `maxScannedFiles`, `probeTimeout`, `probeLoginPath`, `probeLoginAttempts`). New command `security:audit [--from=<file>]` (runs or imports `composer audit`). Widget `core.security-status`, task `SecurityCheckTask` (daily 04:43), notification `SecurityCheckFailed`. Results in `writable/security/`.
 - **Alternatives:** A) A `$securityChecks` manifest key instead of the event (a new manifest key, validated by `modules:sync`). B) The page under Settings (`backend/settings/security-status`, `settings.security`) instead of its own permission. C) `composer audit` only in CI, with no server-side command (the check would always say "never checked" on a server).
-- **Status:** Open
+- **Status:** Applied (decided)
+- **Decision (2026-11-17):** «Com s'ha construït (recomanada)». Everything stays as built: the page `backend/security` (`refresh`, `probe` with re-authentication), permission `security.check` granted to admin, the Core event `securityChecks` for module checks, `Config\ProductionCheck` (`productioncheck.*` in `.env`), the command `security:audit [--from=<file>]` and the results in `writable/security/`. **Must change:** `docs/specification.md` ("Security status page and `security:check`") to name them; no code change.
+- **Applied in:** `docs/specification.md` ("Security status page and `security:check`": names; "Installer and CLI": `security:audit`); code and tests as built in session 30 (`SecurityStatusScreenTest`, `SecurityCheckTest`).
 
 ## D-30-02 — What is an error, a warning or information in `security:check`
 

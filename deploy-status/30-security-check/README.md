@@ -74,7 +74,7 @@ Branch: `ccr-f19bfaf6-ek95xk` · Pull request: [SIENSIS/kpskeletor#38](https://g
 
 ## Decisions and deviations
 
-- **D-30-01 (decide, Open):** URLs, the `securityChecks` event, `Config\ProductionCheck` keys,
+- **D-30-01 (decided as built, Decisions 30):** URLs, the `securityChecks` event, `Config\ProductionCheck` keys,
   `security:audit`, admin grant. Built so it can still change.
 - D-30-02 (levels), D-30-03 (what the probe sends), D-30-04 (web-writable from the console and the
   page), D-30-05 (stored results, task, notification): accepted.
@@ -206,7 +206,7 @@ factor 2; no CSP violation, no horizontal scroll.
 
 ## Notes for the next session
 
-- D-30-01 is **Open (decide)**: run `deploy/decide.md` before session 31.
+- D-30-01 decided as built (Decisions 30).
 - Modules add checks from `securityChecks` (`docs/security.md`, "Production checklist"); texts in
   their own language files (session 31, i18n, must keep `SecurityCheck.php` in ca/es/en).
 - `writable/security/` is a new folder (only `index.html` is tracked).
