@@ -1,7 +1,7 @@
 # Session 35 — Quality: end-to-end, accessibility and CI
 
 Branch: `claude/amazing-wozniak-r3ycn2` (continues `claude/lucid-babbage-qm6oxf`, which stopped
-half way) · Pull request: see `docs/progress.md` · Date: 2026-11-18
+half way) · Pull request: [SIENSIS/kpskeletor#43](https://github.com/SIENSIS/kpskeletor/pull/43) · Date: 2026-11-18
 
 ## What was built
 
