@@ -116,8 +116,14 @@ find /var/www/kpskeletor -type d -exec chmod 0755 {} +
 find /var/www/kpskeletor -type f -exec chmod 0644 {} +
 chown -R www-data:www-data /var/www/kpskeletor/writable   # the PHP user owns it
 chmod -R u=rwX,g=rX,o= /var/www/kpskeletor/writable       # 0750 folders, 0640 files
+chown -R www-data:www-data /var/www/kpskeletor/public/uploads   # the public disk (0755/0644)
 chmod 0640 /var/www/kpskeletor/.env
 ```
+
+`public/uploads` is the Storage service's public disk: the PHP user writes the files people
+upload there (avatars, covers, images in rich text), and `security:check --probe` writes a
+harmless test file there to check it is not executed. The rest of `public/` stays read-only for
+the PHP user; assets are published from the console (`php spark assets:publish`).
 
 The Storage service creates private folders `0750` and files `0640`, public ones `0755`/`0644`
 (`app/Config/Storage.php`); `security:check` (`installation.writableModes`) warns about anything
