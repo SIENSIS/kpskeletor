@@ -211,7 +211,7 @@ final class ModulesScreenTest extends DashboardTestCase
             {
                 public string \$name    = '{$name}';
                 public string \$version = '1.0.0';
-                public array \$requires = ['Core' => '^0.1'];
+                public array \$requires = ['Core' => '^1.0'];
                 public array \$resources = ['items' => ['label' => 'Items', 'type' => 'crud']];
             }
             PHP);

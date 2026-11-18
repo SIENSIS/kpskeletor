@@ -436,7 +436,7 @@ return [
             'empty' => 'Nothing to show.',
         ],
         'bell' => [
-            'label' => 'Notifications ({count} unread)',
+            'label' => 'Unread notifications: {count}',
             'empty' => 'You have no notifications.',
             'error' => 'The notifications could not be loaded.',
         ],
@@ -533,7 +533,7 @@ return [
         'notFound' => 'The notification does not exist.',
         'unavailable' => 'This notification is no longer available.',
         'emailFooter' => 'You receive this email because of your notification settings.',
-        'bell' => '{0, plural, =0{Notifications} one{Notifications (one unread)} other{Notifications (# unread)}}',
+        'bell' => '{0, plural, =0{Notifications} one{Unread notifications: #} other{Unread notifications: #}}',
         'loading' => 'Loading…',
         'seeAll' => 'See all',
         'taskFailedTitle' => 'The scheduled task {0} failed',

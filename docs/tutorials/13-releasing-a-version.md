@@ -175,7 +175,7 @@ Package: module Tasks 0.2.0
   Author:          kpskeletor
   Signed:          no
   Files:           58 (245,827 B)
-  Requires:        Core ^0.1, Auth ^0.2, Dashboard ^0.1, Files ^0.1
+  Requires:        Core ^1.0, Auth ^0.2, Dashboard ^0.1, Files ^0.1
   …
 Running modules:sync…
   Modules\Tasks: 1 migrations run.

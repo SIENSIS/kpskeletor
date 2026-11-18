@@ -11,7 +11,7 @@ release. Specification: "Modules" › "Updates"; decisions D-00-48, D-28-01 … 
 |---|---|---|
 | `updates.repository` | empty | Where the application's releases are published: `github:owner/repo`, `gitlab:group/project` (gitlab.com) or `https://gitlab.example.com/group/project`. Empty = no check for the application. |
 | `updates.token` | empty | Token for a private repository (GitHub: a fine-grained token with *Contents: read*; GitLab: `read_api`). Only in `.env`. |
-| `updates.publicKeys` | empty | The minisign public key(s) trusted for release archives (the base64 line of `minisign.pub`, `RW…`), comma separated. **Empty = every archive update is refused.** |
+| `updates.publicKeys` | the owner's key shipped in `Config\Updates` (empty until the owner provides it) | The minisign public key(s) trusted for release archives (the base64 line of `minisign.pub`, `RW…`), comma separated; `.env` replaces the shipped list. **Empty = every archive update is refused.** |
 | `updates.prereleases` | `false` | Offer pre-releases (`1.2.0-rc.1`). |
 | `updates.method` | `auto` | `auto` (a git checkout updates with git, anything else with the archive), `archive` or `git`. |
 | `updates.gitRemote` | `origin` | Remote fetched by the git method. |
@@ -103,45 +103,79 @@ through `OutboundClient`" ([`outbound-requests.md`](outbound-requests.md)): they
 
 ## Release process (the owner)
 
-1. **Version:** semantic versioning. Raise `Modules\Core\Config\Version::CORE`, note the
-   changes (Keep a Changelog style: Added, Changed, Fixed, Security) and merge to `main`.
-2. **Tag:** `git tag -s v1.2.0` (signed, needed by git installs) and push the tag. Only tags
-   that are a semantic version (`v1.2.3` or `1.2.3`, optionally `-rc.1`) are offered;
-   pre-release tags only reach installations with `updates.prereleases`.
-3. **Release notes:** create the GitHub/GitLab release for the tag; its description (Markdown) is
+Every release of the skeleton follows these steps, from a clean checkout of `main` on the owner's
+own computer (never in CI: the signing key does not leave that computer).
+
+1. **Version:** semantic versioning. Raise `Modules\Core\Config\Version::CORE`; when the major
+   version changes, raise the bundled modules' `'Core' => '^<major>.0'` too. Move the changes
+   from `[Unreleased]` to a new section of `CHANGELOG.md` (Keep a Changelog: Added, Changed,
+   Fixed, Security, with anything that needs action: new `.env` keys, PHP version). Merge to
+   `main` with every check green (CI, `php spark security:check` on a production-like copy).
+2. **Tag:** `git tag -s v1.2.0 -m "kpskeletor 1.2.0"` (a signed tag, needed by git installs) and
+   `git push origin v1.2.0`. Only tags that are a semantic version (`v1.2.3` or `1.2.3`,
+   optionally `-rc.1`) are offered; pre-release tags only reach installations with
+   `updates.prereleases`.
+3. **Archive, checksum and signature:** build them from the tag as in "Signing releases" below.
+4. **Release notes:** create the GitHub/GitLab release for the tag; its description (Markdown) is
    what the page `backend/updates` shows, as safe HTML (`ReleaseNotes`: escaped, headings, lists,
-   bold, code and https links only, then HTMLPurifier). Mark the most important changes and
-   anything that needs action (new `.env` keys, PHP version).
-4. **Archive:** build, checksum and sign it as below and upload the three files (`.zip`,
-   `.zip.sha256`, `.zip.minisig`) to the release. The archive update uses the first `.zip` asset
-   that has both companions; a release without them is refused by the archive method.
-5. Check from a test installation: `php spark updates:check`, then
-   `php spark app:update --dry-run`.
+   bold, code and https links only, then HTMLPurifier). Paste the version's `CHANGELOG.md`
+   section. Upload the three files (`.zip`, `.zip.sha256`, `.zip.minisig`). The archive update
+   uses the first `.zip` asset that has both companions; a release without them is refused by the
+   archive method.
+5. **Check** from a test installation that trusts the key: `php spark updates:check`, then
+   `php spark app:update --dry-run` (the plan says the signature verifies).
 
 ## Signing releases (the owner)
 
-The key pair is generated **on the owner's computer** with
-[minisign](https://jedisct1.github.io/minisign/); the secret key never enters the repository, a
-server or CI.
+Releases are signed with **Ed25519** in the [minisign](https://jedisct1.github.io/minisign/)
+format (`Modules\Core\Security\Minisign` verifies it; D-00-48, D-35-03). The key pair is
+generated **on the owner's computer**; the secret key never enters the repository, a server, a
+backup of the site or CI, and is protected by a password.
 
 ```bash
-# Once: creates minisign.key (secret, password protected) and minisign.pub
+# Once: creates the secret key (password protected) and minisign.pub
 minisign -G -p minisign.pub -s ~/.minisign/kpskeletor.key
+# Keep an offline copy of ~/.minisign/kpskeletor.key and its password (e.g. an encrypted USB key).
 
-# Every release: build the archive (one top-level folder), its checksum and its signature
-git archive --format=zip --prefix=kpskeletor-1.2.0/ -o kpskeletor-1.2.0.zip v1.2.0
-sha256sum kpskeletor-1.2.0.zip > kpskeletor-1.2.0.zip.sha256
-minisign -S -s ~/.minisign/kpskeletor.key -m kpskeletor-1.2.0.zip -t "kpskeletor 1.2.0"
-# Upload the three files to the release v1.2.0
+# Every release (example: 1.2.0), from the signed tag
+VERSION=1.2.0
+git archive --format=zip --prefix=kpskeletor-$VERSION/ -o kpskeletor-$VERSION.zip v$VERSION
+sha256sum kpskeletor-$VERSION.zip > kpskeletor-$VERSION.zip.sha256
+minisign -S -s ~/.minisign/kpskeletor.key -m kpskeletor-$VERSION.zip -t "kpskeletor $VERSION"
+
+# Check before uploading: the checksum and the signature with the public key
+sha256sum -c kpskeletor-$VERSION.zip.sha256
+minisign -V -p minisign.pub -m kpskeletor-$VERSION.zip
+# Upload kpskeletor-$VERSION.zip, .zip.sha256 and .zip.minisig to the release v$VERSION
 ```
 
-Publish the second line of `minisign.pub` (it starts with `RW`) in the installations'
-`.env` (`updates.publicKeys = RW…`). For git installs, sign the tag too: `git tag -s v1.2.0`.
+The archive has one top-level folder (`--prefix`); `git archive` leaves out what is not tracked
+(`.env`, `vendor/`, `writable/` contents), and `app:update` never writes the protected paths.
+The checksum file is `<sha256>  <file name>` (the format of `sha256sum`); `app:update` checks
+both the SHA-256 and the signature (the file signature and its trusted comment) before anything
+changes.
 
-**Key rotation:** generate the new pair, set `updates.publicKeys = RW<old>,RW<new>` everywhere,
-sign the next releases with the new key, and remove the old key once every installation has
-updated. A lost or leaked secret key: remove its public key from every installation at once
-(updates are refused until a release signed with a new key is trusted).
+**Where the public key lives.** The public key is the second line of `minisign.pub` (it starts
+with `RW`). It ships with the skeleton in `Modules\Updates\Config\Updates::$publicKeys`, so a new
+installation trusts the owner's releases without extra steps; an installation can replace the
+list with `updates.publicKeys = RW…` in `.env` (for example to trust a fork's key). The secret key
+is never needed on a server.
+
+**Key rotation** (planned, e.g. every few years or when the owner changes):
+
+1. Generate the new pair as above.
+2. Release a version **signed with the old key** whose `Config\Updates::$publicKeys` lists both
+   keys (`'RW<old>,RW<new>'`), and tell administrators who set `updates.publicKeys` in `.env` to
+   add the new key there too.
+3. Sign the following releases with the new key.
+4. Once every installation runs a version with both keys, release one that lists only the new key.
+
+**A lost or leaked secret key:** publish a security notice at once, remove its public key from
+`Config\Updates::$publicKeys` in a release signed with the new key, and tell administrators to
+set `updates.publicKeys = RW<new>` in `.env` and to install that release by hand (`git pull` or the
+archive, after checking its checksum and signature with `minisign -V`): an installation that still
+trusts the leaked key only, refuses releases signed with the new one, which is the intended
+behaviour. Never reuse a leaked key.
 
 ## Maintenance mode by hand
 

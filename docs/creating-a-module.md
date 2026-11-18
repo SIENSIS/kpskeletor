@@ -62,7 +62,7 @@ key. News' values:
 | `$icon` | string (`'bi bi-box'`) | `'bi bi-newspaper'` (Bootstrap Icons) |
 | `$description` | string (`''`) | not set; a language key (`<Module>.module.description`) or text shown on the Modules screen and by a package |
 | `$author` | string (`''`) | not set; a package may only replace an installed module of the same author |
-| `$requires` | name => constraint | `['Core' => '^0.1', 'Auth' => '^0.2', 'Dashboard' => '^0.1']` |
+| `$requires` | name => constraint | `['Core' => '^1.0', 'Auth' => '^0.2', 'Dashboard' => '^0.1']` |
 | `$enabledByDefault` | bool (`true`) | default; `false` installs the module disabled (the `Tasks` module, D-32-01) |
 | `$repository` | ?string (`null`) | not set; where Updates looks for new versions (`'github:acme/news-module'`, [`updates.md`](updates.md)) |
 | `$resources` | key => definition | `posts`, `categories`, `mine` (crud), `read` (page), `api` (crud, for the API resource) |

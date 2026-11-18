@@ -28,7 +28,7 @@ final class Module extends ModuleManifest
     public string $name    = 'Files';
     public string $version = '0.1.0';
     public string $icon    = 'bi bi-folder2-open';
-    public array $requires = ['Core' => '^0.1', 'Auth' => '^0.2'];
+    public array $requires = ['Core' => '^1.0', 'Auth' => '^0.2'];
 
     public array $resources = [
         'files' => [

@@ -126,7 +126,7 @@ $ php spark about
 Application
 | Item               | Value                                |
 | Name               | KP Skeletor                          |
-| Core version       | 0.1.0                                |
+| Core version       | 1.0.0                                |
 | CodeIgniter        | 4.7.6                                |
 | PHP                | 8.3.6 (cli)                          |
 | Environment        | production                           |
@@ -185,7 +185,7 @@ Nothing to do: every module is up to date.
 ```console
 $ php spark modules:list
 | Module  | Version | Installed | Enabled | Status       | Demo |
-| Core    | 0.1.0   | 0.1.0     | yes     | up to date   | -    |
+| Core    | 1.0.0   | 1.0.0     | yes     | up to date   | -    |
 | News    | 0.1.0   | 0.1.0     | yes     | up to date   | yes  |
 | Library | 0.2.0   | 0.1.0     | yes     | needs sync   | -    |
 …

@@ -18,7 +18,7 @@ final class Module extends ModuleManifest
     public string $name    = 'Auth';
     public string $version = '0.2.0';
     public string $icon    = 'bi bi-shield-lock';
-    public array $requires = ['Core' => '^0.1'];
+    public array $requires = ['Core' => '^1.0'];
 
     /**
      * Personal screens: their own resources, granted to every group (decision D-00-17).

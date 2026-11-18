@@ -58,7 +58,7 @@ final class UpdatesScreensTest extends UpdatesTestCase
 
     public function testTheDashboardShowsANewerTagAfterTheCheck(): void
     {
-        $this->publish([self::release('v0.1.0'), self::release('v0.2.0', "## New\n- **Faster** pages\n<script>alert(1)</script>\n[Docs](https://example.com/docs) [bad](javascript:alert(1))")]);
+        $this->publish([self::release('v' . self::$installed), self::release('v' . self::$next, "## New\n- **Faster** pages\n<script>alert(1)</script>\n[Docs](https://example.com/docs) [bad](javascript:alert(1))")]);
         $this->createUser('admin@example.com', 'admin');
         $this->createUser('root@example.com', 'superadmin');
         $this->login('admin@example.com');
@@ -69,10 +69,10 @@ final class UpdatesScreensTest extends UpdatesTestCase
         $this->assertSame([], $this->transport->sent, 'The dashboard never calls the repository.');
 
         command('updates:check');
-        $this->assertStringContainsString(lang('Updates.msg.available', ['Core 0.2.0']), $this->getStreamFilterBuffer());
+        $this->assertStringContainsString(lang('Updates.msg.available', ['Core ' . self::$next]), $this->getStreamFilterBuffer());
 
         $after = (string) $this->send('GET', 'backend')->getBody();
-        $this->assertStringContainsString(esc(lang('Updates.widget.available', ['0.2.0'])), $after);
+        $this->assertStringContainsString(esc(lang('Updates.widget.available', [self::$next])), $after);
 
         $page = (string) $this->send('GET', 'backend/updates')->getBody();
         $this->assertStringContainsString('<strong>Faster</strong>', $page);
@@ -85,7 +85,7 @@ final class UpdatesScreensTest extends UpdatesTestCase
         // Notified once per version, to the holders of updates.view (admin and superadmin).
         $this->assertSame(2, $this->notifications());
         $this->send('POST', 'backend/updates/check')->assertRedirectTo(site_url('backend/updates'));
-        $this->assertSame(lang('Updates.msg.available', ['Core 0.2.0']), $_SESSION['success'] ?? null);
+        $this->assertSame(lang('Updates.msg.available', ['Core ' . self::$next]), $_SESSION['success'] ?? null);
         $this->assertSame(2, $this->notifications());
         $this->assertNotEmpty(db_connect()->table('activity_log')->where('action', 'checked')->where('module', 'Updates')->get()->getResultArray());
     }
@@ -127,7 +127,7 @@ final class UpdatesScreensTest extends UpdatesTestCase
 
     public function testTheTask(): void
     {
-        $this->publish([self::release('v0.1.0')]);
+        $this->publish([self::release('v' . self::$installed)]);
         $result = (new CheckUpdates())->run();
 
         $this->assertSame(TaskResult::SUCCESS, $result->status);

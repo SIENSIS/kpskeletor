@@ -25,7 +25,7 @@ final class Module extends ModuleManifest
     public string $name    = 'Menus';
     public string $version = '0.1.0';
     public string $icon    = 'bi bi-menu-button-wide';
-    public array $requires = ['Core' => '^0.1', 'Auth' => '^0.2'];
+    public array $requires = ['Core' => '^1.0', 'Auth' => '^0.2'];
 
     public array $resources = [
         'public' => [

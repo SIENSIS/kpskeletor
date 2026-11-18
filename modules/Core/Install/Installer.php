@@ -11,6 +11,7 @@ use CodeIgniter\I18n\Time;
 use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
 use Config\Database;
+use Modules\Core\Config\Packages;
 use Modules\Core\Config\Version;
 use Modules\Core\Demo\DemoDataException;
 use Modules\Core\Demo\DemoDataManager;
@@ -96,11 +97,21 @@ final class Installer
             }
         }
 
-        if ($options->environment === 'production' && $options->demo !== null && setting('Packages.allowDemoInProduction') !== true) {
+        if ($options->environment === 'production' && $options->demo !== null && ! self::demoAllowedInProduction()) {
             $errors['demo'] = lang('Install.invalid.demoProduction');
         }
 
         return $errors;
+    }
+
+    /**
+     * Whether demo data may be loaded in production. Read from the configuration
+     * (`packages.allowDemoInProduction` in `.env`), not from the settings table: the database
+     * does not exist yet when the installer asks.
+     */
+    public static function demoAllowedInProduction(): bool
+    {
+        return config(Packages::class)->allowDemoInProduction === true;
     }
 
     /**

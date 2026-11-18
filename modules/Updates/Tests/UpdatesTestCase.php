@@ -7,6 +7,7 @@ namespace Modules\Updates\Tests;
 use CodeIgniter\Config\Factories;
 use Config\Outbound;
 use Config\Services;
+use Modules\Core\Config\Version;
 use Modules\Core\Http\OutboundAllowList;
 use Modules\Core\Http\OutboundClient;
 use Modules\Core\Http\OutboundResponse;
@@ -38,6 +39,65 @@ abstract class UpdatesTestCase extends DashboardTestCase
 
     /** @var array<string, array{version: string, repository: string}> */
     protected array $moduleRepositories = [];
+
+    /** The installed Core version (`Version::CORE`) and releases relative to it, so the tests follow every release. */
+    protected static string $installed = '';
+
+    protected static string $next = '';
+
+    protected static string $after = '';
+
+    protected static string $older = '';
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        self::$installed = Version::CORE;
+        self::$next      = self::minorAfter(Version::CORE, 1);
+        self::$after     = self::minorAfter(Version::CORE, 2);
+        self::$older     = self::before(Version::CORE);
+    }
+
+    /**
+     * `<major>.<minor + $steps>.0` of a version.
+     */
+    private static function minorAfter(string $version, int $steps): string
+    {
+        [$major, $minor] = self::parts($version);
+
+        return sprintf('%d.%d.0', $major, $minor + $steps);
+    }
+
+    /**
+     * A version just below the given one.
+     */
+    private static function before(string $version): string
+    {
+        [$major, $minor, $patch] = self::parts($version);
+
+        return match (true) {
+            $patch > 0 => sprintf('%d.%d.%d', $major, $minor, $patch - 1),
+            $minor > 0 => sprintf('%d.%d.9', $major, $minor - 1),
+            default    => sprintf('%d.9.9', $major - 1),
+        };
+    }
+
+    /**
+     * @return array{int, int, int}
+     */
+    private static function parts(string $version): array
+    {
+        $numbers = array_map('intval', explode('.', explode('-', $version)[0]));
+
+        return [$numbers[0], $numbers[1] ?? 0, $numbers[2] ?? 0];
+    }
+
+    /** Download folder of the next release's assets. */
+    protected static function download(): string
+    {
+        return 'https://github.com/acme/app/releases/download/v' . self::$next . '/';
+    }
 
     protected function setUp(): void
     {

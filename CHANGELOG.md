@@ -8,9 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ## [Unreleased]
 
-The skeleton has not been released yet: the Core reports version `0.1.0` while it is being built.
-Everything below is what the skeleton contains so far, grouped by area. Details: [`docs/`](docs/)
-(start with [`docs/architecture.md`](docs/architecture.md)).
+Nothing yet.
+
+## [1.0.0] - 2026-11-18
+
+First release. The Core reports version `1.0.0` (`Modules\Core\Config\Version::CORE`) and the
+bundled modules require `Core ^1.0`; the modules keep their own versions (0.x, `Auth` and `Tasks`
+0.2.0). Everything the skeleton contains, grouped by area. Details: [`docs/`](docs/) (start with
+[`docs/architecture.md`](docs/architecture.md)); acceptance criteria 1–13 were checked on fresh
+SQLite and MariaDB installations ([`docs/progress.md`](docs/progress.md), "Final acceptance").
 
 ### Added
 
@@ -126,5 +132,11 @@ Everything below is what the skeleton contains so far, grouped by area. Details:
 ### Fixed
 
 - The Events administration list failed when an event was managed by the Tasks module.
+- `app:install` on a fresh clone (no database yet) with `--demo` in production crashed reading the
+  settings table instead of refusing with a message.
+- The notifications bell's accessible name now contains the unread count shown in its badge
+  (WCAG 2.5.3).
+- `docs/web-server.md`: the PHP user may write `public/uploads` (the public disk).
 
-[Unreleased]: https://github.com/SIENSIS/kpskeletor/commits/main
+[Unreleased]: https://github.com/SIENSIS/kpskeletor/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/SIENSIS/kpskeletor/releases/tag/v1.0.0

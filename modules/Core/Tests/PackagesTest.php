@@ -83,7 +83,7 @@ final class PackagesTest extends CIUnitTestCase
                 public string $name = 'Demo';
                 public string $version = '1.2.0';
                 public string $icon = PHP_EOL;
-                public array $requires = ['Core' => '^0.1', 'News' => '>=0.1'];
+                public array $requires = ['Core' => '^1.0', 'News' => '>=0.1'];
                 public array $widgets = [\Modules\Demo\Widgets\Latest::class];
                 public function __construct() { $this->name = 'Other'; }
             }
@@ -97,7 +97,7 @@ final class PackagesTest extends CIUnitTestCase
         $this->assertSame('Demo', $read['properties']['name']);
         $this->assertSame('1.2.0', $read['properties']['version']);
         $this->assertSame(ManifestReader::UNKNOWN, $read['properties']['icon'], 'A constant is not evaluated.');
-        $this->assertSame(['Core' => '^0.1', 'News' => '>=0.1'], $read['properties']['requires']);
+        $this->assertSame(['Core' => '^1.0', 'News' => '>=0.1'], $read['properties']['requires']);
         $this->assertSame(['Modules\Demo\Widgets\Latest'], $read['properties']['widgets']);
         $this->assertArrayNotHasKey('this', $read['properties']);
     }
@@ -111,7 +111,7 @@ final class PackagesTest extends CIUnitTestCase
         $this->assertSame($name, $info->name);
         $this->assertSame('1.0.0', $info->version);
         $this->assertSame('ACME', $info->author);
-        $this->assertSame(['Core' => '^0.1'], $info->requires);
+        $this->assertSame(['Core' => '^1.0'], $info->requires);
         $this->assertContains(strtolower($name) . '-items.list', $info->permissions);
         $this->assertSame(['Items'], $info->menus);
         $this->assertArrayHasKey('Config/Module.php', $info->files);
@@ -271,7 +271,7 @@ final class PackagesTest extends CIUnitTestCase
         $other = $this->validator()->validate($this->modulePackage($name, '2.0.0', [], 'Someone else'));
         $this->assertSame([lang('Core.packages.otherAuthor', [$name, 'ACME', 'Someone else'])], $this->installer()->plan($other)['problems']);
 
-        $needs = $this->validator()->validate($this->modulePackage($this->uniqueModuleName(), '1.0.0', [], 'ACME', ['Core' => '^0.1', 'Nowhere' => '^1.0']));
+        $needs = $this->validator()->validate($this->modulePackage($this->uniqueModuleName(), '1.0.0', [], 'ACME', ['Core' => '^1.0', 'Nowhere' => '^1.0']));
         $this->assertStringContainsString('Nowhere', implode(' ', $this->installer()->plan($needs)['problems']));
 
         $core = $this->validator()->validate($this->modulePackage($this->uniqueModuleName(), '1.0.0', [], 'ACME', ['Core' => '^9.0']));
@@ -582,7 +582,7 @@ final class PackagesTest extends CIUnitTestCase
     /**
      * @param array<string, string> $requires
      */
-    private function manifest(string $name, string $version, string $author = 'ACME', array $requires = ['Core' => '^0.1'], string $body = ''): string
+    private function manifest(string $name, string $version, string $author = 'ACME', array $requires = ['Core' => '^1.0'], string $body = ''): string
     {
         $requires = var_export($requires, true);
         $lower    = strtolower($name);
@@ -612,7 +612,7 @@ final class PackagesTest extends CIUnitTestCase
      *
      * @return array<string, string>
      */
-    private function moduleFiles(string $name, string $version, string $author = 'ACME', array $requires = ['Core' => '^0.1'], string $body = ''): array
+    private function moduleFiles(string $name, string $version, string $author = 'ACME', array $requires = ['Core' => '^1.0'], string $body = ''): array
     {
         $body = $body !== '' ? $body : "public array \$menu = [['resource' => 'items', 'label' => 'Items']];";
 
@@ -626,7 +626,7 @@ final class PackagesTest extends CIUnitTestCase
      * @param array<string, string> $extra
      * @param array<string, string> $requires
      */
-    private function modulePackage(string $name, string $version, array $extra = [], string $author = 'ACME', array $requires = ['Core' => '^0.1'], string $body = ''): string
+    private function modulePackage(string $name, string $version, array $extra = [], string $author = 'ACME', array $requires = ['Core' => '^1.0'], string $body = ''): string
     {
         return $this->zip($this->prefixed($name, $this->moduleFiles($name, $version, $author, $requires, $body) + $extra));
     }
