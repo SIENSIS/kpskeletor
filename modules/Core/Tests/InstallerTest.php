@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Tests;
 
+use CodeIgniter\Config\Factories;
 use CodeIgniter\Shield\Models\UserModel;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Database;
 use Config\Services;
+use Modules\Core\Config\Packages;
 use Modules\Core\Install\Installer;
 use Modules\Core\Install\InstallException;
 use Modules\Core\Install\InstallOptions;
@@ -214,6 +216,23 @@ final class InstallerTest extends CIUnitTestCase
     {
         $this->assertArrayHasKey('demo', $this->installer()->validate($this->options('production', [])));
         $this->assertArrayNotHasKey('demo', $this->installer()->validate($this->options('development', [])));
+    }
+
+    public function testDemoInProductionIsDecidedByTheConfigurationNotTheMissingDatabase(): void
+    {
+        // A fresh clone has no database yet: the installer must not read the settings table
+        // (it crashed with "Unable to connect" before); here the test database has no tables.
+        $this->assertArrayHasKey('demo', $this->installer()->validate($this->options('production', [])));
+
+        $packages                        = new Packages();
+        $packages->allowDemoInProduction = true;
+        Factories::injectMock('config', Packages::class, $packages);
+
+        try {
+            $this->assertArrayNotHasKey('demo', $this->installer()->validate($this->options('production', [])));
+        } finally {
+            Factories::reset('config');
+        }
     }
 
     public function testDemoOfAModuleLoadsTheModulesItNeedsFirst(): void

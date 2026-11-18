@@ -229,7 +229,7 @@ final class AppInstall extends BaseCommand
             return $given === '' ? [] : array_values(array_filter(array_map('trim', explode(',', $given))));
         }
 
-        if (! $prompt->interactive() || ($environment === 'production' && setting('Packages.allowDemoInProduction') !== true)) {
+        if (! $prompt->interactive() || ($environment === 'production' && ! Installer::demoAllowedInProduction())) {
             return null;
         }
 
