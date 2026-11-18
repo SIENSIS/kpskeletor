@@ -42,7 +42,8 @@ pull request open), *merged* (in `main`).
 | 32 | Tasks tutorial module and AI tooling | merged | `ccr-c5a1782e-jvbm6w` | [SIENSIS/kpskeletor#40](https://github.com/SIENSIS/kpskeletor/pull/40) | [`deploy-status/32-tasks-module/`](../deploy-status/32-tasks-module/README.md) |
 | 33 | Documentation | merged | `claude/vibrant-hypatia-t0pedc` | [SIENSIS/kpskeletor#41](https://github.com/SIENSIS/kpskeletor/pull/41) | [`deploy-status/33-docs/`](../deploy-status/33-docs/README.md) |
 | 34 | Tutorials | merged | `claude/fervent-gauss-9ng4h3` | [SIENSIS/kpskeletor#42](https://github.com/SIENSIS/kpskeletor/pull/42) | [`deploy-status/34-tutorials/`](../deploy-status/34-tutorials/README.md) |
-| 35 | Quality: end-to-end, accessibility and CI | done | `claude/amazing-wozniak-r3ycn2` (started on `claude/lucid-babbage-qm6oxf`) | [SIENSIS/kpskeletor#43](https://github.com/SIENSIS/kpskeletor/pull/43) | [`deploy-status/35-quality/`](../deploy-status/35-quality/README.md) |
+| 35 | Quality: end-to-end, accessibility and CI | merged | `claude/amazing-wozniak-r3ycn2` (started on `claude/lucid-babbage-qm6oxf`) | [SIENSIS/kpskeletor#43](https://github.com/SIENSIS/kpskeletor/pull/43) | [`deploy-status/35-quality/`](../deploy-status/35-quality/README.md) |
+| 36 | Final acceptance and release | in progress | `ccr-86ec5c0e-ha268p` | — | [`deploy-status/36-release/`](../deploy-status/36-release/README.md) |
 
 ## MVP review (session 19)
 
