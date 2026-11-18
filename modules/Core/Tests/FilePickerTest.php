@@ -78,6 +78,14 @@ final class FilePickerTest extends AuthTestCase
         $data['f']             = 'shared/elsewhere';
         $forged                = rtrim(strtr(base64_encode((string) json_encode($data)), '+/', '-_'), '=') . '.' . $signature;
         $this->assertNull(UploadToken::decode($forged), 'Changing the folder breaks the signature.');
+
+        // Tampered types (an executable or HTML added) and size, with the old signature.
+        foreach (['t' => ['txt', 'pdf', 'php', 'html'], 's' => 1_000_000_000] as $field => $value) {
+            $data         = json_decode((string) base64_decode(strtr($payload, '-_', '+/'), true), true);
+            $data[$field] = $value;
+            $forged       = rtrim(strtr(base64_encode((string) json_encode($data)), '+/', '-_'), '=') . '.' . $signature;
+            $this->assertNull(UploadToken::decode($forged), "Changing '{$field}' breaks the signature.");
+        }
         $this->assertNull(UploadToken::decode($payload . '.' . strrev($signature)));
         $this->assertNull(UploadToken::decode('garbage'));
         $this->assertNull(UploadToken::decode($token, $scope->expires + 1), 'Expired.');

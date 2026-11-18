@@ -103,8 +103,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   imported with bare specifiers (`core/…`, `<module>/…`; never relative paths), components by
   `data-component`, URLs with `asset('<owner>::<path>')` (`docs/frontend.md`). **No inline `<script>`, `on*=` handlers or `style=""`** (strict
   CSP with nonces). Never edit `public/assets/modules/…` (published copies).
-- **Rich text:** edit it with the Core's editor (`RichTextEditor::attrs()` on the textarea; type
-  `translation` for a translated kpcrudy field) and sanitise it with
+- **Rich text:** edit it with the Core's editor (`RichTextEditor::attrs()` on the textarea; the
+  `attrs` option of `setTranslations()` for a translated kpcrudy field) and sanitise it with
   `Modules\Core\Security\HtmlSanitizer` before storing and when showing it. Content shared by
   modules (languages and fallback, public/private/groups audience, publish workflow, upload
   handler) comes from `Modules\Core\Content` and `CrudUploadHandler`, not copied (`docs/pages.md`).

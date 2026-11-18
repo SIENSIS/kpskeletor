@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Security\Check\Checks;
 
 use Modules\Core\Config\ProductionCheck;
+use Modules\Core\Frontend\VendorChecksums;
 use Modules\Core\Security\Check\ComposerAudit;
 use Modules\Core\Security\Check\SecurityCheck;
 use Modules\Core\Security\Check\SecurityReport;
@@ -66,31 +67,19 @@ final class DependenciesCheck implements SecurityCheck
 
     private function vendorChecksums(SecurityReport $report): void
     {
-        $title    = lang('SecurityCheck.vendor.title');
-        $manifest = json_decode((string) @file_get_contents($this->vendorAssets . '/vendor.json'), true);
+        $title     = lang('SecurityCheck.vendor.title');
+        $checksums = new VendorChecksums($this->vendorAssets);
 
-        if (! is_array($manifest)) {
+        if (! $checksums->hasManifest()) {
             $report->error(self::GROUP, 'dependencies.vendor', $title, lang('SecurityCheck.vendor.missing'), lang('SecurityCheck.vendor.fix'));
 
             return;
         }
 
-        $bad   = [];
-        $files = 0;
-
-        foreach ($manifest as $library => $entry) {
-            foreach (is_array($entry['files'] ?? null) ? $entry['files'] : [] as $path => $hash) {
-                $files++;
-                $file = $this->vendorAssets . '/' . $library . '/' . $path;
-
-                if (! is_file($file) || ! hash_equals((string) $hash, (string) hash_file('sha256', $file))) {
-                    $bad[] = $library . '/' . $path;
-                }
-            }
-        }
+        $bad = $checksums->problems();
 
         if ($bad === []) {
-            $report->ok(self::GROUP, 'dependencies.vendor', $title, lang('SecurityCheck.vendor.ok', [$files]));
+            $report->ok(self::GROUP, 'dependencies.vendor', $title, lang('SecurityCheck.vendor.ok', [$checksums->fileCount()]));
         } else {
             $report->error(self::GROUP, 'dependencies.vendor', $title, lang('SecurityCheck.vendor.changed', [implode(', ', $bad)]), lang('SecurityCheck.vendor.fix'));
         }

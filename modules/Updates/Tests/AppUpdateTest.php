@@ -12,6 +12,7 @@ use Modules\Updates\Services\CommandRunner;
 use Modules\Updates\Services\Release;
 use Modules\Updates\Services\UpdateException;
 use Modules\Updates\Services\Updater;
+use Tests\Support\Security\TestSigner;
 use ZipArchive;
 
 /**

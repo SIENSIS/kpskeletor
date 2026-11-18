@@ -141,6 +141,21 @@ final class CalendarApiTest extends EventsTestCase
         $this->assertNull($this->published('session-1')['deleted_at']);
     }
 
+    public function testTheManagingModuleIsNamedByItsLanguageFile(): void
+    {
+        // `<Module>.module` is a group of keys (`name`, `description`) in the modules' language
+        // files: the label is `<Module>.module.name`, never the array (a 500 before session 35).
+        $this->assertSame(lang('Tasks.module.name'), \Modules\Events\Controllers\CalendarView::moduleLabel('Tasks'));
+        $this->assertSame('Courses', \Modules\Events\Controllers\CalendarView::moduleLabel('Courses'));
+
+        $this->createUser('boss@example.com', 'admin');
+        $this->login('boss@example.com');
+        (new CalendarService())->publish('Courses', 'task-1', $this->lesson());
+        db_connect()->table('events')->where('id', $this->published('task-1')['id'])->update(['source_module' => 'Tasks']);
+
+        $this->assertStringContainsString(lang('Tasks.module.name'), $this->body('GET', 'backend/events'));
+    }
+
     public function testCalendarPermissionsAndAccessPoliciesNarrowWhatUsersSee(): void
     {
         $john = $this->createUser('john@example.com', 'user');

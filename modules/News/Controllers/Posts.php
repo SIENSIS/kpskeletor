@@ -119,6 +119,7 @@ final class Posts extends BackendController
                 'types'     => ['title' => 'text', 'summary' => 'textarea', 'body' => 'textarea'],
                 'rules'     => ['title' => 'required|max_length[190]', 'summary' => 'permit_empty|max_length[500]', 'body' => 'permit_empty|max_length[200000]'],
                 'fallbacks' => ['*' => ['ca']],
+                'attrs'     => ['body' => RichTextEditor::attrs(RichTextEditor::images('news'))],
             ])
             ->setRelationNN('groups', 'news_groups', 'groups', 'news_id', 'group_id', 'title', ['order' => 'title'])
             ->setRelation('author_id', 'users', 'username')
@@ -127,7 +128,6 @@ final class Posts extends BackendController
             ->fieldType('visibility', 'select', ['options' => $this->options('visibilities', NewsVisibility::VISIBILITIES)])
             ->fieldType('status', 'readonly')
             ->fieldType('category_id', 'select', ['options' => self::categoryOptions()])
-            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs(RichTextEditor::images('news'))])
             ->fieldType('pinned', 'boolean')
             ->fieldType('published_at', 'datetime')
             ->fieldType('expires_at', 'datetime')

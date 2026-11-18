@@ -194,6 +194,23 @@ before the first paint and follows system changes. The switch is `partials/theme
 live under `[data-bs-theme=dark]` in the theme CSS; child themes inherit both modes by overriding
 variables only.
 
+**Contrast (WCAG AA, 4.5:1), checked by axe in the end-to-end tests in both modes.** Bootstrap's
+mid-tone literals fail on the back office's light grey page (`--bs-tertiary-bg`) and on the dark
+body, so the default theme (`theme.css`):
+
+- writes text in the primary colour (links, `.btn-outline-primary`) with
+  `--kp-primary-text` = the primary colour mixed with 15 % black (Bootstrap's `#0d6efd` reaches
+  only 4.26:1 on `#f8f9fa`); dark mode keeps the lightened `--kp-primary-light`. Plain links (no
+  class) read `--bs-link-color` directly, because Bootstrap colours them through
+  `--bs-link-color-rgb`, which cannot hold a mixed colour;
+- uses the next shade of Bootstrap's palette for the text of outline buttons (secondary,
+  success, danger, info, warning) in light mode, and the `*-text-emphasis` colours in dark mode
+  (also `.text-danger`, `.text-success`, `.text-secondary`, `.link-secondary`);
+- dims the labels of disabled checkboxes to 75 % instead of 50 % and darkens inline `code`.
+
+A child theme that changes `primaryColor` should keep `--kp-primary-text` at 4.5:1 on
+`#f8f9fa` (run `npm run e2e`).
+
 ## Responsive layout
 
 Reference widths: phone ≥ 360 px, tablet ≥ 768 px, desktop ≥ 1200 px; no horizontal page scroll

@@ -188,7 +188,7 @@ return [
         'title'   => 'Biblioteques de front-end incloses',
         'ok'      => '{0} fitxers coincideixen amb les sumes de verificació de vendor.json.',
         'missing' => 'public/assets/vendor/vendor.json falta o no és vàlid.',
-        'changed' => 'Canviats o absents: {0}.',
+        'changed' => 'Canviats o absents (+ = no llistat a vendor.json): {0}.',
         'fix'     => 'Restabliu public/assets/vendor a partir de la versió publicada (no editeu mai aquests fitxers).',
     ],
     'outbound' => [

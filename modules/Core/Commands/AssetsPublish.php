@@ -7,6 +7,7 @@ namespace Modules\Core\Commands;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use Modules\Core\Frontend\AssetPublisher;
+use Modules\Core\Frontend\VendorChecksums;
 
 /**
  * php spark assets:publish [--watch] [--check]
@@ -21,7 +22,7 @@ final class AssetsPublish extends BaseCommand
     /** @var array<string, string> */
     protected $options = [
         '--watch' => 'Keep running and republish whenever a source file changes (development; Ctrl+C to stop).',
-        '--check' => 'Change nothing; exit with an error when the published copies or the manifest are out of date.',
+        '--check' => 'Change nothing; exit with an error when the published copies or the manifest are out of date, or a vendored library does not match vendor.json.',
     ];
 
     /**
@@ -35,6 +36,11 @@ final class AssetsPublish extends BaseCommand
 
         if (ModulesSync::option($params, 'check') !== null) {
             $problems = $publisher->check();
+
+            // The vendored libraries must match vendor.json (CI; never edited by hand).
+            foreach ((new VendorChecksums())->problems() as $problem) {
+                $problems[] = 'assets/vendor: ' . $problem;
+            }
 
             if ($problems === []) {
                 CLI::write(lang('Core.assets.upToDate'), 'green');

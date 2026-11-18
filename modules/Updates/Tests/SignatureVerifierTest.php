@@ -7,6 +7,7 @@ namespace Modules\Updates\Tests;
 use CodeIgniter\Test\CIUnitTestCase;
 use Modules\Updates\Services\SignatureVerifier;
 use Modules\Updates\Services\UpdateException;
+use Tests\Support\Security\TestSigner;
 
 /**
  * Release archives: SHA-256 and minisign (Ed25519) signature; an archive signed with a test key

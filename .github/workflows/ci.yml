@@ -62,7 +62,8 @@ jobs:
       - name: CSP check of the project views (no inline scripts, handlers or styles)
         run: php spark csp:check
 
-      - name: Published assets up to date (assets:publish is idempotent, manifest in sync)
+      # --check also verifies the vendored front-end libraries against public/assets/vendor/vendor.json.
+      - name: Published assets up to date and vendor.json checksums
         run: php spark assets:publish && php spark assets:publish --check
 
       # Acceptance criterion 1 on SQLite: a fresh clone installs with one command (last step: it writes .env).
@@ -147,3 +148,89 @@ jobs:
           grep -q '^CI_ENVIRONMENT = production$' .env
           php spark permissions:check
           php spark about
+
+  e2e:
+    name: End-to-end and accessibility (Playwright, axe)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, mbstring, json, openssl, fileinfo, zip, gd, sodium, sqlite3, pdo_sqlite, mysqli, curl, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-8.3-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-8.3-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Playwright and axe
+        run: npm ci && npx playwright install --with-deps chromium
+
+      # A random administrator password per run (a throwaway site; nothing to commit).
+      - name: Demo site (SQLite)
+        run: |
+          E2E_PASSWORD="$(openssl rand -base64 18)"
+          echo "::add-mask::${E2E_PASSWORD}"
+          echo "E2E_PASSWORD=${E2E_PASSWORD}" >> "$GITHUB_ENV"
+          INSTALL_ADMIN_PASSWORD="${E2E_PASSWORD}" php spark app:install --no-interaction --env=development --url=http://localhost:8089/ --db=sqlite --db-name=e2e.db --email=admin@example.com --demo --2fa=none
+          php spark modules:enable Tasks
+          printf 'y\n' | php spark modules:demo Tasks
+
+      - name: End-to-end tests (phone, tablet, desktop × light, dark)
+        env:
+          E2E_USER: admin@example.com
+        run: npm run e2e
+
+      - name: Screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e
+          path: |
+            writable/e2e/screenshots
+            writable/e2e/report
+            writable/e2e/results
+          retention-days: 14
+          if-no-files-found: ignore
+
+  secrets:
+    name: Secret scanning (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The gitleaks binary (MIT) from its release, checked against the published checksums; the
+      # gitleaks GitHub Action needs a licence for organisation repositories.
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: 8.28.0
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl -sSfLO "${base}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz\$" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum -c -
+          tar -xzf "gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" gitleaks
+
+      - name: Scan the history
+        run: ./gitleaks git --config .gitleaks.toml --redact --no-banner --verbose .

@@ -94,6 +94,57 @@ final class RateLimitTest extends AuthTestCase
         $this->assertSame(['error' => lang('Core.errors.tooManyRequests.message')], json_decode((string) $response->getBody(), true));
     }
 
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function limitedRoutes(): iterable
+    {
+        // limit, verb, route as registered
+        yield 'feeds: News RSS' => ['feeds', 'GET', 'news/feed.xml'];
+        yield 'feeds: sitemap' => ['feeds', 'GET', 'sitemap.xml'];
+        yield 'feeds: personal iCal' => ['feeds', 'GET', 'ical/user/([^/]+)'];
+        yield 'uploads: file picker' => ['uploads', 'POST', 'files/picker/upload'];
+        yield 'uploads: module packages' => ['uploads', 'POST', 'backend/modules/packages/upload'];
+        yield 'widgets: widget data' => ['widgets', 'GET', 'backend/dashboard/widgets/([^/]+)/data'];
+        yield 'forms: backup create' => ['forms', 'POST', 'backend/backups/create'];
+    }
+
+    /**
+     * Every named limit answers 429 with Retry-After once its capacity is used (the filter as the
+     * routes use it), and the routes that need it carry it.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('limitedRoutes')]
+    public function testEachLimitAnswers429OnItsRoutes(string $limit, string $verb, string $route): void
+    {
+        $routes = service('routes', false)->loadRoutes();
+        $this->assertArrayHasKey($route, $routes->getRoutes($verb), "{$verb} {$route} exists.");
+        $this->assertContains('ratelimit:' . $limit, $routes->getFiltersForRoute($route, $verb), "{$verb} {$route} is limited by {$limit}.");
+
+        setting(RateLimiter::LIMITS[$limit]['setting'], 1);
+        (new RateLimiter())->reset($limit, 'ip:' . service('request')->getIPAddress());
+        $request = service('request')->setMethod($verb);
+        $filter  = new RateLimit();
+
+        $first    = $filter->before($request, [$limit]);
+        $response = $filter->before($request, [$limit]);
+
+        $this->assertNull($first, 'The first request passes.');
+        $this->assertNotNull($response);
+        $this->assertSame(429, $response->getStatusCode());
+        $this->assertGreaterThan(0, (int) $response->getHeaderLine('Retry-After'));
+    }
+
+    public function testAFeedAnswers429ThroughTheRealRoute(): void
+    {
+        setting('Core.rateLimitFeeds', 1);
+
+        $this->send('GET', 'news/feed.xml')->assertStatus(200);
+
+        $response = $this->send('GET', 'news/feed.xml');
+        $response->assertStatus(429);
+        $this->assertGreaterThan(0, (int) $response->response()->getHeaderLine('Retry-After'));
+    }
+
     public function testRateLimitAliasIsRegistered(): void
     {
         Factories::reset('config');

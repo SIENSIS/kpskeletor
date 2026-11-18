@@ -101,8 +101,13 @@ function label(toolbar) {
 
         for (const control of toolbar.querySelectorAll('.' + name + (value ? '[' + value : ''))) {
             const text = t(key);
-            control.setAttribute('aria-label', text);
             control.setAttribute('title', text);
+
+            // A picker (Quill's span replacing a <select>) has no role: its name goes on the
+            // focusable label (role="button"), which axe/screen readers announce.
+            const pickerLabel = control.classList.contains('ql-picker') ? control.querySelector('.ql-picker-label') : null;
+            (pickerLabel ?? control).setAttribute('aria-label', text);
+            if (pickerLabel !== null) control.removeAttribute('aria-label');
         }
     }
 }
@@ -215,6 +220,7 @@ export async function mount(textarea, options = {}) {
         for (const item of toolbarElement.querySelectorAll('.ql-header .ql-picker-item, .ql-header .ql-picker-label')) {
             const level = item.getAttribute('data-value');
             item.setAttribute('data-label', level ? t('editor.heading' + level) : t('editor.normal'));
+            if (item.classList.contains('ql-picker-item')) item.setAttribute('aria-label', item.getAttribute('data-label'));
         }
     }
 

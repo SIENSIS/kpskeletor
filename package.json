@@ -5,9 +5,12 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "screenshots": "node deploy-status/screenshot.mjs"
+    "screenshots": "node deploy-status/screenshot.mjs",
+    "e2e": "playwright test --trace off"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "axe-core": "4.14.0",
     "playwright": "1.63.0"
   }
 }

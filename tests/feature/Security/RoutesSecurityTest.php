@@ -93,7 +93,7 @@ final class RoutesSecurityTest extends CIUnitTestCase
     {
         $routes = Services::routes(false)->loadRoutes();
 
-        foreach ([
+        $sensitive = [
             ['POST', 'backend/profile/two-factor/email'],
             ['GET', 'backend/profile/two-factor/app'],
             ['POST', 'backend/profile/two-factor/app'],
@@ -111,10 +111,38 @@ final class RoutesSecurityTest extends CIUnitTestCase
             ['POST', 'backend/backups/recover/([^/]+)'],
             ['GET', 'backend/backups/upload'],
             ['POST', 'backend/backups/upload'],
-        ] as [$verb, $path]) {
+            ['POST', 'backend/settings/actions/maintenance'],
+            ['GET', 'backend/modules/packages/upload'],
+            ['POST', 'backend/modules/packages/upload'],
+            ['POST', 'backend/modules/packages/([0-9]+)/approve'],
+            ['GET', 'backend/modules/uninstall/([^/]+)'],
+            ['POST', 'backend/modules/uninstall/([^/]+)'],
+            ['GET', 'backend/modules/themes/uninstall/([^/]+)'],
+            ['POST', 'backend/modules/themes/uninstall/([^/]+)'],
+            ['GET', 'backend/security/probe'],
+            ['POST', 'backend/security/probe'],
+            ['POST', 'backend/calendar/subscription/generate'],
+        ];
+        $expected = [];
+
+        foreach ($sensitive as [$verb, $path]) {
             $this->assertArrayHasKey($path, $routes->getRoutes($verb), "{$verb} {$path} exists.");
             $this->assertContains('reauth', $routes->getFiltersForRoute($path, $verb), "{$verb} {$path} asks for re-authentication.");
+            $expected[] = $verb . ' ' . $path;
         }
+
+        // The list is complete: a new route with `reauth` is added here (and to the docs) on purpose.
+        $found = [];
+
+        foreach (['GET', 'POST'] as $verb) {
+            foreach (array_keys($routes->getRoutes($verb)) as $path) {
+                if (in_array('reauth', $routes->getFiltersForRoute((string) $path, $verb), true)) {
+                    $found[] = $verb . ' ' . $path;
+                }
+            }
+        }
+
+        $this->assertSame($this->sorted($expected), $this->sorted($found));
     }
 
     /**

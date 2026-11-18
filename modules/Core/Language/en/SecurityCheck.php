@@ -188,7 +188,7 @@ return [
         'title'   => 'Vendored front-end libraries',
         'ok'      => '{0} files match the checksums of vendor.json.',
         'missing' => 'public/assets/vendor/vendor.json is missing or invalid.',
-        'changed' => 'Changed or missing: {0}.',
+        'changed' => 'Changed or missing (+ = not listed in vendor.json): {0}.',
         'fix'     => 'Restore public/assets/vendor from the release (never edit those files).',
     ],
     'outbound' => [

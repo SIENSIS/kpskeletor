@@ -58,7 +58,7 @@
                                 <?= ui_badge(lang('News.types.article'), 'secondary', 'bi bi-file-text') ?>
                             <?php endif ?>
                             <?php if ($item['pinned']): ?>
-                                <i class="bi bi-pin-angle-fill text-body-secondary" title="<?= esc(lang('News.pinned'), 'attr') ?>" aria-label="<?= esc(lang('News.pinned'), 'attr') ?>"></i>
+                                <i class="bi bi-pin-angle-fill text-body-secondary" role="img" title="<?= esc(lang('News.pinned'), 'attr') ?>" aria-label="<?= esc(lang('News.pinned'), 'attr') ?>"></i>
                             <?php endif ?>
                             <?php if ($item['category'] !== null): ?>
                                 <span class="text-body-secondary"><?= esc($item['category']) ?></span>

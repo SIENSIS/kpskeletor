@@ -143,6 +143,23 @@ final class IcalTest extends EventsTestCase
         $this->assertNotFound('GET', 'ical/user/' . $secret . '.ics');
     }
 
+    public function testRestrictedEventsStayOutOfTheFeedsOfAdministratorsOutsideTheAudience(): void
+    {
+        $john  = $this->createUser('john@example.com', 'user');
+        $admin = $this->createUser('boss@example.com', 'admin');
+        $root  = $this->createUser('root@example.com', 'superadmin');
+        $this->event('Editors i John', ['visibility' => 'restricted'], ['editor'], [(int) $john->id]);
+        $this->event('Per a tothom');
+
+        foreach ([$admin, $root] as $user) {
+            $secret = (new IcalFeeds())->issue($user);
+            $this->assertSame(['Per a tothom'], $this->summaries('ical/user/' . $secret . '.ics'), (string) $user->email);
+        }
+
+        $secret = (new IcalFeeds())->issue($john);
+        $this->assertSame(['Editors i John', 'Per a tothom'], $this->summaries('ical/user/' . $secret . '.ics'));
+    }
+
     public function testThePersonalFeedIsInTheUsersOwnLanguage(): void
     {
         $user   = $this->createUser('ana@example.com', 'user');

@@ -7,6 +7,7 @@ import { initDirtyGuards } from 'core/forms/dirty-guard.js';
 import { initPwa } from 'core/pwa.js';
 import { bindConfirmations, bindKpcrudyConfirmations } from 'core/ui/confirm.js';
 import { initCookieNotice } from 'core/ui/cookie-notice.js';
+import { initScrollRegions } from 'core/ui/scroll-regions.js';
 import { initSidebar } from 'core/ui/sidebar.js';
 import { initTabsMemory } from 'core/ui/tabs-memory.js';
 import { initThemeSwitch } from 'core/ui/theme-switch.js';
@@ -22,6 +23,7 @@ const steps = [
     () => mountAll(document),
     () => observe(document.body),
     () => initPwa(),
+    () => initScrollRegions(document),
 ];
 
 for (const step of steps) {
