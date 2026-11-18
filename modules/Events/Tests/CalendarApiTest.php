@@ -150,7 +150,8 @@ final class CalendarApiTest extends EventsTestCase
 
         $this->createUser('boss@example.com', 'admin');
         $this->login('boss@example.com');
-        (new CalendarService())->publish('Tasks', 'task-1', $this->lesson());
+        (new CalendarService())->publish('Courses', 'task-1', $this->lesson());
+        db_connect()->table('events')->where('id', $this->published('task-1')['id'])->update(['source_module' => 'Tasks']);
 
         $this->assertStringContainsString(lang('Tasks.module.name'), $this->body('GET', 'backend/events'));
     }
