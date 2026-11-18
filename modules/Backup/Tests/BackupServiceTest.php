@@ -211,6 +211,24 @@ final class BackupServiceTest extends BackupTestCase
         $this->assertSame([], glob($this->config->path . '/*safety*') ?: [], 'No safety backup: nothing was about to change.');
         $this->assertFalse((new MaintenanceMode())->isOn());
         $this->assertCount(count($cases) + 1, [...$this->securityEntries('restore_refused'), ...$this->securityEntries('restore_failed')]);
+
+        // A modified backup (one byte changed) fails authentication before anything is touched.
+        $file = $this->craft(['files/public/a.jpg' => 'a']);
+        $data = (string) file_get_contents($this->backupPath($file));
+        $data[intdiv(strlen($data), 2)] = chr(ord($data[intdiv(strlen($data), 2)]) ^ 0x20);
+        file_put_contents($this->backupPath($file), $data);
+
+        try {
+            (new RestoreService($this->config))->restore($file, self::PASSWORD);
+            $this->fail('A modified backup was accepted.');
+        } catch (BackupException) {
+            // refused
+        }
+
+        $this->assertSame($users, db_connect()->table('users')->countAllResults());
+        $this->assertFileDoesNotExist($this->root . '/public/a.jpg');
+        $this->assertSame([], glob($this->config->path . '/*safety*') ?: []);
+        $this->assertFalse((new MaintenanceMode())->isOn());
     }
 
     public function testServerCodeIsNeverRestoredIntoThePublicDisk(): void

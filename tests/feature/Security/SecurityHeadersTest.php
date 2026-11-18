@@ -42,6 +42,7 @@ final class SecurityHeadersTest extends CIUnitTestCase
         yield 'public page' => ['/'];
         yield 'login form' => ['login'];
         yield 'back office (redirect to the login)' => ['backend/profile'];
+        yield 'API without a token (problem+json)' => ['api/v1/me'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('paths')]
@@ -58,6 +59,14 @@ final class SecurityHeadersTest extends CIUnitTestCase
         $this->assertStringContainsString('microphone=()', $policy);
         $this->assertStringContainsString('geolocation=()', $policy);
         $this->assertFalse($response->response()->hasHeader('Strict-Transport-Security'), 'No HSTS outside production.');
+
+        // The strict CSP (Response::send() finalises it; feature tests do not send).
+        $raw = $response->response();
+        $raw->getCSP()->finalize($raw);
+        $csp = $raw->getHeaderLine('Content-Security-Policy');
+        $this->assertStringContainsString("default-src 'self'", $csp, 'CSP on ' . $path);
+        $this->assertStringNotContainsString('unsafe-inline', $csp);
+        $this->assertStringNotContainsString('unsafe-eval', $csp);
     }
 
     public function testErrorResponsesHaveTheHeaders(): void
