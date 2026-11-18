@@ -85,8 +85,9 @@ Validation (`Modules\Core\Packages\PackageValidator`), before anything is instal
 ### Signatures
 
 A package is signed with [minisign](https://jedisct1.github.io/minisign/) (Ed25519; both the
-default prehashed `ED` and the legacy `Ed` signatures; the trusted comment is verified too,
-`SignatureCheck`, libsodium). The signature is `<package>.zip.minisig`:
+default prehashed `ED` and the legacy `Ed` signatures; the trusted comment is verified too;
+`SignatureCheck` on top of the Core's `Modules\Core\Security\Minisign`, the same verifier as
+release archives, libsodium). The signature is `<package>.zip.minisig`:
 
 - `modules:install <file.zip>` reads `<file.zip>.minisig` next to the file, or `--signature=<file>`;
 - `modules:install <url>` downloads `<url>.minisig` too (through `OutboundClient`: HTTPS and an

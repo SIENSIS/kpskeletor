@@ -22,7 +22,7 @@ Full description: `docs/updates.md`.
   limits, protected paths, paths and binaries; overridable from `.env` (`updates.*`).
 - `Services/ReleaseSource.php` (GitHub/GitLab releases through `OutboundClient`),
   `VersionComparator.php` (semver precedence), `ReleaseChecker.php` + `UpdateStatus.php`
-  (`writable/updates/status.json`), `SignatureVerifier.php` (SHA-256 + minisign Ed25519),
+  (`writable/updates/status.json`), `SignatureVerifier.php` (SHA-256 + minisign Ed25519 through the Core's `Modules\Core\Security\Minisign`, session 35),
   `ReleaseNotes.php` (escaped Markdown subset + HTMLPurifier), `Updater.php` (the update
   procedure), `ProcessRunner.php` (`proc_open` with an argument list).
 - Core pieces used: `OutboundClient`, `MaintenanceMode`, `SafeZip`; Backup's `BackupService`.

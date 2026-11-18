@@ -8,6 +8,7 @@ use CodeIgniter\Test\CIUnitTestCase;
 use Modules\Core\Security\Check\SecurityReport;
 use Modules\Updates\Config\Updates as UpdatesConfig;
 use Modules\Updates\Services\UpdatesSecurityCheck;
+use Tests\Support\Security\TestSigner;
 
 /**
  * The Updates module's part of `security:check`: a release repository without trusted signing

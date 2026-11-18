@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Modules\Updates\Tests;
+namespace Tests\Support\Security;
 
 /**
  * A minisign-compatible signer for tests only (a key pair generated per test). Real releases are

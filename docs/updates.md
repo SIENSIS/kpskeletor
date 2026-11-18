@@ -57,8 +57,8 @@ confirmation (`--yes` skips it) and then:
    (archive method); a backup password (`backup.password`, `BACKUP_PASSWORD` or `--password`).
 2. **Verified before anything is applied:**
    - *archive:* downloads `<name>.zip`, `<name>.zip.sha256` and `<name>.zip.minisig` from the
-     release, checks the SHA-256 **and** the Ed25519 signature (`SignatureVerifier`, minisign
-     format, both the file signature and the trusted-comment signature) with the keys of
+     release, checks the SHA-256 **and** the Ed25519 signature (`SignatureVerifier` on top of the Core's
+     `Modules\Core\Security\Minisign`, minisign format, both the file signature and the trusted-comment signature) with the keys of
      `updates.publicKeys`, then extracts it with `SafeZip` (zip-slip and zip-bomb checks) into
      `writable/updates/staging-*`. The archive holds one top-level folder with the application.
    - *git:* `git fetch --tags <remote>` and `git verify-tag <tag>` (the signer's GPG/SSH key must
