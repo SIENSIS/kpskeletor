@@ -53,15 +53,44 @@ abstract class UpdatesTestCase extends DashboardTestCase
     {
         parent::setUpBeforeClass();
 
-        [$major, $minor, $patch] = array_map('intval', explode('.', explode('-', Version::CORE)[0]));
-        self::$installed         = Version::CORE;
-        self::$next              = sprintf('%d.%d.0', $major, $minor + 1);
-        self::$after             = sprintf('%d.%d.0', $major, $minor + 2);
-        self::$older             = match (true) {
+        self::$installed = Version::CORE;
+        self::$next      = self::minorAfter(Version::CORE, 1);
+        self::$after     = self::minorAfter(Version::CORE, 2);
+        self::$older     = self::before(Version::CORE);
+    }
+
+    /**
+     * `<major>.<minor + $steps>.0` of a version.
+     */
+    private static function minorAfter(string $version, int $steps): string
+    {
+        [$major, $minor] = self::parts($version);
+
+        return sprintf('%d.%d.0', $major, $minor + $steps);
+    }
+
+    /**
+     * A version just below the given one.
+     */
+    private static function before(string $version): string
+    {
+        [$major, $minor, $patch] = self::parts($version);
+
+        return match (true) {
             $patch > 0 => sprintf('%d.%d.%d', $major, $minor, $patch - 1),
             $minor > 0 => sprintf('%d.%d.9', $major, $minor - 1),
             default    => sprintf('%d.9.9', $major - 1),
         };
+    }
+
+    /**
+     * @return array{int, int, int}
+     */
+    private static function parts(string $version): array
+    {
+        $numbers = array_map('intval', explode('.', explode('-', $version)[0]));
+
+        return [$numbers[0], $numbers[1] ?? 0, $numbers[2] ?? 0];
     }
 
     /** Download folder of the next release's assets. */
