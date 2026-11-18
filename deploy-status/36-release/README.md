@@ -73,7 +73,7 @@ sudo -u www-data php spark security:check --probe=https://<site>/
 
 ## Tests and checks
 
-- `vendor/bin/phpunit`: see "Final checks" at the end of this file.
+- `vendor/bin/phpunit` and the end-to-end run: see "Final checks" at the end of this file.
 - PHPStan level 6: `[OK] No errors`. php-cs-fixer: `Found 0 of 1001 files that can be fixed`.
   `php spark csp:check`: no inline scripts, handlers or styles. `composer validate --strict`:
   valid. `composer audit --locked`: no security vulnerability advisories found.
@@ -146,3 +146,18 @@ development sites; a small script with `ignoreHTTPSErrors` for the HTTPS site).
 No session follows. The owner adds the public key to `Config\Updates`, then creates and pushes
 the signed tag `v1.0.0` and publishes the release with its archive, checksum and signature
 (`docs/updates.md`).
+
+## Final checks
+
+- `vendor/bin/phpunit` (full suite, SQLite, 10 m 33 s): `Tests: 1329, Assertions: 17764,
+  Failures: 1` — the failure was `DocumentationTest::testRelativeLinksResolve` on the link to this
+  report, written while the suite was running; `vendor/bin/phpunit tests/unit/Docs` afterwards:
+  `OK (13 tests, 320 assertions)`. The later PHPStan-only refactor of `UpdatesTestCase`:
+  `vendor/bin/phpunit modules/Updates`: `OK (35 tests, 223 assertions)`. (Session 35: 1327 tests.)
+- `vendor/bin/phpstan analyse`: `[OK] No errors`.
+- `vendor/bin/php-cs-fixer fix --dry-run --diff`: `Found 0 of 1001 files that can be fixed`.
+- `php spark csp:check`: no inline scripts, handlers or styles; `php spark assets:publish --check`:
+  published assets up to date (vendor checksums included); `php spark permissions:check`: OK.
+- `npm run e2e` against the SQLite demo site (with an unread notification, which exposed the bell
+  issue): **`175 passed, 5 skipped (5.6m)`**, no axe, overflow or CSP failure (before the fix:
+  95 passed, 80 failed on `label-content-name-mismatch`).

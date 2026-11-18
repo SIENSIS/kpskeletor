@@ -43,7 +43,7 @@ pull request open), *merged* (in `main`).
 | 33 | Documentation | merged | `claude/vibrant-hypatia-t0pedc` | [SIENSIS/kpskeletor#41](https://github.com/SIENSIS/kpskeletor/pull/41) | [`deploy-status/33-docs/`](../deploy-status/33-docs/README.md) |
 | 34 | Tutorials | merged | `claude/fervent-gauss-9ng4h3` | [SIENSIS/kpskeletor#42](https://github.com/SIENSIS/kpskeletor/pull/42) | [`deploy-status/34-tutorials/`](../deploy-status/34-tutorials/README.md) |
 | 35 | Quality: end-to-end, accessibility and CI | merged | `claude/amazing-wozniak-r3ycn2` (started on `claude/lucid-babbage-qm6oxf`) | [SIENSIS/kpskeletor#43](https://github.com/SIENSIS/kpskeletor/pull/43) | [`deploy-status/35-quality/`](../deploy-status/35-quality/README.md) |
-| 36 | Final acceptance and release | in progress | `ccr-86ec5c0e-ha268p` | — | [`deploy-status/36-release/`](../deploy-status/36-release/README.md) |
+| 36 | Final acceptance and release | done | `ccr-86ec5c0e-ha268p` | — | [`deploy-status/36-release/`](../deploy-status/36-release/README.md) |
 
 ## MVP review (session 19)
 
