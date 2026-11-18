@@ -49,6 +49,7 @@ return [
         'visibility'     => 'Visibility',
         'attachments'    => 'Attachments',
         'created_by'     => 'Created by',
+        'started_at'     => 'Started on',
         'completed_at'   => 'Completed on',
         'created_at'     => 'Created',
         'updated_at'     => 'Updated',
@@ -146,6 +147,10 @@ return [
         'reminderGraceDaysHelp' => 'The daily reminder is sent when a to-do task is this many days past its due date (0: from the day after).',
         'publicRequests'        => 'Public request form',
         'publicRequestsHelp'    => 'Visitors can request a to-do task from tasks/request (with a captcha).',
+    ],
+    'settingGroups' => [
+        'reminders' => 'Reminders',
+        'public'    => 'Public site',
     ],
     'notifications' => [
         'assigned'        => 'To-do task assigned to you',

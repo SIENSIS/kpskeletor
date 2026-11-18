@@ -27,7 +27,7 @@ use Modules\Core\Config\ModuleManifest;
 final class Module extends ModuleManifest
 {
     public string $name        = 'Tasks';
-    public string $version     = '0.1.0';
+    public string $version     = '0.2.0';
     public string $icon        = 'bi bi-kanban';
     public string $description = 'Tasks.module.description';
     public string $author      = 'kpskeletor';

@@ -63,6 +63,7 @@ All documents are in English, except the user guide, which is also in Catalan an
 
 - [`architecture.md`](docs/architecture.md): modules, Core services, request lifecycle, caching.
 - [`creating-a-module.md`](docs/creating-a-module.md): a module step by step, the module checklist, Claude Code.
+- [`tutorials/`](docs/tutorials/README.md): 14 step-by-step tutorials built on the `Tasks` module.
 - [`installing-modules.md`](docs/installing-modules.md): installing, upgrading and uninstalling modules and themes.
 - [`permissions.md`](docs/permissions.md): resources, permission names, wildcards, the matrix.
 - [`themes.md`](docs/themes.md): themes, layouts, regions, options, view overrides, child themes.

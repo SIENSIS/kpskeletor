@@ -5,7 +5,7 @@
 > it done.
 
 **Purpose:** a small manager of to-do tasks (projects, to-do tasks, assignees, due dates, labels)
-that holds **the finished code of every tutorial** in `docs/tutorials/` (written in session 34).
+that holds **the finished code of every tutorial** in `docs/tutorials/` (index: `docs/tutorials/README.md`).
 It is installed **disabled** (`$enabledByDefault = false`, D-32-01): enable it in Modules (or
 `php spark modules:enable Tasks`) and load `php spark modules:demo Tasks`. Full description:
 `docs/tasks.md`.
@@ -31,8 +31,8 @@ scheduler's jobs. Never just "task" in texts or docs. The folder `Tasks/` holds 
   `tasks.activity`. Scheduled task `Tasks/OverdueReminder.php`. Notifications `TaskAssigned`,
   `TaskOverdue`, `TaskRequested`. Link type `tasks.project`. Calendars `tasks.due` (push) and
   `tasks.projects` (pull, `tasks-projects.list`, hidden by default).
-- Tables (one migration each): `task_projects`, `task_project_translations`, `tasks`,
-  `task_assignees`, `task_attachments`, `task_requests`. Files: `modules/tasks` (private disk).
+- Version 0.2.0 (`CHANGELOG.md`). Tables (one migration each): `task_projects`, `task_project_translations`, `tasks`,
+  `task_assignees`, `task_attachments`, `task_requests`; 0.2.0 adds `tasks.started_at`. Files: `modules/tasks` (private disk).
 
 ## Where each tutorial lives
 
@@ -50,14 +50,14 @@ scheduler's jobs. Never just "task" in texts or docs. The folder `Tasks/` holds 
 | 10 Uploads | `Storage/AttachmentUploads.php` (picker, private disk), `Storage/AttachmentPolicy.php` (`FileAccessPolicy`, registered in `Config/Events.php`) |
 | 11 JSON API | `Controllers/Api/Tasks.php`, `Controllers/Api/Projects.php`, `$api`, `Config/Routes.php` |
 | 12 Public form with email | `Controllers/RequestForm.php`, `Views/public/request.php`, `Services/TaskRequests.php`, `Views/emails/request_received.php`, `Controllers/Requests.php` |
-| 13 Releasing a version | (session 34: a migration that changes the schema, version bump, ZIP) |
+| 13 Releasing a version | `Database/Migrations/2026-11-18-100001_AddStartedAtToTasks.php` (0.2.0: `tasks.started_at`, filled in for started to-do tasks), `TaskRepository::statusDates()`, `$version = '0.2.0'`, `CHANGELOG.md` |
 | 14 Tests | `Tests/*` |
 
 ## Main pieces
 
 - `Services/TaskRepository.php`: every read and the shared rules (who sees a to-do task on the
   board: `tasks-tasks.list` or assignee; who moves it: `tasks-tasks.edit` or assignee; what is
-  public), `setStatus()` (keeps `completed_at` and the calendar in step).
+  public), `setStatus()` and `statusDates()` (keep `started_at`/`completed_at` and the calendar in step).
 - `Services/Assignees.php` (notify new assignees, drop users without board access),
   `Services/TaskRequests.php` (public form: store, notify, confirmation email through the Core's
   `MailQueue` in the visitor's language; accept/reject).
@@ -71,8 +71,8 @@ D-32-01 (`$enabledByDefault` manifest key, decided by the owner as built), D-32-
 
 ## Open tasks
 
-- Session 34: the tutorial texts (`docs/tutorials/`), tutorial 13 (a schema-change migration and
-  a new version), tutorial 1/11 steps checked in a scratch copy (`Tasks2`).
+- A change to a tutorial's code must update its text in `docs/tutorials/` (excerpts are copied
+  from the code; `tests/unit/Docs/TutorialsTest.php` checks the files and test names they cite).
 - Demo data removal leaves the published calendar events of the demo to-do tasks until
   `php spark calendar:resync Tasks`.
 

@@ -5,7 +5,9 @@ Everything a site adds lives in a module, `modules/<Name>/`, described by its ma
 (`modules/News`, the reference module) as the example; the full contract is in
 `docs/specification.md` ("The module contract"). The `Tasks` tutorial module
 ([`tasks.md`](tasks.md); its `CLAUDE.md` maps every feature to its file) shows the pieces News
-does not have, such as JavaScript components and an asynchronous widget.
+does not have, such as JavaScript components and an asynchronous widget. The
+[tutorials](tutorials/README.md) build that module piece by piece, from `make:module` to
+releasing a new version (tutorial 13 is the worked example of section 9).
 
 Related guides: [`cruds.md`](cruds.md) (kpcrudy screens), [`api.md`](api.md) (kpapy resources),
 [`permissions.md`](permissions.md), [`menus.md`](menus.md), [`settings.md`](settings.md),

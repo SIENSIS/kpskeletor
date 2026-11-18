@@ -49,6 +49,7 @@ return [
         'visibility'     => 'Visibilitat',
         'attachments'    => 'Adjunts',
         'created_by'     => 'Creada per',
+        'started_at'     => 'Començada el',
         'completed_at'   => 'Completada el',
         'created_at'     => 'Creació',
         'updated_at'     => 'Actualització',
@@ -146,6 +147,10 @@ return [
         'reminderGraceDaysHelp' => 'El recordatori diari s’envia quan una tasca fa aquests dies que ha vençut (0: des de l’endemà).',
         'publicRequests'        => 'Formulari públic de sol·licituds',
         'publicRequestsHelp'    => 'Els visitants poden sol·licitar una tasca des de tasks/request (amb captcha).',
+    ],
+    'settingGroups' => [
+        'reminders' => 'Recordatoris',
+        'public'    => 'Lloc públic',
     ],
     'notifications' => [
         'assigned'        => 'Tasca assignada',

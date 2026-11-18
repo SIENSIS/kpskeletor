@@ -10,6 +10,7 @@ use Modules\Core\Modules\ManifestValidator;
 use Modules\Tasks\Calendar\DueDates;
 use Modules\Tasks\Config\Module;
 use Modules\Tasks\Notifications\TaskAssigned;
+use Modules\Tasks\Services\TaskRepository;
 
 /**
  * The Tasks module (tutorials 1, 2 and 14): manifest, the to-do task CRUD with its permissions
@@ -200,7 +201,7 @@ final class TasksModuleTest extends TasksTestCase
             $migrations[] = new $class(Database::forge('tests'));
         }
 
-        $this->assertCount(6, $migrations);
+        $this->assertCount(7, $migrations, 'Six tables (0.1.0) and the started_at column (0.2.0, tutorial 13).');
 
         foreach (array_reverse($migrations) as $migration) {
             \assert($migration instanceof Migration);
@@ -222,6 +223,58 @@ final class TasksModuleTest extends TasksTestCase
         foreach (['task_projects', 'task_project_translations', 'tasks', 'task_assignees', 'task_attachments', 'task_requests'] as $table) {
             $this->assertTrue($this->db->tableExists($table), $table . ' created again.');
         }
+
+        $this->assertTrue($this->db->fieldExists('started_at', 'tasks'), 'The 0.2.0 migration added started_at again.');
+    }
+
+    public function testTheVersionMigrationAddsStartedAtFillsItAndGoesBack(): void
+    {
+        $file = dirname(__DIR__) . '/Database/Migrations/2026-11-18-100001_AddStartedAtToTasks.php';
+        $this->assertFileExists($file);
+        require_once $file;
+
+        $migration = new \Modules\Tasks\Database\Migrations\AddStartedAtToTasks(Database::forge('tests'));
+        $this->assertSame('0.2.0', (new Module())->version, 'The schema change comes with a new version (tutorial 13).');
+
+        $todo  = $this->task('Pendent', ['status' => 'todo']);
+        $doing = $this->task('En curs', ['status' => 'doing', 'updated_at' => '2026-11-10 09:00:00']);
+
+        $migration->down();
+        $this->db->resetDataCache();
+        $this->assertFalse($this->db->fieldExists('started_at', 'tasks'), 'down() drops the column.');
+        $this->assertSame('En curs', $this->taskRow($doing)['title'], 'Dropping the column keeps the rows.');
+
+        $migration->up();
+        $this->db->resetDataCache();
+        $this->assertTrue($this->db->fieldExists('started_at', 'tasks'));
+        $this->assertNull($this->taskRow($todo)['started_at'], 'A to-do task not started has no date.');
+        $this->assertSame('2026-11-10 09:00:00', $this->taskRow($doing)['started_at'], 'Started to-do tasks take their last change.');
+    }
+
+    public function testStartedAtAndCompletedAtFollowTheStatus(): void
+    {
+        $now = \CodeIgniter\I18n\Time::parse('2026-11-18 10:00:00');
+
+        $this->assertSame(['started_at' => null, 'completed_at' => null], TaskRepository::statusDates('todo', [], $now));
+        $this->assertSame(['started_at' => '2026-11-18 10:00:00', 'completed_at' => null], TaskRepository::statusDates('doing', ['status' => 'todo', 'started_at' => null], $now));
+        $this->assertSame(['completed_at' => '2026-11-18 10:00:00'], TaskRepository::statusDates('done', ['status' => 'doing', 'started_at' => '2026-11-17 08:00:00'], $now), 'The start is kept when it is done.');
+        $this->assertSame([], TaskRepository::statusDates('done', ['status' => 'done', 'started_at' => '2026-11-17 08:00:00', 'completed_at' => '2026-11-17 18:00:00'], $now), 'Nothing changes while it stays done.');
+        $this->assertSame(['completed_at' => null], TaskRepository::statusDates('doing', ['status' => 'done', 'started_at' => '2026-11-17 08:00:00'], $now), 'Reopened: not completed, still started.');
+
+        // The CRUD and the board use the same rule.
+        $this->loginWith('tasks-tasks.list', 'tasks-tasks.show', 'tasks-tasks.edit', 'tasks-tasks.complete');
+        $id = $this->task('Revisar');
+        $this->send('POST', 'backend/tasks/tasks/edit/' . $this->taskCode($id), $this->form('Revisar', ['status' => 'doing']))->assertRedirect();
+        $this->assertNotNull($this->taskRow($id)['started_at']);
+        $this->assertNull($this->taskRow($id)['completed_at']);
+
+        $this->send('POST', 'backend/tasks/tasks/complete/' . $this->taskCode($id))->assertRedirect();
+        $this->assertNotNull($this->taskRow($id)['started_at']);
+        $this->assertNotNull($this->taskRow($id)['completed_at']);
+
+        $this->send('POST', 'backend/tasks/tasks/edit/' . $this->taskCode($id), $this->form('Revisar', ['status' => 'todo']))->assertRedirect();
+        $this->assertNull($this->taskRow($id)['started_at']);
+        $this->assertNull($this->taskRow($id)['completed_at']);
     }
 
     /**

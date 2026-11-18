@@ -104,8 +104,12 @@ Everything below is what the skeleton contains so far, grouped by area. Details:
 - Catalan by default, Spanish fallback, English; per-user language, the site's available
   languages, translated settings; every text in `ca`, `es` and `en`.
 
-#### Tutorial
+#### Tutorials
 
-- The `Tasks` tutorial module (disabled by default) with the finished code of the tutorials.
+- The `Tasks` tutorial module (disabled by default) with the finished code of the tutorials;
+  version 0.2.0 adds `tasks.started_at` as the worked example of releasing a module version
+  (its own `modules/Tasks/CHANGELOG.md`).
+- 14 step-by-step tutorials in [`docs/tutorials/`](docs/tutorials/README.md), each ending with
+  the tests that cover it; `tests/unit/Docs/TutorialsTest.php` keeps them in step with the code.
 
 [Unreleased]: https://github.com/SIENSIS/kpskeletor/commits/main

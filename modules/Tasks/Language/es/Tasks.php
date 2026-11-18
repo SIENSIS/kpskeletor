@@ -49,6 +49,7 @@ return [
         'visibility'     => 'Visibilidad',
         'attachments'    => 'Adjuntos',
         'created_by'     => 'Creada por',
+        'started_at'     => 'Empezada el',
         'completed_at'   => 'Completada el',
         'created_at'     => 'Creación',
         'updated_at'     => 'Actualización',
@@ -146,6 +147,10 @@ return [
         'reminderGraceDaysHelp' => 'El recordatorio diario se envía cuando una tarea lleva estos días vencida (0: desde el día siguiente).',
         'publicRequests'        => 'Formulario público de solicitudes',
         'publicRequestsHelp'    => 'Los visitantes pueden solicitar una tarea desde tasks/request (con captcha).',
+    ],
+    'settingGroups' => [
+        'reminders' => 'Recordatorios',
+        'public'    => 'Sitio público',
     ],
     'notifications' => [
         'assigned'        => 'Tarea asignada',

@@ -100,9 +100,18 @@ final class TasksApiTest extends ApiTestCase
         $this->assertSame('nou-web', $filtered[0]['project']['slug']);
         $this->assertSame(['feature'], $filtered[0]['labels']);
 
+        $this->assertNull($this->taskRow($id)['started_at'], 'Created as "to do": not started (0.2.0, tutorial 13).');
+
         $this->api('POST', 'api/v1/tasks/tasks/' . $code . '/complete', null, $token)->assertStatus(200);
         $this->assertSame('done', $this->taskRow($id)['status']);
         $this->assertNotNull($this->taskRow($id)['completed_at']);
+        $this->assertNotNull($this->taskRow($id)['started_at'], 'Completing also starts it.');
+
+        $this->api('PATCH', 'api/v1/tasks/tasks/' . $code, ['status' => 'todo', 'created_by' => 999], $token)->assertStatus(200);
+        $this->assertNull($this->taskRow($id)['started_at'], 'Back to "to do": the dates are cleared, as in the CRUD.');
+        $this->assertNull($this->taskRow($id)['completed_at']);
+        $this->assertSame((int) $boss->id, (int) $this->taskRow($id)['created_by'], 'A field outside writeFields() is ignored.');
+        $this->api('POST', 'api/v1/tasks/tasks/' . $code . '/complete', null, $token)->assertStatus(200);
         $this->api('POST', 'api/v1/tasks/tasks/' . $code . '/complete', null, $token)->assertStatus(409);
 
         // The complete scope alone is enough for the operation, not for edits.
