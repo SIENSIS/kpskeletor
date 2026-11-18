@@ -436,7 +436,7 @@ return [
             'empty' => 'No hi ha res a mostrar.',
         ],
         'bell' => [
-            'label' => 'Notificacions ({count} per llegir)',
+            'label' => 'Notificacions per llegir: {count}',
             'empty' => 'No teniu cap notificació.',
             'error' => 'No s\'han pogut carregar les notificacions.',
         ],
@@ -533,7 +533,7 @@ return [
         'notFound' => 'La notificació no existeix.',
         'unavailable' => 'Aquesta notificació ja no està disponible.',
         'emailFooter' => 'Rebeu aquest correu per la configuració de les vostres notificacions.',
-        'bell' => '{0, plural, =0{Notificacions} one{Notificacions (# per llegir)} other{Notificacions (# per llegir)}}',
+        'bell' => '{0, plural, =0{Notificacions} one{Notificacions per llegir: #} other{Notificacions per llegir: #}}',
         'loading' => 'S\'està carregant…',
         'seeAll' => 'Mostra-les totes',
         'taskFailedTitle' => 'Ha fallat la tasca programada {0}',

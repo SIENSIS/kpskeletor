@@ -436,7 +436,7 @@ return [
             'empty' => 'No hay nada que mostrar.',
         ],
         'bell' => [
-            'label' => 'Notificaciones ({count} por leer)',
+            'label' => 'Notificaciones por leer: {count}',
             'empty' => 'No tiene ninguna notificación.',
             'error' => 'No se han podido cargar las notificaciones.',
         ],
@@ -533,7 +533,7 @@ return [
         'notFound' => 'La notificación no existe.',
         'unavailable' => 'Esta notificación ya no está disponible.',
         'emailFooter' => 'Recibe este correo por la configuración de sus notificaciones.',
-        'bell' => '{0, plural, =0{Notificaciones} one{Notificaciones (# por leer)} other{Notificaciones (# por leer)}}',
+        'bell' => '{0, plural, =0{Notificaciones} one{Notificaciones por leer: #} other{Notificaciones por leer: #}}',
         'loading' => 'Cargando…',
         'seeAll' => 'Ver todas',
         'taskFailedTitle' => 'Ha fallado la tarea programada {0}',
