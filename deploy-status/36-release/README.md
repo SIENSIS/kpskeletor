@@ -1,6 +1,6 @@
 # Session 36 — Final acceptance and release
 
-Branch: `ccr-86ec5c0e-ha268p` · Pull request: see `docs/progress.md` · Date: 2026-11-18
+Branch: `ccr-86ec5c0e-ha268p` · Pull request: [SIENSIS/kpskeletor#49](https://github.com/SIENSIS/kpskeletor/pull/49) · Date: 2026-11-18
 
 ## What was built
 
