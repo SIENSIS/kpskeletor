@@ -1,0 +1,20 @@
+# Secret scanning (CI job "secrets", docs/development.md): gitleaks' default rules, plus the
+# allow-list of values that are not secrets. Never add a real secret here: remove it from the
+# repository and rotate it instead.
+title = "kpskeletor"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test fixtures, examples and generated lock files"
+paths = [
+    '''(^|/)composer\.lock$''',
+    '''(^|/)package-lock\.json$''',
+    '''^public/assets/vendor/''',
+    '''^vendor/''',
+]
+regexes = [
+    # Placeholders of the documentation and the env template.
+    '''(?i)(change[-_]?me|example|placeholder|your[-_]?(token|key|secret|password))''',
+]
