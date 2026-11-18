@@ -68,6 +68,23 @@ final class NotificationScreensTest extends AuthTestCase
         $this->assertMatchesRegularExpression('#data-bell-count>2</span>#', (string) $response->response()->getBody());
     }
 
+    public function testTheBellsAccessibleNameContainsTheVisibleCount(): void
+    {
+        // WCAG 2.5.3 (label in name, axe `label-content-name-mismatch`): the badge shows a digit,
+        // so the button's name must contain the same digit in every language, also for one.
+        db_connect()->table('notifications')->where('id', $this->mine)->update(['read_at' => date('Y-m-d H:i:s')]);
+        $this->login('ana@example.com');
+
+        foreach (['ca', 'es', 'en'] as $locale) {
+            $label = lang('Core.notifications.bell', [1], $locale);
+            $this->assertStringContainsString('1', $label, $locale);
+        }
+
+        $body = (string) $this->send('GET', 'backend/profile')->response()->getBody();
+        $this->assertMatchesRegularExpression('#aria-label="[^"]*\b1\b[^"]*"[^>]*data-bell-button#', $body);
+        $this->assertMatchesRegularExpression('#data-bell-count>1</span>#', $body);
+    }
+
     public function testTheBellListsOnlyTheUsersOwnNotifications(): void
     {
         $this->login('ana@example.com');

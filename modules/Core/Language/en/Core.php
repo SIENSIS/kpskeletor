@@ -533,7 +533,7 @@ return [
         'notFound' => 'The notification does not exist.',
         'unavailable' => 'This notification is no longer available.',
         'emailFooter' => 'You receive this email because of your notification settings.',
-        'bell' => '{0, plural, =0{Notifications} one{Notifications (one unread)} other{Notifications (# unread)}}',
+        'bell' => '{0, plural, =0{Notifications} one{Notifications (# unread)} other{Notifications (# unread)}}',
         'loading' => 'Loading…',
         'seeAll' => 'See all',
         'taskFailedTitle' => 'The scheduled task {0} failed',
