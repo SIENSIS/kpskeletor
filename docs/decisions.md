@@ -279,6 +279,10 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-34-01 | 34 | Tutorial 13's release: Tasks 0.2.0 adds `tasks.started_at` | Accepted (proposal) |
 | D-34-02 | 34 | Tutorials 3 and 4 summarise and link the tutorials of `frontend.md` and `widgets.md` | Accepted (proposal) |
 | D-34-03 | 34 | Tutorials 1 and 11 are followed in a scratch module `Tasks2`; the finished code differs where later tutorials change it | Accepted (proposal) |
+| D-35-01 | 35 | End-to-end tests against a demo site installed beforehand; axe (WCAG 2.0/2.1 A and AA) fails the test | Accepted (proposal) |
+| D-35-02 | 35 | Secret scanning with the gitleaks release binary, not the GitHub Action | Accepted (proposal) |
+| D-35-03 | 35 | One minisign verifier in the Core (`Modules\Core\Security\Minisign`) | Accepted (proposal) |
+| D-35-04 | 35 | WCAG AA colours of the default theme: darker text shades derived from the palette | Accepted (proposal) |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2833,4 +2837,36 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** `modules/Tasks` exists, so its tutorials cannot start with `make:module Tasks`; `--api` works only together with `--crud` on a new module; `make:module --crud` migrates its example table at once.
 - **Proposal:** Tutorial 1 builds `Tasks2` (`make:module Tasks2 --crud=tasks2_tasks`, then `migrate:rollback -f` of the example table, three migrations, a project `setRelation()`; the finished module uses a select of translated names, tutorial 2). Tutorial 11 shows `make:module … --api` for a new module and, for an existing one, `kpapy:make` with the options the generator passes (the route is appended to the module's `Routes.php`; the controller is then made `final` with `strict_types`). Both were followed on a fresh SQLite install (scratch module tests, `permissions:check`, the API with tokens and curl).
 - **Alternatives:** A `--api` option for existing modules in `make:module` (a Core change: needs the owner).
+- **Status:** Accepted (proposal)
+
+## D-35-01 — End-to-end tests against a demo site installed beforehand; axe fails the test
+
+- **Where:** specification "Quality, tests and delivery" and "Themes" (Playwright screenshots at phone, tablet and desktop widths in both modes, failing on horizontal overflow; WCAG AA checked by an automated accessibility test); `docs/plan.md` session 35.
+- **Problem:** The specification does not say how the e2e tests get a site, a user and data, nor how strict the accessibility check is.
+- **Proposal:** `npm run e2e` (Playwright, `playwright.config.mjs`) runs against a demo site installed beforehand (`app:install --demo`, SQLite, `--url=http://localhost:8089/`, Tasks enabled with its demo data), started with `php spark serve` or given by `E2E_BASE_URL`; the administrator logs in once in a global setup (the login is rate limited) and each test keeps the refreshed session cookie (the application rotates session ids). Six projects (phone 390, tablet 820, desktop 1440 × light, dark), the public site as a guest and 21 back-office screens; every page fails on a status ≥ 400, a redirect to the login, horizontal overflow, a CSP violation or **any** axe violation of `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` (no allow-list); axe runs through the DevTools protocol so the CSP stays strict. Screens behind `reauth` are left out. One more test follows every link of the generated menus at desktop width; a keyboard test checks the skip links. CI runs them in a job of its own and keeps the screenshots as an artifact.
+- **Alternatives:** A) Install the site inside the global setup (rewrites `.env` of the developer's checkout). B) Report axe violations without failing (they come back unnoticed).
+- **Status:** Accepted (proposal)
+
+## D-35-02 — Secret scanning with the gitleaks release binary
+
+- **Where:** specification "Quality, tests and delivery" ("secret scanning (e.g. gitleaks)").
+- **Problem:** The gitleaks GitHub Action needs a paid licence for repositories of organisations.
+- **Proposal:** The CI job `secrets` downloads the gitleaks release (MIT) of a fixed version, checks it against the release's checksum file and scans the whole history with `.gitleaks.toml` (default rules + an allow-list of lock files, vendored libraries and placeholder words). A real secret is never allow-listed: it is removed and rotated.
+- **Alternatives:** The action with a licence; GitHub's own secret scanning (a repository setting, not in the CI).
+- **Status:** Accepted (proposal)
+
+## D-35-03 — One minisign verifier in the Core
+
+- **Where:** D-29-01 ("the two copies are merged in session 35"); `Modules\Core\Packages\SignatureCheck`, `Modules\Updates\Services\SignatureVerifier`.
+- **Problem:** Two copies of the same minisign code (packages in the Core, releases in Updates).
+- **Proposal:** `Modules\Core\Security\Minisign` holds the format and the checks and throws `MinisignRefused` with a reason (`noKey`, `format`, `unknownKey` + key id, `signature`, `unreadable`); `SignatureCheck` and `SignatureVerifier` keep their public methods and only translate the reason into their own messages (`PackageRefused`, `UpdateException`). The test signer moved to `tests/_support/Security/TestSigner.php`. Tests: `MinisignTest`, `SignatureVerifierTest`, `PackagesTest`.
+- **Alternatives:** Updates uses the Core's `SignatureCheck` directly (its messages would talk about packages).
+- **Status:** Accepted (proposal)
+
+## D-35-04 — WCAG AA colours of the default theme
+
+- **Where:** specification "Themes" (accessible contrast, WCAG AA in both modes, checked by axe).
+- **Problem:** axe found Bootstrap's mid-tone colours below 4.5:1: `#0d6efd` links and outline buttons on the back office's `#f8f9fa` (4.26), grey/green/red outline buttons and red text on the dark body (3.3–3.4), the calendar's selected tab and event texts on category colours (2.6), the labels of disabled checkboxes (3.9), inline code (4.3).
+- **Proposal:** Keep the palette and the `primaryColor` option, and let the theme CSS use darker (light mode) or `*-text-emphasis` (dark mode) shades for **text** only: `--kp-primary-text` (primary mixed with 15 % black), the next Bootstrap shades for outline buttons, 75 % opacity for disabled labels; FullCalendar events get `contrastColor` (black or white, whichever contrasts more) from the server. Also fixed: ARIA names of the editor's pickers, `role="img"` on labelled icons, `role="button"` on the dashboard's toggle link, keyboard access to scrolled tables (`core/ui/scroll-regions.js`). Documented in `docs/themes.md`.
+- **Alternatives:** A) A darker default primary colour (changes every site's look). B) White back-office background (loses the card contrast).
 - **Status:** Accepted (proposal)

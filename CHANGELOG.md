@@ -112,4 +112,19 @@ Everything below is what the skeleton contains so far, grouped by area. Details:
 - 14 step-by-step tutorials in [`docs/tutorials/`](docs/tutorials/README.md), each ending with
   the tests that cover it; `tests/unit/Docs/TutorialsTest.php` keeps them in step with the code.
 
+#### Quality
+
+- End-to-end and accessibility tests (Playwright + axe-core, `npm run e2e`): the public site and
+  the main back-office screens at phone, tablet and desktop widths in light and dark mode, failing
+  on horizontal overflow, CSP violations and WCAG 2.1 AA violations; keyboard skip links.
+- CI jobs for the end-to-end tests and secret scanning (gitleaks); `assets:publish --check` also
+  checks the `vendor.json` checksums; Dependabot for npm.
+- WCAG AA contrast of the default theme in both modes (links, outline buttons, coloured text,
+  calendar), keyboard access to scrolled tables, ARIA names in the rich-text editor.
+- One minisign verifier for releases and packages (`Modules\Core\Security\Minisign`).
+
+### Fixed
+
+- The Events administration list failed when an event was managed by the Tasks module.
+
 [Unreleased]: https://github.com/SIENSIS/kpskeletor/commits/main
