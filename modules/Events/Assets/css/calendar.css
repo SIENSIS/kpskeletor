@@ -5,7 +5,9 @@
 .events-calendar {
     --fc-classic-button: var(--bs-secondary-bg);
     --fc-classic-button-border: var(--bs-border-color);
-    --fc-classic-button-strong: var(--bs-primary);
+    /* The selected view tab keeps the body colour as text (FullCalendar has no separate
+       foreground for it): a light tint of the primary colour keeps WCAG AA contrast. */
+    --fc-classic-button-strong: rgba(var(--bs-primary-rgb), 0.22);
     --fc-classic-button-strong-border: var(--bs-primary);
     --fc-classic-button-outline: rgba(var(--bs-primary-rgb), 0.5);
     --fc-classic-button-foreground: var(--bs-body-color);
@@ -19,7 +21,7 @@
     --fc-classic-muted: rgba(var(--bs-emphasis-color-rgb), 0.08);
     --fc-classic-strong: rgba(var(--bs-emphasis-color-rgb), 0.14);
     --fc-classic-foreground: var(--bs-body-color);
-    --fc-classic-faint-foreground: var(--bs-tertiary-color);
+    --fc-classic-faint-foreground: var(--bs-secondary-color);
     --fc-classic-muted-foreground: var(--bs-secondary-color);
     --fc-classic-border: var(--bs-border-color);
     --fc-classic-strong-border: var(--bs-border-color-translucent);

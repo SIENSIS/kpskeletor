@@ -170,10 +170,16 @@ final class CalendarView extends BackendController
      */
     public static function moduleLabel(string $module): string
     {
-        $key   = $module . '.module';
-        $label = lang($key);
+        // The convention is `<Module>.module.name`; an older plain `<Module>.module` is accepted.
+        foreach ([$module . '.module.name', $module . '.module'] as $key) {
+            $label = lang($key);
 
-        return $label === $key ? $module : $label;
+            if (is_string($label) && $label !== $key && $label !== '') {
+                return $label;
+            }
+        }
+
+        return $module;
     }
 
     /**

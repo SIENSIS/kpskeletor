@@ -27,15 +27,45 @@
 .theme-font-serif { --bs-body-font-family: var(--kp-font-serif); }
 .theme-font-mono { --bs-body-font-family: var(--kp-font-mono); }
 
-/* Primary colour from the variables */
+/* Primary colour from the variables. Text in the primary colour (links, outline buttons) uses
+   a darker shade in light mode so it keeps WCAG AA contrast (4.5:1) on the light page
+   backgrounds too (`--bs-tertiary-bg` of the back office); Bootstrap's #0d6efd reaches only
+   4.26:1 there. */
 :root,
 [data-bs-theme] {
-    --bs-link-color: var(--bs-primary);
+    --kp-primary-text: color-mix(in srgb, var(--bs-primary) 85%, #000);
+    --bs-link-color: var(--kp-primary-text);
     --bs-link-color-rgb: var(--bs-primary-rgb);
-    --bs-link-hover-color: var(--kp-primary-hover);
+    --bs-link-hover-color: var(--kp-primary-active);
     --bs-link-hover-color-rgb: var(--bs-primary-rgb);
     --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
 }
+
+/* Bootstrap colours links through `--bs-link-color-rgb`, which cannot hold a mixed colour:
+   point plain links (no class: breadcrumbs, text) at `--bs-link-color`. */
+a:not([class]) { color: var(--bs-link-color); }
+a:not([class]):hover { color: var(--bs-link-hover-color); }
+
+/* WCAG AA (4.5:1) for the text of outline buttons and coloured text. Bootstrap compiles these
+   colours as mid-tone literals that fall below 4.5:1 on light grey (light mode) and on the dark
+   body (dark mode); the theme uses the next shades of Bootstrap's own palette. */
+:root:not([data-bs-theme=dark]) .btn-outline-secondary,
+[data-bs-theme=light] .btn-outline-secondary { --bs-btn-color: #565e64; --bs-btn-border-color: #565e64; }
+:root:not([data-bs-theme=dark]) .btn-outline-success,
+[data-bs-theme=light] .btn-outline-success { --bs-btn-color: #146c43; --bs-btn-border-color: #146c43; }
+:root:not([data-bs-theme=dark]) .btn-outline-danger,
+[data-bs-theme=light] .btn-outline-danger { --bs-btn-color: #b02a37; --bs-btn-border-color: #b02a37; }
+:root:not([data-bs-theme=dark]) .btn-outline-info,
+[data-bs-theme=light] .btn-outline-info { --bs-btn-color: #087990; --bs-btn-border-color: #087990; }
+:root:not([data-bs-theme=dark]) .btn-outline-warning,
+[data-bs-theme=light] .btn-outline-warning { --bs-btn-color: #997404; --bs-btn-border-color: #997404; }
+[data-bs-theme=dark] .btn-outline-secondary { --bs-btn-color: #adb5bd; --bs-btn-border-color: #adb5bd; --bs-btn-hover-color: #000; --bs-btn-hover-bg: #adb5bd; --bs-btn-active-color: #000; --bs-btn-active-bg: #adb5bd; }
+[data-bs-theme=dark] .btn-outline-success { --bs-btn-color: #75b798; --bs-btn-border-color: #75b798; }
+[data-bs-theme=dark] .btn-outline-danger { --bs-btn-color: #ea868f; --bs-btn-border-color: #ea868f; }
+[data-bs-theme=dark] .text-danger { color: var(--bs-danger-text-emphasis) !important; }
+[data-bs-theme=dark] .text-success { color: var(--bs-success-text-emphasis) !important; }
+[data-bs-theme=dark] .text-secondary { color: var(--bs-secondary-color) !important; }
+[data-bs-theme=dark] .link-secondary { color: var(--bs-secondary-color) !important; }
 
 /* Dark mode: links and text in the primary colour are lightened for WCAG AA contrast on dark
    backgrounds; buttons keep the primary colour with white text. */
@@ -75,8 +105,8 @@
 }
 
 .btn-outline-primary {
-    --bs-btn-color: var(--bs-primary);
-    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-color: var(--kp-primary-text);
+    --bs-btn-border-color: var(--kp-primary-text);
     --bs-btn-hover-bg: var(--bs-primary);
     --bs-btn-hover-border-color: var(--bs-primary);
     --bs-btn-active-bg: var(--bs-primary);
@@ -396,3 +426,11 @@
     .menu-tree-list { margin-left: .75rem; }
     .menu-tree-moves .btn { padding: .25rem .4rem; }
 }
+
+/* WCAG AA: the labels of disabled checkboxes stay dimmed but readable (Bootstrap: opacity .5,
+   3.9:1), and inline code uses a darker pink in light mode (Bootstrap's #d63384: 4.3:1 on light
+   grey). */
+.form-check-input:disabled ~ .form-check-label,
+.form-check-input[disabled] ~ .form-check-label { opacity: 0.75; }
+:root:not([data-bs-theme=dark]) code,
+[data-bs-theme=light] code { color: #ab296a; }

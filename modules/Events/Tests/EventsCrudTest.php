@@ -6,6 +6,7 @@ namespace Modules\Events\Tests;
 
 use CodeIgniter\Exceptions\PageNotFoundException;
 use Modules\Events\Services\AssignableGroups;
+use Modules\Events\Services\EventRepository;
 
 /**
  * The administration of the events: the assignable-groups rule (an editor cannot target
@@ -293,6 +294,15 @@ final class EventsCrudTest extends EventsTestCase
         $this->assertIsArray($row);
         $this->assertSame('sortides-escolars', $row['slug']);
         $this->assertSame('#aabbcc', $row['color']);
+    }
+
+    public function testEventTextIsBlackOrWhiteForAAContrastOnItsColour(): void
+    {
+        $this->assertSame('#000000', EventRepository::textColor('#fd7e14'), 'Orange: white would be 2.6:1.');
+        $this->assertSame('#000000', EventRepository::textColor('#ffc107'));
+        $this->assertSame('#ffffff', EventRepository::textColor('#0b5ed7'));
+        $this->assertSame('#ffffff', EventRepository::textColor('#000000'));
+        $this->assertSame('#000000', EventRepository::textColor('#ffffff'));
     }
 
     /**

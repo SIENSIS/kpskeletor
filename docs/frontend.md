@@ -105,8 +105,10 @@ Bootstrap's variables in light and dark mode). With kpcrudy:
 
 ```php
 $crud->fieldType('notes', 'textarea', ['attrs' => RichTextEditor::attrs()]);
-// A field of setTranslations(): keep kpcrudy's type of translated fields.
-$crud->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()]);
+// A field of setTranslations(): its `attrs` option (kpcrudy >= 1.3) keeps the language tabs.
+$crud->setTranslations('news_translations', 'news_id', 'locale', ['title', 'body'], $locales, [
+    'attrs' => ['body' => RichTextEditor::attrs()],
+]);
 ```
 
 The textarea stays the form value (kept in sync and posted as usual) and is what users get
@@ -129,7 +131,9 @@ public disk and asks for its alt text; pasted or dropped images go through the s
 The Events module's `events/calendar` component loads the vendored FullCalendar 7.1.3 (MIT,
 `public/assets/vendor/fullcalendar/`) on demand, like the editor: version 7 ships its CSS as
 files and only uses the CSSOM, so it needs no CSP exception. Its colours come from Bootstrap's
-variables (`events::css/calendar.css`). See `docs/events.md`.
+variables (`events::css/calendar.css`). Each event's text colour (`contrastColor` in the feed,
+black or white) is computed from its colour for WCAG AA contrast
+(`EventRepository::textColor()`). See `docs/events.md`.
 
 ## Vendored libraries
 
@@ -138,7 +142,9 @@ npm build): Bootstrap 5.3.8, Bootstrap Icons 1.13.1, Quill 2.0.3 and FullCalenda
 `public/assets/vendor/vendor.json` records, per library, `version`, `licence`, `source` (an
 `https://` download URL), `homepage` and the SHA-256 of **every** file in its folder.
 `modules/Core/Tests/VendorAssetsTest.php` fails when a file is missing, extra or changed, and
-`php spark security:check` checks the same checksums.
+`php spark assets:publish --check` (CI) and `php spark security:check` (`dependencies.vendor`)
+check the same checksums through `Modules\Core\Frontend\VendorChecksums` (a changed or missing
+file, or a file the manifest does not list, `+ <lib>/<file>`).
 
 Reference them with `asset('vendor::<lib>/<path>')` (versioned with the checksum) or, in a theme
 manifest, `vendor:<path>`. Libraries that are not ES modules are loaded on demand by the component
@@ -184,6 +190,12 @@ added by the same filter; docs/settings.md); the other security headers from
 ## Light and dark mode, responsive layout
 
 See `docs/themes.md` ("Light and dark mode", "Responsive layout").
+
+Keyboard access to scrolled regions: `core/app.js` gives `tabindex="0"` to every
+`.table-responsive` (or `[data-scroll-region]`) whose content is wider than its box and holds no
+focusable element (`core/ui/scroll-regions.js`, updated on resize), so it can be focused and
+scrolled with the arrow keys (WCAG 2.1.1). The end-to-end tests check every main screen with axe
+in both modes ([`development.md`](development.md), "End-to-end and accessibility tests").
 
 ## Minimal PWA
 

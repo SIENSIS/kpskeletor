@@ -205,7 +205,8 @@ final class EventRepository
         ];
 
         if ($row['display_color'] !== null) {
-            $item['color'] = $row['display_color'];
+            $item['color']         = $row['display_color'];
+            $item['contrastColor'] = self::textColor($row['display_color']); // FullCalendar 7's text colour
         }
 
         return $item;
@@ -217,6 +218,25 @@ final class EventRepository
     public static function color(mixed $value): ?string
     {
         return is_string($value) && preg_match('/^#[0-9a-fA-F]{6}$/', $value) === 1 ? strtolower($value) : null;
+    }
+
+    /**
+     * The text colour for an event drawn in `$background` (`#rrggbb`): black or white, whichever
+     * has the higher WCAG contrast ratio (any category colour stays readable, WCAG AA).
+     */
+    public static function textColor(string $background): string
+    {
+        $channels = [];
+
+        foreach (str_split(ltrim($background, '#'), 2) as $hex) {
+            $c          = hexdec($hex) / 255;
+            $channels[] = $c <= 0.04045 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+        }
+
+        $luminance = 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2];
+
+        // Contrast with black: (L + 0.05) / 0.05; with white: 1.05 / (L + 0.05).
+        return ($luminance + 0.05) / 0.05 >= 1.05 / ($luminance + 0.05) ? '#000000' : '#ffffff';
     }
 
     /**

@@ -15,7 +15,7 @@
                     <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
                         <?= theme_view('Modules\News\Views\partials\priority', ['priority' => $item['priority']]) ?>
                         <?php if ($item['pinned']): ?>
-                            <i class="bi bi-pin-angle-fill text-body-secondary" title="<?= esc(lang('News.pinned'), 'attr') ?>" aria-label="<?= esc(lang('News.pinned'), 'attr') ?>"></i>
+                            <i class="bi bi-pin-angle-fill text-body-secondary" role="img" title="<?= esc(lang('News.pinned'), 'attr') ?>" aria-label="<?= esc(lang('News.pinned'), 'attr') ?>"></i>
                         <?php endif ?>
                         <a class="fw-semibold text-break" href="<?= esc($item['url'], 'attr') ?>"><?= esc($item['title']) ?></a>
                     </div>
