@@ -28,7 +28,7 @@ final class AppUpdateTest extends UpdatesTestCase
 {
     use StreamFilterTrait;
 
-    
+
 
     private TestSigner $signer;
 
