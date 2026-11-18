@@ -19,7 +19,7 @@ final class Module extends ModuleManifest
     public string $name    = 'Updates';
     public string $version = '0.1.0';
     public string $icon    = 'bi bi-cloud-arrow-down';
-    public array $requires = ['Core' => '^0.1', 'Dashboard' => '^0.1', 'Backup' => '^0.1'];
+    public array $requires = ['Core' => '^1.0', 'Dashboard' => '^0.1', 'Backup' => '^0.1'];
 
     public array $resources = [
         'updates' => [

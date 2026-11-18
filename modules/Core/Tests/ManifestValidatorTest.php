@@ -38,7 +38,7 @@ final class ManifestValidatorTest extends CIUnitTestCase
         return new class () extends ModuleManifest {
             public string $name    = 'News';
             public string $version = '1.0.0';
-            public array $requires = ['Core' => '^0.1'];
+            public array $requires = ['Core' => '^1.0'];
             public array $resources = [
                 'posts'      => ['label' => 'News.res.posts', 'type' => 'crud', 'except' => ['import'], 'extra' => ['publish' => 'News.perm.publish']],
                 'stats'      => ['label' => 'News.res.stats', 'type' => 'page'],

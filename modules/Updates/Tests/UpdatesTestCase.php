@@ -7,6 +7,7 @@ namespace Modules\Updates\Tests;
 use CodeIgniter\Config\Factories;
 use Config\Outbound;
 use Config\Services;
+use Modules\Core\Config\Version;
 use Modules\Core\Http\OutboundAllowList;
 use Modules\Core\Http\OutboundClient;
 use Modules\Core\Http\OutboundResponse;
@@ -38,6 +39,36 @@ abstract class UpdatesTestCase extends DashboardTestCase
 
     /** @var array<string, array{version: string, repository: string}> */
     protected array $moduleRepositories = [];
+
+    /** The installed Core version (`Version::CORE`) and releases relative to it, so the tests follow every release. */
+    protected static string $installed = '';
+
+    protected static string $next = '';
+
+    protected static string $after = '';
+
+    protected static string $older = '';
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        [$major, $minor, $patch] = array_map('intval', explode('.', explode('-', Version::CORE)[0]));
+        self::$installed         = Version::CORE;
+        self::$next              = sprintf('%d.%d.0', $major, $minor + 1);
+        self::$after             = sprintf('%d.%d.0', $major, $minor + 2);
+        self::$older             = match (true) {
+            $patch > 0 => sprintf('%d.%d.%d', $major, $minor, $patch - 1),
+            $minor > 0 => sprintf('%d.%d.9', $major, $minor - 1),
+            default    => sprintf('%d.9.9', $major - 1),
+        };
+    }
+
+    /** Download folder of the next release's assets. */
+    protected static function download(): string
+    {
+        return 'https://github.com/acme/app/releases/download/v' . self::$next . '/';
+    }
 
     protected function setUp(): void
     {

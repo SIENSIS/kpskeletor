@@ -28,7 +28,7 @@ trait ModuleFixturesTrait
         $name = $this->uniqueModuleName();
         (new ModuleGenerator($this->tempRoot()))->generate($name);
 
-        $requires = ['Core' => '^0.1'] + $requires;
+        $requires = ['Core' => '^1.0'] + $requires;
         $export   = var_export($requires, true);
         $manifest = <<<PHP
             <?php

@@ -9,5 +9,5 @@ namespace Modules\Core\Config;
  */
 final class Version
 {
-    public const CORE = '0.1.0';
+    public const CORE = '1.0.0';
 }

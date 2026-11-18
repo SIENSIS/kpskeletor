@@ -22,7 +22,7 @@ final class Module extends ModuleManifest
     public string $name    = 'Backup';
     public string $version = '0.1.0';
     public string $icon    = 'bi bi-archive';
-    public array $requires = ['Core' => '^0.1', 'Auth' => '^0.2', 'Dashboard' => '^0.1'];
+    public array $requires = ['Core' => '^1.0', 'Auth' => '^0.2', 'Dashboard' => '^0.1'];
 
     public array $resources = [
         'backups' => [

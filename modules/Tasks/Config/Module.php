@@ -32,7 +32,7 @@ final class Module extends ModuleManifest
     public string $description = 'Tasks.module.description';
     public string $author      = 'kpskeletor';
     public bool $enabledByDefault = false;
-    public array $requires     = ['Core' => '^0.1', 'Auth' => '^0.2', 'Dashboard' => '^0.1', 'Files' => '^0.1'];
+    public array $requires     = ['Core' => '^1.0', 'Auth' => '^0.2', 'Dashboard' => '^0.1', 'Files' => '^0.1'];
 
     public array $resources = [
         'tasks' => [

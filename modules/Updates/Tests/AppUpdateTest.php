@@ -28,7 +28,7 @@ final class AppUpdateTest extends UpdatesTestCase
 {
     use StreamFilterTrait;
 
-    private const DOWNLOAD = 'https://github.com/acme/app/releases/download/v0.2.0/';
+    
 
     private TestSigner $signer;
 
@@ -77,8 +77,8 @@ final class AppUpdateTest extends UpdatesTestCase
         command('app:update --dry-run');
         $output = $this->getStreamFilterBuffer();
 
-        $this->assertStringContainsString(lang('Updates.cli.available', ['0.1.0', '0.2.0', 'archive']), $output);
-        $this->assertStringContainsString(lang('Updates.plan.download', ['app-0.2.0.zip']), $output);
+        $this->assertStringContainsString(lang('Updates.cli.available', [self::$installed, self::$next, 'archive']), $output);
+        $this->assertStringContainsString(lang('Updates.plan.download', ['app-' . self::$next . '.zip']), $output);
         $this->assertStringContainsString(lang('Updates.plan.verify'), $output);
         $this->assertStringContainsString(lang('Updates.plan.backup'), $output);
         $this->assertStringContainsString(lang('Updates.plan.composer'), $output);
@@ -100,11 +100,11 @@ final class AppUpdateTest extends UpdatesTestCase
 
     public function testUpToDate(): void
     {
-        $this->publish([self::release('v0.1.0'), self::release('v0.0.9')]);
+        $this->publish([self::release('v' . self::$installed), self::release('v' . self::$older)]);
         AppUpdate::$updater = $this->updater();
 
         command('app:update --dry-run');
-        $this->assertStringContainsString(lang('Updates.cli.upToDate', ['0.1.0']), $this->getStreamFilterBuffer());
+        $this->assertStringContainsString(lang('Updates.cli.upToDate', [self::$installed]), $this->getStreamFilterBuffer());
     }
 
     public function testReleasesThatDoNotVerifyAreRefusedBeforeAnythingChanges(): void
@@ -124,8 +124,8 @@ final class AppUpdateTest extends UpdatesTestCase
         $this->assertRefusedUntouched(lang('Updates.error.checksum'));
 
         // No signature published, or no key configured.
-        $this->publish([self::release('v0.2.0', '', ['app-0.2.0.zip' => self::DOWNLOAD . 'app-0.2.0.zip'])]);
-        $this->assertRefusedUntouched(lang('Updates.error.unsigned', ['v0.2.0']));
+        $this->publish([self::release('v' . self::$next, '', ['app-' . self::$next . '.zip' => self::download() . 'app-' . self::$next . '.zip'])]);
+        $this->assertRefusedUntouched(lang('Updates.error.unsigned', ['v' . self::$next]));
         $this->publishArchive($archive);
         $this->config->publicKeys = '';
         $this->assertRefusedUntouched(lang('Updates.error.noKey'));
@@ -143,14 +143,14 @@ final class AppUpdateTest extends UpdatesTestCase
         $app    = $this->config->rootPath;
 
         $this->assertStringContainsString(lang('Updates.step.verified'), $output);
-        $this->assertStringContainsString(lang('Updates.step.done', ['0.2.0']), $output);
+        $this->assertStringContainsString(lang('Updates.step.done', [self::$next]), $output);
         $this->assertSame('new spark', file_get_contents($app . '/spark'));
-        $this->assertSame('<?php // 0.2.0', file_get_contents($app . '/modules/Core/Config/Version.php'));
+        $this->assertSame('<?php // ' . self::$next, file_get_contents($app . '/modules/Core/Config/Version.php'));
         $this->assertSame('encryption.key = keep-me', file_get_contents($app . '/.env'), '.env is never written.');
         $this->assertSame('keep', file_get_contents($app . '/writable/data.txt'), 'writable/ is never written.');
         $this->assertFileDoesNotExist($app . '/writable/evil.php');
-        $this->assertSame('old spark', file_get_contents($this->config->path . '/previous/0.1.0/spark'), 'Replaced files are kept.');
-        $this->assertFileDoesNotExist($this->config->path . '/previous/0.1.0/README.md', 'Unchanged files are not copied.');
+        $this->assertSame('old spark', file_get_contents($this->config->path . '/previous/' . self::$installed . '/spark'), 'Replaced files are kept.');
+        $this->assertFileDoesNotExist($this->config->path . '/previous/' . self::$installed . '/README.md', 'Unchanged files are not copied.');
         $this->assertSame(['correct-horse-battery'], $this->backups);
         $this->assertSame([
             'composer install --no-dev --no-interaction --no-progress --optimize-autoloader',
@@ -168,7 +168,7 @@ final class AppUpdateTest extends UpdatesTestCase
         $this->assertSame([], $updater->localChanges());
         file_put_contents($app . '/spark', 'edited');
         $this->assertSame(['spark'], $updater->localChanges());
-        $this->assertStringContainsString('spark', implode(' ', $updater->problems(new Release('0.3.0', 'v0.3.0', assets: ['a.zip' => 'x', 'a.zip.minisig' => 'x', 'a.zip.sha256' => 'x']))));
+        $this->assertStringContainsString('spark', implode(' ', $updater->problems(new Release(self::$after, 'v' . self::$after, assets: ['a.zip' => 'x', 'a.zip.minisig' => 'x', 'a.zip.sha256' => 'x']))));
     }
 
     public function testAFailureKeepsMaintenanceModeOnAndNamesTheBackup(): void
@@ -184,7 +184,7 @@ final class AppUpdateTest extends UpdatesTestCase
             $this->fail('The update should fail.');
         } catch (UpdateException $e) {
             $this->assertStringContainsString('backup-update.kpb', $e->getMessage());
-            $this->assertStringContainsString('previous/0.1.0', $e->getMessage());
+            $this->assertStringContainsString('previous/' . self::$installed, $e->getMessage());
         }
 
         $this->assertTrue((new MaintenanceMode())->isOn());
@@ -201,11 +201,11 @@ final class AppUpdateTest extends UpdatesTestCase
     public function testGitInstallsVerifyTheTag(): void
     {
         $this->config->method = 'git';
-        $this->publish([self::release('v0.2.0')]);
+        $this->publish([self::release('v' . self::$next)]);
         $updater = $this->updater();
         $release = $updater->available();
         $this->assertNotNull($release);
-        $this->assertContains(lang('Updates.plan.gitVerify', ['v0.2.0']), $updater->plan($release));
+        $this->assertContains(lang('Updates.plan.gitVerify', ['v' . self::$next]), $updater->plan($release));
         $this->assertSame([], $updater->problems($release), 'Git installs need no archive nor minisign key.');
 
         $this->runner->fail = 'verify-tag';
@@ -214,7 +214,7 @@ final class AppUpdateTest extends UpdatesTestCase
             $updater->update($release, 'correct-horse-battery');
             $this->fail('An unsigned tag is refused.');
         } catch (UpdateException $e) {
-            $this->assertSame(lang('Updates.error.tagNotVerified', ['v0.2.0']), $e->getMessage());
+            $this->assertSame(lang('Updates.error.tagNotVerified', ['v' . self::$next]), $e->getMessage());
         }
 
         $this->assertFalse((new MaintenanceMode())->isOn());
@@ -223,7 +223,7 @@ final class AppUpdateTest extends UpdatesTestCase
         $this->runner->fail     = null;
         $this->runner->commands = [];
         $updater->update($release, 'correct-horse-battery');
-        $this->assertContains('git merge --ff-only -- refs/tags/v0.2.0', $this->runner->commands);
+        $this->assertContains('git merge --ff-only -- refs/tags/v' . self::$next, $this->runner->commands);
         $this->assertContains('git status --porcelain --untracked-files=no', $this->runner->commands);
 
         $this->runner->status = " M app/Config/App.php\n";
@@ -280,15 +280,15 @@ final class AppUpdateTest extends UpdatesTestCase
      */
     private function publishArchive(string $archive, ?string $signature = null, ?string $checksum = null): void
     {
-        $this->publish([self::release('v0.1.0'), self::release('v0.2.0', 'Notes', [
-            'app-0.2.0.zip'         => self::DOWNLOAD . 'app-0.2.0.zip',
-            'app-0.2.0.zip.minisig' => self::DOWNLOAD . 'app-0.2.0.zip.minisig',
-            'app-0.2.0.zip.sha256'  => self::DOWNLOAD . 'app-0.2.0.zip.sha256',
+        $this->publish([self::release('v' . self::$installed), self::release('v' . self::$next, 'Notes', [
+            'app-' . self::$next . '.zip'         => self::download() . 'app-' . self::$next . '.zip',
+            'app-' . self::$next . '.zip.minisig' => self::download() . 'app-' . self::$next . '.zip.minisig',
+            'app-' . self::$next . '.zip.sha256'  => self::download() . 'app-' . self::$next . '.zip.sha256',
         ])]);
 
-        $this->transport->routes[self::DOWNLOAD . 'app-0.2.0.zip']         = new OutboundResponse(200, [], $archive);
-        $this->transport->routes[self::DOWNLOAD . 'app-0.2.0.zip.minisig'] = new OutboundResponse(200, [], $signature ?? $this->signer->sign($archive));
-        $this->transport->routes[self::DOWNLOAD . 'app-0.2.0.zip.sha256']  = new OutboundResponse(200, [], ($checksum ?? hash('sha256', $archive)) . '  app-0.2.0.zip');
+        $this->transport->routes[self::download() . 'app-' . self::$next . '.zip']         = new OutboundResponse(200, [], $archive);
+        $this->transport->routes[self::download() . 'app-' . self::$next . '.zip.minisig'] = new OutboundResponse(200, [], $signature ?? $this->signer->sign($archive));
+        $this->transport->routes[self::download() . 'app-' . self::$next . '.zip.sha256']  = new OutboundResponse(200, [], ($checksum ?? hash('sha256', $archive)) . '  app-' . self::$next . '.zip');
     }
 
     /**
@@ -299,11 +299,11 @@ final class AppUpdateTest extends UpdatesTestCase
         $file = $this->root . '/build-' . bin2hex(random_bytes(4)) . '.zip';
         $zip  = new ZipArchive();
         $zip->open($file, ZipArchive::CREATE);
-        $zip->addFromString('app-0.2.0/spark', 'new spark');
-        $zip->addFromString('app-0.2.0/README.md', 'same');
-        $zip->addFromString('app-0.2.0/modules/Core/Config/Version.php', '<?php // 0.2.0');
-        $zip->addFromString('app-0.2.0/.env', 'encryption.key = from-the-archive');
-        $zip->addFromString('app-0.2.0/writable/evil.php', '<?php');
+        $zip->addFromString('app-' . self::$next . '/spark', 'new spark');
+        $zip->addFromString('app-' . self::$next . '/README.md', 'same');
+        $zip->addFromString('app-' . self::$next . '/modules/Core/Config/Version.php', '<?php // ' . self::$next);
+        $zip->addFromString('app-' . self::$next . '/.env', 'encryption.key = from-the-archive');
+        $zip->addFromString('app-' . self::$next . '/writable/evil.php', '<?php');
         $zip->close();
         $contents = (string) file_get_contents($file);
         unlink($file);
