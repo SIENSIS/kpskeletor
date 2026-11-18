@@ -8,6 +8,8 @@
     "screenshots": "node deploy-status/screenshot.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "axe-core": "4.14.0",
     "playwright": "1.63.0"
   }
 }

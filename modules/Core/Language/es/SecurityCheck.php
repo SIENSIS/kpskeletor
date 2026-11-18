@@ -188,7 +188,7 @@ return [
         'title'   => 'Bibliotecas de front-end incluidas',
         'ok'      => '{0} archivos coinciden con las sumas de verificación de vendor.json.',
         'missing' => 'public/assets/vendor/vendor.json falta o no es válido.',
-        'changed' => 'Cambiados o ausentes: {0}.',
+        'changed' => 'Cambiados o ausentes (+ = no listado en vendor.json): {0}.',
         'fix'     => 'Restablezca public/assets/vendor a partir de la versión publicada (no edite nunca esos archivos).',
     ],
     'outbound' => [
