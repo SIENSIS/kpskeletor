@@ -41,7 +41,7 @@ pull request open), *merged* (in `main`).
 | 31 | Internationalisation pass | merged | `claude/amazing-goldberg-2trmeu` | [SIENSIS/kpskeletor#39](https://github.com/SIENSIS/kpskeletor/pull/39) | [`deploy-status/31-i18n/`](../deploy-status/31-i18n/README.md) |
 | 32 | Tasks tutorial module and AI tooling | merged | `ccr-c5a1782e-jvbm6w` | [SIENSIS/kpskeletor#40](https://github.com/SIENSIS/kpskeletor/pull/40) | [`deploy-status/32-tasks-module/`](../deploy-status/32-tasks-module/README.md) |
 | 33 | Documentation | merged | `claude/vibrant-hypatia-t0pedc` | [SIENSIS/kpskeletor#41](https://github.com/SIENSIS/kpskeletor/pull/41) | [`deploy-status/33-docs/`](../deploy-status/33-docs/README.md) |
-| 34 | Tutorials | done | `claude/fervent-gauss-9ng4h3` | [SIENSIS/kpskeletor#42](https://github.com/SIENSIS/kpskeletor/pull/42) | [`deploy-status/34-tutorials/`](../deploy-status/34-tutorials/README.md) |
+| 34 | Tutorials | merged | `claude/fervent-gauss-9ng4h3` | [SIENSIS/kpskeletor#42](https://github.com/SIENSIS/kpskeletor/pull/42) | [`deploy-status/34-tutorials/`](../deploy-status/34-tutorials/README.md) |
 
 ## MVP review (session 19)
 
