@@ -8,7 +8,11 @@ useDefault = true
 
 [allowlist]
 description = "Test fixtures, examples and generated lock files"
+# Test folders hold made-up passwords and keys for throwaway test users (PHPUnit fixtures); a real
+# credential never belongs in a test either.
 paths = [
+    '''(^|/)Tests/''',
+    '''^tests/''',
     '''(^|/)composer\.lock$''',
     '''(^|/)package-lock\.json$''',
     '''^public/assets/vendor/''',
@@ -17,4 +21,6 @@ paths = [
 regexes = [
     # Placeholders of the documentation and the env template.
     '''(?i)(change[-_]?me|example|placeholder|your[-_]?(token|key|secret|password))''',
+    # Throwaway administrator passwords of the CI installs (`Ci-<what>-Tramuntana-2026`).
+    '''Ci-[A-Za-z0-9]+-Tramuntana-2026''',
 ]

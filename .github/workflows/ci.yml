@@ -185,18 +185,19 @@ jobs:
       - name: Install Playwright and axe
         run: npm ci && npx playwright install --with-deps chromium
 
+      # A random administrator password per run (a throwaway site; nothing to commit).
       - name: Demo site (SQLite)
-        env:
-          INSTALL_ADMIN_PASSWORD: Ci-E2e-Tramuntana-2026
         run: |
-          php spark app:install --no-interaction --env=development --url=http://localhost:8089/ --db=sqlite --db-name=e2e.db --email=admin@example.com --demo --2fa=none
+          E2E_PASSWORD="$(openssl rand -base64 18)"
+          echo "::add-mask::${E2E_PASSWORD}"
+          echo "E2E_PASSWORD=${E2E_PASSWORD}" >> "$GITHUB_ENV"
+          INSTALL_ADMIN_PASSWORD="${E2E_PASSWORD}" php spark app:install --no-interaction --env=development --url=http://localhost:8089/ --db=sqlite --db-name=e2e.db --email=admin@example.com --demo --2fa=none
           php spark modules:enable Tasks
           printf 'y\n' | php spark modules:demo Tasks
 
       - name: End-to-end tests (phone, tablet, desktop × light, dark)
         env:
           E2E_USER: admin@example.com
-          E2E_PASSWORD: Ci-E2e-Tramuntana-2026
         run: npm run e2e
 
       - name: Screenshots and report

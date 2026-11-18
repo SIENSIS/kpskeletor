@@ -2851,7 +2851,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 
 - **Where:** specification "Quality, tests and delivery" ("secret scanning (e.g. gitleaks)").
 - **Problem:** The gitleaks GitHub Action needs a paid licence for repositories of organisations.
-- **Proposal:** The CI job `secrets` downloads the gitleaks release (MIT) of a fixed version, checks it against the release's checksum file and scans the whole history with `.gitleaks.toml` (default rules + an allow-list of lock files, vendored libraries and placeholder words). A real secret is never allow-listed: it is removed and rotated.
+- **Proposal:** The CI job `secrets` downloads the gitleaks release (MIT) of a fixed version, checks it against the release's checksum file and scans the whole history with `.gitleaks.toml` (default rules + an allow-list of test folders with fixture passwords, the CI throwaway passwords `Ci-<what>-Tramuntana-2026`, lock files, vendored libraries and placeholder words; the e2e job generates its password per run). A real secret is never allow-listed: it is removed and rotated.
 - **Alternatives:** The action with a licence; GitHub's own secret scanning (a repository setting, not in the CI).
 - **Status:** Accepted (proposal)
 

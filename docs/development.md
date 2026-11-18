@@ -129,7 +129,7 @@ pre-installed Chromium (do not run `playwright install`).
 | Checks (PHP 8.2, 8.3, 8.4) | `composer validate --strict`, `composer audit`, php-cs-fixer (dry run), PHPStan level 6, PHPUnit on SQLite, `csp:check`, `assets:publish --check` (published copies, manifest and the `vendor.json` checksums of `public/assets/vendor`), a fresh SQLite install with a smoke test |
 | Tests on MariaDB (PHP 8.3) | PHPUnit on MariaDB 11.4 and a production install into an empty database |
 | End-to-end and accessibility | a demo site on SQLite and `npm run e2e`; screenshots and the HTML report as the `e2e` artifact |
-| Secret scanning | gitleaks (release binary checked against its checksums) over the whole history, configuration `.gitleaks.toml` (default rules + an allow-list of examples and lock files; never allow-list a real secret: remove and rotate it) |
+| Secret scanning | gitleaks (release binary checked against its checksums) over the whole history, configuration `.gitleaks.toml` (default rules + an allow-list of test fixtures, CI throwaway passwords, examples and lock files; never allow-list a real secret: remove and rotate it). The e2e job generates its administrator password per run |
 
 Dependabot (`.github/dependabot.yml`) proposes weekly Composer, npm and GitHub Actions updates.
 
