@@ -14,9 +14,8 @@ use Modules\Core\Storage\Picker\PickerField;
  * (`Modules\Core\Security\HtmlSanitizer`).
  *
  * kpcrudy: `$crud->fieldType('body', 'textarea', ['attrs' => RichTextEditor::attrs()])`; for a
- * field of `setTranslations()` use the type `translation` (kpcrudy's own type of translated
- * fields: another type would take the field out of the language tabs), e.g.
- * `fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs()])`.
+ * field of `setTranslations()` use its `attrs` option (kpcrudy >= 1.3), e.g.
+ * `setTranslations(..., ['attrs' => ['body' => RichTextEditor::attrs()]])`.
  *
  * "Insert image" (D-17-08): pass the module's image field, e.g.
  * `RichTextEditor::attrs(RichTextEditor::images('news'))`: upload or choose a JPG, PNG, WebP or GIF

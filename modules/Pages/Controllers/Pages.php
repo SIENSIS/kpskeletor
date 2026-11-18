@@ -68,8 +68,8 @@ final class Pages extends BackendController
                     'canonical'        => 'permit_empty|max_length[500]|valid_url_strict[https]',
                 ],
                 'fallbacks' => ['*' => ['ca']],
+                'attrs'     => ['body' => RichTextEditor::attrs(RichTextEditor::images('pages'))],
             ])
-            ->fieldType('body', 'translation', ['attrs' => RichTextEditor::attrs(RichTextEditor::images('pages'))])
             ->setRelationNN('groups', 'page_groups', 'groups', 'page_id', 'group_id', 'title', ['order' => 'title'])
             ->setRelation('author_id', 'users', 'username')
             ->fieldType('parent_id', 'select', ['options' => $tree->options($this->editedId(), $locale)])
