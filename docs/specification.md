@@ -873,6 +873,11 @@ granularity instead of collapsing it into read/create/update/delete.
 * **Vendored libraries** in `public/assets/vendor/` (Bootstrap, Bootstrap Icons, the rich-text
   editor, the calendar library) with a `vendor.json` listing name, version, licence, source and
   the **SHA-256 of every file**; CI fails if a file does not match (see `docs/dependencies.md`).
+* **Icon fields:** an input with `data-icon-picker` gets the Core's icon picker
+  (`core/forms/icon-picker.js`: a searchable, keyboard-accessible grid of the vendored Bootstrap
+  Icons, the field still works as text and the server validates it as before). The list of icon
+  names is generated from the vendored Bootstrap Icons when assets are published and checked by
+  `assets:publish --check`; no network request.
 * **Development mode:** `php spark assets:publish --watch` republishes changed files, and with
   `CI_ENVIRONMENT=development` the asset helper can serve a module's file directly when it is
   newer than the published copy, so edits show up without running the command each time.
@@ -1380,6 +1385,11 @@ field declares how it works:
   re-encoding) and inserts the image with an alt text; pasted or dropped images go through the
   same signed upload. HTMLPurifier then keeps only images of the site itself (internal
   `/uploads/…` URLs or the site's hosts); external images are removed. Used by News and Pages.
+* **Icons inside rich text:** an "Insert an icon" button opens the Core's icon picker and inserts
+  a decorative icon `<i class="bi bi-<name>" aria-hidden="true"></i>`. HTMLPurifier keeps on `<i>`
+  only the class `bi` plus one `bi-<name>` whose name is in the vendored icon list, and
+  `aria-hidden="true"`; every other class, `style` and handler is removed, and no other element
+  gains classes. An icon that carries meaning needs its meaning written next to it.
 * **Avatars** are stored on the **private** disk: they are only served to logged-in users (the
   personal folder's `avatar` subfolder grants `view` to "all logged-in users"), at
   `files/avatar/{key}` (the file key: a new avatar is a new URL) with long cache headers, so they
