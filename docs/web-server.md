@@ -130,6 +130,23 @@ The Storage service creates private folders `0750` and files `0640`, public ones
 looser under `writable/`. Access control never relies on these permissions: every private file
 is read through `files/private/{key}`.
 
+## Rules that name the back office
+
+The back office lives under `/backend` unless another prefix was chosen when installing
+(`app.backendPath`, D-40-01; [`security.md`](security.md), "Back-office path"). Extra web-server
+rules for it (an IP allow-list, basic authentication, a separate log) use that prefix, e.g. for
+`/admin` in Nginx:
+
+```nginx
+location ^~ /admin/ {
+    allow 192.0.2.0/24;
+    deny all;
+    try_files $uri /index.php$is_args$args;
+}
+```
+
+After `php spark app:backend-path <new>` change these rules by hand: the command cannot see them.
+
 ## Check
 
 ```bash

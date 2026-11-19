@@ -24,7 +24,7 @@ The generated controller is a starting point: choose the columns, fields, relati
 // modules/News/Config/Routes.php
 use Modules\Core\Crud\CrudFactory;
 
-CrudFactory::routes($routes, 'news-posts', 'backend/news/posts', '\Modules\News\Controllers\Posts::index');
+CrudFactory::routes($routes, 'news-posts', backend_path('news/posts'), '\Modules\News\Controllers\Posts::index');
 ```
 
 ```php

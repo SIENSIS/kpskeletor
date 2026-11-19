@@ -209,13 +209,15 @@ Grant the permission in the matrix to show the field to a group.
 
 ## Routes: default deny
 
-- The `backend` filter chain runs on `backend` and `backend/*` (`app/Config/Filters.php`): login
+- The `backend` filter chain runs on the back-office prefix and everything under it (`backend`
+  and `backend/*` by default; `app.backendPath`, D-40-01, set in the constructor of
+  `app/Config/Filters.php`): login
   (Shield `session`), forced password change, forced 2FA set-up, the per-user request limit
   (`RateLimit`, limit `backend`, `docs/security.md`). The global filters cover the
   disabled-module check (`moduleenabled`) and the session hardening with the idle lock
   (`authsession`), and maintenance mode (`maintenance`, first). After the rate limit the chain
   runs the scheduler fallback (`PoorMansCron`, off unless `Core.poorMansCron`).
-- Every `backend/` route also has its own `can:` filter; sensitive ones add `reauth`.
+- Every back-office route (`BackendPath::contains()`) also has its own `can:` filter; sensitive ones add `reauth`.
 - Every `api/v1/` route has `kpapy`, `kpapy:optional` or `kpapy:hmac`; `kpapy:login` only on the
   `auth/token*` login routes; `kpapy:public` only for GET. No other route may live under `api/`
   (it has no CSRF or session filters): the auditor refuses `api/internal/…` or `api/v2/…`.

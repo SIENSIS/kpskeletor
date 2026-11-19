@@ -1727,6 +1727,9 @@ both supported:
 
 ## Security baseline (must be on by default)
 
+(The back office is under the configurable prefix `app.backendPath`, default `backend`, D-40-01;
+"Installer and CLI".)
+
 * **Requests and headers** (all configurable, see "Configuring headers and CSP" below):
   * CSRF (session based, regenerate) on every POST; no blanket exemptions (only the API group,
     which never accepts cookies);
@@ -1901,7 +1904,9 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   top-level path or a page slug. It is read from configuration, never from the database, and is
   not editable from the back office. `php spark app:backend-path <new>` changes it later
   (validation, maintenance mode, `.env`, stored links, caches, security log). Stored internal links
-  are relative to the back office; old `backend/…` links keep working.
+  are relative to the back office, written with the canonical prefix `backend/…` and resolved when
+  shown (D-40-02); old `backend/…` links keep working. Code uses `backend_path()`,
+  `backend_url()` and `backend_link()`.
 * **Commands** (all documented in `docs/commands.md`):
   * modules and themes: `modules:sync|list|status|enable|disable|install|uninstall|demo`,
     `themes:install|uninstall`, `make:module`, `make:theme`, `assets:publish [--watch]`;

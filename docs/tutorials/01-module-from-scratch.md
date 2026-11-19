@@ -172,7 +172,7 @@ The finished manifest, with every other key used by the later tutorials, is
 is the resource; `CrudFactory::routes()` registers every CRUD URL with its `can:` filter):
 
 ```php
-\Modules\Core\Crud\CrudFactory::routes($routes, 'tasks2-projects', 'backend/tasks2/projects', '\Modules\Tasks2\Controllers\Projects::index');
+\Modules\Core\Crud\CrudFactory::routes($routes, 'tasks2-projects', backend_path('tasks2/projects'), '\Modules\Tasks2\Controllers\Projects::index');
 ```
 
 Routes never query the database, and never `require` another file.

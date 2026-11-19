@@ -25,15 +25,20 @@ composer install
 php spark app:install
 ```
 
-`app:install` asks for the site URL, the database (an existing, empty one) and the first
+`app:install` asks for the site URL, the database (an existing, empty one), the back-office
+address (`/backend` by default; `/admin`, `/intranet`… with `--backend-path=<slug>`) and the first
 superadmin, writes `.env` with new keys (`CI_ENVIRONMENT = production`), runs `modules:sync`,
 offers two-factor authentication and writes `writable/install.lock`. Without questions:
 
 ```bash
 INSTALL_DB_PASSWORD=… INSTALL_ADMIN_PASSWORD=… php spark app:install --no-interaction \
     --url=https://intranet.example.com/ --db=mysql --db-name=kpskeletor --db-user=kpskeletor \
-    --email=admin@example.com --2fa=email
+    --email=admin@example.com --2fa=email --backend-path=admin
 ```
+
+Choose the back-office address once, when installing: changing it later
+(`php spark app:backend-path <new>`) rewrites the stored links, but bookmarks, API clients and
+web-server rules that name the old address must be updated by hand.
 
 On your own computer: `php spark app:install --env=development --db=sqlite --demo`, then
 `php spark serve` (http://localhost:8080). Alternatively, open the site in a browser before

@@ -315,7 +315,7 @@ public function render(array $options): string
     return $this->view('Modules\Tasks\Views\widgets\pending', [
         'items' => $items,
         'total' => $repository->pendingCount((int) $user->id),
-        'url'   => site_url('backend/tasks'),
+        'url'   => backend_url('tasks'),
     ]);
 }
 ```

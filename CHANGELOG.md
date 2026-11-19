@@ -10,6 +10,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- Configurable back-office path (D-40-01): `app.backendPath` in `.env` (default `backend`),
+  chosen with `app:install --backend-path=<slug>` or the web installer's "Back-office address"
+  (validated: format, reserved paths, language codes, module routes, top-level page slugs); helpers
+  `backend_path()`, `backend_url()`, `backend_link()` and `backendUrl()` (`core/config.js`);
+  `Modules\Core\Routing\BackendPath`; the Core event `backendPathCheck` (Pages refuses a top-level
+  page slug).
+- `php spark app:backend-path [<new>] [--yes]`: changes the prefix later (maintenance mode, `.env`,
+  stored links through the Core event `backendPathChanged`, caches, security log
+  `backend_path_changed`).
+- `security:check` reports the back-office path (`configuration.backendPath`, info).
 - Settings menu groups (D-38-01): the `settings` zone of the back-office sidebar shows five Core
   groups — Usuaris i accés, Seguretat, API, Personalització, Sistema — each visible only while
   one of its entries is; menu group entries in manifests (`'group' => 'group.<name>'`,
@@ -36,6 +46,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Changed
 
+- Every back-office route, filter pattern, redirect, link and the `make:module` templates use the
+  back-office prefix instead of a written `backend/`; the `backend` filter chain, Shield's
+  redirects, `RouteSecurityAuditor`, the error pages, the language-prefix exclusions and the probe
+  follow it.
+- Stored back-office links (notification and calendar links, dashboard quick links, Menus
+  addresses) are saved with the canonical prefix `backend/…` and resolved when shown (D-40-02).
+  Modules written for 1.0.0 keep working with the default prefix; with another prefix their
+  `'backend/…'` literals must become `backend_path()` / `backend_url()` / `backend_link()`
+  (`docs/creating-a-module.md`).
+- The demo page "Intranet" uses the slug `area-interna` when the back office is at `/intranet`.
 - The web installer shows its progress (session 39): a progress bar and a log of the steps
   (checks, keys, database, migrations "n of m", modules, permissions, settings, assets, groups,
   API, superadmin, demo data, `.env`, lock, security check), then a result page that shows the
