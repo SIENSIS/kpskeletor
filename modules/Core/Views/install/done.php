@@ -8,7 +8,11 @@
  * @var string                              $envPath
  * @var string                              $loginUrl
  * @var string                              $username
+ * @var bool|null                           $secretsShown The one-time values were already shown (result page reloaded)
+ * @var array<string, mixed>|null           $security     Errors and warnings of the security check (web job)
  */
+$secretsShown ??= false;
+$security ??= null;
 ?>
 <?= view('Modules\Core\Views\install\_head', ['base' => $base, 'title' => lang('Install.web.doneTitle')]) ?>
 <main class="container py-4 py-md-5">
@@ -16,9 +20,13 @@
         <div class="col-12 col-lg-9 col-xl-8">
             <h1 class="h3 mb-3"><i class="bi bi-check-circle text-success me-2" aria-hidden="true"></i><?= esc(lang('Install.web.doneTitle')) ?></h1>
 
+            <?php if ($secretsShown) : ?>
+                <div class="alert alert-info" role="status"><i class="bi bi-eye-slash me-1" aria-hidden="true"></i><?= esc(lang('Install.web.secretsShown')) ?></div>
+            <?php endif ?>
+
             <?php if ($result->envWritten) : ?>
                 <p><?= esc(lang('Install.web.envWritten', [$envPath])) ?></p>
-            <?php else : ?>
+            <?php elseif ($result->env !== '') : ?>
                 <div class="alert alert-warning" role="alert">
                     <strong><?= esc(lang('Install.web.envCopyTitle')) ?></strong>
                     <?= esc(lang('Install.web.envCopy', [$envPath])) ?>
@@ -54,7 +62,11 @@
             <ul>
                 <li><?= esc(lang('Install.web.nextLogin', [$username])) ?></li>
                 <li><?= esc(lang('Install.web.twoFactor')) ?></li>
-                <li><?= esc(lang('Install.cli.securityCheck')) ?></li>
+                <?php if ($security !== null) : ?>
+                    <li><?= esc(lang('Install.web.securityResult', [(int) ($security['errors'] ?? 0), (int) ($security['warnings'] ?? 0)])) ?></li>
+                <?php else : ?>
+                    <li><?= esc(lang('Install.cli.securityCheck')) ?></li>
+                <?php endif ?>
             </ul>
 
             <?php if ($result->envWritten) : ?>

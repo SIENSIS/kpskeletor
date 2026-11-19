@@ -12,7 +12,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 /**
  * Required filter (`installguard`, before the global filters): while the application is not
  * configured (no `.env`, no `writable/install.lock`), every web request except the web
- * installer is redirected to `install`; nothing else can run without a database. Once it is
+ * installer (and its progress, `progress/install/<job>`) is redirected to `install`; nothing else can run without a database. Once it is
  * configured the filter does nothing (and the installer answers 404).
  */
 final class InstallGuard implements FilterInterface
@@ -51,6 +51,6 @@ final class InstallGuard implements FilterInterface
     {
         $path = trim($path, '/');
 
-        return $path === 'install' || str_starts_with($path, 'install/');
+        return $path === 'install' || str_starts_with($path, 'install/') || str_starts_with($path, 'progress/install/');
     }
 }

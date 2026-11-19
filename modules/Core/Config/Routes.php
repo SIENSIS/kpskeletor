@@ -15,6 +15,10 @@ use Modules\Core\Crud\CrudFactory;
 // when the database has tables). Every other page redirects here meanwhile (InstallGuard).
 $routes->get('install', '\Modules\Core\Controllers\WebInstaller::index');
 $routes->post('install', '\Modules\Core\Controllers\WebInstaller::install');
+// The progress of a web installation (JSON, read from a file, rate limited) and its result page:
+// only for an existing job, until it expires, also once installed (session 39).
+$routes->get('install/result/(:segment)', '\Modules\Core\Controllers\WebInstaller::result/$1');
+$routes->get('progress/install/(:segment)', '\Modules\Core\Controllers\WebInstaller::progress/$1');
 
 // Theme preview (development only, Config\Theme::$preview; otherwise 404).
 $routes->get('theme-preview', '\Modules\Core\Controllers\ThemePreview::show/backend');
