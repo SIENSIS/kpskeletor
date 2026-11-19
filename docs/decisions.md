@@ -294,9 +294,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-39-02 | 39 | Web installer jobs: storage, lifetime, rate limit, lock and the order of the last steps | Accepted (proposal) |
 | D-40-01 | 40 | Configurable back-office path chosen at install time (decide) | Applied (decided) |
 | D-40-02 | 40 | Stored back-office links use the canonical prefix `backend/…`, resolved when shown | Accepted (proposal) |
-| D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Decided |
+| D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Applied (decided) |
 | D-41-02 | 41 | In development, Devtools may write module code from the back office (decide) | Decided |
-| D-41-03 | 41 | Devtools answers only local requests, to the superadmin, with re-authentication for writes (decide) | Decided |
+| D-41-03 | 41 | Devtools answers only local requests, to the superadmin, with re-authentication for writes (decide) | Applied (decided) |
+| D-41-04 | 41 | Devtools menu entry under the Core's Sistema group | Accepted (proposal) |
+| D-41-05 | 41 | Devtools routes not registered for non-local web requests; a docs viewer for the recipes' links | Accepted (proposal) |
 | D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Decided |
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 | D-44-01 | 44 | Web Push encryption and VAPID implemented in the Core with OpenSSL, no library (decide) | Decided |
@@ -3031,6 +3033,22 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) No loopback check (any client of a development site could use it).
 - **Status:** Decided
 - **Decision (2026-11-19):** «amb tots els panys». As proposed. **Must change:** session 41.
+
+## D-41-04 — Devtools menu entry under the Core's Sistema group
+
+- **Where:** `deploy/41-devtools.md` ("under the **Sistema** group of D-38-01 — or its own group"); `modules/Devtools/Config/Module.php`.
+- **Problem:** Where the single Devtools entry goes in the settings zone.
+- **Proposal (built):** `'zone' => 'settings', 'parent' => 'group.system'` (order 99, last): one entry does not justify a new group, and D-38-01 says settings entries go in one of the Core's groups. Sessions 42–43 add their screens inside Devtools, not as menu entries.
+- **Alternatives:** A) A new Core group "Desenvolupament" (a Core change for one dev-only entry).
+- **Status:** Accepted (proposal)
+
+## D-41-05 — Devtools routes not registered for non-local web requests; a docs viewer for the recipes' links
+
+- **Where:** lock 4 of `deploy/41-devtools.md` ("every Devtools URL answers 404" from another machine); the recipes "link the doc section".
+- **Problem:** Route filters run after the global and pattern filters, so the `backend` chain's login redirect answered a non-local, signed-out request before the `devtools` filter, revealing that the URLs exist. And `docs/` is not served by the application, so a card could not link its section.
+- **Proposal (built):** `Config/Routes.php` registers the Devtools routes only when `ENVIRONMENT === 'development'` **and** (console, or `REMOTE_ADDR` loopback and a local `Host`, `LocalOnly::isLocal()`); the `devtools` route filter keeps checking each request (defence in depth, and the tests use it). A read-only viewer `backend/devtools/docs/<page>` (`devtools.view`) shows `docs/<page>.md` as escaped plain text with GitHub-style heading ids (names `^[a-z0-9-]+$`, existing files only).
+- **Alternatives:** A) Filter only (signed-out network clients see a login redirect). B) Cite the doc path as text without a link.
+- **Status:** Accepted (proposal)
 
 ## D-42-01 — `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide)
 

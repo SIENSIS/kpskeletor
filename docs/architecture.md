@@ -31,6 +31,7 @@ checks it on `modules:sync` and fails with a message naming the module and the k
 | `$name`, `$version`, `$icon`, `$description`, `$author` | Identity (semantic version; description as a language key or text). |
 | `$requires` | Dependencies: module name => version constraint (`^`, `~`…). |
 | `$enabledByDefault` | `false` installs the module disabled (the `Tasks` tutorial module). |
+| `$developmentOnly` | `true` = only for development (the `Devtools` module, D-41-01): never installed or enabled outside `development` ([`devtools.md`](devtools.md)). |
 | `$repository` | Where the Updates module looks for new releases of the module. |
 | `$resources` | One per CRUD or screen: `label`, `type` (`crud`/`page`), `except`, `extra`, optional `name` (permission prefix override). Generates the permissions `<module>-<resource>.<operation>` ([`permissions.md`](permissions.md)). |
 | `$defaultGrants` | Group => permissions, applied once on first install. |

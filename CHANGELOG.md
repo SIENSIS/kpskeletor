@@ -10,6 +10,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- `Devtools` module, only for development (D-41-01 … D-41-03, `docs/devtools.md`): installed
+  disabled; superadmins only (`devtools.view`, `devtools.write`), from the loopback with a local
+  `Host` (`php spark serve`); **CRUD recipes** (`backend/devtools/recipes`): every CRUD/API variant
+  with real code, its source file and a link to its `docs/` section (plain-text docs viewer).
+- Manifest key `$developmentOnly` (D-41-01): `modules:sync`, `modules:enable`, `modules:install`
+  and the Modules screen ("Development only" badge) refuse to install or enable such a module
+  outside `development`; a sync there disables it (security log `devonly_disabled`).
+- `security:check`: `installation.devtools` (error when a development-only module is enabled
+  outside development, info in development).
 - Configurable back-office path (D-40-01): `app.backendPath` in `.env` (default `backend`),
   chosen with `app:install --backend-path=<slug>` or the web installer's "Back-office address"
   (validated: format, reserved paths, language codes, module routes, top-level page slugs); helpers
@@ -46,6 +55,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Changed
 
+- `ManifestValidator` checks that `$enabledByDefault` and `$developmentOnly` are booleans
+  (`validateProperties()` validates raw manifest values).
 - Every back-office route, filter pattern, redirect, link and the `make:module` templates use the
   back-office prefix instead of a written `backend/`; the `backend` filter chain, Shield's
   redirects, `RouteSecurityAuditor`, the error pages, the language-prefix exclusions and the probe
