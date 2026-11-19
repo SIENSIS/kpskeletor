@@ -99,7 +99,7 @@ final class PageTree
     }
 
     /**
-     * Title of a page in a language (else Catalan, else any).
+     * Title of a page in a language (else the site's default language, else any available one).
      */
     public function title(int $id, string $locale): string
     {
@@ -108,7 +108,7 @@ final class PageTree
 
     /**
      * The public path of a page in a language (`about/team`): each level's slug in that language,
-     * else in Catalan, else any; null when the page is not in the tree.
+     * else in the site's default language, else any; null when the page is not in the tree.
      */
     public function path(int $id, string $locale): ?string
     {

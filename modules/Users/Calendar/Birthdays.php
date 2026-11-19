@@ -69,11 +69,7 @@ final class Birthdays
                 }
 
                 $events[] = new CalendarEvent(
-                    title: [
-                        'ca' => lang('Users.birthdays.title', [$name], 'ca'),
-                        'es' => lang('Users.birthdays.title', [$name], 'es'),
-                        'en' => lang('Users.birthdays.title', [$name], 'en'),
-                    ],
+                    title: CalendarEvent::translated('Users.birthdays.title', [$name]),
                     start: $date,
                     allDay: true,
                     calendar: $calendar,

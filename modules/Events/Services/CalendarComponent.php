@@ -30,7 +30,8 @@ final class CalendarComponent
         $locale  = service('request')->getLocale();
         $scripts = [asset('vendor::fullcalendar/global.js'), asset('vendor::fullcalendar/themes/classic/global.js')];
 
-        if (in_array($locale, ['ca', 'es'], true)) {
+        // FullCalendar's own texts: its locale file when one is vendored (English is built in).
+        if (preg_match('/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/', $locale) === 1 && is_file(FCPATH . 'assets/vendor/fullcalendar/locales/' . $locale . '.global.js')) {
             $scripts[] = asset('vendor::fullcalendar/locales/' . $locale . '.global.js');
         }
 

@@ -79,12 +79,16 @@ final class CustomLinks extends BackendController
             return redirect()->to($back)->withInput()->with('error', implode(' ', $errors));
         }
 
+        if ($old !== null) {
+            $link['labels'] = ContentTranslations::keepUnavailable($link['labels'], $old['labels']);
+        }
+
         $saved = $store->saveLink($id, $link, $this->userId());
 
         activity_log('Menus', $id === null ? 'backend_custom_added' : 'backend_custom_edited', [
             'resource'  => 'menus-backend',
             'record_id' => Customisations::PREFIX . $saved,
-            'summary'   => $kind . ': ' . ($link['labels']['ca'] ?? ''),
+            'summary'   => $kind . ': ' . ContentTranslations::defaultText($link['labels']),
             'before'    => $old === null ? null : self::summary($old),
             'after'     => self::summary($link),
         ]);
@@ -112,7 +116,7 @@ final class CustomLinks extends BackendController
         activity_log('Menus', 'backend_custom_deleted', [
             'resource'  => 'menus-backend',
             'record_id' => Customisations::PREFIX . $id,
-            'summary'   => $link['kind'] . ': ' . ($link['labels']['ca'] ?? ''),
+            'summary'   => $link['kind'] . ': ' . ContentTranslations::defaultText($link['labels']),
             'before'    => self::summary($link),
         ]);
 
@@ -178,7 +182,8 @@ final class CustomLinks extends BackendController
             'zones'       => BackendMenu::zoneLabels(),
             'groups'      => $groups,
             'permissions' => (new PermissionCatalogue())->enabledNames(),
-            'locales'     => ContentTranslations::LOCALES,
+            'locales'     => ContentTranslations::locales(),
+            'required'    => ContentTranslations::defaultLocale(),
             'action'      => site_url('backend/menus/backend/custom/save'),
             'deleteUrl'   => $id === null ? null : site_url('backend/menus/backend/custom/' . $id . '/delete'),
             'backUrl'     => site_url('backend/menus/backend'),
@@ -198,7 +203,7 @@ final class CustomLinks extends BackendController
         $labels = [];
         $posted = $this->request->getPost('labels');
 
-        foreach (array_keys(ContentTranslations::LOCALES) as $locale) {
+        foreach (ContentTranslations::codes() as $locale) {
             $label = trim((string) (is_array($posted) && is_scalar($posted[$locale] ?? null) ? $posted[$locale] : ''));
 
             if (mb_strlen($label) > 100) {
@@ -210,7 +215,7 @@ final class CustomLinks extends BackendController
             }
         }
 
-        if (($labels['ca'] ?? '') === '') {
+        if (($labels[ContentTranslations::defaultLocale()] ?? '') === '') {
             $errors[] = lang('Menus.errors.labelRequired');
         }
 

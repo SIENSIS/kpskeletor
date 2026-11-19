@@ -205,10 +205,12 @@ final class Revisions
             }
 
             $db->table('pages')->where('id', $pageId)->update($update);
-            $db->table('page_translations')->where('page_id', $pageId)->delete();
+            // Only the site's languages are restored; rows of a language no longer offered are kept.
+            $codes = ContentTranslations::codes();
+            $db->table('page_translations')->where('page_id', $pageId)->whereIn('locale', $codes)->delete();
 
             foreach (is_array($snapshot['translations'] ?? null) ? $snapshot['translations'] : [] as $locale => $fields) {
-                if (! array_key_exists((string) $locale, ContentTranslations::LOCALES) || ! is_array($fields)) {
+                if (! in_array((string) $locale, $codes, true) || ! is_array($fields)) {
                     continue;
                 }
 

@@ -8,8 +8,8 @@ use CodeIgniter\Controller;
 use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\HTTP\ResponseInterface;
 use Kpapy\Resource;
+use Modules\Core\Content\ContentTranslations;
 use Modules\Core\Security\HtmlSanitizer;
-use Modules\News\Controllers\Posts as PostsCrud;
 use Modules\News\Services\NewsVisibility;
 use Modules\News\Storage\CoverUploads;
 
@@ -35,7 +35,7 @@ final class PublicNews extends Controller
             ->setPermission('list', true)
             ->setPermission('show', true)
             ->where(static fn (BaseBuilder $builder): BaseBuilder => NewsVisibility::apply($builder, null, 'news', true))
-            ->setTranslations('news_translations', 'news_id', 'locale', ['title', 'summary', 'body'], array_keys(PostsCrud::LOCALES), ['required' => ['ca']])
+            ->setTranslations('news_translations', 'news_id', 'locale', ['title', 'summary', 'body'], ContentTranslations::codes(), ContentTranslations::apiOptions())
             ->fields(['id', 'slug', 'type', 'priority', 'pinned', 'category', 'title', 'summary', 'body', 'cover_url', 'url', 'published_at', 'expires_at'])
             ->listFields(['id', 'slug', 'type', 'priority', 'pinned', 'category', 'title', 'summary', 'cover_url', 'url', 'published_at', 'expires_at'])
             ->fieldType('pinned', 'bool')

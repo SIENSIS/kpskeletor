@@ -82,7 +82,7 @@ final class MenuRepository
     }
 
     /**
-     * The label of an item in a language (else Catalan, else the first one).
+     * The label of an item in a language (else the site's default language, else the first available one).
      *
      * @param array<string, string> $labels
      */
@@ -114,7 +114,8 @@ final class MenuRepository
             $db->table('menu_items')->where('id', $itemId)->where('menu_id', $menuId)->update($data + ['updated_at' => $now]);
         }
 
-        $db->table('menu_item_translations')->where('item_id', $itemId)->delete();
+        // Labels of the site's languages are replaced; those of a language no longer offered are kept.
+        $db->table('menu_item_translations')->where('item_id', $itemId)->whereIn('locale', ContentTranslations::codes())->delete();
 
         foreach ($labels as $locale => $label) {
             if ($label !== '') {

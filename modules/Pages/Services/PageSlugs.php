@@ -30,7 +30,7 @@ final class PageSlugs
     public function fill(array $translations, ?int $parent, ?int $exceptId): array
     {
         foreach ($translations as $locale => $fields) {
-            if (! is_array($fields) || ! array_key_exists($locale, ContentTranslations::LOCALES)) {
+            if (! is_array($fields) || ! in_array((string) $locale, ContentTranslations::codes(), true)) {
                 continue;
             }
 
@@ -66,7 +66,7 @@ final class PageSlugs
                 continue;
             }
 
-            $language = ContentTranslations::LOCALES[$locale] ?? $locale;
+            $language = ContentTranslations::locales()[$locale] ?? (string) $locale;
 
             if ($parent === null && $this->reserved($slug)) {
                 return lang('Pages.errors.slugReserved', [$slug]);

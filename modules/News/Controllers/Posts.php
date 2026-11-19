@@ -12,7 +12,6 @@ use Modules\Core\Crud\AuditedCrud;
 use Modules\Core\Frontend\RichTextEditor;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\Core\Text\Slugger;
-use Modules\News\Services\NewsRepository;
 use Modules\News\Services\NewsVisibility;
 use Modules\News\Services\NoticeCalendar;
 use Modules\News\Services\Publisher;
@@ -28,7 +27,7 @@ use Modules\News\Storage\CoverUploads;
  * - `backend/news/mine` (`news-mine`, "My posts"): the `where('author_id', me)` pattern: only the
  *   user's posts, a forged id is "not found", new posts are always theirs.
  *
- * Both: multilingual title/summary/body (`setTranslations()`, Catalan required), groups with
+ * Both: multilingual title/summary/body (`setTranslations()`, the site's languages, its default one required), groups with
  * `setRelationNN()` (`news_groups`), the body sanitised with HTMLPurifier before kpcrudy reads the
  * form, a unique slug, a cover through the Storage service, the `publish` / `unpublish`
  * operations (and bulk action) and, on `news-posts`, the readers page (`news-posts.readers`).
@@ -36,9 +35,6 @@ use Modules\News\Storage\CoverUploads;
  */
 final class Posts extends BackendController
 {
-    /** Languages of the content: Catalan (required, the default), Spanish, English. */
-    public const LOCALES = ContentTranslations::LOCALES;
-
     public function index(): ResponseInterface|string
     {
         $crud = $this->configure($this->crud('news-posts'), false);
@@ -99,7 +95,7 @@ final class Posts extends BackendController
 
         foreach ($rows as $row) {
             $id           = (int) $row['id'];
-            $options[$id] = $texts[$id][$locale] ?? $texts[$id][NewsRepository::FALLBACK_LOCALE] ?? (string) $row['slug'];
+            $options[$id] = $texts[$id][$locale] ?? $texts[$id][ContentTranslations::defaultLocale()] ?? (string) $row['slug'];
         }
 
         return $options;
@@ -114,13 +110,11 @@ final class Posts extends BackendController
 
         $crud->setTable('news')
             ->setSubject(lang('News.post'), lang('News.posts'))
-            ->setTranslations('news_translations', 'news_id', 'locale', ['title', 'summary', 'body'], self::LOCALES, [
-                'required'  => ['ca'],
-                'types'     => ['title' => 'text', 'summary' => 'textarea', 'body' => 'textarea'],
-                'rules'     => ['title' => 'required|max_length[190]', 'summary' => 'permit_empty|max_length[500]', 'body' => 'permit_empty|max_length[200000]'],
-                'fallbacks' => ['*' => ['ca']],
-                'attrs'     => ['body' => RichTextEditor::attrs(RichTextEditor::images('news'))],
-            ])
+            ->setTranslations('news_translations', 'news_id', 'locale', ['title', 'summary', 'body'], ContentTranslations::locales(), ContentTranslations::crudOptions([
+                'types' => ['title' => 'text', 'summary' => 'textarea', 'body' => 'textarea'],
+                'rules' => ['title' => 'required|max_length[190]', 'summary' => 'permit_empty|max_length[500]', 'body' => 'permit_empty|max_length[200000]'],
+                'attrs' => ['body' => RichTextEditor::attrs(RichTextEditor::images('news'))],
+            ]))
             ->setRelationNN('groups', 'news_groups', 'groups', 'news_id', 'group_id', 'title', ['order' => 'title'])
             ->setRelation('author_id', 'users', 'username')
             ->fieldType('type', 'select', ['options' => $this->options('types', NewsVisibility::TYPES)])
@@ -220,7 +214,7 @@ final class Posts extends BackendController
     }
 
     /**
-     * Slug (generated from the Catalan title or checked when given), the author of new posts,
+     * Slug (generated from the default language's title or checked when given), the author of new posts,
      * new posts start as drafts. `$author`: forced author ("My posts").
      *
      * @param array<string, mixed> $data
@@ -240,7 +234,7 @@ final class Posts extends BackendController
             }
         }
 
-        $title = (string) ($crud->postedTranslations()['ca']['title'] ?? '');
+        $title = ContentTranslations::defaultText($crud->postedTranslations(), 'title');
         $slug  = trim((string) ($data['slug'] ?? ''));
 
         if ($id === null || array_key_exists('slug', $data)) {
@@ -304,7 +298,7 @@ final class Posts extends BackendController
     {
         $receipts = new ReadReceipts();
         $titles   = array_column(db_connect()->table('news_translations')->select('locale, title')->where('news_id', (int) $id)->get()->getResultArray(), 'title', 'locale');
-        $title    = (string) ($titles[NewsRepository::FALLBACK_LOCALE] ?? reset($titles) ?: '');
+        $title    = ContentTranslations::defaultText($titles);
 
         $html = theme_view('Modules\News\Views\readers', [
             'title'   => $title,

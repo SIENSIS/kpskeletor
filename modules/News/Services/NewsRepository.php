@@ -14,14 +14,11 @@ use Modules\Core\Content\ContentTranslations;
  * starts from `NewsVisibility::apply()`, so nothing a user may not read is ever loaded.
  *
  * Rows are `news` columns plus `title`, `summary`, `body` in the current language (falling back
- * to Catalan, then any language: demo data is Catalan only) and `category` (name) /
+ * to the site's default language, then any available one: ContentTranslations) and `category` (name) /
  * `category_slug`.
  */
 final class NewsRepository
 {
-    /** Language used when a post has no text in the current one (the default content language). */
-    public const FALLBACK_LOCALE = ContentTranslations::FALLBACK_LOCALE;
-
     /**
      * A page of readable posts, pinned notices first, newest first.
      *
@@ -177,7 +174,7 @@ final class NewsRepository
     }
 
     /**
-     * Texts of several rows in the current language, else Catalan, else the first language found.
+     * Texts of several rows in the current language, else the default one, else the first one found.
      *
      * @param list<mixed>  $ids
      * @param list<string> $fields

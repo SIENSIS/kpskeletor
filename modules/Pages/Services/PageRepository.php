@@ -8,7 +8,7 @@ use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Content\ContentTranslations;
 
 /**
- * Read queries of the public site: one page with its texts in the current language (Catalan
+ * Read queries of the public site: one page with its texts in the current language (the site's default language
  * fallback) and the readable subpages of a page.
  */
 final class PageRepository

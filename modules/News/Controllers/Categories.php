@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Modules\News\Controllers;
 
 use CodeIgniter\HTTP\ResponseInterface;
+use Modules\Core\Content\ContentTranslations;
 use Modules\Core\Controllers\BackendController;
 use Modules\Core\Text\Slugger;
 
 /**
  * Categories of the posts (`backend/news/categories`, resource `news-categories`): translated
- * name and description (Catalan required), a unique slug for the public URL
+ * name and description (the site's default language required), a unique slug for the public URL
  * `news/category/{slug}`, order and an active flag. Deleting a category leaves its posts without
  * category (foreign key `SET NULL`).
  */
@@ -22,12 +23,10 @@ final class Categories extends BackendController
 
         $crud->setTable('news_categories')
             ->setSubject(lang('News.category'), lang('News.categories'))
-            ->setTranslations('news_category_translations', 'category_id', 'locale', ['name', 'description'], Posts::LOCALES, [
-                'required'  => ['ca'],
-                'types'     => ['name' => 'text', 'description' => 'textarea'],
-                'rules'     => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[255]'],
-                'fallbacks' => ['*' => ['ca']],
-            ])
+            ->setTranslations('news_category_translations', 'category_id', 'locale', ['name', 'description'], ContentTranslations::locales(), ContentTranslations::crudOptions([
+                'types' => ['name' => 'text', 'description' => 'textarea'],
+                'rules' => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[255]'],
+            ]))
             ->fieldType('active', 'boolean')
             ->fieldType('position', 'number', ['attrs' => ['min' => 0, 'max' => 9999]])
             ->columns(['name', 'slug', 'position', 'active'])
@@ -69,7 +68,7 @@ final class Categories extends BackendController
         $slug = trim((string) ($data['slug'] ?? ''));
 
         if ($id === null || array_key_exists('slug', $data)) {
-            $data['slug'] = Slugger::unique('news_categories', $slug !== '' ? $slug : (string) ($translations['ca']['name'] ?? ''), $id, fallback: 'category');
+            $data['slug'] = Slugger::unique('news_categories', $slug !== '' ? $slug : ContentTranslations::defaultText($translations, 'name'), $id, fallback: 'category');
         }
 
         $data['position'] = (int) ($data['position'] ?? 0);

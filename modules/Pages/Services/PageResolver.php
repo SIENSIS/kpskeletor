@@ -9,7 +9,7 @@ use Modules\Core\Content\ContentTranslations;
 /**
  * Finds the page of a public path (`about/team`): segment by segment, a child of the previous
  * page (a root page first) whose slug in some language matches. Slugs are unique per parent and
- * language, so when two languages share a slug the current language wins, then Catalan, then
+ * language, so when two languages share a slug the current language wins, then the site's default language, then
  * the lowest page id. Trashed pages never match (nor their children). Visibility is checked by
  * the caller (PageVisibility).
  */
@@ -89,7 +89,7 @@ final class PageResolver
             return null;
         }
 
-        foreach ([$locale, ContentTranslations::FALLBACK_LOCALE] as $preferred) {
+        foreach ([$locale, ContentTranslations::defaultLocale()] as $preferred) {
             foreach ($rows as $row) {
                 if ($row['locale'] === $preferred) {
                     return (int) $row['page_id'];
