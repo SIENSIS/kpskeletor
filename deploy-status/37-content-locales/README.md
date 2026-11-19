@@ -15,11 +15,13 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   a new default language is required on the next edit, existing records stay readable.
 - Slugs, activity summaries and notification titles use the default language's text (else the
   first one filled in); help texts and the Menus "label required" message name that language.
-- **Public language switch** (added at the owner's request during the session, D-37-02 decided as built):
-  the default theme's public header shows a globe with the current code next to the light/dark
-  switch; visitors choose among the site's languages (cookie `kp_locale`, which wins over the
-  browser), and a signed-in user's choice becomes their profile language. Hidden with a single
-  language or with the theme option `languageSwitch` off.
+- **The language in public URLs** (added at the owner's request during the session, D-37-02):
+  `/qui-som` is in the site's default language, `/es/quienes-somos` in Spanish, `/en/news/…` in
+  English; internal links keep the prefix; the public header shows a language switch (globe + the
+  current code, next to the light/dark switch) that links to the same page in every language (each
+  page's own slugs for Pages); `hreflang` alternates and a sitemap with every translation. The back
+  office, the API and the sign-in pages are unchanged. Hidden with a single language or with the
+  theme option `languageSwitch` off.
 - Calendar titles of birthdays and to-do task due dates are written in every site language;
   FullCalendar loads its locale file for any vendored language.
 
@@ -51,14 +53,18 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   FullCalendar locale. `Core/Settings/TranslatedText.php` falls back to the default language.
 - **Settings:** `Core.defaultLocale` and `Core.locales` take their choices from the supported
   locales through `optionsProvider` (`Core/I18n/DefaultLocaleOptions.php`, `LocaleOptions.php`).
-- **Language switch:** `modules/Core/Controllers/LanguageSwitch.php` (`POST language`, route
-  `language-switch`; ignores locales not offered, cookie `kp_locale` for a year, HTTP-only,
-  event `localeChosen` for signed-in users, `safe_redirect()` back), `LocaleNegotiator::COOKIE`
-  read by the `locale` filter (profile → chosen → browser → default), Auth's listener in
-  `modules/Auth/Config/Events.php` saves the profile language; view
-  `themes/default/Views/partials/language_switch.php` (POST forms, no JavaScript), theme option
-  `languageSwitch`, styles in `theme.css`.
-- **No tables, permissions or commands changed;** one public route added (`POST language`); no migration (one translation row per
+- **Language in the URL:** `modules/Core/I18n/LocaleRouter.php` (the `router` service in
+  `app/Config/Services.php`) reads the prefix before routing, so module routes are unchanged;
+  `modules/Core/I18n/LocaleUrls.php` (service `localeurls`: split, public paths, redirects of
+  `/ca/…`, unavailable languages and `/es/<non-public>`, `localize()`, `url()`, alternates, links,
+  `hreflang`); `app/Config/LocaleUrls.php` (`$enabled`, `$excluded`); the application's
+  `site_url()` in `app/Helpers/url_helper.php` keeps the prefix; the `locale` filter applies the
+  URL's language and `authsession` keeps the profile's for non-public paths only;
+  `themes/default/Views/partials/language_switch.php` (links) and `partials/head.php`
+  (`hreflang`); Pages: `PublicPages` (alternates, redirect of another language's slug),
+  `PageTree::translatedPaths()`, `SitemapBuilder` (every translation), language codes reserved
+  in `PageSlugs`.
+- **No tables, permissions, routes or commands changed;** no migration (one translation row per
   locale already).
 
 ## Decisions and deviations
@@ -67,9 +73,10 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   deprecated alias: a constant cannot follow a setting), and the behaviour when languages are
   added, removed or the default changes. The specification's "Catalan as the required language"
   now reads "the site's default language".
-- **D-37-02** (decided by the owner on 2026-11-19: cookie + profile, as built): the public language switch's URL `POST language`, cookie
-  `kp_locale` and event `localeChosen`, built as proposed; alternatives: a language prefix in the
-  URL, `?lang=` links, or keeping a signed-in user's public choice apart from the profile.
+- **D-37-02** (decided by the owner on 2026-11-19): the language is part of public URLs (no prefix
+  = the default language). A first version (a cookie + the profile language, `POST language`) was
+  built and decided first, then replaced the same day at the owner's request (Pages has one slug per
+  language; better for SEO and usability).
 - Earlier gaps fixed because they blocked the goal: the language settings only offered ca/es/en;
   help texts and a Menus message named Catalan; translated settings fell back to Catalan.
 - Tests: the suite runs with `app.defaultLocale=en` (English assertions), which would make English
@@ -110,10 +117,14 @@ New tests (all in the suite):
   code (allow-list: language files, `Database/`, `Config/`, tests, `Locales`, `Language`); the
   removed constants are not used.
 - `modules/Core/Tests/I18nTest.php::testTheLanguageSettingsOfferEverySupportedLocale`.
-- `modules/Core/Tests/LanguageSwitchTest.php`: the header offers the available languages; hidden
-  with one language or the option off; the cookie wins over the browser; locales not offered
-  ignored; only internal `return` paths; forged POST without CSRF refused; a signed-in user's
-  choice becomes the profile language (back office follows).
+- `modules/Core/Tests/LocaleUrlsTest.php`: no prefix = the default language whatever the browser;
+  the prefix gives the language and internal links keep it; the switch links to the same page in
+  every language and `hreflang`/`x-default` are listed; hidden with one language or the option
+  off; redirects of `/ca/…`, `/es/login`, `/es/backend` and unavailable languages; back office and
+  sign-in keep negotiating (profile, browser); it can be turned off.
+- `modules/Pages/Tests/PublicPagesTest.php`: `/es/quienes-somos`, the redirect of another
+  language's slug, canonical and `hreflang` per translation, the home page per language, the
+  sitemap with every translation.
 
 Results:
 
@@ -148,26 +159,26 @@ Catalan optional.*
 *04 — The Events category form at phone width in dark mode: the same four tabs.*
 
 ![Public news in French](screenshots/05-public-news-fr-fallback.png)
-*05 — A public post opened by a French browser: no French text, so the Spanish one (the site's
-default) is shown instead of the Catalan one; the interface texts follow the language chain
-(fr → es).*
+*05 — A public post at `/fr/news/…`: no French text, so the Spanish one (the site's default)
+is shown instead of the Catalan one; the interface texts follow the language chain (fr → es).*
 
 ![Public language switch](screenshots/06-public-language-switch.png)
-*06 — The public language switch open on the news list (globe + current code, next to the
-light/dark switch).*
+*06 — The public language switch open on the news list (`/news`, the default language; Spanish in this demo, Settings › General): links
+to `/ca/…` → `/news`, `/en/news`… (globe + current code, next to the light/dark switch).*
 
 ![After choosing English](screenshots/07-public-after-choosing-english.png)
-*07 — The same page after choosing English: back on `/news`, interface in English, content falls
-back to the default language where there is no English text.*
+*07 — After choosing English: the same page at `/en/news`, interface in English, content falls
+back to the default language where there is no English text; its links stay under `/en/`.*
 
 ![Language switch, phone, dark](screenshots/08-public-language-switch-phone-dark.png)
 *08 — The switch at phone width in dark mode, next to the colour-mode switch and the menu button.*
 
 ## Known issues
 
-- The public switch changes the language through a cookie, so each page keeps one URL for every
-  language (no `hreflang` alternates for search engines; a URL prefix would be a later session,
-  D-37-02 alternative A).
+- News, Events and Tasks have one slug per record (from the default language), so their URLs differ
+  only by the prefix (`/news/x`, `/es/news/x`); Pages has one slug per language.
+- Page caching (`pagecache`, unused today) keys pages by the routed path: it would mix the
+  languages of one page if turned on.
 - A new language shows its code (`fr`) on tabs and checkboxes until `Core.locales.<code>` and its
   language files exist (`docs/i18n.md`, "Adding a language", step 2).
 - Composer needed the known issue 04 workaround again: `phpstan/phpstan` (zip only) installed
