@@ -1,6 +1,6 @@
 # Session 37 — Content languages from the site's locales
 
-Branch: `claude/tender-pasteur-75mv6z` · Pull request: "Session 37: Content languages from the site's locales" · Date: 2026-11-19
+Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](https://github.com/SIENSIS/kpskeletor/pull/51) · Date: 2026-11-19
 
 ## What was built
 
