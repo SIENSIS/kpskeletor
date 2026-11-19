@@ -198,6 +198,11 @@ return [
     'user' => [
         'logout' => 'Log out',
     ],
+    'account' => [
+        'signIn'     => 'Sign in',
+        'backOffice' => 'Administration',
+        'myAccount'  => 'My account',
+    ],
     'menu' => [
         'modules' => 'Modules',
         'settings' => 'Settings',

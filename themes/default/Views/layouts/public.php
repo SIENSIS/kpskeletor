@@ -26,6 +26,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
         <div class="collapse navbar-collapse" id="site-menu" data-menu-location="primary">
             <?= theme_partial('public_menu', ['location' => 'primary']) ?>
             <?= theme_region('public', 'header') ?>
+            <?= theme_partial('account_link') ?>
         </div>
         <?= theme_partial('language_switch', ['switchClass' => 'site-language-switch ms-md-2']) ?>
         <?= theme_partial('theme_switch', ['switchClass' => 'site-theme-switch ms-md-1']) ?>

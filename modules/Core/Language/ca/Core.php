@@ -198,6 +198,11 @@ return [
     'user' => [
         'logout' => 'Tanca la sessió',
     ],
+    'account' => [
+        'signIn'     => 'Entra',
+        'backOffice' => 'Administració',
+        'myAccount'  => 'El meu compte',
+    ],
     'menu' => [
         'modules' => 'Mòduls',
         'settings' => 'Configuració',

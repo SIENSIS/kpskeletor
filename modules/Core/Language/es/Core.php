@@ -198,6 +198,11 @@ return [
     'user' => [
         'logout' => 'Cerrar sesión',
     ],
+    'account' => [
+        'signIn'     => 'Entrar',
+        'backOffice' => 'Administración',
+        'myAccount'  => 'Mi cuenta',
+    ],
     'menu' => [
         'modules' => 'Módulos',
         'settings' => 'Configuración',

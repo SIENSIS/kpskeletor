@@ -28,6 +28,8 @@ return [
         'forceModeNone'        => 'Do not force (visitors choose)',
         'modeSwitch'           => 'Show the light/dark switch',
         'languageSwitch'       => 'Show the language switch on the public site',
+        'showAccountLink'      => 'Show the sign-in link on the public site',
+        'showAccountLinkHelp'  => '“Sign in” for visitors, “Administration” for users who can open the back office, “My account” for the rest.',
         'sidebarColor' => 'Back-office sidebar colour',
         'font'         => 'Font',
         'fontSystem'   => 'System (sans-serif)',

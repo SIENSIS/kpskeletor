@@ -28,6 +28,8 @@ return [
         'forceModeNone'        => 'No forzar (eligen los visitantes)',
         'modeSwitch'           => 'Mostrar el selector claro/oscuro',
         'languageSwitch'       => 'Mostrar el selector de idioma en la web pública',
+        'showAccountLink'      => 'Mostrar el enlace de acceso en la web pública',
+        'showAccountLinkHelp'  => '«Entrar» para los visitantes, «Administración» para los usuarios que pueden abrir la administración y «Mi cuenta» para el resto.',
         'sidebarColor' => 'Color de la barra lateral del back office',
         'font'         => 'Tipo de letra',
         'fontSystem'   => 'Del sistema (sin serifa)',
