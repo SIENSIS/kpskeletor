@@ -156,7 +156,8 @@ final class ReauthTest extends TwoFactorTestCase
         $response = (new RequireReauth())->before($request);
         $this->assertNotNull($response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertStringContainsString('index.php/auth/reauth', (string) $response->getBody());
+        // The URL follows `App::$indexPage` (empty since index.php is hidden from site URIs).
+        $this->assertSame(site_url('auth/reauth'), json_decode((string) $response->getBody(), true)['reauth'] ?? null);
     }
 
     public function testExternalReturnPathsAreIgnored(): void
