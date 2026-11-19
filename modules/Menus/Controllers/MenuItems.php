@@ -240,7 +240,7 @@ final class MenuItems extends BackendController
         }
 
         if ($labels[ContentTranslations::defaultLocale()] === '') {
-            $errors[] = lang('Menus.errors.labelRequired');
+            $errors[] = lang('Menus.errors.labelRequired', [ContentTranslations::locales()[ContentTranslations::defaultLocale()] ?? ContentTranslations::defaultLocale()]);
         }
 
         $type    = $post('type');

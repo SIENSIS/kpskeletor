@@ -166,7 +166,7 @@ return [
         'route'         => 'No hay ninguna ruta con ese nombre (o necesita parámetros).',
         'type'          => 'Tipo de enlace desconocido.',
         'choice'        => 'Elegid una de las opciones.',
-        'labelRequired' => 'La etiqueta en catalán es obligatoria.',
+        'labelRequired' => 'La etiqueta en {0} es obligatoria.',
         'labelLength'   => 'Las etiquetas tienen como máximo 100 caracteres.',
         'parent'        => 'El padre elegido no pertenece a este menú.',
         'cycle'         => 'Una entrada no puede ir dentro de sí misma ni dentro de sus propias entradas.',

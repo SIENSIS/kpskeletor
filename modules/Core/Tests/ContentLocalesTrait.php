@@ -16,10 +16,22 @@ use Modules\Core\Content\ContentTranslations;
  * checks the translation tabs of a kpcrudy form.
  *
  * Use it in a test case whose site is installed (settings table available); call
- * `useContentLocales()` before the requests.
+ * `useContentLocales()` or `useShippedContentLocales()` before the requests.
  */
 trait ContentLocalesTrait
 {
+    /**
+     * The shipped languages (`ca`, `es`, `en`, Catalan the site's default and so the required
+     * content language) visited by a browser asking for English: the tests run with
+     * `app.defaultLocale=en` to assert English texts, which would otherwise make English the
+     * default content language.
+     */
+    protected function useShippedContentLocales(): void
+    {
+        setting('Core.defaultLocale', 'ca');
+        $this->withHeaders(['Accept-Language' => 'en']);
+    }
+
     /**
      * Site languages `ca`, `es`, `en` and `$extra`, with `$default` as the default one.
      */

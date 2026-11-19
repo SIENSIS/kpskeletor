@@ -86,8 +86,9 @@ final class TranslatedSettingsTest extends SettingsTestCase
         $this->assertSame(0, $this->storedCount('Users', 'birthdayGreeting'));
     }
 
-    public function testTheResolutionFallsBackToCatalanThenToTheDefault(): void
+    public function testTheResolutionFallsBackToTheSiteDefaultLanguageThenToTheDefault(): void
     {
+        setting('Core.defaultLocale', 'ca'); // the shipped default (the tests run with app.defaultLocale=en)
         $defaults = ['ca' => 'Default ca', 'es' => 'Default es'];
 
         $this->assertSame('Text es', TranslatedText::resolve(['ca' => 'Text ca', 'es' => 'Text es'], $defaults, 'es'));
@@ -95,6 +96,11 @@ final class TranslatedSettingsTest extends SettingsTestCase
         $this->assertSame('Text ca', TranslatedText::resolve(['ca' => 'Text ca'], $defaults, 'es'));
         $this->assertSame('Default es', TranslatedText::resolve([], $defaults, 'es'));
         $this->assertSame('Default ca', TranslatedText::resolve([], $defaults, 'fr'));
+
+        // Another default language is the fallback (session 37, D-37-01).
+        setting('Core.defaultLocale', 'es');
+        $this->assertSame('Text es', TranslatedText::resolve(['ca' => 'Text ca', 'es' => 'Text es'], $defaults, 'en'));
+        $this->assertSame('Default es', TranslatedText::resolve([], $defaults, 'fr'));
     }
 
     public function testTheGeneralTabSavesTheLanguagesAndRefusesUnsupportedOnes(): void

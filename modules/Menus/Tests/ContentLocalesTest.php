@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Menus\Tests;
 
 use Modules\Core\Menus\PublicMenuItem;
-use Modules\Core\Tests\ContentLocalesTrait;
 use Modules\Menus\Services\MenuRenderer;
 
 /**
@@ -18,8 +17,6 @@ use Modules\Menus\Services\MenuRenderer;
  */
 final class ContentLocalesTest extends MenusTestCase
 {
-    use ContentLocalesTrait;
-
     protected function setUp(): void
     {
         parent::setUp();

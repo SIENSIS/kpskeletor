@@ -12,6 +12,7 @@ use Modules\Core\Menus\MenuEntry;
 use Modules\Core\Modules\CacheInvalidator;
 use Modules\Core\Modules\ModuleDiscovery;
 use Modules\Core\Registry\DeclarationRegistry;
+use Modules\Core\Tests\ContentLocalesTrait;
 
 /**
  * Base of the Menus feature tests: the Auth fixture (every module migrated, catalogue and default
@@ -20,9 +21,12 @@ use Modules\Core\Registry\DeclarationRegistry;
  */
 abstract class MenusTestCase extends AuthTestCase
 {
+    use ContentLocalesTrait;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->useShippedContentLocales();
         service('routes')->loadRoutes();
         $this->storeDeclarations();
         (new CacheInvalidator())->invalidate(['menus', 'modules']);

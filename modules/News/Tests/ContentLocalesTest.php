@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\News\Tests;
 
-use Modules\Core\Tests\ContentLocalesTrait;
-
 /**
  * News follows the site's languages (session 37, docs/i18n.md "Content languages"): with a fourth
  * language and Spanish as the default, the forms show four tabs with Spanish required, the slug
@@ -15,8 +13,6 @@ use Modules\Core\Tests\ContentLocalesTrait;
  */
 final class ContentLocalesTest extends NewsTestCase
 {
-    use ContentLocalesTrait;
-
     protected function setUp(): void
     {
         parent::setUp();

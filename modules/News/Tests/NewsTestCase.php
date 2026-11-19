@@ -7,6 +7,7 @@ namespace Modules\News\Tests;
 use CodeIgniter\I18n\Time;
 use Kpcrudy\Crud;
 use Modules\Core\Permissions\CrudPermissions;
+use Modules\Core\Tests\ContentLocalesTrait;
 use Modules\Dashboard\Tests\DashboardTestCase;
 
 /**
@@ -16,11 +17,13 @@ use Modules\Dashboard\Tests\DashboardTestCase;
  */
 abstract class NewsTestCase extends DashboardTestCase
 {
+    use ContentLocalesTrait;
     protected array $widgetModules = ['Core', 'Dashboard', 'Users', 'News'];
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->useShippedContentLocales();
         CrudPermissions::reset();
     }
 

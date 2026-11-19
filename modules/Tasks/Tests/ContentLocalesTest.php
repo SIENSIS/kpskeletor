@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Tasks\Tests;
 
-use Modules\Core\Tests\ContentLocalesTrait;
-
 /**
  * Projects follow the site's languages (session 37, docs/i18n.md "Content languages"): with a
  * fourth language and Spanish as the default, the project form shows four tabs with Spanish
@@ -15,8 +13,6 @@ use Modules\Core\Tests\ContentLocalesTrait;
  */
 final class ContentLocalesTest extends TasksTestCase
 {
-    use ContentLocalesTrait;
-
     protected function setUp(): void
     {
         parent::setUp();
