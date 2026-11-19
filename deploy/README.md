@@ -150,6 +150,7 @@ s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou
 | 41 | `41-devtools.md` | Mòdul `Devtools` (només development, amb tots els panys) i receptes de CRUD | |
 | 42 | `42-devtools-generator.md` | Generador visual de codi amb vista prèvia (afegeix `nikic/php-parser`, D-42-01) | |
 | 43 | `43-devtools-packages.md` | Empaquetar i signar mòduls | |
+| 44 | `44-web-push.md` | Notificacions push al navegador i a la PWA (cal decidir D-44-02) | |
 
 Fitxers auxiliars: `next.md` (executa la sessió següent), `decide.md` (et pregunta els dubtes
 oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió inacabada) i
@@ -172,5 +173,5 @@ oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió ina
 - Si canvies alguna cosa de l'especificació, edita `docs/specification.md` al repositori nou (i, si
   vols conservar-ho, també `prompt_new.md` aquí).
 - Quan la sessió 36 acabi, crea l'etiqueta `v1.0.0` del repositori nou des de GitHub (Releases).
-- Les sessions 37–43 s'han afegit després de la 1.0.0 (revisió del 19-11-2026); `next.md` les
+- Les sessions 37–44 s'han afegit després de la 1.0.0 (revisió del 19-11-2026); `next.md` les
   executa en ordre.

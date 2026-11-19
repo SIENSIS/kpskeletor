@@ -864,7 +864,17 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
   the console or the local form with the key's safeguards and a cleanup afterwards (debug
   history, logs, caches, the session; D-43-01).
 - **Tests:** packages install with `modules:install`; signatures verify; no trace of the key.
-- **Depends on:** 42. Merges itself into `main` (last planned session).
+- **Depends on:** 42.
+
+## 44 — Web Push notifications (`deploy/44-web-push.md`)
+
+- **Goal:** a `push` notification channel to browsers and installed PWAs: subscriptions per
+  device, preferences, queue and scheduled task, Web Push encryption and VAPID in the Core with
+  OpenSSL (D-44-01), endpoints only of known push services (D-44-02).
+- **Tables:** `push_subscriptions`, `push_queue`.
+- **Tests:** RFC 8291/8292 vectors, SSRF refusals, delivery through `OutboundClient`, e2e push.
+- **Depends on:** 43 (order only); D-44-02 **(decide)**. Merges itself into `main` (last planned
+  session).
 
 ---
 
