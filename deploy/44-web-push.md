@@ -190,9 +190,7 @@ installation notes (keys, iOS), `CHANGELOG.md` `[Unreleased]`.
 4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
    request titled exactly
    "Session 44: Web Push notifications" with a summary, the checks' output and a link to the status report.
-   No session follows this one: merge this branch into `main` yourself with the procedure of
-   "Before starting" (checks, `docs/progress.md` → merged, push, never `--force`; if `main`
-   cannot be pushed, stop and ask me to merge the pull request on GitHub).
+   The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and
    titles), and the next step: "run `deploy/decide.md`" when there are open (decide) entries,
-   otherwise "the planned sessions are complete".
+   otherwise "run `deploy/next.md`".

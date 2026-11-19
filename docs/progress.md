@@ -288,6 +288,7 @@ map only lists URLs); no CDN; English code and docs, UI texts in ca/es/en (`Lang
 
 ## Notes for the next session
 
+- Owner's requests of 2026-11-19 (later): sessions 45–48 added — pages built from sections (45), section types from modules (46), reusable blocks, zones, footer columns and home page models (47), contact form (48); visual references in `docs/design/`. Open (decide) before them: D-45-01, D-46-01 … D-46-03, D-47-01, D-48-01, D-48-02 (and D-44-02 before 44).
 - Session 39: the installer's pages load no JavaScript; when they load the Core's scripts (`core/install/progress.js`), call `initPasswordReveal()` (`core/forms/password-reveal.js`) or load `core/app.js`, so its three password fields get the show/hide button (D-38-04; `docs/frontend.md`, "Password fields"). New `settings` menu entries take `'parent' => 'group.<…>'` (`docs/menus.md`). Session 40: `AccountLink` already builds its URLs from the menu and the route `login`, not from `backend`.
 - Session 38: the public navbar already has the language switch (partial `language_switch`) next to the light/dark switch; put the sign-in link with them. Session 44: push subscription routes outside `backend/` (if any) go into `Config\LocaleUrls::$excluded` (public URLs carry the language, D-37-02).
 - Session 40: add the configured back-office path to `Config\LocaleUrls::$excluded`. Public links only through `site_url()` (it keeps the `/es/` prefix).

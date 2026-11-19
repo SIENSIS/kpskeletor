@@ -873,8 +873,36 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
   OpenSSL (D-44-01), endpoints only of known push services (D-44-02).
 - **Tables:** `push_subscriptions`, `push_queue`.
 - **Tests:** RFC 8291/8292 vectors, SSRF refusals, delivery through `OutboundClient`, e2e push.
-- **Depends on:** 43 (order only); D-44-02 **(decide)**. Merges itself into `main` (last planned
-  session).
+- **Depends on:** 43 (order only); D-44-02 **(decide)**.
+
+## 45 — Pages built from sections (`deploy/45-page-sections.md`)
+
+- **Goal:** a Core registry of section types (`$sectionTypes`), pages in `sections` mode with an
+  editor (forms, reorder, preview, revisions), full-width rendering and the first six types
+  (hero, quick links, cards, image and text, call to action, text). No shortcodes. References:
+  `docs/design/reference-home-sections.webp`, `docs/design/reference-home-current-site.webp`.
+- **Tables:** `page_sections`, `page_section_translations` (D-45-01).
+- **Depends on:** 44 (order only); D-45-01 **(decide)**.
+
+## 46 — Section types from modules (`deploy/46-module-sections.md`)
+
+- **Goal:** news list (latest or full with pagination), category banners, calendar and events
+  list, gallery, testimonials, logos, carousel and embeds (allowed hosts, CSP, click to load).
+- **Depends on:** 45; D-46-01 … D-46-03 **(decide)**.
+
+## 47 — Reusable blocks, theme zones, footer columns and home page models (`deploy/47-reusable-blocks.md`)
+
+- **Goal:** blocks edited once and shown in pages or theme zones (e.g. the funding notice), a footer
+  in columns from the footer menu, the "Institut" and "Moderna" home page models.
+- **Depends on:** 46; D-47-01 **(decide)**.
+
+## 48 — Contact module (`deploy/48-contact.md`)
+
+- **Goal:** a contact form (page and section) with stored messages, recipients chosen from a list,
+  layered anti-spam (honeypot, time trap, local captcha, rate limits, content rules), no relay, no
+  auto-reply, retention.
+- **Depends on:** 47 (the section type); D-48-01, D-48-02 **(decide)**. Merges itself into `main`
+  (last planned session).
 
 ---
 

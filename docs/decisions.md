@@ -298,6 +298,13 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 | D-44-01 | 44 | Web Push encryption and VAPID implemented in the Core with OpenSSL, no library (decide) | Decided |
 | D-44-02 | 44 | Web Push: channel name, tables, URLs, settings, keys and the endpoint allow-list (decide) | Decided |
+| D-45-01 | 45 | Pages from sections: section types (`$sectionTypes`), tables, page layout and editor URL (decide) | Open |
+| D-46-01 | 46 | Embedded content: allowed hosts in Settings › Security, CSP `frame-src`, click to load (decide) | Open |
+| D-46-02 | 46 | Carousel: no automatic rotation by default (decide) | Open |
+| D-46-03 | 46 | A page marked as the main news list: `/news` redirects to it (decide) | Open |
+| D-47-01 | 47 | Reusable blocks and theme zones: tables, the theme's `$zones`, URLs and permissions (decide) | Open |
+| D-48-01 | 48 | Contact module: names, URLs, settings and who reads the messages (decide) | Open |
+| D-48-02 | 48 | Contact form: captcha policy, no third-party captcha, retention of messages (decide) | Open |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -3025,4 +3032,60 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Make the channel list extensible (channels registered by modules, push in its own module): more general, a bigger change to the Core. B) Accept any HTTPS endpoint (works with unknown push services, but an SSRF risk).
 - **Status:** Decided
 - **Decision (2026-11-19):** «Proposta (recomanada)». As proposed: channel `push`, tables `push_subscriptions` and `push_queue`, personal routes under `backend/profile/push`, settings `Core.pushEnabled` (off) and `Core.pushContent`, VAPID keys in `.env`, endpoints only over HTTPS on the hosts of `Config\Push::$serviceHosts` and never private addresses. **Must change:** session 44 (`deploy/44-web-push.md` already describes this; no earlier code changes).
+
+## D-45-01 — Pages from sections: section types (`$sectionTypes`), tables, page layout and editor URL (decide)
+
+- **Where:** owner's requests of 2026-11-19 (pages with a banner, home pages like the references in `docs/design/`, no shortcodes because editors are not technical); `deploy/45-page-sections.md`; specification "Modules" › "Pages".
+- **Problem:** A page is one rich-text body inside a contained layout: no full-width banner, no structured blocks. Shortcodes typed into the text would be easy to break for non-technical editors.
+- **Proposal:** A Core registry of section types (`Modules\Core\Sections\SectionType`, keys `<module>.<name>`) declared by modules in a new manifest key `$sectionTypes`, each with a field schema validated on the server and a theme view. Pages get a layout field (`article` | `sections`); tables `page_sections` (page, position, type, options and non-translated values as JSON, hidden) and `page_section_translations` (section, locale, translated values as JSON); the editor at `backend/pages/<id>/sections` with the page's permissions (`pages-pages.edit` and its record rules); sections saved in the page's revisions. First types in the Pages module: `pages.hero`, `pages.links`, `pages.cards`, `pages.media_text`, `pages.cta`, `pages.text`. No shortcodes.
+- **Alternatives:** A) Shortcodes in the rich text with an editor button (flexible, fragile for non-technical editors). B) Only a page template "with banner" using the featured image (cheap, one banner per page).
+- **Status:** Open
+
+## D-46-01 — Embedded content: allowed hosts in Settings › Security, CSP `frame-src`, click to load (decide)
+
+- **Where:** `deploy/46-module-sections.md` (`pages.embed`, e.g. the school's 360° virtual tour, videos); the strict CSP (`docs/security.md`).
+- **Problem:** An iframe loads a third party's page inside ours: it needs a CSP `frame-src` exception and sends the visitor's IP and cookies to that third party.
+- **Proposal:** A setting in Settings › Security (proposal `Pages.embedHosts`, empty by default) lists the allowed hosts; only `https://` URLs on them are accepted; the CSP gets `frame-src` for exactly those origins through `ContentSecurity`; the iframe has a title, `loading="lazy"`, a minimal `sandbox` and `referrerpolicy`; **click to load** on by default (nothing is requested from the third party until the visitor clicks).
+- **Alternatives:** A) A fixed list in the code (YouTube no-cookie, Vimeo): simpler, but the virtual tour's host would need a code change. B) No click to load (the embed loads with the page).
+- **Status:** Open
+
+## D-46-02 — Carousel: no automatic rotation by default (decide)
+
+- **Where:** `deploy/46-module-sections.md` (`pages.carousel`, like the banner of the school's current site).
+- **Problem:** Automatic rotation fails WCAG 2.2.2 unless it can be paused, and moves content away from people who read slowly or use screen readers.
+- **Proposal:** No rotation by default; an option to rotate (minimum interval 6 s) that always shows a pause button, stops on hover and focus, and never rotates with `prefers-reduced-motion`.
+- **Alternatives:** A) Rotation on by default (with the same pause button). B) No rotation option at all.
+- **Status:** Open
+
+## D-46-03 — A page marked as the main news list: `/news` redirects to it (decide)
+
+- **Where:** `deploy/46-module-sections.md` (`news.list` in full-list mode); `docs/news.md`; the sitemap.
+- **Problem:** A page with the full news list (and its own banner) duplicates the module's `/news` page; links and search engines would see two lists.
+- **Proposal:** A News setting (proposal `News.listPage`, a page id, empty by default) marks a page as the main list: `/news` then answers a 301 redirect to it (with the language prefix), and the sitemap lists only that page. Category pages (`/news/category/<slug>`) keep working.
+- **Alternatives:** A) No redirect: both lists exist, the page sets a canonical link to itself. B) Remove the module's public list when a page shows it (breaks existing links).
+- **Status:** Open
+
+## D-47-01 — Reusable blocks and theme zones: tables, the theme's `$zones`, URLs and permissions (decide)
+
+- **Where:** `deploy/47-reusable-blocks.md` (the funding notice shown on every page, partner logos); `docs/themes.md`.
+- **Problem:** Some content must appear on many or all pages and be edited once.
+- **Proposal:** Table `page_blocks` (name, status) and the section tables reused with an owner type (page or block); a section type `pages.block`; themes declare zones in a new `Theme.php` key `$zones` (default theme: `public.after_header`, `public.before_footer`); assignments (block, zone, visibility rule: all / home / selected pages / all except selected, order) in a table `page_block_zones`; screen `backend/pages/blocks` with a new resource `pages-blocks` (list, add, edit, delete; default grant like `pages-pages`); deleting a block in use asks for confirmation and removes its uses.
+- **Alternatives:** A) Blocks only as theme options (one fixed text area per zone, no sections). B) Reuse pages as blocks (a hidden page type).
+- **Status:** Open
+
+## D-48-01 — Contact module: names, URLs, settings and who reads the messages (decide)
+
+- **Where:** `deploy/48-contact.md`.
+- **Problem:** A new module adds public names and decides who may read visitors' messages (personal data).
+- **Proposal:** Module `Contact`; resources `contact-messages` (list, show, delete, extras `answer`, `archive`) and `contact-recipients` (crud); public page `contact` (with the language prefix; the path translated per language if `LocaleUrls` allows it), section type `contact.form`; settings `Contact.privacyPage`, `Contact.maxLinks` (2), `Contact.blockedWords`, `Contact.rateLimit` (3 per hour per IP and per email); default grants: admin all, and each recipient's users read only the messages addressed to them (record rule).
+- **Alternatives:** A) Messages only by email, nothing stored (no back office, harder to audit, mail delivery problems lose messages).
+- **Status:** Open
+
+## D-48-02 — Contact form: captcha policy, no third-party captcha, retention of messages (decide)
+
+- **Where:** `deploy/48-contact.md`; `CLAUDE.md` (no outbound HTTP on regular requests).
+- **Problem:** Public forms attract spam; third-party captchas (reCAPTCHA, hCaptcha, Turnstile) work well but share visitors' data and need a server call during the request; messages are personal data that should not be kept forever.
+- **Proposal:** Honeypot, signed time trap, rate limits and content rules always; the Auth module's local captcha **always** (simplest and predictable; a setting can switch to "only after N messages from the same IP or email"); no third-party captcha; messages deleted after **365 days** (setting, minimum 30) by a scheduled task.
+- **Alternatives:** A) Captcha only when suspicious (fewer obstacles for visitors, a little more spam). B) A third-party captcha as an option (a documented exception to the outbound rule). C) A shorter retention (e.g. 90 days).
+- **Status:** Open
 
