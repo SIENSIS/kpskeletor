@@ -35,7 +35,7 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['route' => 'updates', 'permission' => 'updates.view', 'label' => 'Updates.menu.updates', 'icon' => 'bi bi-cloud-arrow-down', 'order' => 87, 'zone' => 'settings'],
+        ['route' => 'updates', 'permission' => 'updates.view', 'label' => 'Updates.menu.updates', 'icon' => 'bi bi-cloud-arrow-down', 'order' => 87, 'zone' => 'settings', 'parent' => 'group.system'],
     ];
 
     public array $widgets = [\Modules\Updates\Widgets\SystemVersion::class];

@@ -19,8 +19,8 @@ $names   = Locales::names();
 $current = service('request')->getLocale();
 ?>
 <div class="dropdown language-switch <?= esc($switchClass ?? '') ?>">
-    <button class="btn btn-link nav-link text-body px-2 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<?= esc(lang('Core.languageSwitch.current', [$names[$current] ?? $current])) ?>" title="<?= esc(lang('Core.languageSwitch.label')) ?>">
-        <i class="bi bi-translate" aria-hidden="true"></i><span class="small text-uppercase"><?= esc($current) ?></span>
+    <button class="btn btn-link nav-link text-body px-2 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="<?= esc(lang('Core.languageSwitch.label')) ?>">
+        <i class="bi bi-translate" aria-hidden="true"></i><span class="small text-uppercase"><?= esc($current) ?></span><span class="visually-hidden"> — <?= esc(lang('Core.languageSwitch.current', [$names[$current] ?? $current])) ?></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
         <?php foreach ($links as $locale => $href): ?>

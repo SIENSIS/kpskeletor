@@ -26,6 +26,8 @@ return [
         'group'             => 'té un nom de grup no vàlid "{0}"',
         'permission'        => 'concedeix "{0}", que no és un permís d’aquest mòdul',
         'unknownResource'   => 'fa referència a un recurs desconegut "{0}"',
+        'menuGroup'         => 'ha de ser una clau de grup com ara "group.system" (s\'ha rebut "{0}")',
+        'menuGroupLink'     => 'no es permet en una entrada de grup ("{0}")',
         'settingKey'        => 'té un nom de paràmetre no vàlid "{0}" (camelCase)',
         'path'              => 'té un camí no vàlid "{0}"',
         'color'             => 'ha de ser un color hexadecimal (p. ex. "#dc3545")',
@@ -196,12 +198,22 @@ return [
     'user' => [
         'logout' => 'Tanca la sessió',
     ],
+    'account' => [
+        'signIn'     => 'Entra',
+        'backOffice' => 'Administració',
+        'myAccount'  => 'El meu compte',
+    ],
     'menu' => [
         'modules' => 'Mòduls',
         'settings' => 'Configuració',
         'toggle' => 'Mostra o amaga les entrades de {0}',
         'notifications' => 'Notificacions',
         'schedule' => 'Tasques programades',
+        'groupAccess' => 'Usuaris i accés',
+        'groupSecurity' => 'Seguretat',
+        'groupApi' => 'API',
+        'groupCustomisation' => 'Personalització',
+        'groupSystem' => 'Sistema',
     ],
     'ui' => [
         'backOffice'      => 'Administració',
@@ -381,6 +393,10 @@ return [
         'auto'  => 'Automàtic (sistema)',
     ],
     'js' => [
+        'password' => [
+            'show' => 'Mostra la contrasenya',
+            'hide' => 'Amaga la contrasenya',
+        ],
         'ui'      => ['close' => 'Tanca'],
         'confirm' => [
             'title'  => 'Confirma-ho',

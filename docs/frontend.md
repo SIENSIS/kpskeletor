@@ -135,6 +135,29 @@ variables (`events::css/calendar.css`). Each event's text colour (`contrastColor
 black or white) is computed from its colour for WCAG AA contrast
 (`EventRepository::textColor()`). See `docs/events.md`.
 
+### Password fields
+
+Every `<input type="password">` on a page that loads the Core's JavaScript gets a show/hide
+button automatically (`core/forms/password-reveal.js`, started by `core/app.js`): module views,
+the forms kpcrudy renders (Users › new user…) and fields added later (a `MutationObserver`). A
+module writes a plain password input and does nothing else.
+
+- **Markup:** the input (or its `.form-floating` wrapper) goes into a Bootstrap `.input-group`
+  (an existing one is reused) followed by a `type="button"` toggle (`bi-eye` / `bi-eye-slash`,
+  `aria-hidden`) with `aria-controls`, `aria-pressed` and an accessible name that changes
+  ("Mostra la contrasenya" / "Amaga la contrasenya": `Core.js.password.*`, ca/es/en). Validation
+  messages (`.invalid-feedback`) that followed the input move into the group
+  (`.has-validation`), so `is-invalid` errors keep showing; help texts, `required`, autofocus
+  and `data-dirty-guard` are unchanged.
+- **Behaviour:** hidden by default; clicking keeps the focus in the field; Tab + Space/Enter work;
+  the field goes back to `type="password"` when its form is submitted (capture phase, before
+  other handlers) and on `pagehide`, so the browser never stores or restores it as plain text.
+  Without JavaScript nothing changes; nothing changes on the server.
+- **Opt out:** `data-no-reveal` on the input (e.g. a field that must never be shown, such as a
+  confirmation typed blind on purpose).
+- The web installer's pages load no JavaScript yet (assets are published during installation):
+  their password fields get the button when the installer loads the Core's scripts (session 39).
+
 ## Vendored libraries
 
 Third-party front-end libraries are **committed** under `public/assets/vendor/<lib>/` (no CDN, no

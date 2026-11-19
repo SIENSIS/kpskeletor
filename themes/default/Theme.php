@@ -107,6 +107,14 @@ final class Theme extends ThemeManifest
             'default' => true,
             'label'   => 'ThemeDefault.options.languageSwitch',
         ],
+        // The account link at the end of the public navbar (partial account_link, Core
+        // `AccountLink`): sign in, back office or my account (docs/themes.md, "Account link").
+        'showAccountLink' => [
+            'type'    => 'bool',
+            'default' => true,
+            'label'   => 'ThemeDefault.options.showAccountLink',
+            'help'    => 'ThemeDefault.options.showAccountLinkHelp',
+        ],
         'sidebarColor' => [
             'type'    => 'color',
             'default' => '#1e293b',

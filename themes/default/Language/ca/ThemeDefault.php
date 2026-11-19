@@ -28,6 +28,8 @@ return [
         'forceModeNone'        => 'No forcis (trien els visitants)',
         'modeSwitch'           => 'Mostra el selector clar/fosc',
         'languageSwitch'       => 'Mostra el selector d\'idioma a la web pública',
+        'showAccountLink'      => 'Mostra l\'enllaç d\'accés a la web pública',
+        'showAccountLinkHelp'  => '«Entra» per als visitants, «Administració» per als usuaris que poden obrir l\'administració i «El meu compte» per a la resta.',
         'sidebarColor' => 'Color de la barra lateral del back office',
         'font'         => 'Tipus de lletra',
         'fontSystem'   => 'Del sistema (sense serif)',

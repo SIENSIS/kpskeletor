@@ -303,13 +303,15 @@ final class Module extends ModuleManifest
      * Back-office menu entries. With 'resource', the route (named after the resource) and the
      * permission (".list", or ".view" for pages) come from the resource. Other entries give
      * 'route' and 'permission'. 'zone' places the entry (sidebar by default, settings, user
-     * menu...); 'parent' nests it.
+     * menu...); 'parent' nests it. 'group' declares a heading without a route (the Core's
+     * groups of the settings zone: group.access, group.security, group.api,
+     * group.customisation, group.system).
      */
     public array $menu = [
         ['resource' => 'posts',      'label' => 'News.menu.news', 'icon' => 'bi bi-newspaper', 'order' => 20],
         ['resource' => 'categories', 'label' => 'News.menu.categories', 'parent' => 'posts'],
         ['resource' => 'stats',      'label' => 'News.menu.stats',      'parent' => 'posts'],
-        ['route' => 'settings.news', 'label' => 'News.menu.settings', 'zone' => 'settings', 'permission' => 'settings.news'], // generated, see "Configuration and settings"
+        ['route' => 'settings.news', 'label' => 'News.menu.settings', 'zone' => 'settings', 'parent' => 'group.system', 'permission' => 'settings.news'], // generated, see "Configuration and settings"
     ];
 
     /** Link types the module offers to the public menu editor (e.g. "a news category") */
@@ -732,6 +734,12 @@ granularity instead of collapsing it into read/create/update/delete.
     `news-posts`) and the permission (`.list`, or `.view` for pages) from it.
   * Filter by permission and sort by `order`. A parent without visible children and without a
     permission of its own is hidden.
+  * The **settings zone is grouped**: the Core declares five group entries (`'group' => '<key>'`,
+    no route or permission, shown only while a child is visible) and modules put their settings
+    entries in one of them with `parent`: `group.access` (users, groups, permissions),
+    `group.security` (security settings, security status, activity log), `group.api` (tokens,
+    documentation), `group.customisation` (modules, back-office menu, dashboard widgets) and
+    `group.system` (general settings, backups, updates, scheduled tasks).
   * Mark the active entry from the current route name; breadcrumbs come from the same tree.
   * Cache per group set; invalidate on sync, on module enable/disable and on grant changes.
 * **Customisation of the back-office menu** (edited in the `Menus` module, stored apart, never

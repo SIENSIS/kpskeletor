@@ -51,7 +51,7 @@ final class Module extends ModuleManifest
 
     public array $menu = [
         ['resource' => 'public', 'label' => 'Menus.menu.public', 'icon' => 'bi bi-menu-button-wide', 'order' => 28],
-        ['resource' => 'backend', 'label' => 'Menus.menu.backend', 'icon' => 'bi bi-layout-sidebar', 'order' => 74, 'zone' => 'settings'],
+        ['resource' => 'backend', 'label' => 'Menus.menu.backend', 'icon' => 'bi bi-layout-sidebar', 'order' => 74, 'zone' => 'settings', 'parent' => 'group.customisation'],
     ];
 
     /** Menus, items and customisations are database rows: backed up with the database. */

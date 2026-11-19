@@ -26,6 +26,8 @@ return [
         'group'             => 'has an invalid group name "{0}"',
         'permission'        => 'grants "{0}", which is not a permission of this module',
         'unknownResource'   => 'refers to an unknown resource "{0}"',
+        'menuGroup'         => 'must be a group key such as "group.system" (got "{0}")',
+        'menuGroupLink'     => 'is not allowed in a group entry ("{0}")',
         'settingKey'        => 'has an invalid setting name "{0}" (camelCase)',
         'path'              => 'has an invalid path "{0}"',
         'color'             => 'must be a hex colour (e.g. "#dc3545")',
@@ -196,12 +198,22 @@ return [
     'user' => [
         'logout' => 'Log out',
     ],
+    'account' => [
+        'signIn'     => 'Sign in',
+        'backOffice' => 'Administration',
+        'myAccount'  => 'My account',
+    ],
     'menu' => [
         'modules' => 'Modules',
         'settings' => 'Settings',
         'toggle' => 'Show or hide the entries of {0}',
         'notifications' => 'Notifications',
         'schedule' => 'Scheduled tasks',
+        'groupAccess' => 'Users and access',
+        'groupSecurity' => 'Security',
+        'groupApi' => 'API',
+        'groupCustomisation' => 'Customisation',
+        'groupSystem' => 'System',
     ],
     'ui' => [
         'backOffice'      => 'Back office',
@@ -381,6 +393,10 @@ return [
         'auto'  => 'Automatic (system)',
     ],
     'js' => [
+        'password' => [
+            'show' => 'Show the password',
+            'hide' => 'Hide the password',
+        ],
         'ui'      => ['close' => 'Close'],
         'confirm' => [
             'title'  => 'Please confirm',

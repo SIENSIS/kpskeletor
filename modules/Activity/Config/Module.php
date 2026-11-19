@@ -50,7 +50,7 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['resource' => 'log', 'label' => 'Activity.menu.log', 'icon' => 'bi bi-activity', 'order' => 84, 'zone' => 'settings'],
+        ['resource' => 'log', 'label' => 'Activity.menu.log', 'icon' => 'bi bi-activity', 'order' => 85, 'zone' => 'settings', 'parent' => 'group.security'],
         ['resource' => 'mine', 'label' => 'Activity.menu.mine', 'icon' => 'bi bi-clock-history', 'order' => 18, 'zone' => 'user'],
     ];
 }

@@ -58,7 +58,16 @@ final class PwaTest extends CIUnitTestCase
 
             public function get(string $key, ?string $context = null): mixed
             {
-                return array_key_exists($key, $this->values) ? $this->values[$key] : null;
+                if (array_key_exists($key, $this->values)) {
+                    return $this->values[$key];
+                }
+
+                // Shield's settings come from its config file, like the real service without a
+                // stored value (`Auth.sessionConfig` is read by `auth()` in the public layout).
+                $property = str_starts_with($key, 'Auth.') ? substr($key, 5) : '';
+                $auth     = config(\Config\Auth::class);
+
+                return $property !== '' && property_exists($auth, $property) ? $auth->{$property} : null;
             }
         };
         Services::injectMock('settings', $settings);

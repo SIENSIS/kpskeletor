@@ -149,7 +149,7 @@ final class WidgetOptions
             foreach ($this->registry->menuEntries() as $key => $declaration) {
                 $label = $declaration['definition']['label'] ?? null;
 
-                if (is_string($label) && isset($declaration['definition']['route'])) {
+                if (is_string($label) && ($declaration['definition']['route'] ?? '') !== '') { // group headings have no link
                     $choices[(string) $key] = lang($label) . ' (' . $declaration['module'] . ')';
                 }
             }

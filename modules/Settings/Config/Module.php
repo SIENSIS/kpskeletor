@@ -46,7 +46,7 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['route' => 'settings', 'permission' => 'settings.update', 'label' => 'Settings.menu.settings', 'icon' => 'bi bi-gear', 'order' => 70, 'zone' => 'settings'],
-        ['route' => 'settings-security', 'permission' => 'settings.security', 'label' => 'Settings.menu.security', 'icon' => 'bi bi-shield-lock', 'order' => 71, 'zone' => 'settings'],
+        ['route' => 'settings', 'permission' => 'settings.update', 'label' => 'Settings.menu.settings', 'icon' => 'bi bi-gear', 'order' => 70, 'zone' => 'settings', 'parent' => 'group.system'],
+        ['route' => 'settings-security', 'permission' => 'settings.security', 'label' => 'Settings.menu.security', 'icon' => 'bi bi-shield-lock', 'order' => 71, 'zone' => 'settings', 'parent' => 'group.security'],
     ];
 }

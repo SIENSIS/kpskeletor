@@ -79,10 +79,17 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['resource' => 'modules', 'label' => 'Core.menu.modules', 'icon' => 'bi bi-boxes', 'order' => 80, 'zone' => 'settings'],
+        // The groups of the settings zone (D-38-01, docs/menus.md): headings without a route,
+        // shown only while one of their children is visible. Modules use them as `parent`.
+        ['group' => 'group.access', 'label' => 'Core.menu.groupAccess', 'icon' => 'bi bi-person-lock', 'order' => 60, 'zone' => 'settings'],
+        ['group' => 'group.security', 'label' => 'Core.menu.groupSecurity', 'icon' => 'bi bi-shield-lock', 'order' => 65, 'zone' => 'settings'],
+        ['group' => 'group.api', 'label' => 'Core.menu.groupApi', 'icon' => 'bi bi-plug', 'order' => 70, 'zone' => 'settings'],
+        ['group' => 'group.customisation', 'label' => 'Core.menu.groupCustomisation', 'icon' => 'bi bi-sliders', 'order' => 75, 'zone' => 'settings'],
+        ['group' => 'group.system', 'label' => 'Core.menu.groupSystem', 'icon' => 'bi bi-hdd-stack', 'order' => 80, 'zone' => 'settings'],
+        ['resource' => 'modules', 'label' => 'Core.menu.modules', 'icon' => 'bi bi-boxes', 'order' => 80, 'zone' => 'settings', 'parent' => 'group.customisation'],
         ['resource' => 'notifications', 'label' => 'Core.menu.notifications', 'icon' => 'bi bi-bell', 'order' => 15, 'zone' => 'user'],
-        ['route' => 'security-status', 'permission' => 'security.check', 'label' => 'SecurityCheck.menu', 'icon' => 'bi bi-shield-check', 'order' => 84, 'zone' => 'settings'],
-        ['resource' => 'schedule', 'label' => 'Core.menu.schedule', 'icon' => 'bi bi-clock-history', 'order' => 85, 'zone' => 'settings'],
+        ['route' => 'security-status', 'permission' => 'security.check', 'label' => 'SecurityCheck.menu', 'icon' => 'bi bi-shield-check', 'order' => 84, 'zone' => 'settings', 'parent' => 'group.security'],
+        ['resource' => 'schedule', 'label' => 'Core.menu.schedule', 'icon' => 'bi bi-clock-history', 'order' => 85, 'zone' => 'settings', 'parent' => 'group.system'],
     ];
 
     /** @var list<string> */

@@ -26,6 +26,8 @@ return [
         'group'             => 'tiene un nombre de grupo no válido "{0}"',
         'permission'        => 'concede "{0}", que no es un permiso de este módulo',
         'unknownResource'   => 'hace referencia a un recurso desconocido "{0}"',
+        'menuGroup'         => 'debe ser una clave de grupo como "group.system" (se ha recibido "{0}")',
+        'menuGroupLink'     => 'no se permite en una entrada de grupo ("{0}")',
         'settingKey'        => 'tiene un nombre de parámetro no válido "{0}" (camelCase)',
         'path'              => 'tiene una ruta no válida "{0}"',
         'color'             => 'debe ser un color hexadecimal (p. ej. "#dc3545")',
@@ -196,12 +198,22 @@ return [
     'user' => [
         'logout' => 'Cerrar sesión',
     ],
+    'account' => [
+        'signIn'     => 'Entrar',
+        'backOffice' => 'Administración',
+        'myAccount'  => 'Mi cuenta',
+    ],
     'menu' => [
         'modules' => 'Módulos',
         'settings' => 'Configuración',
         'toggle' => 'Muestra u oculta las entradas de {0}',
         'notifications' => 'Notificaciones',
         'schedule' => 'Tareas programadas',
+        'groupAccess' => 'Usuarios y acceso',
+        'groupSecurity' => 'Seguridad',
+        'groupApi' => 'API',
+        'groupCustomisation' => 'Personalización',
+        'groupSystem' => 'Sistema',
     ],
     'ui' => [
         'backOffice'      => 'Administración',
@@ -381,6 +393,10 @@ return [
         'auto'  => 'Automático (sistema)',
     ],
     'js' => [
+        'password' => [
+            'show' => 'Mostrar la contraseña',
+            'hide' => 'Ocultar la contraseña',
+        ],
         'ui'      => ['close' => 'Cerrar'],
         'confirm' => [
             'title'  => 'Confírmalo',

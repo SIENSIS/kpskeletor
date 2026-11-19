@@ -179,7 +179,24 @@ an empty value keeps the light one. For `--bs-primary` the layouts also print
 Default theme options: `logo`, `logoDark` (logo for dark backgrounds), `primaryColor`,
 `primaryColorDark`, `defaultMode` (auto, light, dark), `forceMode` (empty, light, dark: forces a
 mode and hides the switch), `modeSwitch` (show the light/dark switch), `languageSwitch` (show the public language switch, `docs/i18n.md`), `sidebarColor`, `font`
-(system, serif, mono), `footerText`, `cookieNotice`.
+(system, serif, mono), `footerText`, `cookieNotice`, `showAccountLink` (the account link of the
+public navbar, below).
+
+### Account link
+
+The default theme's public navbar ends with an account link (partial `partials/account_link`,
+option `showAccountLink`, on by default; at phone width it is inside the collapsed menu):
+
+| Visitor | Link | Goes to |
+|---|---|---|
+| guest | **Entra** (Sign in) | the route `login` |
+| signed in, can open the back office | **Administració** (Administration) | the first entry of their back-office menu (`sidebar`, then `settings`: the dashboard in the skeleton) |
+| signed in, no back-office screen | **El meu compte** (My account) | the first entry of their `user` menu (the profile) |
+
+`Modules\Core\Frontend\AccountLink::for($user)` decides it from route names and the generated
+back-office menu (already filtered by permission), never from the `backend` string, so another
+theme can reuse it: `(new AccountLink())->for(auth()->user())` returns `kind`, `label`, `url` and
+`icon`, or null. Child themes (`tasks-demo`) inherit the partial and the option.
 
 ## Light and dark mode
 

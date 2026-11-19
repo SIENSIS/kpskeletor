@@ -4,6 +4,7 @@
  */
 import { mountAll, observe } from 'core/components.js';
 import { initDirtyGuards } from 'core/forms/dirty-guard.js';
+import { initPasswordReveal } from 'core/forms/password-reveal.js';
 import { initPwa } from 'core/pwa.js';
 import { bindConfirmations, bindKpcrudyConfirmations } from 'core/ui/confirm.js';
 import { initCookieNotice } from 'core/ui/cookie-notice.js';
@@ -18,6 +19,7 @@ const steps = [
     () => initTabsMemory(document),
     () => initCookieNotice(document),
     () => initDirtyGuards(document),
+    () => initPasswordReveal(document),
     () => bindConfirmations(document),
     () => bindKpcrudyConfirmations(document),
     () => mountAll(document),
