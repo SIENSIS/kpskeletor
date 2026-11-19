@@ -158,6 +158,7 @@ s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou
 | 49 | `49-icon-picker.md` | Selector d'icones als camps d'icona i botó «Insereix una icona» a l'editor (D-49-01 i D-49-02 decidides) | |
 | 50 | `50-site-search.md` | Cercador del web: índex de cerca al Core alimentat pels mòduls (pàgines i notícies) (D-50-01 decidida) | |
 | 51 | `51-chat-assistant.md` | Assistent de xat sense serveis externs: preguntes freqüents i cerca del web en una bombolla (D-51-01 i D-51-02 decidides) | |
+| 52 | `52-tutorial-module.md` | Canvi de nom del mòdul tutorial: de `Tasks` a `Tutorial` (D-52-01 decidida) | |
 
 Fitxers auxiliars: `next.md` (executa la sessió següent), `decide.md` (et pregunta els dubtes
 oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió inacabada) i

@@ -938,6 +938,18 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Tests:** matching per language, visibility, endpoint security (CSRF, rate limit, input),
   e2e of the bubble (keyboard, phone, dark, axe).
 - **Depends on:** 50 (the index) and 48 (the contact form); D-51-01, D-51-02 decided.
+
+## 52 — Rename the Tasks tutorial module to Tutorial (`deploy/52-tutorial-module.md`)
+
+- **Goal:** the tutorial module of session 32 becomes `Tutorial` (namespace, permissions
+  `tutorial-*`, URLs `backend/tutorial/…`, `tutorial`, `api/v1/tutorial/…`, settings, assets,
+  calendars, widgets, tasks, tables `tutorial_*`), so the name `Tasks` stays free and is not
+  confused with the Core's scheduled tasks; tutorials and docs updated; a documented and
+  reported upgrade step for installations that enabled it. Owner's request of 2026-11-19.
+- **Tables:** the module's six tables, recreated with the `tutorial_` prefix (new module).
+- **Tests:** the module's suite under the new names, no `tasks-*` permission left, the
+  renamed-module hint of `modules:sync`, tutorials check, e2e.
+- **Depends on:** 51 (order only, last in the queue); D-52-01 decided.
   Merges itself into `main` (last planned session).
 
 ---

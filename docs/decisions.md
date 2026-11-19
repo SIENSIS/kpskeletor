@@ -312,6 +312,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-50-01 | 50 | Site search: contract, tables, URLs and settings (decide) | Decided |
 | D-51-01 | 51 | Chat assistant: module name, resources, URLs and settings (decide) | Decided |
 | D-51-02 | 51 | Chat assistant: what is stored (unanswered questions) and for how long (decide) | Decided |
+| D-52-01 | 52 | The tutorial module is renamed from `Tasks` to `Tutorial` (decide) | Decided |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -3172,3 +3173,12 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Never store questions. B) Store whole conversations (more useful, much more personal data).
 - **Status:** Decided
 - **Decision (2026-11-19):** «Proposta (recomanada)». As proposed: nothing stored by default; `Assistant.logUnanswered` (off) keeps only anonymised unanswered questions, deleted after 90 days (minimum 7). **Must change:** session 51 (as written), specification "Assistant" (updated).
+
+## D-52-01 — The tutorial module is renamed from `Tasks` to `Tutorial` (decide)
+
+- **Where:** owner's request of 2026-11-19 (after session 39); `deploy/52-tutorial-module.md`; session 32 (D-00-31, the tutorial module).
+- **Problem:** The tutorial module is called `Tasks`: it can be confused with the Core's scheduled tasks (`Tasks/` folders, `TaskInterface`, `schedule:run`; the module even has `modules/Tasks/Tasks/`) and it takes the name, permissions (`tasks-*`), URLs (`backend/tasks/…`, `api/v1/tasks/…`) and tables (`tasks`, `task_*`) a real tasks module may need later. Renaming changes public conventions (module name, permissions, URLs, settings).
+- **Proposal:** Module `Tutorial` (namespace `Modules\Tutorial`, disabled by default, version 1.0.0), visible name "Mòdul tutorial" / "Módulo tutorial" / "Tutorial module"; the example inside stays a to-do list: resources `tasks`, `projects`, `board`, `requests` → permissions `tutorial-tasks.*`, `tutorial-projects.*`, `tutorial-board.*`, `tutorial-requests.*`; URLs `backend/tutorial/…`, public `tutorial` and `tutorial/request`, API `api/v1/tutorial/…`; settings `Tutorial.*`; assets `tutorial/…`; calendars, widgets, notifications and scheduled tasks `tutorial.*`; tables `tutorial_*` (new migrations of the new module; the old released ones leave with the old module). Installations that enabled it run `php spark modules:uninstall Tasks` before updating (release notes, `docs/updates.md`, and a hint from `modules:sync` for the missing module); its data is not migrated. Last in the queue (session 52).
+- **Alternatives:** A) `TutorialTasks` (longer; keeps "tasks" in the name). B) `Demo` (clashes with the demo data commands and seeders). C) Keep `Tasks` and rename later if a real module is needed (more installations to migrate by then).
+- **Status:** Decided
+- **Decision (2026-11-19):** The owner chose the name `Tutorial` and to put the session at the end of the queue. **Must change:** session 52 (as written); the specification's tutorial module section and every mention (updated by session 52).
