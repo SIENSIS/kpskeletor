@@ -804,7 +804,7 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 
 Sessions added after 1.0.0 from the owner's review (points 1, 5, 6 and 7; point 2, Synology
 Calendar, is postponed; point 3, page update dates, waits for the owner's steps to reproduce it;
-point 4, automatic translation, is being discussed). They follow the same procedure as 00–36.
+point 4, automatic translation, is postponed: Google Cloud Translation with an in-app monthly character limit was proposed). They follow the same procedure as 00–36.
 
 ## 37 — Content languages from the site's locales (`deploy/37-content-locales.md`)
 
