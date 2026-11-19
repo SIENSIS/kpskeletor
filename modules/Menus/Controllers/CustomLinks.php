@@ -216,7 +216,7 @@ final class CustomLinks extends BackendController
         }
 
         if (($labels[ContentTranslations::defaultLocale()] ?? '') === '') {
-            $errors[] = lang('Menus.errors.labelRequired', [ContentTranslations::locales()[ContentTranslations::defaultLocale()] ?? ContentTranslations::defaultLocale()]);
+            $errors[] = lang('Menus.errors.labelRequired', [ContentTranslations::defaultName()]);
         }
 
         $icon = $post('icon');

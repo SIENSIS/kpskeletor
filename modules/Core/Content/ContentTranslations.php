@@ -52,9 +52,12 @@ final class ContentTranslations
         return Locales::default();
     }
 
-    public static function isRequired(string $locale): bool
+    /**
+     * The name of the default language in its own language (`Català`), for messages and help texts.
+     */
+    public static function defaultName(): string
     {
-        return $locale === self::defaultLocale();
+        return Locales::name(self::defaultLocale());
     }
 
     /**

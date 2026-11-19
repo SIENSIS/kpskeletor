@@ -94,7 +94,7 @@ return [
         'visibility'  => 'Les tasques públiques surten a la pàgina pública (i qualsevol en pot baixar els adjunts).',
         'attachments' => 'Fins a 5 fitxers (PDF, text, imatges, documents d’oficina). Fitxers privats: només els baixa qui pot veure la tasca.',
         'estimate'    => 'Hores de feina previstes. Només visible amb el permís d’estimacions.',
-        'slug'        => 'Part de l’adreça pública tasks/project/…; es genera a partir del nom en català si és buida.',
+        'slug'        => 'Part de l’adreça pública tasks/project/…; es genera a partir del nom en {0} si és buida.',
         'endsOn'      => 'Surt al calendari «Dates límit dels projectes».',
     ],
     'complete'        => 'Completar',

@@ -40,7 +40,7 @@ final class Categories extends BackendController
             ])
             ->setDefault('active', 1)
             ->setDefault('position', 0)
-            ->setHelp('slug', lang('News.help.categorySlug'))
+            ->setHelp('slug', lang('News.help.categorySlug', [ContentTranslations::defaultName()]))
             ->displayAs([
                 'name'        => lang('News.fields.name'),
                 'description' => lang('News.fields.description'),

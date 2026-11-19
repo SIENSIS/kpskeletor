@@ -44,7 +44,7 @@ final class Projects extends BackendController
             ])
             ->setDefault('color', '#0d6efd')
             ->setDefault('active', 1)
-            ->setHelp('slug', lang('Tasks.help.slug'))
+            ->setHelp('slug', lang('Tasks.help.slug', [ContentTranslations::defaultName()]))
             ->setHelp('ends_on', lang('Tasks.help.endsOn'))
             ->displayAs([
                 'name'        => lang('Tasks.fields.name'),

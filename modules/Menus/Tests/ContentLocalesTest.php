@@ -49,6 +49,7 @@ final class ContentLocalesTest extends MenusTestCase
 
         $this->send('POST', 'backend/menus/items/' . $menu . '/save', $form + ['labels' => ['ca' => 'Inici', 'es' => '', 'en' => '', 'fr' => '']]);
         $this->assertSame(0, db_connect()->table('menu_items')->countAllResults(), 'Without Spanish: refused.');
+        $this->assertStringContainsString(lang('Menus.errors.labelRequired', ['Español']), (string) ($_SESSION['error'] ?? ''), 'The message names the default language.');
 
         $this->send('POST', 'backend/menus/items/' . $menu . '/save', $form + ['labels' => ['ca' => '', 'es' => 'Inicio', 'en' => '', 'fr' => 'Accueil']])->assertRedirect();
         $this->assertSame(['es' => 'Inicio', 'fr' => 'Accueil'], array_column(db_connect()->table('menu_item_translations')->orderBy('locale')->get()->getResultArray(), 'label', 'locale'));

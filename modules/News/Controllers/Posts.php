@@ -148,7 +148,7 @@ final class Posts extends BackendController
             ->setDefault('priority', 'info')
             ->setDefault('visibility', 'private')
             ->setDefault('author_id', $me)
-            ->setHelp('slug', lang('News.help.slug'))
+            ->setHelp('slug', lang('News.help.slug', [ContentTranslations::defaultName()]))
             ->setHelp('visibility', lang('News.help.visibility'))
             ->setHelp('groups', lang('News.help.groups'))
             ->setHelp('priority', lang('News.help.priority'))

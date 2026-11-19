@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
-- `ContentTranslations::locales()`, `codes()`, `defaultLocale()`, `crudOptions()`, `apiOptions()`,
+- `ContentTranslations::locales()`, `codes()`, `defaultLocale()`, `defaultName()`, `crudOptions()`, `apiOptions()`,
   `defaultText()` and `keepUnavailable()`: the content languages of a module come from the site's
   locales (`docs/i18n.md`, "Content languages"); `CalendarEvent::translated()` for per-language
   calendar titles; `Modules\Core\Tests\ContentLocalesTrait` for module tests with another
@@ -33,6 +33,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
   text, and kpapy's translated fields fall back to the site's default language.
 - The calendar titles of birthdays and to-do task due dates are written in every site language;
   FullCalendar loads its locale file for any vendored language.
+- Help texts and messages that named Catalan (slug help of News posts, News categories and Tasks
+  projects; the required label of Menus) name the site's default language.
 
 ## [1.0.0] - 2026-11-18
 
