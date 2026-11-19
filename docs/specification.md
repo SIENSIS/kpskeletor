@@ -1803,6 +1803,14 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   `INSTALL_DB_PASSWORD` / `INSTALL_ADMIN_PASSWORD`, D-18-03); demo data follows the installed
   environment and loads the modules it requires first (D-18-04); 2FA is offered through the
   `install.superadmin` event (D-18-05); `.env` and the lock file are written last (D-18-08).
+* **Back-office path:** the back office lives under a configurable prefix, `app.backendPath` in
+  `.env` (default `backend`; every `backend/…` in this specification means "under that prefix").
+  It is chosen at install time (`app:install --backend-path=<slug>`, a field of the web
+  installer): lowercase letters, digits and hyphens, 2–30 characters, one segment, never a reserved
+  top-level path or a page slug. It is read from configuration, never from the database, and is
+  not editable from the back office. `php spark app:backend-path <new>` changes it later
+  (validation, maintenance mode, `.env`, stored links, caches, security log). Stored internal links
+  are relative to the back office; old `backend/…` links keep working.
 * **Commands** (all documented in `docs/commands.md`):
   * modules and themes: `modules:sync|list|status|enable|disable|install|uninstall|demo`,
     `themes:install|uninstall`, `make:module`, `make:theme`, `assets:publish [--watch]`;
@@ -1812,7 +1820,7 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
     `app:update`;
   * calendar and API: `calendar:resync <module>`, `kpapy:openapi`, `kpapy:routes`,
     `kpapy:token`;
-  * application: `app:install`, `about` (Core) and `app:cache-clear` (Core caches plus
+  * application: `app:install`, `app:backend-path`, `about` (Core) and `app:cache-clear` (Core caches plus
     CodeIgniter's cache; CodeIgniter's own `cache:clear` cannot be replaced, so modules listen to
     a `cache.cleared` event).
 

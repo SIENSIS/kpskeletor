@@ -837,7 +837,7 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Goal:** the `backend` prefix becomes `app.backendPath`, chosen at install time (D-40-01).
 - **Files:** every route file, filters, Shield redirects, helpers, installer, stored links, docs.
 - **Tests:** the suite with the default; a case with `admin`; installer validation; e2e.
-- **Depends on:** 39 (installer field) and D-40-01 **(decide)**.
+- **Depends on:** 39 (installer field); D-40-01 decided (install-time choice plus `app:backend-path`).
 - **Risks:** the widest change after the release (≈ 380 places in code, ≈ 950 in tests, stored
   links); it merges itself into `main` (last planned session).
 
