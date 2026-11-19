@@ -45,7 +45,7 @@ pull request open), *merged* (in `main`).
 | 35 | Quality: end-to-end, accessibility and CI | merged | `claude/amazing-wozniak-r3ycn2` (started on `claude/lucid-babbage-qm6oxf`) | [SIENSIS/kpskeletor#43](https://github.com/SIENSIS/kpskeletor/pull/43) | [`deploy-status/35-quality/`](../deploy-status/35-quality/README.md) |
 | 36 | Final acceptance and release | merged | `ccr-86ec5c0e-ha268p` | [SIENSIS/kpskeletor#49](https://github.com/SIENSIS/kpskeletor/pull/49) | [`deploy-status/36-release/`](../deploy-status/36-release/README.md) |
 | 37 | Content languages from the site's locales | merged | `claude/tender-pasteur-75mv6z` | [SIENSIS/kpskeletor#51](https://github.com/SIENSIS/kpskeletor/pull/51) | [`deploy-status/37-content-locales/`](../deploy-status/37-content-locales/README.md) |
-| 38 | Settings menu groups, the public sign-in link and password reveal | done | `ccr-9a87a802-7fo7kt` | PR_LINK | [`deploy-status/38-settings-menu/`](../deploy-status/38-settings-menu/README.md) |
+| 38 | Settings menu groups, the public sign-in link and password reveal | done | `ccr-9a87a802-7fo7kt` | [SIENSIS/kpskeletor#53](https://github.com/SIENSIS/kpskeletor/pull/53) | [`deploy-status/38-settings-menu/`](../deploy-status/38-settings-menu/README.md) |
 
 ## MVP review (session 19)
 

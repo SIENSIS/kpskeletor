@@ -1,6 +1,6 @@
 # Session 38 — Settings menu groups, the public sign-in link and password reveal
 
-Branch: `ccr-9a87a802-7fo7kt` · Pull request: PR_LINK · Date: 2026-11-19
+Branch: `ccr-9a87a802-7fo7kt` · Pull request: [SIENSIS/kpskeletor#53](https://github.com/SIENSIS/kpskeletor/pull/53) · Date: 2026-11-19
 
 ## What was built
 
@@ -106,13 +106,15 @@ New tests:
 Results:
 
 ```
-PHPUNIT_RESULT
+vendor/bin/phpunit                    OK (1370 tests, 18112 assertions), 12:48
 vendor/bin/phpstan analyse            [OK] No errors
 vendor/bin/php-cs-fixer --dry-run     Found 0 of 1021 files that can be fixed
 php spark modules:sync                No cal fer res: tots els mòduls estan al dia.
 php spark permissions:check           Permisos correctes: 169 permís(os) al catàleg, 344 ruta(es) comprovades.
 php spark csp:check                   No hi ha scripts, gestors ni estils en línia a les vistes del projecte.
-npm run e2e                           E2E_RESULT
+npm run e2e                           184 passed, 10 skipped, 4 failed (6.3 min): the public pages at phone-light,
+                                      axe label-content-name-mismatch on the language switch (session 37's)
+after the fix (public + password-reveal specs, all six projects): 55 passed, 5 skipped
 ```
 
 ## Screenshots
