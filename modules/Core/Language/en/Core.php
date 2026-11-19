@@ -393,6 +393,10 @@ return [
         'auto'  => 'Automatic (system)',
     ],
     'js' => [
+        'password' => [
+            'show' => 'Show the password',
+            'hide' => 'Hide the password',
+        ],
         'ui'      => ['close' => 'Close'],
         'confirm' => [
             'title'  => 'Please confirm',

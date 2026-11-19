@@ -393,6 +393,10 @@ return [
         'auto'  => 'Automàtic (sistema)',
     ],
     'js' => [
+        'password' => [
+            'show' => 'Mostra la contrasenya',
+            'hide' => 'Amaga la contrasenya',
+        ],
         'ui'      => ['close' => 'Tanca'],
         'confirm' => [
             'title'  => 'Confirma-ho',

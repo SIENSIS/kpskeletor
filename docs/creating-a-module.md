@@ -194,7 +194,8 @@ write to `events` directly.
 `public/assets/modules/<name>/` by `php spark assets:publish` (or `modules:sync`; `--watch` while
 editing). Components are mounted by `data-component="<module>/<file>"`, URLs come from
 `asset('<module>::<path>')`, no inline scripts, handlers or styles (`php spark csp:check`).
-News ships no JavaScript; the `Tasks` board (`Assets/js/board.js`, `Assets/css/tasks.css`) is
+Password inputs get a show/hide button from the Core by themselves (`frontend.md`, "Password
+fields"; `data-no-reveal` to opt out). News ships no JavaScript; the `Tasks` board (`Assets/js/board.js`, `Assets/css/tasks.css`) is
 the worked example of the tutorial "A new view with JavaScript".
 
 **Texts**: only in `Language/{ca,es,en}/<Name>.php` with the same keys (`res.*`, `perm.*`,
