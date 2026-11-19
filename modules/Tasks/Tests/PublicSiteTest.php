@@ -87,13 +87,13 @@ final class PublicSiteTest extends TasksTestCase
         $pau  = $this->createUser('pau@example.com', 'user');
 
         $this->challenge(5);
-        $this->send('POST', 'tasks/request', $this->request(['captcha' => '5']))->assertRedirectTo(site_url('tasks/request'));
+        $this->send('POST', 'en/tasks/request', $this->request(['captcha' => '5']))->assertRedirectTo(site_url('en/tasks/request'));
 
         $row = db_connect()->table('task_requests')->get()->getRowArray();
         $this->assertIsArray($row);
         $this->assertSame('Afegir el calendari', $row['title']);
         $this->assertSame('new', $row['status']);
-        $this->assertSame('en', $row['locale'], 'The visitor\'s language (tests run in English).');
+        $this->assertSame('en', $row['locale'], 'The language of the page (/en/…).');
 
         $this->assertSame(1, $this->notificationsOf((int) $boss->id, TaskRequested::class), 'Reviewers (tasks-requests.list) are notified.');
         $this->assertSame(0, $this->notificationsOf((int) $pau->id, TaskRequested::class));
@@ -108,7 +108,7 @@ final class PublicSiteTest extends TasksTestCase
     public function testTheConfirmationEmailIsInTheVisitorsLanguage(): void
     {
         $this->challenge(5);
-        $this->withHeaders(['Accept-Language' => 'es-ES,es;q=0.9'])->send('POST', 'tasks/request', $this->request(['captcha' => '5']));
+        $this->send('POST', 'es/tasks/request', $this->request(['captcha' => '5']));
         $row = db_connect()->table('task_requests')->get()->getRowArray();
         $this->assertIsArray($row);
         $this->assertSame('es', $row['locale']);

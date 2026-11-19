@@ -19,7 +19,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
 <a class="visually-hidden-focusable skip-link" href="#main"><?= esc(lang('Core.ui.skipToContent')) ?></a>
 <header class="site-header border-bottom bg-body">
     <nav class="navbar navbar-expand-md container" aria-label="<?= esc(lang('Core.ui.mainMenu')) ?>">
-        <?= theme_partial('brand', ['brandClass' => 'navbar-brand']) ?>
+        <?= theme_partial('brand', ['brandClass' => 'navbar-brand', 'brandUrl' => site_url('/')]) ?>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false" aria-label="<?= esc(lang('Core.ui.openMenu')) ?>">
             <span class="navbar-toggler-icon"></span>
         </button>

@@ -78,15 +78,17 @@ The skeleton ships these modules:
     `en`. CodeIgniter's `Language` class falls back to `en` only, so the Core provides its own
     `Language` service (configurable chain in `Config\App` / a setting) used for every module
     and for kpcrudy's texts.
-  * Supported locales `ca`, `es`, `en`, negotiated from the user's profile, then the language
-    chosen with the public site's language switch, then the browser, then the default; the site
+  * Supported locales `ca`, `es`, `en`, negotiated from the user's profile, then the browser,
+    then the default (public pages: the language of their URL); the site
     can restrict the available ones: settings `Core.defaultLocale` (empty =
     `Config\App::$defaultLocale`) and `Core.locales` (checkboxes, at least one, offering every
     supported locale; the default is always one of the available locales).
-  * The public site has a language switch next to the light/dark switch (default theme, option
-    `languageSwitch`, hidden with a single language): `POST language` stores the choice in the
-    cookie `kp_locale` and, for a signed-in user, as the profile language (Core event
-    `localeChosen`, saved by Auth). The language is not part of public URLs.
+  * Public URLs carry the language: a path without a prefix is in the site's default language
+    (`/qui-som`), the other available languages carry their code as the first segment
+    (`/es/quienes-somos`); non-public paths (back office, API, sign-in, files…) never do. Internal
+    links keep the current prefix, the public header has a language switch next to the light/dark
+    switch (links to the same page in each language; default theme, option `languageSwitch`), and
+    public pages list their `hreflang` alternates; the sitemap lists every translation.
 * **Every module shipped with the skeleton (Core included) is complete in Catalan, Spanish and
   English:**
   * language files (`Language/en|ca|es/<Name>.php`) with the same keys in the three languages;

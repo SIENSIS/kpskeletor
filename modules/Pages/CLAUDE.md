@@ -38,8 +38,11 @@ Session 37 (D-37-01): translated texts use the site's languages and require its 
 ## Open tasks
 
 - Session 21: the Menus module consumes `Menu/PageLink.php`.
-- Session 26: pages in the API (if wanted). Session 31: the path's language could select the
-  content language (D-20-05).
+- Session 26: pages in the API (if wanted).
+- Done in session 37 (D-37-02): public URLs carry the language (`/es/quienes-somos`); `PublicPages`
+  gives each language's path to `service('localeurls')->setAlternates()` and redirects another
+  language's slug to the URL language's path; `PageTree::translatedPaths()`; the sitemap lists every
+  translation; language codes are reserved slugs.
 
 ## How to test
 

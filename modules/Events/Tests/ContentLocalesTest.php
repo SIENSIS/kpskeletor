@@ -51,8 +51,7 @@ final class ContentLocalesTest extends EventsTestCase
         db_connect()->table('event_translations')->insert(['event_id' => $id, 'locale' => 'es', 'title' => 'Título español', 'description' => '']);
         $this->send('GET', 'logout');
 
-        $this->withHeaders(['Accept-Language' => 'fr']);
-        $this->assertSame(['Título español'], $this->feedTitles('calendar/feed'), 'No French text: the default language, not Catalan.');
+        $this->assertSame(['Título español'], $this->feedTitles('fr/calendar/feed'), 'No French text: the default language, not Catalan.');
     }
 
     /**

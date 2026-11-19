@@ -12,6 +12,7 @@ use Modules\Pages\Services\HomePageResolver;
 use Modules\Pages\Services\PageRenderer;
 use Modules\Pages\Services\PageRepository;
 use Modules\Pages\Services\PageResolver;
+use Modules\Pages\Services\PageTree;
 use Modules\Pages\Services\PageVisibility;
 
 /**
@@ -49,6 +50,18 @@ final class PublicPages extends FrontendController
 
         if ($id === (new HomePageResolver())->id()) {
             return redirect()->to(site_url('/'));
+        }
+
+        // Public URLs carry the language (D-37-02): the page's own slugs in each language for the
+        // switch and `hreflang`, and its path in this URL's language when another one was used.
+        $tree   = new PageTree();
+        $paths  = $tree->translatedPaths($id);
+        $locale = $this->request->getLocale();
+        $path   = $tree->path($id, $locale);
+        service('localeurls')->setAlternates($paths);
+
+        if ($path !== null && $path !== implode('/', $segments)) {
+            return redirect()->to(site_url($path), 301);
         }
 
         $page = (new PageRepository())->find($id);

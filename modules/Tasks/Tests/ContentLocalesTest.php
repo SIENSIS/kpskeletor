@@ -43,7 +43,7 @@ final class ContentLocalesTest extends TasksTestCase
         db_connect()->table('task_project_translations')->insert(['project_id' => $web, 'locale' => 'es', 'name' => 'Nueva web', 'description' => '']);
         $this->task('Pública del web', ['visibility' => 'public', 'project_id' => $web]);
 
-        $page = html_entity_decode((string) $this->withHeaders(['Accept-Language' => 'fr'])->send('GET', 'tasks/project/nou-web')->response()->getBody(), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $page = $this->body('GET', 'fr/tasks/project/nou-web');
         $this->assertStringContainsString('Nueva web', $page, 'No French text: the default language, not Catalan.');
         $this->assertStringNotContainsString('Nou web', $page);
     }

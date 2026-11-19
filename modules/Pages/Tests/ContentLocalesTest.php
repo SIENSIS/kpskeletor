@@ -47,7 +47,7 @@ final class ContentLocalesTest extends PagesTestCase
     {
         $this->page('Qui som', [], ['es' => ['title' => 'Quiénes somos', 'slug' => 'quienes-somos']]);
 
-        $page = html_entity_decode((string) $this->withHeaders(['Accept-Language' => 'fr'])->send('GET', 'quienes-somos')->response()->getBody(), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $page = $this->body('GET', 'fr/quienes-somos'); // no French slug: the default language's
         $this->assertStringContainsString('Text de Quiénes somos', $page, 'No French text: the default language, not Catalan.');
         $this->assertStringNotContainsString('Text de Qui som', $page);
     }

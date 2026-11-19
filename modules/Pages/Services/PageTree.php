@@ -145,6 +145,27 @@ final class PageTree
     }
 
     /**
+     * The page's path in every available language it has a translation in (locale => path), for
+     * the language switch, the `hreflang` links and the sitemap (public URLs carry the language,
+     * D-37-02).
+     *
+     * @return array<string, string>
+     */
+    public function translatedPaths(int $id): array
+    {
+        $this->load();
+        $paths = [];
+
+        foreach (\Modules\Core\I18n\Locales::available() as $locale) {
+            if (isset($this->texts[$id][$locale]) && ($path = $this->path($id, $locale)) !== null) {
+                $paths[$locale] = $path;
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
      * Options of the parent field in tree order ("— — Child"), without a page and its descendants
      * (a page cannot become its own ancestor).
      *

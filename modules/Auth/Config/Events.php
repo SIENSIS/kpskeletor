@@ -15,9 +15,6 @@ declare(strict_types=1);
  * - `install.superadmin` (Core's Installer, `php spark app:install`): offer 2FA to the first
  *   superadmin.
  *
- * - `localeChosen` (the Core's public language switch): the signed-in user's choice becomes their
- *   profile language, so the back office and their emails follow it.
- *
  * It also tells the Core's notifications the language each user reads them in (the profile's
  * locale), so queued emails are rendered in it.
  */
@@ -51,12 +48,6 @@ Events::on('twoFactorReset', static function (User $user, ?int $byUserId = null)
 
 Events::on(Installer::EVENT_SUPERADMIN, static function (User $user, ?InstallPrompt $prompt = null): void {
     (new InstallTwoFactor())->offer($user, $prompt);
-});
-
-Events::on(\Modules\Core\Controllers\LanguageSwitch::EVENT, static function (int $userId, string $locale = ''): void {
-    if ($locale !== '') {
-        model(UserProfileModel::class)->saveFor($userId, ['locale' => $locale]);
-    }
 });
 
 RecipientLocale::resolveWith(static function (User $user): ?string {

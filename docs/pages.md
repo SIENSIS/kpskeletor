@@ -40,8 +40,13 @@ One resource named `pages`: `pages.{list,show,add,edit,delete,export,trash,resto
   slug that clashes is refused, a generated one gets `-2`, `-3`…
 - A root page cannot take the first segment of another route (`news`, `login`, `install`…) or
   `api`, `assets`, `backend`, `themes`, `uploads`, `vendor`, `writable`.
-- A path is resolved with the slugs of any language (the current one first, then the site's default
-  language); the texts follow the visitor's language with the fallback to the default language (D-20-05).
+- Public URLs carry the language (D-37-02, `docs/i18n.md` "Language in the URL"): `/qui-som` in
+  the default language, `/es/quienes-somos` in Spanish, each level with the slug of the URL's
+  language. A path is resolved with the slugs of any language (the URL's first, then the default
+  one); when another language's slug was used, the page redirects (301) to its path in the URL's
+  language. The texts are in the URL's language with the fallback to the default language. The
+  language switch and the `hreflang` links use each language's own slugs; the sitemap lists every
+  translation.
 - The public route is a catch-all with the lowest priority (`Config\Routing::$prioritize`):
   every other route wins, and `backend/…` / `api/…` are never pages (D-20-04).
 

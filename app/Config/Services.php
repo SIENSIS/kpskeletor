@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use CodeIgniter\HTTP\Request;
+use CodeIgniter\Router\RouteCollectionInterface;
 use Config\Logger as LoggerConfig;
 use Modules\Core\I18n\Language;
+use Modules\Core\I18n\LocaleRouter;
+use Modules\Core\I18n\LocaleUrls;
 use Modules\Core\Log\SafeLogger;
 use Modules\Core\Mail\GuardedEmail;
 
@@ -83,6 +87,34 @@ class Services extends BaseService
         $locale  = in_array($locale, [null, '', '0'], true) ? $current : $locale;
 
         return new Language($locale);
+    }
+
+    /**
+     * The language of public URLs (Modules\Core\I18n\LocaleUrls, docs/i18n.md "Language in the URL").
+     */
+    public static function localeurls(bool $getShared = true): LocaleUrls
+    {
+        if ($getShared) {
+            return static::getSharedInstance('localeurls');
+        }
+
+        return new LocaleUrls(config(\Config\LocaleUrls::class));
+    }
+
+    /**
+     * The router that reads the language prefix of public URLs before routing the rest
+     * (Modules\Core\I18n\LocaleRouter, D-37-02).
+     */
+    public static function router(?RouteCollectionInterface $routes = null, ?Request $request = null, bool $getShared = true): \CodeIgniter\Router\Router
+    {
+        if ($getShared) {
+            return static::getSharedInstance('router', $routes, $request);
+        }
+
+        $routes ??= static::get('routes');
+        $request ??= static::get('request');
+
+        return new LocaleRouter($routes, $request);
     }
 
     /*

@@ -57,13 +57,13 @@ final class ContentLocalesTest extends NewsTestCase
         $id = $this->newsPost('Text català', ['visibility' => 'public', 'slug' => 'noticia']);
         db_connect()->table('news_translations')->insert(['news_id' => $id, 'locale' => 'es', 'title' => 'Texto español', 'summary' => '', 'body' => '<p>Cuerpo</p>']);
 
-        $page = (string) $this->withHeaders(['Accept-Language' => 'fr'])->send('GET', 'news/noticia')->response()->getBody();
+        $page = (string) $this->send('GET', 'fr/news/noticia')->response()->getBody();
         $this->assertStringContainsString('<html lang="fr"', $page);
         $this->assertStringContainsString('Texto español', $page, 'No French text: the default language, not Catalan.');
         $this->assertStringNotContainsString('Text català', $page);
 
         db_connect()->table('news_translations')->insert(['news_id' => $id, 'locale' => 'fr', 'title' => 'Texte français', 'summary' => '', 'body' => '<p>Corps</p>']);
-        $page = (string) $this->withHeaders(['Accept-Language' => 'fr'])->send('GET', 'news/noticia')->response()->getBody();
+        $page = (string) $this->send('GET', 'fr/news/noticia')->response()->getBody();
         $this->assertStringContainsString('Texte français', $page);
     }
 
@@ -73,7 +73,7 @@ final class ContentLocalesTest extends NewsTestCase
         db_connect()->table('news_translations')->insert(['news_id' => $id, 'locale' => 'es', 'title' => 'Texto español', 'summary' => '', 'body' => '']);
         setting('Core.locales', ['es', 'en', 'fr']);
 
-        $page = (string) $this->withHeaders(['Accept-Language' => 'ca'])->send('GET', 'news/noticia')->response()->getBody();
+        $page = (string) $this->send('GET', 'news/noticia')->response()->getBody(); // the default language (es)
         $this->assertStringContainsString('Texto español', $page);
         $this->assertStringNotContainsString('Text català', $page);
 
