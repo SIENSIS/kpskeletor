@@ -286,7 +286,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-37-01 | 37 | Content languages from the site's locales: helpers, removed constants and language changes | Accepted (proposal) |
 | D-37-02 | 37 | Public language switch and the language of public URLs (decide) | Applied (decided) |
 | D-38-01 | 38 | Settings zone of the back-office menu grouped in five containers (decide) | Applied (decided) |
-| D-38-02 | 38 | Menu group entries declared with a `group` key in `$menu` (keys `group.<name>`) (decide) | Open |
+| D-38-02 | 38 | Menu group entries declared with a `group` key in `$menu` (keys `group.<name>`) (decide) | Applied (decided) |
 | D-38-03 | 38 | Who sees "Administració" on the public site, and where it links | Accepted (proposal) |
 | D-38-04 | 38 | The web installer's password fields get the button in session 39 | Accepted (proposal) |
 | D-38-05 | 38 | Order and icons inside the settings groups | Accepted (proposal) |
@@ -2902,7 +2902,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Until now every manifest menu entry had a route and a permission, and its key was the resource key or the route name. A group heading has neither, so it needs another way to be declared and a stable key that modules can name as `parent` (a public convention for third-party modules) and the Menus module can store customisations for.
 - **Proposal:** A new optional manifest key `group`: `['group' => 'group.system', 'label' => …, 'icon' => …, 'order' => …, 'zone' => 'settings']` declares a heading of kind `group` whose key is the given value; it must match `group.<name>` (lower case) and cannot be combined with `resource`, `route` or `permission` (the validator refuses it). The Core's keys are `group.access`, `group.security`, `group.api`, `group.customisation`, `group.system` (constants `MenuDefinitions::GROUP_*`); any module may declare its own group the same way. Built so the names can still change (one constant per key, one place in the Core manifest).
 - **Alternatives:** A) Groups only in the Core, as a constant list in `MenuDefinitions` (no new manifest key; modules cannot add groups). B) Keys like `Core.settings-access` following `<Module>.<resource>` (could collide with a future Core resource).
-- **Status:** Open
+- **Status:** Applied (decided)
+- **Decision (2026-11-19):** «Clau 'group' (recomanada)». As proposed: the optional manifest key `group` declares a heading with the key `group.<name>`; the Core's five keys are a public convention, and any module may declare its own group.
+- **Applied in:** session 38 (built as proposed): `modules/Core/Menus/MenuDefinitions.php`, `modules/Core/Modules/ManifestValidator.php`, `modules/Core/Config/Module.php`, `docs/menus.md`, `docs/creating-a-module.md`, `CLAUDE.md`, specification "Menus"; tests `modules/Menus/Tests/SettingsGroupsTest.php`.
 
 ## D-38-03 — Who sees "Administració" on the public site, and where it links
 

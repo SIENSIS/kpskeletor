@@ -23,7 +23,7 @@ Branch: `ccr-9a87a802-7fo7kt` · Pull request: [SIENSIS/kpskeletor#53](https://g
 
 **Menu groups**
 
-- `MenuDefinitions` accepts a new manifest menu key `group` (D-38-02, **Open**):
+- `MenuDefinitions` accepts a new manifest menu key `group` (D-38-02, decided):
   `['group' => 'group.system', 'label' => …, 'icon' => …, 'order' => …, 'zone' => 'settings']` is a
   definition of kind `group` (no route, no permission) whose key is the given value; constants
   `MenuDefinitions::GROUP_ACCESS|SECURITY|API|CUSTOMISATION|SYSTEM` and the pattern `GROUP_KEY`
@@ -62,7 +62,7 @@ No new tables, routes, permissions or commands.
 ## Decisions and deviations
 
 - **D-38-01** (decided by the owner) applied.
-- **D-38-02 (decide, Open):** group entries declared with a new manifest key `group` and keys
+- **D-38-02 (decided by the owner as built):** group entries declared with a new manifest key `group` and keys
   `group.<name>`; built so the key and names can still change (one constant each).
 - **D-38-03 (accepted):** who sees "Administració" and where it links (from the generated menu).
 - **D-38-04 (accepted):** the web installer loads no JavaScript before the assets are published, so
@@ -166,6 +166,6 @@ view; breadcrumbs include the group.*
 - Session 39: when the installer loads the Core's JavaScript, call `initPasswordReveal()`
   (`core/forms/password-reveal.js`) or load `core/app.js`; its password fields need no change.
 - New `settings` menu entries take `'parent' => 'group.<…>'` (`docs/menus.md`, "Groups of the
-  settings zone"). D-38-02 is Open (decide): run `deploy/decide.md` before relying on the key name.
+  settings zone"). D-38-02 decided: the key `group` and the `group.<name>` keys are a public convention.
 - Session 40: `AccountLink` builds its URLs from the menu and the route `login`, never from
   `backend`.
