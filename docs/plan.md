@@ -816,10 +816,11 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
   static test against hard-coded content languages.
 - **Depends on:** 36.
 
-## 38 — Settings menu groups and the public sign-in link (`deploy/38-settings-menu.md`)
+## 38 — Settings menu groups, the public sign-in link and password reveal (`deploy/38-settings-menu.md`)
 
 - **Goal:** five groups in the settings zone (D-38-01); a sign-in / back-office link on the public
-  site (theme option).
+  site (theme option); a show/hide button on every password field (global Core enhancement,
+  opt-out `data-no-reveal`, documented in `docs/frontend.md`; owner's request of 2026-11-19).
 - **Files:** manifests' `settings` entries, Core group entries, default theme navbar and options.
 - **Tests:** groups per permission, customisations still applied, the link per user type.
 - **Depends on:** 37 (order only).
@@ -839,7 +840,41 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Tests:** the suite with the default; a case with `admin`; installer validation; e2e.
 - **Depends on:** 39 (installer field); D-40-01 decided (install-time choice plus `app:backend-path`).
 - **Risks:** the widest change after the release (≈ 380 places in code, ≈ 950 in tests, stored
-  links); it merges itself into `main` (last planned session).
+  links).
+
+## 41 — Devtools module: development-only tools and their locks (`deploy/41-devtools.md`)
+
+- **Goal:** a `Devtools` module usable only in development, from the local machine, by the
+  superadmin (D-41-01, D-41-03), with the CRUD recipes page (the "cheat sheet" of CRUD variants).
+- **Files:** `modules/Devtools/`, `ModuleManifest` (`$developmentOnly`), module commands and
+  screen, a `security:check` check.
+- **Tests:** one per lock.
+- **Depends on:** 40 (order only).
+
+## 42 — Devtools: visual code generator with preview (`deploy/42-devtools-generator.md`)
+
+- **Goal:** a wizard (module, tables, demo data, CRUD options, API, menu, permissions) that
+  previews and then writes the files, on one engine shared with `make:module` (D-41-02).
+- **Tests:** plans against fixtures; generated modules pass the checks and their own tests.
+- **Depends on:** 41; adds `nikic/php-parser` as a development dependency (D-42-01, decided).
+
+## 43 — Devtools: module packages and signing (`deploy/43-devtools-packages.md`)
+
+- **Goal:** `modules:package` and a screen that build, validate and sign packages; signing from
+  the console or the local form with the key's safeguards and a cleanup afterwards (debug
+  history, logs, caches, the session; D-43-01).
+- **Tests:** packages install with `modules:install`; signatures verify; no trace of the key.
+- **Depends on:** 42.
+
+## 44 — Web Push notifications (`deploy/44-web-push.md`)
+
+- **Goal:** a `push` notification channel to browsers and installed PWAs: subscriptions per
+  device, preferences, queue and scheduled task, Web Push encryption and VAPID in the Core with
+  OpenSSL (D-44-01), endpoints only of known push services (D-44-02).
+- **Tables:** `push_subscriptions`, `push_queue`.
+- **Tests:** RFC 8291/8292 vectors, SSRF refusals, delivery through `OutboundClient`, e2e push.
+- **Depends on:** 43 (order only); D-44-02 **(decide)**. Merges itself into `main` (last planned
+  session).
 
 ---
 
