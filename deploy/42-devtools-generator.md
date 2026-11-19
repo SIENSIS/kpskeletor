@@ -91,9 +91,10 @@ this module may do and the locks it must keep.
    `php spark modules:sync` and optionally `modules:demo <Name>`, then shows the log, the next
    steps and the commands to run the generated tests. Logged with `activity_log()`.
 - **Existing modules:** new files are simply added; changes to the existing manifest,
-  `Routes.php` and language files are applied with a format-preserving PHP parser if D-42-01
-  allows the dependency (`nikic/php-parser`, `require-dev`), otherwise shown as snippets to paste
-  (the preview says which). Never edit a migration that already ran: a change to an existing table
+  `Routes.php` and language files are applied with `nikic/php-parser`'s format-preserving
+  printer (D-42-01, decided: `composer require --dev nikic/php-parser:^5` from Packagist at the
+  start of this session; stop and report if Composer fails; add it to `docs/dependencies.md`), and
+  each change is shown as a diff in the preview. Never edit a migration that already ran: a change to an existing table
   is a new "alter" migration (add/drop column, add/drop index) — include it if time allows,
   otherwise record it as the next step.
 

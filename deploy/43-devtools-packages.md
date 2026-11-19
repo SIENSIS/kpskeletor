@@ -83,6 +83,14 @@ this module may do and the locks it must keep.
     controller and answer with a generic error);
   - `autocomplete="off"` on both fields, `Cache-Control: no-store` on the response, the Devtools
     locks (development, loopback, `devtools.write`, `reauth`, rate limit).
+  - **cleanup afterwards (owner's addition to D-43-01):** the signing POST answers a redirect to
+    the result page, and that next request runs the equivalent of `php spark debugbar:clear`,
+    `php spark logs:clear`, `php spark cache:clear` and `php spark app:cache-clear` (call the
+    services, do not spawn processes), drops the session's flash and old-input data and **ends
+    the current session** (the user signs in again; there is no spark command for sessions, use
+    the session service), then logs that the cleanup ran. Prevention stays mandatory: the toolbar
+    writes its file in an *after* filter, after the controller, so only the next request can
+    clean it. Say on the form that signing logs you out and clears the debug history.
 - Themes: the same for a theme folder (`themes:install` package format).
 
 ## Tests
@@ -94,7 +102,8 @@ this module may do and the locks it must keep.
   `Minisign` verifies; interoperability with the format (compare with a signature made by the
   `minisign` CLI if available, otherwise with known test vectors); wrong password refused.
 - The safeguards above (no trace of the key or the password under `writable/`, in the session, in
-  logs or in the activity log; toolbar; error page); all Devtools locks still apply.
+  logs or in the activity log; toolbar; error page), and the cleanup (debug history, logs and
+  caches emptied, the session ended, after signing); all Devtools locks still apply.
 - Screenshots of the packages screen and the signing form.
 
 ## Docs

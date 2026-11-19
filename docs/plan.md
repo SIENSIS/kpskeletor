@@ -856,12 +856,13 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Goal:** a wizard (module, tables, demo data, CRUD options, API, menu, permissions) that
   previews and then writes the files, on one engine shared with `make:module` (D-41-02).
 - **Tests:** plans against fixtures; generated modules pass the checks and their own tests.
-- **Depends on:** 41; D-42-01 **(decide)** for editing existing modules' PHP files.
+- **Depends on:** 41; adds `nikic/php-parser` as a development dependency (D-42-01, decided).
 
 ## 43 — Devtools: module packages and signing (`deploy/43-devtools-packages.md`)
 
 - **Goal:** `modules:package` and a screen that build, validate and sign packages; signing from
-  the console or the local form with the key's safeguards (D-43-01).
+  the console or the local form with the key's safeguards and a cleanup afterwards (debug
+  history, logs, caches, the session; D-43-01).
 - **Tests:** packages install with `modules:install`; signatures verify; no trace of the key.
 - **Depends on:** 42. Merges itself into `main` (last planned session).
 

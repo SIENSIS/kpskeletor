@@ -288,7 +288,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Decided |
 | D-41-02 | 41 | In development, Devtools may write module code from the back office (decide) | Decided |
 | D-41-03 | 41 | Devtools answers only local requests, to the superadmin, with re-authentication for writes (decide) | Decided |
-| D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Open |
+| D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Decided |
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 
 ## D-00-01 — Branch names and pushing to `main`
@@ -2930,7 +2930,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Problem:** Adding a resource to an existing module means changing its `Config/Module.php`, `Config/Routes.php` and language files. Editing PHP with text replacements is fragile; a parser with a format-preserving printer changes only what it must. The library is already in `vendor/` through the development tools, but not a direct dependency.
 - **Proposal:** `composer require --dev nikic/php-parser:^5` (BSD-3-Clause; development only, like Devtools); the generator edits existing PHP files with it and shows the diff in the preview.
 - **Alternatives:** A) No dependency: for existing modules the preview shows the snippets to paste into the manifest, routes and language files by hand (new files are still written). B) Regenerate the whole manifest from a stored definition (loses manual changes).
-- **Status:** Open
+- **Status:** Decided
+- **Decision (2026-11-19):** «afegeix nikic/php-parser com a dependència de desenvolupament». As proposed: session 42 runs `composer require --dev nikic/php-parser:^5` (from Packagist; stop and report if Composer fails) and records it in `docs/dependencies.md`. **Must change:** `composer.json`/`composer.lock` and `docs/dependencies.md` (session 42).
 
 ## D-43-01 — Signing packages from the local Devtools form, with safeguards for the key (decide)
 
@@ -2940,4 +2941,5 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Console only (the screen shows the command). B) Keep the secret key encrypted in `writable/` for repeated use (convenient, but the key would live on the development machine's disk next to the project).
 - **Status:** Decided
 - **Decision (2026-11-19):** «… podria demanar la clau en el moment de fer la signatura … s'executa en local». As proposed, with the safeguards above. **Must change:** session 43, `docs/devtools.md`, `docs/installing-modules.md`.
+- **Addition (2026-11-19):** «… forçar eliminar les variables de sessió amb la comanda de CodeIgniter de php spark i amb la d'eliminar la memòria cau de l'app». After a signature made from the form, Devtools also **cleans up**, on top of the prevention above (which stays mandatory: the debug toolbar writes its file in an *after* filter, once the controller has finished, so a cleanup during the signing request cannot remove that request's own file): the signing request answers a redirect to a result page, and that next request runs the equivalent of `php spark debugbar:clear` (deletes the whole toolbar history), `php spark logs:clear`, `php spark cache:clear` and `php spark app:cache-clear`, removes the session's flash and old-input data and **ends the current session** (log out; CodeIgniter has no spark command for sessions, so the session is destroyed through the session service; the user signs in again), and logs that the cleanup ran. A test checks that after signing and the cleanup nothing under `writable/` (debugbar, logs, cache, session) contains the key or the password.
 
