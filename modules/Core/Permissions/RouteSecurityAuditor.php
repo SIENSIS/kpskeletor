@@ -6,6 +6,7 @@ namespace Modules\Core\Permissions;
 
 use CodeIgniter\Router\RouteCollection;
 use CodeIgniter\Router\Router;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * Default deny on routes (docs/specification.md, "RBAC" › "Enforcement on routes"; D-00-30):
@@ -38,7 +39,7 @@ final class RouteSecurityAuditor
             $path    = ltrim($from, '/');
             $label   = $verb . ' ' . $path;
 
-            if ($path === 'backend' || str_starts_with($path, 'backend/')) {
+            if (BackendPath::contains($path)) {
                 foreach ($this->backendProblems($filters, $catalogue) as $problem) {
                     $problems[] = $label . ': ' . $problem;
                 }

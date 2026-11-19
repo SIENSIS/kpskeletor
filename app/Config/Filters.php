@@ -20,6 +20,7 @@ use Modules\Core\Filters\InstallGuard;
 use Modules\Core\Filters\PoorMansCron;
 use Modules\Core\Filters\RateLimit;
 use Modules\Core\Filters\SecurityHeaders;
+use Modules\Core\Routing\BackendPath;
 
 class Filters extends BaseFilters
 {
@@ -149,9 +150,18 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [
-        // Every back-office request runs the `backend` chain (RoutesSecurityTest checks it).
+        // Every back-office request runs the `backend` chain (RoutesSecurityTest checks it); the
+        // patterns follow the back-office prefix (`app.backendPath`, set in the constructor).
         'backend' => ['before' => ['backend', 'backend/*']],
         // API responses in the client's language (Accept-Language; Modules\Api\Filters\ApiLocale).
         'apilocale' => ['before' => ['api/*']],
     ];
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $prefix                   = BackendPath::current();
+        $this->filters['backend'] = ['before' => [$prefix, $prefix . '/*']];
+    }
 }

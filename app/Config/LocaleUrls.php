@@ -21,7 +21,7 @@ class LocaleUrls extends BaseConfig
 
     /**
      * First path segments that are never public pages and never carry a language prefix (the back
-     * office, the API, sign-in, files, feeds, installer, assets…). `/es/<one of these>/…`
+     * office (the prefix of `app.backendPath` is added by `Modules\Core\I18n\LocaleUrls`), the API, sign-in, files, feeds, installer, assets…). `/es/<one of these>/…`
      * redirects to the path without the prefix.
      *
      * @var list<string>
