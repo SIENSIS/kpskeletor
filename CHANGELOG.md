@@ -36,6 +36,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Changed
 
+- The web installer shows its progress (session 39): a progress bar and a log of the steps
+  (checks, keys, database, migrations "n of m", modules, permissions, settings, assets, groups,
+  API, superadmin, demo data, `.env`, lock, security check), then a result page that shows the
+  one-time values (`.env` to copy, demo passwords) once. The installation runs after the response
+  under PHP-FPM / LiteSpeed (`Modules\Core\Install\InstallJob`, `InstallJobs`, routes
+  `progress/install/<job>` and `install/result/<job>`, ES module `core/install/progress.js`) and
+  inside the request otherwise (no JavaScript, `php spark serve`, mod_php). One installation at a
+  time; a second POST answers 409. `Installer::install()` takes an `InstallProgress` listener and
+  `ModuleSynchronizer::sync()` a `progress` closure (both optional). The installer pages follow
+  the system's dark mode and get the password show/hide button when the Core's scripts are
+  published (the installer publishes them when it can).
+
 - The settings entries of Users, Settings, Core, Activity, Api, Menus, Dashboard, Backup and
   Updates now have a `parent` (a Core group); their keys did not change, so saved back-office
   menu customisations still apply. The Activity log's `order` is 85 (was 84). A module's own

@@ -290,6 +290,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-38-03 | 38 | Who sees "Administració" on the public site, and where it links | Accepted (proposal) |
 | D-38-04 | 38 | The web installer's password fields get the button in session 39 | Accepted (proposal) |
 | D-38-05 | 38 | Order and icons inside the settings groups | Accepted (proposal) |
+| D-39-01 | 39 | The web installer publishes the Core's assets before installing, so its pages can load the Core's scripts | Accepted (proposal) |
+| D-39-02 | 39 | Web installer jobs: storage, lifetime, rate limit, lock and the order of the last steps | Accepted (proposal) |
 | D-40-01 | 40 | Configurable back-office path chosen at install time (decide) | Applied (decided) |
 | D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Decided |
 | D-41-02 | 41 | In development, Devtools may write module code from the back office (decide) | Decided |
@@ -2932,6 +2934,24 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Serve `password-reveal.js` and `config.js` from a controller route under `install/` before installation (new URLs, more code for one page). B) Publish the Core's assets from the installer's GET (the web server writing to `public/` before installation).
 - **Status:** Accepted (proposal)
 - **Applied in:** `docs/frontend.md` ("Password fields"), `docs/progress.md` (notes for session 39).
+
+## D-39-01 — The web installer publishes the Core's assets before installing, so its pages can load the Core's scripts
+
+- **Where:** `deploy/39-installer-progress.md` (front end: `core/install/progress.js`); D-38-04 (alternative B).
+- **Problem:** The progress page and the form's switch to it need the Core's ES modules (`core/install/progress.js`, `core/app.js` and the modules they import, with the import map), but `public/assets/core/` is ignored by git and only exists after `assets:publish` / `modules:sync`, which run during the installation.
+- **Proposal:** The installer's pages (`install` and a running job's result page) publish the Core's assets (`AssetPublisher::publish('core')`, the Core's own files only) when the manifest lacks `core::js/install/progress.js`. The web installer already writes `public/assets/` during the installation (step 7 of `modules:sync`), so this adds no new write. When it cannot write (or fails), the pages load no script and everything works as before: the form posts `progress=0` and the installation runs inside the request. With the scripts, the pages get `core/app.js` (password show/hide button, D-38-04) and `core/theme-mode.js` (dark mode); the import map is built without a theme (there is no database).
+- **Alternatives:** A) Serve the few files from a controller under `install/` (new URLs, duplicates the asset pipeline). B) Commit the published copies (forbidden: `public/assets/modules/…` and `public/assets/core/` are generated).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Controllers/WebInstaller.php` (`scriptsPublished()`), `modules/Core/Views/install/{_head,_scripts}.php`; test `WebInstallerTest::testFormAsksForTheProgressPageOnlyThroughItsScript`.
+
+## D-39-02 — Web installer jobs: storage, lifetime, rate limit, lock and the order of the last steps
+
+- **Where:** `deploy/39-installer-progress.md` (web flow, security).
+- **Problem:** The session asks for job files like Backup's `JobStore`, a TTL, a rate limit, a lock and a step list ending with "assets, `security:check`, lock file"; it does not fix the values, and the rate limiter's capacities are settings in a database that does not exist yet.
+- **Proposal:** `Modules\Core\Install\InstallJobs` in `writable/install-jobs/` (folder 0700, files 0600, atomic writes): `<id>.json` (status, step, counts, percentage, log of language keys with scalar parameters, the page's language, the non-secret result), `<id>.secrets.json` (the `.env` to copy and the demo passwords, deleted when the result page first reads it) and `running.lock` (created with `fopen('x')`; stale after the TTL). TTL one hour (`InstallJobs::TTL`): afterwards both job pages answer 404 and the files are purged on the next job. `progress/install/<job>`: `RateLimiter::attemptCustom('installProgress', ip, 120, MINUTE)` (file cache, no setting), JSON keys `status, step, label, percent, log, next` only (the failure message is shown on the result page, not in the JSON). A second POST while the lock is held answers the form with 409; the in-request fallback takes the lock too. The order of the last steps is the installer's own (`envFile`, `lock`), then the job runs `security:check` (stored for the Security status page without notifications, as `app:install` does) and `done`; `app:install` keeps its output (it does not print the steps). The superadmin step covers the 2FA offer (`install.superadmin`; on the web the 2FA is set up from the profile, as before).
+- **Alternatives:** A) Jobs in the database (none yet). B) A rate limit through the `ratelimit:` filter (its capacities are settings in the database). C) Run `security:check` before the lock (it would describe an installation that is not finished).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Install/{InstallJobs,InstallJob,InstallProgress}.php`, `modules/Core/Controllers/WebInstaller.php`; tests `InstallJobsTest`, `InstallProgressTest`, `WebInstallerTest`.
 
 ## D-38-05 — Order and icons inside the settings groups
 

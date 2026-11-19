@@ -155,8 +155,12 @@ module writes a plain password input and does nothing else.
   Without JavaScript nothing changes; nothing changes on the server.
 - **Opt out:** `data-no-reveal` on the input (e.g. a field that must never be shown, such as a
   confirmation typed blind on purpose).
-- The web installer's pages load no JavaScript yet (assets are published during installation):
-  their password fields get the button when the installer loads the Core's scripts (session 39).
+- The web installer's pages load `core/app.js` (import map without a theme, `core/theme-mode.js`
+  for dark mode) once the Core's assets are published; the installer publishes them itself before
+  installing when it can write `public/assets` (D-39-01). Without them the pages work with no
+  JavaScript (no button, installation inside the request). Its progress component is
+  `core/install/progress.js` (`data-component="core/install/progress"`, on the form and on the
+  progress page).
 
 ## Vendored libraries
 
