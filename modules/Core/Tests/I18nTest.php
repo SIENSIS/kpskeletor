@@ -9,8 +9,8 @@ use Config\Services;
 use Modules\Auth\Tests\AuthTestCase;
 use Modules\Core\I18n\DefaultLocaleOptions;
 use Modules\Core\I18n\Language;
-use Modules\Core\I18n\LocaleOptions;
 use Modules\Core\I18n\LocaleNegotiator;
+use Modules\Core\I18n\LocaleOptions;
 use Modules\Core\I18n\Locales;
 use Modules\Core\Notifications\RecipientLocale;
 
