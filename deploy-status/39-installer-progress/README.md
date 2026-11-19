@@ -1,6 +1,6 @@
 # Session 39 — Web installer progress
 
-Branch: `claude/great-knuth-jz5xq8` · Pull request: see `docs/progress.md` · Date: 2026-11-19
+Branch: `claude/great-knuth-jz5xq8` · Pull request: [SIENSIS/kpskeletor#57](https://github.com/SIENSIS/kpskeletor/pull/57) · Date: 2026-11-19
 
 ## What was built
 

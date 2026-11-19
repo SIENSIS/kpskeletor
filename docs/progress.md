@@ -46,7 +46,7 @@ pull request open), *merged* (in `main`).
 | 36 | Final acceptance and release | merged | `ccr-86ec5c0e-ha268p` | [SIENSIS/kpskeletor#49](https://github.com/SIENSIS/kpskeletor/pull/49) | [`deploy-status/36-release/`](../deploy-status/36-release/README.md) |
 | 37 | Content languages from the site's locales | merged | `claude/tender-pasteur-75mv6z` | [SIENSIS/kpskeletor#51](https://github.com/SIENSIS/kpskeletor/pull/51) | [`deploy-status/37-content-locales/`](../deploy-status/37-content-locales/README.md) |
 | 38 | Settings menu groups, the public sign-in link and password reveal | merged | `ccr-9a87a802-7fo7kt` | [SIENSIS/kpskeletor#53](https://github.com/SIENSIS/kpskeletor/pull/53) | [`deploy-status/38-settings-menu/`](../deploy-status/38-settings-menu/README.md) |
-| 39 | Web installer progress | done | `claude/great-knuth-jz5xq8` | (pull request "Session 39: Web installer progress") | [`deploy-status/39-installer-progress/`](../deploy-status/39-installer-progress/README.md) |
+| 39 | Web installer progress | done | `claude/great-knuth-jz5xq8` | [SIENSIS/kpskeletor#57](https://github.com/SIENSIS/kpskeletor/pull/57) | [`deploy-status/39-installer-progress/`](../deploy-status/39-installer-progress/README.md) |
 
 ## MVP review (session 19)
 
