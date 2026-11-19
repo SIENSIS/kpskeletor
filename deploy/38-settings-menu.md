@@ -1,10 +1,10 @@
-# Session 38 — Settings menu groups and the public sign-in link
+# Session 38 — Settings menu groups, the public sign-in link and password reveal
 
 > Run it by saying: **`executa deploy/38-settings-menu.md`** (or `run deploy/38-settings-menu.md`) in a
 > Claude Code session on the project repository. You (Claude) are reading this file from the
 > repository: follow it from start to end without waiting for more instructions.
 >
-> Added after the 1.0.0 release from the owner's review of 2026-11-19 (points 5 and 6: the settings menu is chaotic; the public site has no link to the back office).
+> Added after the 1.0.0 release from the owner's review of 2026-11-19 (points 5 and 6: the settings menu is chaotic; the public site has no link to the back office; and, added the same day, a show/hide button on password fields).
 
 ## Before starting: bring `main` up to date
 
@@ -40,8 +40,8 @@
 ## Goal
 
 The settings zone of the back-office sidebar shows a few groups (D-38-01, decided by the owner)
-instead of fifteen loose entries, and the public site has a link to sign in or to go to the back
-office.
+instead of fifteen loose entries, the public site has a link to sign in or to go to the back
+office, and every password field has the usual "eye" button to show or hide what was typed.
 
 ## Scope
 
@@ -73,6 +73,28 @@ office.
   not from the `backend` string (session 40 makes the prefix configurable). Accessible name,
   phone width (inside the collapsed menu), dark mode; the `tasks-demo` child theme inherits it.
 
+### Show/hide button on password fields
+
+- A **global Core enhancement**, not a change per view: an ES module (e.g.
+  `core/forms/password-reveal.js`, loaded by the Core's behaviours like the other global ones) adds
+  a toggle button to **every** `input[type="password"]` on the page, including the fields kpcrudy
+  renders (e.g. Users › new user) and those of future modules, with no change to their views.
+  Opt-out with `data-no-reveal` on the input. Today's fields: Auth login, re-authentication, lock,
+  profile (password change, email change), reset form, password page; the web installer; Backup
+  create, verify and restore.
+- Markup: wrap the input in a Bootstrap `input-group` (or attach to an existing one) without
+  breaking `is-invalid` feedback, help texts, floating labels, `required`, autofocus or the
+  `dirtyGuard`; the button is `type="button"` (never submits), has `aria-controls`, `aria-pressed`
+  and an accessible name that changes ("Mostra la contrasenya" / "Amaga la contrasenya", ca/es/en
+  through `core/config.js`), and a Bootstrap icon (`bi-eye` / `bi-eye-slash`, `aria-hidden`).
+- Behaviour: hidden by default; the field goes back to `password` before the form is submitted and
+  on `pagehide` (so it is never saved or restored as plain text); focus stays in the field; works
+  with the keyboard. Without JavaScript nothing changes. Server-side nothing changes.
+- Pages that do not load the Core's JavaScript (if any: check the auth layout and the installer)
+  get it the same way as the rest of the Core components.
+- Document it in `docs/frontend.md` (a section "Password fields": automatic, opt-out with
+  `data-no-reveal`, what it does on submit) and mention it in `docs/creating-a-module.md`.
+
 ## Tests
 
 - Menu: for an administrator the settings zone is exactly the five groups with the listed
@@ -80,18 +102,23 @@ office.
   customisation saved before (moved/renamed entry) is still applied; `permissions:check` passes.
 - Theme: guest sees "Entra" → login; a back-office user sees "Administració"; a user without
   back-office access does not; the option off hides it; no inline code (`csp:check`).
+- Password reveal: an e2e test on the login page and on a kpcrudy form (new user): the button
+  shows and hides the value, has the right accessible name and `aria-pressed`, the value is sent
+  normally, the field is `password` again after submitting, `data-no-reveal` skips a field; axe
+  passes in light and dark mode; `csp:check` passes.
 - e2e: the menu crawl and the screens still pass (update `tests/e2e/` if they rely on the flat
   list); screenshots of the grouped sidebar (desktop, phone, dark) and the public navbar.
 
 ## Docs
 
-`docs/menus.md`, `docs/creating-a-module.md`, `docs/themes.md` (the option), `docs/user-guide.md`
+`docs/menus.md`, `docs/creating-a-module.md`, `docs/themes.md` (the option), `docs/frontend.md`
+(password fields), `docs/user-guide.md`
 (+ `docs/ca/`, `docs/es/`), `CHANGELOG.md` `[Unreleased]`.
 
 ## Done when
 
-- The settings zone shows the five groups, customisations still apply, the public link works, with
-  tests.
+- The settings zone shows the five groups, customisations still apply, the public link works and
+  every password field has the show/hide button, with tests and docs.
 - All checks pass and the tests of this session are in the suite.
 
 ## Working rules for this session
@@ -134,7 +161,7 @@ office.
    `deploy-status/38-settings-menu/`.
 4. Commit in small commits on the session branch, push it (never with `--force`) and open a pull
    request titled exactly
-   "Session 38: Settings menu groups and the public sign-in link" with a summary, the checks' output and a link to the status report.
+   "Session 38: Settings menu groups, the public sign-in link and password reveal" with a summary, the checks' output and a link to the status report.
    The next session merges it into `main` (review it before running the next one if you want).
 5. Reply with a short report: done, not done (and why), risks, the open decisions (IDs and
    titles), and the next step: "run `deploy/decide.md`" when there are open (decide) entries,

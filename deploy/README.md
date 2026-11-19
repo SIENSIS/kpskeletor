@@ -144,7 +144,7 @@ s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou
 | 35 | `35-quality.md` | Proves end-to-end, accessibilitat i CI | |
 | 36 | `36-release.md` | Acceptació final i versió 1.0.0 | **Fita 3: plantilla lliurada** |
 | 37 | `37-content-locales.md` | Idiomes del contingut des dels idiomes del lloc (no només ca/es/en) | Després de la 1.0.0 |
-| 38 | `38-settings-menu.md` | Menú de configuració agrupat i enllaç d'accés al lloc públic | |
+| 38 | `38-settings-menu.md` | Menú de configuració agrupat, enllaç d'accés al lloc públic i ullet per mostrar/ocultar contrasenyes | |
 | 39 | `39-installer-progress.md` | Progrés de l'instal·lador web | |
 | 40 | `40-backend-path.md` | Ruta del back-office configurable en instal·lar, i comanda per canviar-la (D-40-01) | |
 
