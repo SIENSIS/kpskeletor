@@ -449,7 +449,7 @@ return [
     'settings' => [
         'defaultLocale' => 'Default language',
         'defaultLocaleHelp' => 'Language of visitors whose browser asks for none of the available languages, of new users and of emails to users without a language.',
-        'defaultLocaleConfig' => 'As configured (Catalan)',
+        'defaultLocaleConfig' => 'As configured ({0})',
         'locales' => 'Available languages',
         'localesHelp' => 'Users and visitors can only use the checked languages (at least one).',
         'pwa'             => 'Installable web app (PWA)',

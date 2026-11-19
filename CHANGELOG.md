@@ -22,6 +22,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
   `NewsRepository::FALLBACK_LOCALE`, `News\Controllers\Posts::LOCALES` and
   `TranslatedText::FALLBACK_LOCALE` (D-37-01). Modules that used them: replace them as described in
   `docs/i18n.md` ("Upgrading a module written for 1.0.0").
+- The settings `Core.defaultLocale` and `Core.locales` offer every supported locale
+  (`Config\App::$supportedLocales`) instead of a fixed ca/es/en list.
 - The required content language is the site's default language (`Core.defaultLocale`), not always
   Catalan; a language no longer offered keeps its texts but they are neither shown nor edited.
 

@@ -449,7 +449,7 @@ return [
     'settings' => [
         'defaultLocale' => 'Idioma per defecte',
         'defaultLocaleHelp' => 'Idioma dels visitants el navegador dels quals no demana cap dels idiomes disponibles, dels usuaris nous i dels correus als usuaris sense idioma.',
-        'defaultLocaleConfig' => 'El de la configuració (català)',
+        'defaultLocaleConfig' => 'El de la configuració ({0})',
         'locales' => 'Idiomes disponibles',
         'localesHelp' => 'Els usuaris i els visitants només poden fer servir els idiomes marcats (com a mínim un).',
         'pwa'             => 'Aplicació web instal·lable (PWA)',
