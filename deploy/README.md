@@ -148,7 +148,7 @@ s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou
 | 39 | `39-installer-progress.md` | Progrés de l'instal·lador web | |
 | 40 | `40-backend-path.md` | Ruta del back-office configurable en instal·lar, i comanda per canviar-la (D-40-01) | |
 | 41 | `41-devtools.md` | Mòdul `Devtools` (només development, amb tots els panys) i receptes de CRUD | |
-| 42 | `42-devtools-generator.md` | Generador visual de codi amb vista prèvia (cal decidir D-42-01) | |
+| 42 | `42-devtools-generator.md` | Generador visual de codi amb vista prèvia (afegeix `nikic/php-parser`, D-42-01) | |
 | 43 | `43-devtools-packages.md` | Empaquetar i signar mòduls | |
 
 Fitxers auxiliars: `next.md` (executa la sessió següent), `decide.md` (et pregunta els dubtes
