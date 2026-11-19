@@ -20,7 +20,14 @@ export default async function globalSetup(config) {
     await page.goto('/login');
     await page.fill('input[name=email]', user);
     await page.fill('input[name=password]', password);
-    await Promise.all([page.waitForURL(/\/backend/, { timeout: 30_000 }), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL((url) => !/\/login(\/|\?|$)/.test(url.pathname), { timeout: 30_000 }), page.click('button[type=submit]')]);
     await page.context().storageState({ path: storageState });
+
+    // The back-office prefix (app.backendPath, D-40-01): where the login landed, unless given.
+    // Workers inherit the variable (support.mjs, backend()).
+    if (!process.env.E2E_BACKEND_PATH) {
+        process.env.E2E_BACKEND_PATH = new URL(page.url()).pathname.replace(/^\/+/, '').replace(/^index\.php\/?/, '').split('/')[0] || 'backend';
+    }
+
     await browser.close();
 }

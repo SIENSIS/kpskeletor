@@ -39,6 +39,15 @@ export const test = base.extend({
 export { expect };
 
 /**
+ * A back-office path under the site's prefix (app.backendPath; `E2E_BACKEND_PATH`, found by the
+ * global set-up from where the login lands): backend('news') = '/admin/news'.
+ */
+export function backend(path = '') {
+    const prefix = '/' + (process.env.E2E_BACKEND_PATH || 'backend');
+    return path === '' ? prefix : `${prefix}/${path.replace(/^\/+/, '')}`;
+}
+
+/**
  * Opens a URL and checks it: status below 400, no CSP violation, no horizontal overflow, no axe
  * violation of AXE_TAGS; then saves a screenshot.
  */

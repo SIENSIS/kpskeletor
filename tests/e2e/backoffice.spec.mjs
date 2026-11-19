@@ -3,30 +3,30 @@
 // violations. Screens that need a recent re-authentication (Settings › Security, Users'
 // access, Backups' restore…) are left out: the e2e session never re-authenticates. The Tasks
 // tutorial module is disabled by default: the e2e site enables it (docs/development.md).
-import { test, expect, checkPage, checkSkipLink } from './support.mjs';
+import { test, expect, checkPage, checkSkipLink, backend } from './support.mjs';
 
 const screens = [
-    ['/backend', 'dashboard'],
-    ['/backend/news', 'news-reader'],
-    ['/backend/news/posts', 'news-posts'],
-    ['/backend/news/posts/add', 'news-post-form'],
-    ['/backend/pages', 'pages'],
-    ['/backend/files', 'files'],
-    ['/backend/calendar', 'calendar'],
-    ['/backend/events', 'events'],
-    ['/backend/tasks', 'tasks-board'],
-    ['/backend/tasks/tasks', 'tasks-list'],
-    ['/backend/users', 'users'],
-    ['/backend/users/groups', 'groups'],
-    ['/backend/users/permissions', 'permission-matrix'],
-    ['/backend/settings', 'settings'],
-    ['/backend/activity', 'activity'],
-    ['/backend/notifications', 'notifications'],
-    ['/backend/modules', 'modules'],
-    ['/backend/menus/public', 'menus'],
-    ['/backend/backups', 'backups'],
-    ['/backend/security', 'security-status'],
-    ['/backend/profile', 'profile'],
+    [backend(), 'dashboard'],
+    [backend('news'), 'news-reader'],
+    [backend('news/posts'), 'news-posts'],
+    [backend('news/posts/add'), 'news-post-form'],
+    [backend('pages'), 'pages'],
+    [backend('files'), 'files'],
+    [backend('calendar'), 'calendar'],
+    [backend('events'), 'events'],
+    [backend('tasks'), 'tasks-board'],
+    [backend('tasks/tasks'), 'tasks-list'],
+    [backend('users'), 'users'],
+    [backend('users/groups'), 'groups'],
+    [backend('users/permissions'), 'permission-matrix'],
+    [backend('settings'), 'settings'],
+    [backend('activity'), 'activity'],
+    [backend('notifications'), 'notifications'],
+    [backend('modules'), 'modules'],
+    [backend('menus/public'), 'menus'],
+    [backend('backups'), 'backups'],
+    [backend('security'), 'security-status'],
+    [backend('profile'), 'profile'],
 ];
 
 for (const [url, name] of screens) {
@@ -41,11 +41,11 @@ test('every menu entry opens', async ({ page }) => {
     test.skip(test.info().project.name !== 'desktop-light', 'Once, at desktop width.');
     test.setTimeout(240_000);
 
-    await page.goto('/backend');
+    await page.goto(backend());
     const origin = new URL(page.url()).origin;
     const links = await page.locator('a[href]').evaluateAll((anchors) => anchors.map((a) => a.href));
     const targets = [...new Set(links)]
-        .filter((href) => href.startsWith(origin) && /\/backend(\/|$)/.test(new URL(href).pathname))
+        .filter((href) => href.startsWith(origin) && (new URL(href).pathname === backend() || new URL(href).pathname.startsWith(backend('') + '/')))
         .filter((href) => !/logout|\/export|download/.test(href))
         .map((href) => href.split('#')[0]);
 
@@ -66,5 +66,5 @@ test('every menu entry opens', async ({ page }) => {
 // Keyboard navigation: the first Tab stop is the "skip to content" link, and it moves to the
 // main content past the menus.
 test('keyboard: skip link', async ({ page }) => {
-    await checkSkipLink(page, '/backend');
+    await checkSkipLink(page, backend());
 });
