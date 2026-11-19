@@ -53,6 +53,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Fixed
 
+- The public language switch's button names its visible language code (axe `label-content-name-mismatch`).
 - Content forms, readers and APIs (News, Pages, Events, Menus, Tasks) only offered Catalan,
   Spanish and English and always required Catalan: a language added by configuration now reaches
   every translated form, reader and API, slugs and activity summaries use the default language's
