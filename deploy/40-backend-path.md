@@ -39,11 +39,11 @@
 
 ## Goal
 
-The back-office path prefix, `backend` today, becomes an installation choice (D-40-01), so a site
-can use `/admin`, `/private`, `/intranet`… without changing code.
+The back-office path prefix, `backend` today, becomes an installation choice that a console
+command can change later (D-40-01, decided 2026-11-19: alternative C), so a site can use `/admin`,
+`/private`, `/intranet`… without changing code.
 
-**Requires D-40-01 decided.** If it is still Open, stop and ask me to run `deploy/decide.md`.
-Build exactly what the decision says; the scope below is the proposal it was written from.
+**D-40-01 is decided** (read it in `docs/decisions.md`); build exactly what it says.
 
 ## Findings (counted on 2026-11-19)
 
@@ -69,8 +69,17 @@ dashboard quick links, `backend_menu_links`, the activity log.
   installed module, `robots.txt`, `sitemap.xml`…). Pages refuses it as a top-level slug
   (`PageSlugs::reservedSlugs()`), and the installer refuses a path a demo page uses (`intranet`
   is a demo page today: solve it as the decision says).
-- **After installation:** as decided (proposal: not changed from the UI; documented as a choice
-  made at install time).
+- **Changing it later (D-40-01):** never from the back office. A console command
+  `php spark app:backend-path <new> [--yes]`: validates the new path like the installer (and
+  refuses the current one), asks for confirmation, turns maintenance mode on
+  (`MaintenanceMode`), rewrites `app.backendPath` in `.env` (prints the line to copy when `.env`
+  is not writable, and stops before touching data), rewrites the stored links that still carry
+  the old prefix (notifications, dashboard quick links, back-office menu links and any other
+  module data that stores internal paths: modules can answer a Core event, e.g.
+  `backendPathChanged`, with their own rewrite), clears the caches (menus included), writes a
+  `security_log()` entry and turns maintenance off; on failure it leaves maintenance on and says
+  what to undo. Document it in `docs/commands.md` and in the installation docs (bookmarks, API
+  clients and the web server's own rules that mention the old path must be updated by hand).
 - `security:check` reports the path (info) and the probe uses it (`?return=` check on the back
   office); `CLAUDE.md` and the docs say "the back-office prefix" instead of `backend/`.
 - The public sign-in link of session 38 keeps working (route names).
@@ -82,6 +91,10 @@ dashboard quick links, `backend_menu_links`, the activity log.
   (`permissions:check`), login redirect and forced reset, menus, CRUD URLs (kpcrudy), notification
   links, quick links and back-office menu links resolve under `/admin`; `/backend/...` answers 404.
 - Installer validation (reserved paths, page slugs, format) for the CLI and the web form.
+- `app:backend-path`: refuses invalid, reserved and current paths; changes `.env`, rewrites the
+  stored links with the old prefix (and leaves other data alone), clears the menu cache, logs a
+  security event, and the site answers under the new prefix and 404 under the old one; a failure
+  leaves maintenance mode on.
 - e2e against a demo site installed with `--backend-path=admin` (the specs read the prefix).
 
 ## Docs

@@ -146,7 +146,7 @@ s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou
 | 37 | `37-content-locales.md` | Idiomes del contingut des dels idiomes del lloc (no només ca/es/en) | Després de la 1.0.0 |
 | 38 | `38-settings-menu.md` | Menú de configuració agrupat i enllaç d'accés al lloc públic | |
 | 39 | `39-installer-progress.md` | Progrés de l'instal·lador web | |
-| 40 | `40-backend-path.md` | Ruta del back-office configurable (cal decidir D-40-01) | |
+| 40 | `40-backend-path.md` | Ruta del back-office configurable en instal·lar, i comanda per canviar-la (D-40-01) | |
 
 Fitxers auxiliars: `next.md` (executa la sessió següent), `decide.md` (et pregunta els dubtes
 oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió inacabada) i
@@ -170,4 +170,4 @@ oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió ina
   vols conservar-ho, també `prompt_new.md` aquí).
 - Quan la sessió 36 acabi, crea l'etiqueta `v1.0.0` del repositori nou des de GitHub (Releases).
 - Les sessions 37–40 s'han afegit després de la 1.0.0 (revisió del 19-11-2026); `next.md` les
-  executa en ordre. Abans de la 40 cal decidir D-40-01 (`executa deploy/decide.md`).
+  executa en ordre.
