@@ -41,7 +41,7 @@ use Throwable;
 final class WebInstaller extends BaseController
 {
     /** Form fields read from the POST (never the whole POST). */
-    private const FIELDS = ['environment', 'baseURL', 'dbDriver', 'dbHost', 'dbPort', 'dbName', 'dbUser', 'dbPassword', 'dbPrefix', 'adminUsername', 'adminEmail', 'adminPassword', 'adminPasswordConfirm', 'demo'];
+    private const FIELDS = ['environment', 'baseURL', 'dbDriver', 'dbHost', 'dbPort', 'dbName', 'dbUser', 'dbPassword', 'dbPrefix', 'backendPath', 'adminUsername', 'adminEmail', 'adminPassword', 'adminPasswordConfirm', 'demo'];
 
     /** Requests per minute and IP address to `progress/install/<job>`. */
     public const PROGRESS_LIMIT = 120;
@@ -75,6 +75,7 @@ final class WebInstaller extends BaseController
             adminEmail: $text('adminEmail'),
             adminPassword: is_string($post['adminPassword'] ?? null) ? $post['adminPassword'] : '',
             demo: ($post['demo'] ?? '') === '1' ? [] : null,
+            backendPath: strtolower($text('backendPath')),
         );
 
         $installer = new Installer(service('installstate'));

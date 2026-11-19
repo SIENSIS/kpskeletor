@@ -41,6 +41,7 @@ return [
         'envExists' => 'Ya existe un archivo .env: vuelva a ejecutarlo con --keep-env para usarlo, o bórrelo para empezar de cero.',
         'askEnvironment' => 'Entorno',
         'askUrl' => 'URL base del sitio (p. ej. https://intranet.example.com/)',
+        'askBackendPath' => 'Primer segmento de la dirección del back office (p. ej. backend, admin, intranet)',
         'askDriver' => 'Base de datos (mysql = MariaDB/MySQL, sqlite)',
         'askSqliteName' => 'Nombre del archivo SQLite (dentro de writable/)',
         'askHost' => 'Servidor de la base de datos',
@@ -100,6 +101,8 @@ return [
         'demoProduction' => 'En producción no se cargan datos de demostración: elija desarrollo (o defina packages.allowDemoInProduction).',
     ],
     'form' => [
+        'backendPath' => 'Dirección del back office',
+        'backendPathHelp' => 'El back office estará en esta dirección, p. ej. /admin o /intranet. Letras minúsculas, cifras y guiones. Elíjala ahora: cambiarla después requiere un comando de consola.',
         'baseURL' => 'Dirección del sitio (URL base)',
         'environment' => 'Entorno',
         'envProduction' => 'Producción (recomendado)',

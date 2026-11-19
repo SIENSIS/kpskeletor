@@ -58,6 +58,15 @@ $aria    = static fn (string $field): string => isset($errors[$field]) ? ' aria-
                             </select>
                             <?= $error('environment') ?>
                         </div>
+                        <div class="col-12 col-md-8">
+                            <label for="backendPath" class="form-label"><?= esc(lang('Install.form.backendPath')) ?></label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text">/</span>
+                                <input type="text" class="form-control<?= $invalid('backendPath') ?>" id="backendPath" name="backendPath" value="<?= esc($options->backendPath) ?>" required pattern="[a-z][a-z0-9\-]{0,28}[a-z0-9]" maxlength="30" autocapitalize="none" spellcheck="false" aria-describedby="backendPath-help<?= isset($errors['backendPath']) ? ' backendPath-error' : '' ?>"<?= isset($errors['backendPath']) ? ' aria-invalid="true"' : '' ?>>
+                                <?= $error('backendPath') ?>
+                            </div>
+                            <div id="backendPath-help" class="form-text"><?= esc(lang('Install.form.backendPathHelp')) ?></div>
+                        </div>
                     </div>
                 </div>
 

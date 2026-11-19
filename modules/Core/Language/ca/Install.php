@@ -41,6 +41,7 @@ return [
         'envExists' => 'Ja existeix un fitxer .env: torneu-ho a executar amb --keep-env per fer-lo servir, o esborreu-lo per començar de zero.',
         'askEnvironment' => 'Entorn',
         'askUrl' => 'URL base del lloc (p. ex. https://intranet.example.com/)',
+        'askBackendPath' => 'Primer segment de l\'adreça del back office (p. ex. backend, admin, intranet)',
         'askDriver' => 'Base de dades (mysql = MariaDB/MySQL, sqlite)',
         'askSqliteName' => 'Nom del fitxer SQLite (dins de writable/)',
         'askHost' => 'Servidor de la base de dades',
@@ -100,6 +101,8 @@ return [
         'demoProduction' => 'En producció no es carreguen dades de demostració: trieu desenvolupament (o definiu packages.allowDemoInProduction).',
     ],
     'form' => [
+        'backendPath' => 'Adreça del back office',
+        'backendPathHelp' => 'El back office serà en aquesta adreça, p. ex. /admin o /intranet. Lletres minúscules, xifres i guionets. Trieu-la ara: canviar-la després requereix una ordre de consola.',
         'baseURL' => 'Adreça del lloc (URL base)',
         'environment' => 'Entorn',
         'envProduction' => 'Producció (recomanat)',

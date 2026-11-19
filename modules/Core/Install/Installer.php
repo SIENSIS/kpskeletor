@@ -18,6 +18,7 @@ use Modules\Core\Demo\DemoDataManager;
 use Modules\Core\Modules\ModuleDiscovery;
 use Modules\Core\Modules\ModuleSynchronizer;
 use Modules\Core\Modules\SyncFailedException;
+use Modules\Core\Routing\BackendPath;
 use Throwable;
 
 /**
@@ -132,6 +133,8 @@ final class Installer
             $values['app.baseURL'] = rtrim($options->baseURL, '/') . '/';
         }
 
+        $values['app.backendPath'] = $options->backendPath;
+
         return $values + [
             'app.maskKey'    => $this->keys->maskKey(),
             'encryption.key' => $this->keys->encryptionKey(),
@@ -208,6 +211,13 @@ final class Installer
             }
 
             $result->envCompleted = $keys === [] ? [] : $this->env->complete($this->state->envPath(), $keys);
+
+            if ($options->backendPath !== BackendPath::current()) {
+                $content = EnvWriter::withValue((string) file_get_contents($this->state->envPath()), 'app.backendPath', $options->backendPath);
+                $this->env->write($this->state->envPath(), $content);
+                $result->envCompleted[] = 'app.backendPath';
+                $keys['app.backendPath'] = $options->backendPath;
+            }
             $values               = $keys;
         } else {
             $values      = $this->envValues($options);

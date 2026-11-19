@@ -41,6 +41,7 @@ return [
         'envExists' => 'A .env file already exists: run again with --keep-env to use it, or delete it to start from scratch.',
         'askEnvironment' => 'Environment',
         'askUrl' => 'Site base URL (e.g. https://intranet.example.com/)',
+        'askBackendPath' => 'First path segment of the back office (e.g. backend, admin, intranet)',
         'askDriver' => 'Database (mysql = MariaDB/MySQL, sqlite)',
         'askSqliteName' => 'SQLite file name (in writable/)',
         'askHost' => 'Database host',
@@ -100,6 +101,8 @@ return [
         'demoProduction' => 'Demo data is not loaded in production: choose development (or set packages.allowDemoInProduction).',
     ],
     'form' => [
+        'backendPath' => 'Back-office address',
+        'backendPathHelp' => 'The back office will be at this address, e.g. /admin or /intranet. Lowercase letters, digits and hyphens. Choose it now: changing it later needs a console command.',
         'baseURL' => 'Site address (base URL)',
         'environment' => 'Environment',
         'envProduction' => 'Production (recommended)',

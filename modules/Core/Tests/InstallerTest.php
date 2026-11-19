@@ -204,6 +204,68 @@ final class InstallerTest extends CIUnitTestCase
         $this->assertFalse($this->db->tableExists('modules'));
     }
 
+    public function testTheBackOfficePathIsWrittenToTheEnv(): void
+    {
+        $state                = $this->installState();
+        $options              = $this->options();
+        $options->backendPath = 'admin';
+        $result               = $this->installer($state)->install($options);
+
+        $this->assertTrue($result->envWritten);
+        $this->assertStringContainsString("app.backendPath = admin\n", (string) file_get_contents($state->envPath()));
+    }
+
+    public function testTheDefaultBackOfficePathIsWrittenToo(): void
+    {
+        $state = $this->installState();
+        $this->installer($state)->install($this->options());
+
+        $this->assertStringContainsString("app.backendPath = backend\n", (string) file_get_contents($state->envPath()));
+    }
+
+    /**
+     * @return iterable<string, array{0: string}>
+     */
+    public static function invalidBackendPaths(): iterable
+    {
+        yield 'too short' => ['a'];
+        yield 'uppercase' => ['Admin'];
+        yield 'two segments' => ['admin/panel'];
+        yield 'starts with a digit' => ['1admin'];
+        yield 'ends with a hyphen' => ['admin-'];
+        yield 'dot' => ['admin.php'];
+        yield 'too long' => [str_repeat('a', 31)];
+        yield 'api' => ['api'];
+        yield 'login' => ['login'];
+        yield 'install' => ['install'];
+        yield 'progress' => ['progress'];
+        yield 'uploads' => ['uploads'];
+        yield 'assets' => ['assets'];
+        yield 'a language code' => ['es'];
+        yield 'a module route' => ['news'];
+        yield 'files' => ['files'];
+        yield 'ical' => ['ical'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidBackendPaths')]
+    public function testInvalidBackOfficePathsAreRefused(string $path): void
+    {
+        $options              = $this->options();
+        $options->backendPath = $path;
+
+        $this->assertArrayHasKey('backendPath', $this->installer()->validate($options, false));
+    }
+
+    public function testValidBackOfficePathsAreAccepted(): void
+    {
+        foreach (['admin', 'private', 'intranet', 'gestio-2', 'backend'] as $path) {
+            $options              = $this->options();
+            $options->backendPath = $path;
+
+            $this->assertArrayNotHasKey('backendPath', $this->installer()->validate($options, false), $path);
+        }
+    }
+
     public function testCommonPasswordsAreRefusedByShieldsRules(): void
     {
         $options                = $this->options();

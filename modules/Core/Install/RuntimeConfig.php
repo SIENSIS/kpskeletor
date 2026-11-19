@@ -52,6 +52,10 @@ class RuntimeConfig
             $app->baseURL = $values['app.baseURL'];
         }
 
+        if (($values['app.backendPath'] ?? '') !== '') {
+            $app->backendPath = $values['app.backendPath'];
+        }
+
         foreach (['Kpcrudy', 'Kpapy'] as $name) {
             config($name)->maskKey = $app->maskKey;
         }

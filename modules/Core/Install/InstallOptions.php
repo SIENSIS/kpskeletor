@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\Core\Install;
 
+use Modules\Core\Routing\BackendPath;
+
 /**
  * What the installer needs, from `app:install` options/prompts or the web installer's form.
  * `validate()` returns the problems as field => message.
@@ -31,6 +33,7 @@ final class InstallOptions
         public string $adminEmail = '',
         public string $adminPassword = '',
         public ?array $demo = null,
+        public string $backendPath = BackendPath::CANONICAL,
     ) {
     }
 
@@ -68,6 +71,13 @@ final class InstallOptions
 
         if ($checkDatabase) {
             $errors += $this->validateDatabase();
+        }
+
+        // The back-office prefix (D-40-01): format, reserved paths, the routes of the modules.
+        $backendError = BackendPath::error($this->backendPath, BackendPath::routedSegments());
+
+        if ($backendError !== null) {
+            $errors['backendPath'] = $backendError;
         }
 
         if (preg_match('/^[A-Za-z0-9._-]{3,30}$/', $this->adminUsername) !== 1) {
