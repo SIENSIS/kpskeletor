@@ -43,7 +43,7 @@ final class Reader extends BackendController
 
         $items = array_map(static fn (array $row): array => self::item($row, isset($read[(int) $row['id']])), $result['rows']);
         $pager = service('pager');
-        $pager->setPath('backend/news');
+        $pager->setPath(backend_path('news'));
 
         return $this->render('Modules\News\Views\reader\index', [
             'title'      => lang('News.readerTitle'),
@@ -62,7 +62,7 @@ final class Reader extends BackendController
         $row  = $this->readable($code, $user);
         $read = (new ReadReceipts())->isRead((int) $row['id'], (int) $user->id);
 
-        $this->breadcrumb(lang('News.readerTitle'), site_url('backend/news'));
+        $this->breadcrumb(lang('News.readerTitle'), backend_url('news'));
 
         return $this->render('Modules\News\Views\reader\show', [
             'title' => (string) $row['title'],
@@ -82,7 +82,7 @@ final class Reader extends BackendController
 
         $return = $this->request->getPost('return');
 
-        return safe_redirect(is_string($return) ? $return : null, 'backend/news/read/' . $code);
+        return safe_redirect(is_string($return) ? $return : null, backend_path('news/read/' . $code));
     }
 
     /**
@@ -107,8 +107,8 @@ final class Reader extends BackendController
             'date'       => (string) $row['published_at'],
             'expires'    => $row['expires_at'] === null ? null : (string) $row['expires_at'],
             'read'       => $read,
-            'url'        => site_url('backend/news/read/' . $code),
-            'markUrl'    => site_url('backend/news/read/' . $code . '/mark'),
+            'url'        => backend_url('news/read/' . $code),
+            'markUrl'    => backend_url('news/read/' . $code . '/mark'),
         ];
     }
 

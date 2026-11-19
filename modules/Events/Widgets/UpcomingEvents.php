@@ -71,9 +71,9 @@ final class UpcomingEvents extends Widget
             'title'    => (string) $row['title'],
             'when'     => EventDetails::when($row['occurrence_start'], $row['occurrence_end'], (bool) $row['all_day']),
             'location' => (string) ($row['location'] ?? ''),
-            'url'      => site_url('backend/calendar/event/' . EventRepository::code((int) $row['id'])) . '?date=' . $row['occurrence_start']->format('Y-m-d'),
+            'url'      => backend_url('calendar/event/' . EventRepository::code((int) $row['id'])) . '?date=' . $row['occurrence_start']->format('Y-m-d'),
         ], $rows);
 
-        return $this->view('Modules\Events\Views\widgets\upcoming', ['items' => $items, 'url' => site_url('backend/calendar')]);
+        return $this->view('Modules\Events\Views\widgets\upcoming', ['items' => $items, 'url' => backend_url('calendar')]);
     }
 }

@@ -47,7 +47,7 @@
             <div class="alert alert-info small" role="note"><i class="bi bi-terminal me-1" aria-hidden="true"></i><?= esc(lang('Updates.howTo')) ?> <code>php spark app:update --dry-run</code></div>
         <?php endif ?>
         <?php if ($canCheck): ?>
-            <form action="<?= esc(site_url('backend/updates/check'), 'attr') ?>" method="post">
+            <form action="<?= esc(backend_url('updates/check'), 'attr') ?>" method="post">
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-outline-primary"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i><?= esc(lang('Updates.checkNow')) ?></button>
             </form>

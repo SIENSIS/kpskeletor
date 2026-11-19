@@ -4,7 +4,7 @@
  * "Customise" turns on the edit mode instead of opening the form page: every card gets a drag
  * handle (pointer events: mouse, pen and touch; arrow keys when the handle has the focus), a size
  * menu (the widget's sizes only) and a "hide" button; hidden widgets get a "show" button. Every
- * change is saved at once with `POST backend/dashboard/layout` (JSON); the server keeps only the
+ * change is saved at once with `POST <back office>/dashboard/layout` (JSON); the server keeps only the
  * widgets the user may see. Showing a hidden widget reloads the page so its content is rendered.
  */
 import { post } from 'core/http.js';

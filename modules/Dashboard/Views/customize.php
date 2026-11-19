@@ -49,7 +49,7 @@
             </table>
         </div>
         <div class="card-footer d-flex flex-wrap gap-2 justify-content-end">
-            <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend'), 'attr') ?>"><?= esc(lang('Dashboard.cancel')) ?></a>
+            <a class="btn btn-outline-secondary" href="<?= esc(backend_url(), 'attr') ?>"><?= esc(lang('Dashboard.cancel')) ?></a>
             <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1" aria-hidden="true"></i><?= esc(lang('Dashboard.save')) ?></button>
         </div>
     </form>

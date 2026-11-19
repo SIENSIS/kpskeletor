@@ -27,11 +27,11 @@ helper('number');
         </div>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/modules/packages/upload'),
+            'action'      => backend_url('modules/packages/upload'),
             'fields'      => $fields,
             'multipart'   => true,
             'submitLabel' => lang('Core.packages.upload'),
-            'cancelUrl'   => site_url('backend/modules/packages'),
+            'cancelUrl'   => backend_url('modules/packages'),
         ]) ?>
     </div>
 </div>

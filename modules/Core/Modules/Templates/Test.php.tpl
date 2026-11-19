@@ -27,17 +27,17 @@ final class {{Name}}ModuleTest extends AuthTestCase
 
     public function testTheScreenNeedsItsPermission(): void
     {
-        $this->send('GET', 'backend/{{name}}')->assertRedirectTo(site_url('login'));
+        $this->send('GET', backend_path('{{name}}'))->assertRedirectTo(site_url('login'));
 
         $this->loginWith();
-        $this->send('GET', 'backend/{{name}}')->assertStatus(403);
+        $this->send('GET', backend_path('{{name}}'))->assertStatus(403);
     }
 
     public function testAUserWithThePermissionSeesTheScreen(): void
     {
         $this->loginWith('{{name}}-main.view');
 
-        $response = $this->send('GET', 'backend/{{name}}');
+        $response = $this->send('GET', backend_path('{{name}}'));
         $response->assertOK();
         $response->assertSee(lang('{{Name}}.title'));
     }
@@ -48,7 +48,7 @@ final class {{Name}}ModuleTest extends AuthTestCase
 
         // No POST route yet: answered 404. When you add a write route (or a CRUD), post to it here
         // without its permission and assert the 403 or `assertCrudRefused()`, and that nothing changed.
-        $this->assertNotFound('POST', 'backend/{{name}}', ['anything' => '1']);
+        $this->assertNotFound('POST', backend_path('{{name}}'), ['anything' => '1']);
     }
 
     public function testMigrationsGoDownAndUpAgain(): void

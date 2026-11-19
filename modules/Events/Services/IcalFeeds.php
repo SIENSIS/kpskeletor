@@ -152,7 +152,7 @@ final class IcalFeeds
 
             $rows = $this->unique($this->events->occurrences($user, $from, $to, false, $filters));
             $rows = [...$rows, ...$this->filtered($this->events->deletedSince($user, $this->graceStart()), $categories, $calendars)];
-            $base = site_url('backend/calendar/event');
+            $base = backend_url('calendar/event');
             $alarms = $this->alarms($user, array_map(static fn (array $r): int => (int) $r['id'], $rows));
 
             foreach ($rows as $i => $event) {

@@ -124,20 +124,28 @@ Names, wildcards, the `'name'` override, own records and hidden fields: [`permis
 `Config/Routes.php` is discovered by CodeIgniter and never queries the database:
 
 ```php
-CrudFactory::routes($routes, 'news-posts', 'backend/news/posts', '\Modules\News\Controllers\Posts::index');
+CrudFactory::routes($routes, 'news-posts', backend_path('news/posts'), '\Modules\News\Controllers\Posts::index');
 
-$routes->group('backend/news', ['namespace' => 'Modules\News\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('news'), ['namespace' => 'Modules\News\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Reader::index', ['filter' => 'can:news-read.view', 'as' => 'news-read']);
 });
 
 Resource::routes($routes, 'api/v1/news', '\Modules\News\Controllers\Api\Posts::index', ['filter' => 'kpapy']);
 ```
 
+- **The back-office prefix** is configurable (`app.backendPath`, default `backend`, D-40-01):
+  never write `backend/` in code. Routes, redirects, links and views use `backend_path('news')`
+  (a path) or `backend_url('news')` (a URL); scripts use `backendUrl()` from `core/config.js` or,
+  better, URLs printed by the server; a link that is **stored** (a notification's `url`, a
+  calendar entry's source link) uses `backend_link('news/read/7')`, the canonical form
+  `backend/news/read/7` that is moved under the installed prefix when shown (D-40-02). A module
+  that stores addresses typed by people listens to `backendPathChanged` (`php spark
+  app:backend-path`) and rewrites them with `BackendPathChanged::rewriteColumn()`.
 - **CRUD screens** (`Controllers/Categories.php`): extend `BackendController`, build the CRUD
   with `$this->crud('news-categories')`, return `$this->renderCrud($crud)` ([`cruds.md`](cruds.md)).
   `CrudFactory::routes()` adds the `backend` chain and `can:<resource>.list`.
 - **Other screens** (`Controllers/Reader.php`): `$this->render()` through the active theme with
-  the standard components ([`themes.md`](themes.md)); every `backend/` route has `can:`.
+  the standard components ([`themes.md`](themes.md)); every back-office route has `can:`.
 - **API** (`Controllers/Api/Posts.php`): a `Kpapy\Resource` with `setResource('news-api')`,
   routed under `api/v1/` with the `kpapy` filter and declared in `$api` ([`api.md`](api.md)).
   A public endpoint uses `kpapy:public` (GET only), like `api/v1/public/news`.

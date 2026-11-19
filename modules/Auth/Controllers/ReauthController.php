@@ -35,7 +35,7 @@ final class ReauthController extends AuthController
         }
 
         if (Impersonation::active()) {
-            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+            return redirect()->to(backend_url('profile'))->with('error', lang('Auth.impersonation.refused'));
         }
 
         return $this->render(self::VIEW, $this->data($user));
@@ -53,7 +53,7 @@ final class ReauthController extends AuthController
         }
 
         if (Impersonation::active()) {
-            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+            return redirect()->to(backend_url('profile'))->with('error', lang('Auth.impersonation.refused'));
         }
 
         $email = (string) $user->email;

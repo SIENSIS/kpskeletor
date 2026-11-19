@@ -20,7 +20,7 @@ $font = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
 <div class="backend-shell">
     <aside class="sidebar offcanvas-md offcanvas-start" id="backend-sidebar" tabindex="-1" aria-labelledby="backend-sidebar-title">
         <div class="sidebar-header d-flex align-items-center justify-content-between px-3">
-            <h2 class="h6 mb-0" id="backend-sidebar-title"><?= theme_partial('brand', ['brandUrl' => base_url('backend'), 'brandClass' => 'sidebar-brand']) ?></h2>
+            <h2 class="h6 mb-0" id="backend-sidebar-title"><?= theme_partial('brand', ['brandUrl' => base_url(backend_path()), 'brandClass' => 'sidebar-brand']) ?></h2>
             <button type="button" class="btn-close btn-close-white d-md-none" data-bs-dismiss="offcanvas" data-bs-target="#backend-sidebar" aria-label="<?= esc(lang('Core.ui.close')) ?>"></button>
         </div>
         <nav class="sidebar-nav flex-grow-1 overflow-y-auto px-2 py-3" aria-label="<?= esc(lang('Core.ui.mainMenu')) ?>">

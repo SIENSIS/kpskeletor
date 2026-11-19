@@ -64,7 +64,7 @@ final class Notifications extends BackendController
             }, ['permission' => 'list'])
             // Marking as read changes only the user's own view: not written to the activity log.
             ->skipActivity('read', 'readall')
-            ->addHeaderAction(lang('Core.notifications.preferences'), 'backend/profile/notifications', ['icon' => 'bi bi-sliders']);
+            ->addHeaderAction(lang('Core.notifications.preferences'), backend_path('profile/notifications'), ['icon' => 'bi bi-sliders']);
 
         return $this->renderCrud($crud);
     }
@@ -87,13 +87,13 @@ final class Notifications extends BackendController
         $row   = $inbox->find((int) $id);
 
         if ($row === null) {
-            return redirect()->to(site_url('backend/notifications'))->with('error', lang('Core.notifications.notFound'));
+            return redirect()->to(backend_url('notifications'))->with('error', lang('Core.notifications.notFound'));
         }
 
         $inbox->markRead((int) $row['id']);
         $path = Notifier::messageOf($row)->path();
 
-        return redirect()->to(site_url($path ?? 'backend/notifications/show/' . Crud::idForUrl((int) $row['id'], 'notifications')));
+        return redirect()->to(site_url($path ?? backend_path('notifications/show/' . Crud::idForUrl((int) $row['id'], 'notifications'))));
     }
 
     /**
@@ -107,7 +107,7 @@ final class Notifications extends BackendController
             return $this->json(['marked' => $count, 'unread' => 0]);
         }
 
-        return redirect()->to(site_url('backend/notifications'))->with('success', lang('Core.notifications.markedAllRead', [$count]));
+        return redirect()->to(backend_url('notifications'))->with('success', lang('Core.notifications.markedAllRead', [$count]));
     }
 
     /**
@@ -124,7 +124,7 @@ final class Notifications extends BackendController
         }
 
         if ($message->path() !== null) {
-            $html .= '<div class="small"><a href="' . esc(site_url('backend/notifications/open/' . (int) $row['id']), 'attr') . '">' . esc(lang('Core.notifications.open')) . '</a></div>';
+            $html .= '<div class="small"><a href="' . esc(backend_url('notifications/open/' . (int) $row['id']), 'attr') . '">' . esc(lang('Core.notifications.open')) . '</a></div>';
         }
 
         return $html;

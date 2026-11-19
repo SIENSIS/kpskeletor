@@ -87,14 +87,14 @@ final class Notices extends Widget
                 'pinned'   => (int) $notice['pinned'] === 1,
                 'date'     => (string) $notice['published_at'],
                 'read'     => isset($read[(int) $notice['id']]),
-                'url'      => site_url('backend/news/read/' . $code),
-                'markUrl'  => site_url('backend/news/read/' . $code . '/mark'),
+                'url'      => backend_url('news/read/' . $code),
+                'markUrl'  => backend_url('news/read/' . $code . '/mark'),
             ];
         }
 
         return $this->view('Modules\News\Views\widgets\notices', [
             'items' => $items,
-            'url'   => site_url('backend/news?type=notice'),
+            'url'   => backend_url('news?type=notice'),
         ]);
     }
 }

@@ -10,6 +10,7 @@ use Modules\Core\Install\CliPrompt;
 use Modules\Core\Install\Installer;
 use Modules\Core\Install\InstallException;
 use Modules\Core\Install\InstallOptions;
+use Modules\Core\Routing\BackendPath;
 use Modules\Core\Security\Check\SecurityChecker;
 use Modules\Core\Security\Check\SecurityStatus;
 use Throwable;
@@ -41,6 +42,7 @@ final class AppInstall extends BaseCommand
         '--db-name'        => 'Database name (SQLite: file name in writable/, default database.db).',
         '--db-user'        => 'Database user.',
         '--db-prefix'      => 'Table prefix (default none).',
+        '--backend-path'   => 'First path segment of the back office (default backend; e.g. admin, intranet). Chosen once: see app:backend-path.',
         '--admin'          => 'Username of the first superadmin (default admin).',
         '--email'          => 'Email of the first superadmin.',
         '--demo'           => 'Load demo data: of every module, or of the listed ones (with the modules they need).',
@@ -160,6 +162,7 @@ final class AppInstall extends BaseCommand
             $options->dbPrefix = $this->value($prompt, 'db-prefix', lang('Install.cli.askPrefix'), '');
         }
 
+        $options->backendPath   = strtolower($keepEnv ? (string) ($prompt->option('backend-path') ?? BackendPath::current()) : $this->value($prompt, 'backend-path', lang('Install.cli.askBackendPath'), BackendPath::current()));
         $options->adminUsername = $this->value($prompt, 'admin', lang('Install.cli.askUsername'), 'admin');
         $options->adminEmail    = $this->value($prompt, 'email', lang('Install.cli.askEmail'), '');
         $options->adminPassword = $this->password($prompt, 'INSTALL_ADMIN_PASSWORD', lang('Install.cli.askPassword'), true);

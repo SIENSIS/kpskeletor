@@ -24,7 +24,7 @@ final class NotificationPreferences extends BackendController
         }
 
         ksort($groups);
-        $this->breadcrumb(lang('Core.notifications.title'), site_url('backend/notifications'))->breadcrumb(lang('Core.notifications.preferences'));
+        $this->breadcrumb(lang('Core.notifications.title'), backend_url('notifications'))->breadcrumb(lang('Core.notifications.preferences'));
 
         return $this->render('Modules\Core\Views\notifications\preferences', [
             'title'    => lang('Core.notifications.preferences'),
@@ -53,6 +53,6 @@ final class NotificationPreferences extends BackendController
         service('notifications')->savePreferences((int) auth()->id(), $choices);
         activity_log('Core', 'preferences_saved', ['resource' => 'core-notifications', 'changes' => ['channels' => $choices]]);
 
-        return redirect()->to(site_url('backend/profile/notifications'))->with('success', lang('Core.notifications.preferencesSaved'));
+        return redirect()->to(backend_url('profile/notifications'))->with('success', lang('Core.notifications.preferencesSaved'));
     }
 }

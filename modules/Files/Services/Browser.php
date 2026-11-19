@@ -169,7 +169,7 @@ final class Browser
     public function item(array $row, array $rights): array
     {
         $id       = (int) $row['id'];
-        $base     = site_url('backend/files/api/file/' . $id);
+        $base     = backend_url('files/api/file/' . $id);
         $mime     = (string) $row['mime'];
         $image    = in_array($mime, ['image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif', 'image/webp'], true);
         $previewable = $image || $mime === 'application/pdf' || in_array((string) $row['extension'], ['txt', 'csv', 'md'], true);

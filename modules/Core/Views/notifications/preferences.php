@@ -12,7 +12,7 @@
 <?php if ($groups === []): ?>
     <?= theme_component('empty_state', ['title' => lang('Core.notifications.noTypes'), 'icon' => 'bi bi-bell-slash']) ?>
 <?php else: ?>
-<form action="<?= esc(site_url('backend/profile/notifications')) ?>" method="post">
+<form action="<?= esc(backend_url('profile/notifications')) ?>" method="post">
     <?= csrf_field() ?>
     <p class="small text-body-secondary"><?= esc(lang('Core.notifications.preferencesIntro')) ?></p>
     <?php foreach ($groups as $module => $types): ?>
@@ -55,7 +55,7 @@
     <?php endforeach ?>
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary"><i class="bi bi-check2 me-1" aria-hidden="true"></i><?= esc(lang('Core.ui.save')) ?></button>
-        <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend/notifications')) ?>"><?= esc(lang('Core.notifications.title')) ?></a>
+        <a class="btn btn-outline-secondary" href="<?= esc(backend_url('notifications')) ?>"><?= esc(lang('Core.notifications.title')) ?></a>
     </div>
 </form>
 <?php endif ?>

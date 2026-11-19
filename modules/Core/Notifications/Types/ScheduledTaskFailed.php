@@ -35,7 +35,7 @@ final class ScheduledTaskFailed extends NotificationType
         return new NotificationMessage(
             lang('Core.notifications.taskFailedTitle', [$short]),
             (string) ($this->data['output'] ?? ''),
-            'backend/schedule',
+            backend_link('schedule'),
         );
     }
 }

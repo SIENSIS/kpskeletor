@@ -36,7 +36,7 @@ final class SecurityCheckFailed extends NotificationType
         return new NotificationMessage(
             lang('SecurityCheck.notification.title', [(int) ($this->data['errors'] ?? count($checks))]),
             lang('SecurityCheck.notification.body', [implode(', ', $checks)]),
-            'backend/security',
+            backend_link('security'),
         );
     }
 }

@@ -17,11 +17,11 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-CrudFactory::routes($routes, 'news-posts', 'backend/news/posts', '\Modules\News\Controllers\Posts::index');
-CrudFactory::routes($routes, 'news-mine', 'backend/news/mine', '\Modules\News\Controllers\Posts::mine');
-CrudFactory::routes($routes, 'news-categories', 'backend/news/categories', '\Modules\News\Controllers\Categories::index');
+CrudFactory::routes($routes, 'news-posts', backend_path('news/posts'), '\Modules\News\Controllers\Posts::index');
+CrudFactory::routes($routes, 'news-mine', backend_path('news/mine'), '\Modules\News\Controllers\Posts::mine');
+CrudFactory::routes($routes, 'news-categories', backend_path('news/categories'), '\Modules\News\Controllers\Categories::index');
 
-$routes->group('backend/news', ['namespace' => 'Modules\News\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('news'), ['namespace' => 'Modules\News\Controllers'], static function (RouteCollection $routes): void {
     $read = ['filter' => 'can:news-read.view'];
 
     $routes->get('/', 'Reader::index', $read + ['as' => 'news-read']);

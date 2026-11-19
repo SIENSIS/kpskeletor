@@ -82,6 +82,16 @@ requests never load the manifests.
 - Guests get no menu. Permissions always win: the menu only hides what the routes' `can:` filters
   refuse anyway.
 
+## Back-office prefix and stored links
+
+Generated entries come from route names and resources, so they follow the back-office prefix
+(`app.backendPath`, D-40-01) by themselves. Addresses typed in the Menus module (a custom link of
+the back-office menu, a public menu item) that point inside the back office are stored with the
+canonical prefix (`/backend/…`, `LinkTarget::storedValue()`) and shown under the installed one
+(D-40-02); `php spark app:backend-path` rewrites those typed with an older prefix (event
+`backendPathChanged`, `Config/Events.php`). Dashboard quick links do the same
+(`WidgetOptions`, `QuickLinks`).
+
 ## Cache
 
 The filtered tree is cached per **group set plus the user's individual permissions**

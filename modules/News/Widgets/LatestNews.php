@@ -66,9 +66,9 @@ final class LatestNews extends Widget
             'title'    => (string) $row['title'],
             'category' => $row['category'] === null ? null : (string) $row['category'],
             'date'     => (string) $row['published_at'],
-            'url'      => site_url('backend/news/read/' . Crud::maskId((int) $row['id'], 'news')),
+            'url'      => backend_url('news/read/' . Crud::maskId((int) $row['id'], 'news')),
         ], $rows);
 
-        return $this->view('Modules\News\Views\widgets\latest', ['items' => $items, 'url' => site_url('backend/news')]);
+        return $this->view('Modules\News\Views\widgets\latest', ['items' => $items, 'url' => backend_url('news')]);
     }
 }

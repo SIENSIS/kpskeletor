@@ -115,7 +115,8 @@ final class PageSlugs
     public function reservedSlugs(): array
     {
         // The language codes: `/es/…` is the language prefix of public URLs (D-37-02).
-        $reserved = [...self::RESERVED, ...\Modules\Core\I18n\Locales::supported()];
+        // The back-office prefix (D-40-01; `backend` stays in RESERVED: stored links use it).
+        $reserved = [...self::RESERVED, \Modules\Core\Routing\BackendPath::current(), ...\Modules\Core\I18n\Locales::supported()];
 
         foreach (['GET', 'POST', '*'] as $verb) {
             foreach (array_keys(service('routes')->getRoutes($verb)) as $route) {

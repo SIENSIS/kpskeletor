@@ -44,7 +44,7 @@ final class SessionsController extends BackendController
             ];
         }
 
-        $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))->breadcrumb(lang('Auth.sessions.title'));
+        $this->breadcrumb(lang('Auth.profile.title'), backend_url('profile'))->breadcrumb(lang('Auth.sessions.title'));
 
         return $this->render('Modules\Auth\Views\sessions', [
             'title'     => lang('Auth.sessions.title'),
@@ -101,6 +101,6 @@ final class SessionsController extends BackendController
 
     private function back(string $type, string $message): RedirectResponse
     {
-        return redirect()->to(site_url('backend/profile/sessions'))->with($type, $message);
+        return redirect()->to(backend_url('profile/sessions'))->with($type, $message);
     }
 }

@@ -32,7 +32,7 @@ modules for this module's needs: write the request down and ask the skeleton's o
   `$this->crud('<resource>')`, `$this->renderCrud()`); JSON API endpoints with **kpapy** under
   `api/v1/<path>` (`kpapy` filter, `setResource()` = the CRUD's resource, declared in `$api`). Read
   their docs in `vendor/siensis/<lib>/` before using them; never edit `vendor/`.
-- Permissions `{{name}}-<resource>.<operation>` generated from the manifest; every `backend/` route
+- Permissions `{{name}}-<resource>.<operation>` generated from the manifest; every back-office route (`backend_path()`)
   has a `can:` filter; check them only through `Authorization::for($user)` / `can()`; default deny.
 - One migration per table (Forge / Query Builder, `down()` always), demo data only in
   `{{Name}}DemoSeeder`.
@@ -58,7 +58,7 @@ modules for this module's needs: write the request down and ask the skeleton's o
 
 ## Resources and permissions
 
-- `{{name}}-main` (page: `view`): the module's screen `backend/{{name}}`.{{crudClaude}}{{apiClaude}}
+- `{{name}}-main` (page: `view`): the module's screen `<back office>/{{name}}` (`backend_path('{{name}}')`).{{crudClaude}}{{apiClaude}}
 - Default grants: admin `{{name}}-main.*`{{crudGrantClaude}}.
 
 ## Decisions

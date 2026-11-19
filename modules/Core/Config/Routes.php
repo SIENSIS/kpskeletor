@@ -42,7 +42,7 @@ $routes->get('files/picker/browse', '\Modules\Core\Controllers\FilePicker::brows
 
 // Notifications of the logged-in user (resource core-notifications, granted to every group).
 // The bell's endpoints come before the CRUD's catch-all route.
-$routes->group('backend', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path(), ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
     $can = ['filter' => 'can:core-notifications.list'];
 
     $routes->get('notifications/bell', 'Notifications::bell', $can);
@@ -52,19 +52,19 @@ $routes->group('backend', ['namespace' => 'Modules\Core\Controllers'], static fu
     $routes->post('profile/notifications', 'NotificationPreferences::save', $can);
 });
 
-CrudFactory::routes($routes, 'core-notifications', 'backend/notifications', '\Modules\Core\Controllers\Notifications::index');
+CrudFactory::routes($routes, 'core-notifications', backend_path('notifications'), '\Modules\Core\Controllers\Notifications::index');
 
 // The same notifications in the API (D-26-01; token required).
 \Kpapy\Resource::routes($routes, 'api/v1/notifications', '\Modules\Core\Controllers\Api\Notifications::index', ['filter' => 'kpapy']);
 
 // Scheduled tasks (schedule.list / schedule.show / schedule.run for "run now").
-CrudFactory::routes($routes, 'schedule', 'backend/schedule', '\Modules\Core\Controllers\Schedule::index');
+CrudFactory::routes($routes, 'schedule', backend_path('schedule'), '\Modules\Core\Controllers\Schedule::index');
 
 /*
  * The Modules screen (docs/installing-modules.md). Uploads, approvals and uninstall requests need a recent
  * re-authentication; the installs run from the console (`php spark modules:install --pending`).
  */
-$routes->group('backend/modules', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('modules'), ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
     $list      = ['filter' => 'can:modules.list'];
     $toggle    = ['filter' => 'can:modules.toggle'];
     $upload    = ['filter' => ['can:modules.upload', 'reauth']];
@@ -93,7 +93,7 @@ $routes->group('backend/modules', ['namespace' => 'Modules\Core\Controllers'], s
  * The Security status page (docs/security.md, "Production checklist"): the cached results of
  * `security:check`, "check again" and the external probe (a deliberate action: re-authentication).
  */
-$routes->group('backend/security', ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('security'), ['namespace' => 'Modules\Core\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('/', 'SecurityStatus::index', ['as' => 'security-status', 'filter' => 'can:security.check']);
     $routes->post('refresh', 'SecurityStatus::refresh', ['filter' => ['can:security.check', 'ratelimit:forms']]);
     $routes->get('probe', 'SecurityStatus::probeForm', ['filter' => ['can:security.check', 'reauth']]);

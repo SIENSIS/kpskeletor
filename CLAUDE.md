@@ -58,12 +58,18 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - **Permissions:** `<module>-<resource>.<operation>` (e.g. `news-posts.edit`), generated from the
   manifest, never written by hand. Only Core and single-resource modules may override the prefix
   with the resource `'name'` (e.g. `backup.*`); duplicates are rejected and `Security`/`Update` are
-  reserved module names. Every `backend/` route has a `can:` filter, personal screens included
+  reserved module names. Every back-office route has a `can:` filter, personal screens included
   (their own resources, granted to every group by `defaultGrants`); every `api/v1/` route has the
   `kpapy` filter or is declared public. Default deny. `can:a,b` = any, `can:all,a,b` = all; the
-  `backend` chain covers `backend/*` by itself. Check permissions only through
+  `backend` chain covers the back office by itself. Check permissions only through
   `Authorization::for($user)` / `can()` / `CrudPermissions`, change grants only through
   `GrantManager` (`docs/permissions.md`); `php spark permissions:check` must pass.
+- **Back-office prefix:** `app.backendPath` in `.env` (default `backend`, chosen at install time,
+  changed only with `php spark app:backend-path`; D-40-01). Never write `backend/` in code: use
+  `backend_path('<path>')` (routes, redirects), `backend_url('<path>')` (links), `backendUrl()`
+  (`core/config.js`), and `backend_link('<path>')` for links that are stored (notifications,
+  calendar entries), which are resolved when shown (D-40-02). Docs write `backend/…` for "under
+  the back-office prefix".
 - **Database:** one migration per table, Forge / Query Builder only, `down()` always implemented,
   released migrations never edited. Demo data only in `<Name>DemoSeeder` (extends
   `Modules\Core\Demo\DemoSeeder`) through `DemoData`; load it with `php spark modules:demo <Name>`.

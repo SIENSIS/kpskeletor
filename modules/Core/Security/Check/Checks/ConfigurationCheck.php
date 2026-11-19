@@ -7,6 +7,7 @@ namespace Modules\Core\Security\Check\Checks;
 use Config\App;
 use Config\ContentSecurityPolicy as CspConfig;
 use Config\Cookie;
+use Modules\Core\Routing\BackendPath;
 use Modules\Core\Security\Check\EffectivePolicy;
 use Modules\Core\Security\Check\SecurityCheck;
 use Modules\Core\Security\Check\SecurityReport;
@@ -52,6 +53,9 @@ final class ConfigurationCheck implements SecurityCheck
         } else {
             $report->error(self::GROUP, 'configuration.environment', lang('SecurityCheck.environment.title'), lang('SecurityCheck.environment.error', [$this->environment]), lang('SecurityCheck.environment.fix'));
         }
+
+        // The back-office prefix (D-40-01): information only.
+        $report->info(self::GROUP, 'configuration.backendPath', lang('SecurityCheck.backendPath.title'), lang('SecurityCheck.backendPath.info', ['/' . BackendPath::current()]));
 
         // Debug toolbar and detailed errors
         $debug   = $this->debug ?? (defined('CI_DEBUG') && CI_DEBUG);

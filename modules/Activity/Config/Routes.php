@@ -14,5 +14,5 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-CrudFactory::routes($routes, 'activity-mine', 'backend/activity/mine', '\Modules\Activity\Controllers\Activity::mine');
-CrudFactory::routes($routes, 'activity-log', 'backend/activity', '\Modules\Activity\Controllers\Activity::index');
+CrudFactory::routes($routes, 'activity-mine', backend_path('activity/mine'), '\Modules\Activity\Controllers\Activity::mine');
+CrudFactory::routes($routes, 'activity-log', backend_path('activity'), '\Modules\Activity\Controllers\Activity::index');

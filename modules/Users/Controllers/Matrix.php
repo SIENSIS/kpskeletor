@@ -40,14 +40,14 @@ final class Matrix extends BackendController
             'grants'   => $matrix->grants(),
             'editable' => $editable,
             'canSave'  => in_array(true, $editable, true),
-            'formAction' => site_url('backend/users/permissions'),
+            'formAction' => backend_url('users/permissions'),
         ]);
     }
 
     public function save(): RedirectResponse
     {
         $posted = $this->request->getPost('grants');
-        $back   = site_url('backend/users/permissions');
+        $back   = backend_url('users/permissions');
 
         try {
             $changed = (new PermissionMatrix())->save($this->currentUser(), is_array($posted) ? $posted : []);

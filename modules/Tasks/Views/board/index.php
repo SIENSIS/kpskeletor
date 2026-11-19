@@ -18,7 +18,7 @@
 <?= $this->section('content') ?>
 <div class="tasks-board" data-component="tasks/board" data-options="<?= esc((string) json_encode($options, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 'attr') ?>">
     <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
-        <form method="get" action="<?= esc(site_url('backend/tasks'), 'attr') ?>" class="d-flex flex-wrap align-items-end gap-2" role="search">
+        <form method="get" action="<?= esc(backend_url('tasks'), 'attr') ?>" class="d-flex flex-wrap align-items-end gap-2" role="search">
             <div>
                 <label class="form-label small mb-1" for="tasks-project"><?= esc(lang('Tasks.fields.project_id')) ?></label>
                 <select class="form-select form-select-sm" id="tasks-project" name="project">
@@ -33,7 +33,7 @@
         <div class="d-flex flex-wrap gap-2">
             <span class="small text-body-secondary align-self-center"><?= esc(lang($seesAll ? 'Tasks.board.seesAll' : 'Tasks.board.seesMine')) ?></span>
             <?php if ($canAdd): ?>
-                <a class="btn btn-sm btn-primary" href="<?= esc(site_url('backend/tasks/tasks/add'), 'attr') ?>"><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= esc(lang('Tasks.board.add')) ?></a>
+                <a class="btn btn-sm btn-primary" href="<?= esc(backend_url('tasks/tasks/add'), 'attr') ?>"><i class="bi bi-plus-lg" aria-hidden="true"></i> <?= esc(lang('Tasks.board.add')) ?></a>
             <?php endif ?>
         </div>
     </div>

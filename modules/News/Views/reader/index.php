@@ -12,7 +12,7 @@
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
-<form method="get" action="<?= esc(site_url('backend/news'), 'attr') ?>" class="row g-2 align-items-end mb-3 news-filters" role="search">
+<form method="get" action="<?= esc(backend_url('news'), 'attr') ?>" class="row g-2 align-items-end mb-3 news-filters" role="search">
     <div class="col-12 col-sm-4 col-lg-3">
         <label class="form-label small mb-1" for="news-type"><?= esc(lang('News.fields.type')) ?></label>
         <select class="form-select form-select-sm" id="news-type" name="type">

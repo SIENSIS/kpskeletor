@@ -10,6 +10,6 @@ use CodeIgniter\Router\RouteCollection;
  *
  * @var RouteCollection $routes
  */
-$routes->group('backend/{{name}}', ['namespace' => 'Modules\{{Name}}\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('{{name}}'), ['namespace' => 'Modules\{{Name}}\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Home::index', ['as' => '{{name}}-main', 'filter' => 'can:{{name}}-main.view']);
 });

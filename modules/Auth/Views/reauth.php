@@ -39,6 +39,6 @@
     </form>
 <?php endif ?>
 <div class="text-center mt-2">
-    <a class="small" href="<?= esc(site_url('backend/profile')) ?>"><?= esc(lang('Auth.reauth.back')) ?></a>
+    <a class="small" href="<?= esc(backend_url('profile')) ?>"><?= esc(lang('Auth.reauth.back')) ?></a>
 </div>
 <?= $this->endSection() ?>

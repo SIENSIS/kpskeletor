@@ -17,7 +17,7 @@ use CodeIgniter\Router\RouteCollection;
  *
  * @var RouteCollection $routes
  */
-$routes->group('backend/settings', ['namespace' => 'Modules\Settings\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('settings'), ['namespace' => 'Modules\Settings\Controllers'], static function (RouteCollection $routes): void {
     $update   = ['filter' => 'can:settings.update'];
     $security = ['filter' => ['can:settings.security', 'reauth']];
 

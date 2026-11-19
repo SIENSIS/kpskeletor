@@ -34,14 +34,14 @@ final class BackupResult extends NotificationType
             return new NotificationMessage(
                 lang('Backup.notification.success'),
                 lang('Backup.notification.successBody', [(string) ($this->data['file'] ?? ''), ui_bytes((int) ($this->data['size'] ?? 0))]),
-                'backend/backups',
+                backend_link('backups'),
             );
         }
 
         return new NotificationMessage(
             lang('Backup.notification.failed'),
             (string) ($this->data['message'] ?? ''),
-            'backend/backups',
+            backend_link('backups'),
         );
     }
 }

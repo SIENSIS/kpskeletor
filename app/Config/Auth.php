@@ -12,6 +12,7 @@ use CodeIgniter\Shield\Authentication\Passwords\NothingPersonalValidator;
 use CodeIgniter\Shield\Config\Auth as ShieldAuth;
 use Modules\Auth\Authentication\SessionAuthenticator;
 use Modules\Auth\Authentication\UserTwoFactorAction;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * Shield's configuration with the skeleton's defaults (docs/specification.md, "Authentication").
@@ -45,15 +46,16 @@ class Auth extends ShieldAuth
     ];
 
     /**
-     * A login lands on the dashboard (`backend`, Dashboard module; D-16-01).
+     * A login lands on the dashboard (the back-office prefix, Dashboard module; D-16-01). The
+     * back-office entries follow `app.backendPath` (set in the constructor).
      *
      * @var array<string, string>
      */
     public array $redirects = [
         'register'          => 'login',
-        'login'             => 'backend',
+        'login'             => 'backend', // = backend_path()
         'logout'            => 'login',
-        'force_reset'       => 'backend/profile/password',
+        'force_reset'       => 'backend/profile/password', // = backend_path('profile/password')
         'permission_denied' => 'login',
         'group_denied'      => 'login',
     ];
@@ -157,4 +159,12 @@ class Auth extends ShieldAuth
      * Minutes a re-authentication ("sudo mode") lasts for the session.
      */
     public int $reauthMinutes = 15;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->redirects['login']       = BackendPath::path();
+        $this->redirects['force_reset'] = BackendPath::path('profile/password');
+    }
 }

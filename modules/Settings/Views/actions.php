@@ -12,9 +12,9 @@
  * @var bool                                                                              $canMaintain
  */
 $actions = [
-    ['url' => 'backend/settings/actions/email', 'icon' => 'bi bi-envelope', 'key' => 'email', 'args' => [$email, $pending], 'enabled' => $email !== '', 'confirm' => null],
-    ['url' => 'backend/settings/actions/caches', 'icon' => 'bi bi-arrow-repeat', 'key' => 'caches', 'args' => [], 'enabled' => true, 'confirm' => null],
-    ['url' => 'backend/settings/actions/assets', 'icon' => 'bi bi-box-arrow-up', 'key' => 'assets', 'args' => [], 'enabled' => $canPublish, 'confirm' => lang('Settings.actions.assetsConfirm')],
+    ['url' => backend_path('settings/actions/email'), 'icon' => 'bi bi-envelope', 'key' => 'email', 'args' => [$email, $pending], 'enabled' => $email !== '', 'confirm' => null],
+    ['url' => backend_path('settings/actions/caches'), 'icon' => 'bi bi-arrow-repeat', 'key' => 'caches', 'args' => [], 'enabled' => true, 'confirm' => null],
+    ['url' => backend_path('settings/actions/assets'), 'icon' => 'bi bi-box-arrow-up', 'key' => 'assets', 'args' => [], 'enabled' => $canPublish, 'confirm' => lang('Settings.actions.assetsConfirm')],
 ];
 ?>
 <?= $this->extend($layout) ?>
@@ -51,7 +51,7 @@ $actions = [
         <?php if (! $canMaintain): ?>
             <p class="small mb-0"><?= ui_badge(lang('Settings.actions.unavailable'), 'secondary') ?></p>
         <?php elseif ($maintenance === null): ?>
-            <form action="<?= esc(site_url('backend/settings/actions/maintenance'), 'attr') ?>" method="post" data-confirm="<?= esc(lang('Settings.actions.maintenanceConfirm'), 'attr') ?>">
+            <form action="<?= esc(backend_url('settings/actions/maintenance'), 'attr') ?>" method="post" data-confirm="<?= esc(lang('Settings.actions.maintenanceConfirm'), 'attr') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="state" value="on">
                 <div class="mb-2">
@@ -64,7 +64,7 @@ $actions = [
             <?php if ($maintenance['message'] !== ''): ?>
                 <p class="small fst-italic"><?= esc($maintenance['message']) ?></p>
             <?php endif ?>
-            <form action="<?= esc(site_url('backend/settings/actions/maintenance'), 'attr') ?>" method="post">
+            <form action="<?= esc(backend_url('settings/actions/maintenance'), 'attr') ?>" method="post">
                 <?= csrf_field() ?>
                 <input type="hidden" name="state" value="off">
                 <button type="submit" class="btn btn-primary"<?= $maintenance['reason'] !== \Modules\Core\Maintenance\MaintenanceMode::REASON_MANUAL ? ' disabled' : '' ?>><i class="bi bi-check-circle me-1" aria-hidden="true"></i><?= esc(lang('Settings.actions.maintenanceOff')) ?></button>

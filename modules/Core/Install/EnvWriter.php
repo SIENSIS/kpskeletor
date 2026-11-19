@@ -133,6 +133,26 @@ final class EnvWriter
         return $added;
     }
 
+    /**
+     * The content with `key = value` set: every uncommented line of the key is replaced, or a
+     * line is appended when there is none (`php spark app:backend-path`).
+     */
+    public static function withValue(string $content, string $key, string $value): string
+    {
+        if (! self::acceptable($value)) {
+            throw new InstallException(lang('Install.error.envValue', [$key]));
+        }
+
+        $line    = $key . ' = ' . self::quote($value);
+        $pattern = '/^[ \t]*' . preg_quote($key, '/') . '[ \t]*=.*$/m';
+
+        if (preg_match($pattern, $content) === 1) {
+            return (string) preg_replace_callback($pattern, static fn (): string => $line, $content);
+        }
+
+        return rtrim($content) . "\n" . $line . "\n";
+    }
+
     private function template(): string
     {
         $path = $this->templatePath ?? ROOTPATH . 'env';

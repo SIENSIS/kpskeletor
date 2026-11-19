@@ -39,7 +39,7 @@ final class PackageProcessed extends NotificationType
                 lang('Core.packages.actions.' . (($this->data['action'] ?? '') === 'uninstall' ? 'uninstall' : 'install')),
             ]),
             (string) ($this->data['message'] ?? ''),
-            'backend/modules/packages',
+            backend_link('modules/packages'),
         );
     }
 }

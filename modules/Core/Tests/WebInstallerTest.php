@@ -71,6 +71,7 @@ final class WebInstallerTest extends CIUnitTestCase
             'dbDriver'             => 'SQLite3',
             'dbName'               => 'site.db',
             'dbPrefix'             => '',
+            'backendPath'          => 'backend',
             'adminUsername'        => 'owner',
             'adminEmail'           => 'owner@example.com',
             'adminPassword'        => self::PASSWORD,
@@ -148,6 +149,39 @@ final class WebInstallerTest extends CIUnitTestCase
         $response->assertDontSee(self::PASSWORD);
         $this->assertFalse($this->db->tableExists('modules'));
         $this->assertFalse($this->installState()->isConfigured());
+    }
+
+    public function testTheFormAsksForTheBackOfficePath(): void
+    {
+        $this->unconfigured();
+
+        $response = $this->get('install');
+
+        $this->assertStringContainsString('name="backendPath"', (string) $response->getBody());
+        $response->assertSee(lang('Install.form.backendPathHelp'));
+    }
+
+    public function testAnInvalidOrReservedBackOfficePathIsRefused(): void
+    {
+        $this->unconfigured();
+
+        foreach (['Admin!', 'api', 'login', 'es'] as $path) {
+            $response = $this->submit(['backendPath' => $path]);
+
+            $response->assertOK();
+            $this->assertStringContainsString('id="backendPath-error"', (string) $response->getBody(), $path);
+            $this->assertFalse($this->db->tableExists('modules'), $path);
+        }
+    }
+
+    public function testTheChosenBackOfficePathIsInTheEnv(): void
+    {
+        $this->unconfigured(false);
+
+        $response = $this->submit(['backendPath' => 'intranet']);
+
+        $response->assertOK();
+        $response->assertSee('app.backendPath = intranet');
     }
 
     public function testInstallsAndShowsTheEnvWhenTheRootIsNotWritable(): void

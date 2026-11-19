@@ -20,9 +20,9 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-CrudFactory::routes($routes, 'menus-public', 'backend/menus/public', '\Modules\Menus\Controllers\PublicMenus::index');
+CrudFactory::routes($routes, 'menus-public', backend_path('menus/public'), '\Modules\Menus\Controllers\PublicMenus::index');
 
-$routes->group('backend/menus/items', ['namespace' => 'Modules\Menus\Controllers', 'filter' => 'can:menus-public.edit'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('menus/items'), ['namespace' => 'Modules\Menus\Controllers', 'filter' => 'can:menus-public.edit'], static function (RouteCollection $routes): void {
     $routes->get('(:num)', 'MenuItems::index/$1', ['as' => 'menus-items']);
     $routes->post('(:num)/order', 'MenuItems::order/$1');
     $routes->get('(:num)/new', 'MenuItems::create/$1');
@@ -31,7 +31,7 @@ $routes->group('backend/menus/items', ['namespace' => 'Modules\Menus\Controllers
     $routes->post('(:num)/delete/(:num)', 'MenuItems::delete/$1/$2');
 });
 
-$routes->group('backend/menus/backend', ['namespace' => 'Modules\Menus\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('menus/backend'), ['namespace' => 'Modules\Menus\Controllers'], static function (RouteCollection $routes): void {
     $customise = ['filter' => 'can:menus-backend.customise'];
     $links     = ['filter' => 'can:menus-backend.links'];
     $reset     = ['filter' => 'can:menus-backend.reset'];

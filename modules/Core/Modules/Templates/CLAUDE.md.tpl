@@ -12,7 +12,7 @@ public site and the API.
 Permissions are `{{name}}-<resource>.<operation>`, generated from `Config/Module.php` (never
 written by hand).
 
-- `{{name}}-main` (page: `view`): the module's screen `backend/{{name}}`.{{crudClaude}}{{apiClaude}}
+- `{{name}}-main` (page: `view`): the module's screen `<back office>/{{name}}` (`backend_path('{{name}}')`).{{crudClaude}}{{apiClaude}}
 - Default grants: admin `{{name}}-main.*`{{crudGrantClaude}}.
 - Settings: `{{Name}}.perPage`. Widget `{{name}}.main` (`Widgets/{{Name}}Widget.php`). Scheduled
   task `Tasks/{{Name}}Task.php`.
@@ -49,4 +49,4 @@ php spark permissions:check
 vendor/bin/phpunit modules/{{Name}}
 ```
 
-By hand: `php spark modules:demo {{Name}}`, then `backend/{{name}}` with a user of the `admin` group.
+By hand: `php spark modules:demo {{Name}}`, then `<back office>/{{name}}` (`backend_path('{{name}}')`) with a user of the `admin` group.

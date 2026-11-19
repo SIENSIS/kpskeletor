@@ -17,7 +17,7 @@
 <?= $this->section('content') ?>
 <div class="d-flex flex-wrap gap-2 mb-3">
     <a class="btn btn-primary" href="<?= esc($newUrl, 'attr') ?>"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i><?= esc(lang('Menus.items.add')) ?></a>
-    <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend/menus/public'), 'attr') ?>"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i><?= esc(lang('Menus.public.back')) ?></a>
+    <a class="btn btn-outline-secondary" href="<?= esc(backend_url('menus/public'), 'attr') ?>"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i><?= esc(lang('Menus.public.back')) ?></a>
 </div>
 <?php if ($tree === []): ?>
     <?= theme_component('empty_state', ['icon' => 'bi bi-diagram-3', 'title' => lang('Menus.items.none'), 'message' => lang('Menus.items.noneHelp')]) ?>

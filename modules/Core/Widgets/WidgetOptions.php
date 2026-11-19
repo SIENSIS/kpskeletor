@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Widgets;
 
 use Modules\Core\Registry\DeclarationRegistry;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * The options of a widget (`WidgetInterface::settings()`): defaults, values read back from the
@@ -254,7 +255,8 @@ final class WidgetOptions
                 return null;
             }
 
-            $items[] = ['label' => $label, 'url' => $url];
+            // Internal back-office links are stored with the canonical prefix (D-40-02).
+            $items[] = ['label' => $label, 'url' => str_starts_with($url, '/') ? BackendPath::store($url) : $url];
         }
 
         return $items;

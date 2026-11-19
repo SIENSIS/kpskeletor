@@ -62,18 +62,18 @@ $list = static fn (array $items): string => $items === [] ? '—' : esc(implode(
         <?php endif ?>
         <div class="d-flex flex-wrap gap-2 mt-2">
             <?php if ($row['status'] === 'uploaded' && $can['upload'] && $plan !== null && $plan['problems'] === []): ?>
-                <form action="<?= esc(site_url('backend/modules/packages/' . $row['id'] . '/approve'), 'attr') ?>" method="post">
+                <form action="<?= esc(backend_url('modules/packages/' . $row['id'] . '/approve'), 'attr') ?>" method="post">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-primary" data-confirm="<?= esc(lang('Core.packages.confirmApprove'), 'attr') ?>" data-confirm-variant="primary"><i class="bi bi-check2 me-1" aria-hidden="true"></i><?= esc(lang('Core.packages.approve')) ?></button>
                 </form>
             <?php endif ?>
             <?php if (in_array($row['status'], ['uploaded', 'pending'], true) && ($row['action'] === 'uninstall' ? $can['uninstall'] : $can['upload'])): ?>
-                <form action="<?= esc(site_url('backend/modules/packages/' . $row['id'] . '/discard'), 'attr') ?>" method="post">
+                <form action="<?= esc(backend_url('modules/packages/' . $row['id'] . '/discard'), 'attr') ?>" method="post">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-danger" data-confirm="<?= esc(lang('Core.packages.confirmDiscard'), 'attr') ?>"><?= esc(lang('Core.packages.discard')) ?></button>
                 </form>
             <?php endif ?>
-            <a class="btn btn-link" href="<?= esc(site_url('backend/modules/packages'), 'attr') ?>"><?= esc(lang('Core.packages.back')) ?></a>
+            <a class="btn btn-link" href="<?= esc(backend_url('modules/packages'), 'attr') ?>"><?= esc(lang('Core.packages.back')) ?></a>
         </div>
         <?php if ($row['status'] === 'pending'): ?>
             <p class="small mt-3 mb-0"><?= esc(lang('Core.packages.howToRun')) ?> <code>php spark modules:install --pending</code></p>

@@ -55,7 +55,7 @@ final class SecurityStatus extends Widget
             'counts'    => $report?->counts(),
             'errors'    => array_slice(array_values(array_unique($errors)), 0, 5),
             'checkedAt' => $report?->checkedAt,
-            'url'       => site_url('backend/security'),
+            'url'       => backend_url('security'),
         ]);
     }
 }

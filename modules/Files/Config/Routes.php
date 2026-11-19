@@ -15,9 +15,9 @@ use CodeIgniter\Router\RouteCollection;
  *
  * @var RouteCollection $routes
  */
-$routes->get('backend/files', '\Modules\Files\Controllers\FileManager::index', ['as' => 'files', 'filter' => 'can:files.list']);
+$routes->get(backend_path('files'), '\Modules\Files\Controllers\FileManager::index', ['as' => 'files', 'filter' => 'can:files.list']);
 
-$routes->group('backend/files/api', ['namespace' => 'Modules\Files\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('files/api'), ['namespace' => 'Modules\Files\Controllers'], static function (RouteCollection $routes): void {
     $list    = ['filter' => 'can:all,files.list'];
     $upload  = ['filter' => ['can:all,files.list,files.upload', 'ratelimit:uploads']];
     $edit    = ['filter' => 'can:all,files.list,files.edit'];

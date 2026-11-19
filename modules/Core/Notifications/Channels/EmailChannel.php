@@ -38,7 +38,7 @@ final class EmailChannel
                 'message'        => $message,
                 'user'           => $user,
                 'url'            => $path !== null ? site_url($path) : null,
-                'preferencesUrl' => site_url('backend/profile/notifications'),
+                'preferencesUrl' => backend_url('profile/notifications'),
             ], ['debug' => false])];
         });
 

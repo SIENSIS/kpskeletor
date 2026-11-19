@@ -60,6 +60,30 @@ server; the user interface only hides what the server also refuses.
 - Installation and the first superadmin are written to the activity log (`installed`,
   `superadmin_created`).
 
+### Back-office path
+
+The back office lives under one path prefix, `/backend` unless another one was chosen when
+installing (`app:install --backend-path=admin` or the web installer's "Back-office address";
+`.env` key `app.backendPath`, D-40-01). In this documentation `backend/…` means "under the
+back-office prefix". It is configuration read at boot, never a database setting, so a wrong
+value cannot lock everybody out from the back office (an invalid value falls back to `backend`).
+
+- Rules: 2–30 lowercase letters, digits and hyphens, one segment, starting with a letter; never a
+  reserved top-level path (`api`, `install`, `progress`, `login`, `logout`, `register`, `auth`,
+  `uploads`, `assets`, `themes`, `ical`, `files`…, `Config\LocaleUrls::$excluded`), a language
+  code, another module's top-level route or a top-level page slug (`Modules\Core\Routing\BackendPath`).
+- A different prefix hides nothing: every back-office route still needs a login and its `can:`
+  filter. It only keeps the address out of automated scans that look for `/backend` or `/admin`.
+- Changing it later: `php spark app:backend-path <new>` (console only, maintenance on, `.env`,
+  stored links, caches, security log entry `backend_path_changed`; [`commands.md`](commands.md)).
+  Bookmarks, API clients and web-server rules that name the old path (IP allow-lists, basic
+  auth, rewrites; [`web-server.md`](web-server.md)) are changed by hand.
+- Stored back-office links (notification links, quick links, menu links, calendar source links)
+  are saved with the canonical prefix `backend/…` and resolved when shown (D-40-02), so `backend`
+  stays a reserved top-level path on every site.
+- `security:check` reports the path (`configuration.backendPath`, info) and the probe checks
+  `?return=` on it.
+
 ## Authentication: passwords, 2FA, re-authentication and sessions
 
 The full rules are in [`auth.md`](auth.md); the settings are in **Settings › Security**
@@ -426,7 +450,7 @@ are not stored) and `--json` prints JSON. Before going live:
 | `accounts` | superadmins without 2FA (warning); groups where 2FA is optional (info); `Auth.minimumPasswordLength` below 12 (warning); personal API tokens without expiry (info) |
 | `dependencies` | the last `composer audit` (advisories: error; never run, failed or older than 7 days: warning); the SHA-256 checksums of `public/assets/vendor/vendor.json`; `updates.repository` without `updates.publicKeys` (warning; none configured: info; Updates module) |
 | `outbound` | the allow-list and the hosts each module adds (info) |
-| `probe` | with `--probe=<url>` or "Run external probe" (re-authentication): the security headers on `/`; `/.env`, `writable/` (logs, packages, backups), `modules/`, `app/`, `vendor/`, `composer.json`, `.git/config` not served; a harmless PHP file written to `public/uploads` is not executed (and is removed); `?return=https://…invalid/` is not followed on `/`, `login` and `backend`; the login answers 429 after at most `productioncheck.probeLoginAttempts` wrong passwords for a made-up `example.invalid` address (they count towards the server's own login limit for a while; `productioncheck.probeLoginPath = ""` skips it); plain HTTP redirects to HTTPS (or is not answered); the `progress/*` routes answer no secret-looking keys (D-27-02). The probe uses its own client: requests only to the base URL host and `app.allowedHostnames`, HTTPS (HTTP only for the redirect check), no redirects followed, never through the OutboundClient nor to third parties. |
+| `probe` | with `--probe=<url>` or "Run external probe" (re-authentication): the security headers on `/`; `/.env`, `writable/` (logs, packages, backups), `modules/`, `app/`, `vendor/`, `composer.json`, `.git/config` not served; a harmless PHP file written to `public/uploads` is not executed (and is removed); `?return=https://…invalid/` is not followed on `/`, `login` and the back office; the login answers 429 after at most `productioncheck.probeLoginAttempts` wrong passwords for a made-up `example.invalid` address (they count towards the server's own login limit for a while; `productioncheck.probeLoginPath = ""` skips it); plain HTTP redirects to HTTPS (or is not answered); the `progress/*` routes answer no secret-looking keys (D-27-02). The probe uses its own client: requests only to the base URL host and `app.allowedHostnames`, HTTPS (HTTP only for the redirect check), no redirects followed, never through the OutboundClient nor to third parties. |
 
 Check ids, by group (stable: the JSON output, the stored results and the notification use them;
 a check that throws is reported as `check.<class>` in its first group):

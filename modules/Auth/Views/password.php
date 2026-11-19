@@ -38,10 +38,10 @@ $feedback = static fn (string $field): string => isset($errors[$field]) ? '<div 
         <p class="small text-body-secondary mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i><?= esc(lang('Auth.profile.passwordEndsSessions')) ?></p>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/profile/password'),
+            'action'      => backend_url('profile/password'),
             'fields'      => $fields,
             'submitLabel' => lang('Auth.profile.changePassword'),
-            'cancelUrl'   => $forced ? null : site_url('backend/profile'),
+            'cancelUrl'   => $forced ? null : backend_url('profile'),
         ]) ?>
     </div>
 </div>

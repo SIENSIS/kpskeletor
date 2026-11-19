@@ -1,0 +1,12 @@
+{
+  "baseURL": "http://localhost:8089",
+  "outDir": "deploy-status/40-backend-path/screenshots",
+  "deviceScaleFactor": 2,
+  "login": { "url": "/login", "user": "owner@example.com", "password": "Tramuntana-Garbi-2026!", "waitFor": "/admin" },
+  "shots": [
+    { "url": "/admin", "name": "03-dashboard-under-admin" },
+    { "url": "/admin", "name": "04-dashboard-under-admin-phone-dark", "width": 390, "height": 844, "dark": true },
+    { "url": "/admin/security", "name": "05-security-status-backend-path", "fullPage": true },
+    { "url": "/backend", "name": "06-old-path-404", "login": false }
+  ]
+}

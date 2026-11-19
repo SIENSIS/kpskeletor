@@ -17,9 +17,9 @@ use CodeIgniter\Router\RouteCollection;
  *
  * @var RouteCollection $routes
  */
-$routes->get('backend', '\Modules\Dashboard\Controllers\Dashboard::index', ['as' => 'dashboard', 'filter' => 'can:dashboard.view']);
+$routes->get(backend_path(), '\Modules\Dashboard\Controllers\Dashboard::index', ['as' => 'dashboard', 'filter' => 'can:dashboard.view']);
 
-$routes->group('backend/dashboard', ['namespace' => 'Modules\Dashboard\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('dashboard'), ['namespace' => 'Modules\Dashboard\Controllers'], static function (RouteCollection $routes): void {
     $view      = ['filter' => 'can:dashboard.view'];
     $configure = ['filter' => 'can:dashboard.configure'];
 

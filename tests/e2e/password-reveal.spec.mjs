@@ -3,7 +3,7 @@
 // user), with the right accessible name and aria-pressed, the value sent normally, the field
 // back to type="password" when the form is submitted, and `data-no-reveal` respected. axe runs
 // on both pages in every project (light and dark).
-import { test, expect, checkPage } from './support.mjs';
+import { test, expect, checkPage, backend } from './support.mjs';
 
 const SHOW = 'Mostra la contrasenya';
 const HIDE = 'Amaga la contrasenya';
@@ -95,7 +95,7 @@ test.describe('as a guest', () => {
 });
 
 test('kpcrudy form: new user', async ({ page }) => {
-    await checkPage(page, '/backend/users/add', 'password-reveal-new-user');
+    await checkPage(page, backend('users/add'), 'password-reveal-new-user');
     const field = 'form input[type="password"]';
     test.skip(await page.locator(field).count() === 0, 'The new user form has no password field.');
 
@@ -107,7 +107,7 @@ test('kpcrudy form: new user', async ({ page }) => {
 
 test('the field is hidden again on pagehide', async ({ page }) => {
     test.skip(test.info().project.name !== 'desktop-light', 'Once.');
-    await page.goto('/backend/users/add');
+    await page.goto(backend('users/add'));
     const id = await page.locator('form input[type="password"]').first().getAttribute('id');
     await page.locator(`button[aria-controls="${id}"]`).click();
     const type = await page.evaluate((fieldId) => {

@@ -19,7 +19,7 @@ $old = is_array($old) ? $old : null;
     <ul class="nav nav-pills flex-wrap gap-1">
         <?php foreach ($groups as $name => $info): ?>
             <li class="nav-item">
-                <a class="nav-link<?= $name === $group ? ' active' : '' ?>" href="<?= esc(site_url('backend/dashboard/groups/' . $name), 'attr') ?>"<?= $name === $group ? ' aria-current="page"' : '' ?>><?= esc($info['title']) ?></a>
+                <a class="nav-link<?= $name === $group ? ' active' : '' ?>" href="<?= esc(backend_url('dashboard/groups/' . $name), 'attr') ?>"<?= $name === $group ? ' aria-current="page"' : '' ?>><?= esc($info['title']) ?></a>
             </li>
         <?php endforeach ?>
     </ul>

@@ -76,7 +76,7 @@ final class DeviceRecognizer
             'device'    => DeviceName::fromUserAgent($agent),
             'ipAddress' => $ip,
             'date'      => $now,
-            'url'       => site_url('backend/profile/sessions'),
+            'url'       => backend_url('profile/sessions'),
         ]);
     }
 

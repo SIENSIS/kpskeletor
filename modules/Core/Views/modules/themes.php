@@ -44,7 +44,7 @@
                     <?php if ($can['toggle'] && $theme['error'] === null): ?>
                         <?php foreach (['backend', 'public'] as $area): ?>
                             <?php if (! $theme[$area]): ?>
-                                <form action="<?= esc(site_url('backend/modules/themes/activate'), 'attr') ?>" method="post">
+                                <form action="<?= esc(backend_url('modules/themes/activate'), 'attr') ?>" method="post">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="area" value="<?= esc($area, 'attr') ?>">
                                     <input type="hidden" name="theme" value="<?= esc($slug, 'attr') ?>">
@@ -54,10 +54,10 @@
                         <?php endforeach ?>
                     <?php endif ?>
                     <?php if ($can['options'] && $theme['error'] === null): ?>
-                        <a class="btn btn-sm btn-outline-secondary" href="<?= esc(site_url('backend/settings/theme') . '?theme=' . rawurlencode($slug), 'attr') ?>"><?= esc(lang('Core.themes.options')) ?></a>
+                        <a class="btn btn-sm btn-outline-secondary" href="<?= esc(backend_url('settings/theme') . '?theme=' . rawurlencode($slug), 'attr') ?>"><?= esc(lang('Core.themes.options')) ?></a>
                     <?php endif ?>
                     <?php if ($can['uninstall'] && ! $theme['backend'] && ! $theme['public'] && ! $theme['fallback']): ?>
-                        <a class="btn btn-sm btn-outline-danger" href="<?= esc(site_url('backend/modules/themes/uninstall/' . $slug), 'attr') ?>"><?= esc(lang('Core.modules.uninstall')) ?></a>
+                        <a class="btn btn-sm btn-outline-danger" href="<?= esc(backend_url('modules/themes/uninstall/' . $slug), 'attr') ?>"><?= esc(lang('Core.modules.uninstall')) ?></a>
                     <?php endif ?>
                 </div>
             </div>

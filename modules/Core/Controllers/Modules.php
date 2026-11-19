@@ -141,7 +141,7 @@ final class Modules extends BackendController
     {
         $staged = new StagedPackages();
         $staged->expire();
-        $this->breadcrumb(lang('Core.modules.title'), site_url('backend/modules'))->breadcrumb(lang('Core.modules.tabs.packages'));
+        $this->breadcrumb(lang('Core.modules.title'), backend_url('modules'))->breadcrumb(lang('Core.modules.tabs.packages'));
 
         return $this->render('Modules\Core\Views\modules\packages', [
             'title'  => lang('Core.modules.title'),
@@ -183,7 +183,7 @@ final class Modules extends BackendController
             return $this->uploadPage($e->getMessage());
         }
 
-        return redirect()->to(site_url('backend/modules/packages/' . $row['id']))->with('success', lang('Core.packages.uploaded', [$row['name'] . ' ' . $row['version']]));
+        return redirect()->to(backend_url('modules/packages/' . $row['id']))->with('success', lang('Core.packages.uploaded', [$row['name'] . ' ' . $row['version']]));
     }
 
     public function package(int $id): string
@@ -198,8 +198,8 @@ final class Modules extends BackendController
         $info = $staged->info($row);
         $plan = $info !== null && $row['status'] === 'uploaded' ? (new PackageInstaller())->plan($info, false, false) : null;
 
-        $this->breadcrumb(lang('Core.modules.title'), site_url('backend/modules'))
-            ->breadcrumb(lang('Core.modules.tabs.packages'), site_url('backend/modules/packages'))
+        $this->breadcrumb(lang('Core.modules.title'), backend_url('modules'))
+            ->breadcrumb(lang('Core.modules.tabs.packages'), backend_url('modules/packages'))
             ->breadcrumb(trim($row['name'] . ' ' . $row['version']));
 
         return $this->render('Modules\Core\Views\modules\package', [
@@ -217,10 +217,10 @@ final class Modules extends BackendController
         try {
             (new StagedPackages())->approve($id, (int) auth()->id());
         } catch (PackageRefused $e) {
-            return redirect()->to(site_url('backend/modules/packages/' . $id))->with('error', $e->getMessage());
+            return redirect()->to(backend_url('modules/packages/' . $id))->with('error', $e->getMessage());
         }
 
-        return redirect()->to(site_url('backend/modules/packages/' . $id))->with('success', lang('Core.packages.approved'));
+        return redirect()->to(backend_url('modules/packages/' . $id))->with('success', lang('Core.packages.approved'));
     }
 
     public function discard(int $id): RedirectResponse
@@ -232,16 +232,16 @@ final class Modules extends BackendController
         if ($row === null || ! $this->can($row['action'] === 'uninstall' ? 'modules.uninstall' : 'modules.upload')) {
             security_log('Core', 'forbidden', ['resource' => 'modules', 'summary' => 'discard ' . $id]);
 
-            return redirect()->to(site_url('backend/modules/packages'))->with('error', lang('Core.modules.notAllowed'));
+            return redirect()->to(backend_url('modules/packages'))->with('error', lang('Core.modules.notAllowed'));
         }
 
         try {
             $staged->discard($id);
         } catch (PackageRefused $e) {
-            return redirect()->to(site_url('backend/modules/packages'))->with('error', $e->getMessage());
+            return redirect()->to(backend_url('modules/packages'))->with('error', $e->getMessage());
         }
 
-        return redirect()->to(site_url('backend/modules/packages'))->with('success', lang('Core.packages.discarded'));
+        return redirect()->to(backend_url('modules/packages'))->with('success', lang('Core.packages.discarded'));
     }
 
     public function uninstallForm(string $name): string
@@ -257,13 +257,13 @@ final class Modules extends BackendController
             return $this->uninstallPage($name, $e->getMessage());
         }
 
-        return redirect()->to(site_url('backend/modules/packages'))->with('success', lang('Core.packages.uninstallRequested', [$name]));
+        return redirect()->to(backend_url('modules/packages'))->with('success', lang('Core.packages.uninstallRequested', [$name]));
     }
 
     private function uploadPage(?string $error = null): string
     {
-        $this->breadcrumb(lang('Core.modules.title'), site_url('backend/modules'))
-            ->breadcrumb(lang('Core.modules.tabs.packages'), site_url('backend/modules/packages'))
+        $this->breadcrumb(lang('Core.modules.title'), backend_url('modules'))
+            ->breadcrumb(lang('Core.modules.tabs.packages'), backend_url('modules/packages'))
             ->breadcrumb(lang('Core.packages.upload'));
 
         return $this->render('Modules\Core\Views\modules\upload', [
@@ -282,14 +282,14 @@ final class Modules extends BackendController
             throw PageNotFoundException::forPageNotFound();
         }
 
-        $this->breadcrumb(lang('Core.modules.title'), site_url('backend/modules'))->breadcrumb(lang('Core.modules.uninstallTitle', [$name]));
+        $this->breadcrumb(lang('Core.modules.title'), backend_url('modules'))->breadcrumb(lang('Core.modules.uninstallTitle', [$name]));
 
         return $this->render('Modules\Core\Views\modules\uninstall', [
             'title'    => lang('Core.modules.uninstallTitle', [$name]),
             'icon'     => 'bi bi-trash',
             'module'   => $rows[$name],
-            'action'   => site_url('backend/modules/uninstall/' . $name),
-            'cancel'   => site_url('backend/modules'),
+            'action'   => backend_url('modules/uninstall/' . $name),
+            'cancel'   => backend_url('modules'),
             'keepData' => true,
             'error'    => $error,
         ]);
@@ -311,6 +311,6 @@ final class Modules extends BackendController
 
     private function back(): RedirectResponse
     {
-        return redirect()->to(site_url('backend/modules'));
+        return redirect()->to(backend_url('modules'));
     }
 }

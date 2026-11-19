@@ -7,6 +7,7 @@ namespace Modules\Core\Widgets;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Menus\MenuBuilder;
 use Modules\Core\Menus\MenuEntry;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * Core widget "Quick links": shortcuts chosen and ordered per group (option `links`): entries of
@@ -79,7 +80,7 @@ final class QuickLinks extends Widget
             $links[]  = [
                 'label'    => (string) $item['label'],
                 'icon'     => $external ? 'bi bi-box-arrow-up-right' : 'bi bi-link-45deg',
-                'url'      => $external ? $url : site_url(ltrim($url, '/')),
+                'url'      => $external ? $url : site_url(ltrim(BackendPath::resolve($url), '/')),
                 'external' => $external,
             ];
         }

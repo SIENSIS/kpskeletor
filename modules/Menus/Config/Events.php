@@ -14,6 +14,8 @@ declare(strict_types=1);
  * - `moduleUninstalling` (the Core's Uninstaller, docs/installing-modules.md): the customisations of the
  *   uninstalled module's back-office entries and the public menu items of its link types are
  *   deleted (their children move up one level). Runs while Menus is disabled too.
+ * - `backendPathChanged` (`php spark app:backend-path`): public and back-office addresses typed
+ *   with the old prefix are rewritten (D-40-01).
  */
 
 use CodeIgniter\Database\Exceptions\DatabaseException;
@@ -25,6 +27,7 @@ use Modules\Core\Menus\BackendMenuLayer;
 use Modules\Core\Modules\CacheInvalidator;
 use Modules\Core\Packages\ModuleUninstalling;
 use Modules\Core\Registry\ModuleState;
+use Modules\Core\Routing\BackendPathChanged;
 use Modules\Menus\Services\CustomisationApplier;
 use Modules\Menus\Services\MenuRenderer;
 
@@ -87,5 +90,15 @@ Events::on(ModuleUninstalling::EVENT, static function (ModuleUninstalling $event
     if ($removed > 0) {
         (new CacheInvalidator())->invalidate(['menus']);
         $event->note(lang('Menus.uninstall.removed', [$removed]));
+    }
+});
+
+// `php spark app:backend-path` (D-40-01): addresses typed with the old back-office prefix.
+Events::on('backendPathChanged', static function (BackendPathChanged $event): void {
+    $rows = $event->rewriteColumn('menu_items', 'value', false, ['type' => 'url'])
+        + $event->rewriteColumn('backend_menu_links', 'value', false, ['type' => 'url']);
+
+    if ($rows > 0) {
+        (new CacheInvalidator())->invalidate(['menus']);
     }
 });

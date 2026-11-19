@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Core\Notifications;
 
+use Modules\Core\Routing\BackendPath;
+
 /**
  * What a notification says: a title, an optional body and an optional internal link (a path
- * such as "backend/news/notices/7"; external URLs are ignored).
+ * such as "backend/news/notices/7", written with `backend_link()`; external URLs are ignored).
  */
 final class NotificationMessage
 {
@@ -18,7 +20,8 @@ final class NotificationMessage
     }
 
     /**
-     * The internal path of the link, or null (absolute URLs, scheme-relative URLs and
+     * The internal path of the link (a stored back-office link moved under the installed
+     * prefix), or null (absolute URLs, scheme-relative URLs and
      * backslashes are refused: notifications only link inside the site).
      */
     public function path(): ?string
@@ -29,6 +32,7 @@ final class NotificationMessage
             return null;
         }
 
-        return ltrim($url, '/');
+        // Stored back-office links use the canonical prefix (D-40-02).
+        return BackendPath::resolve(ltrim($url, '/'));
     }
 }

@@ -148,7 +148,7 @@ abstract class BackendController extends BaseController
             }
         }
 
-        return [['label' => lang('Core.ui.backOffice'), 'url' => base_url('backend')], ...$crumbs];
+        return [['label' => lang('Core.ui.backOffice'), 'url' => base_url(backend_path())], ...$crumbs];
     }
 
     /**

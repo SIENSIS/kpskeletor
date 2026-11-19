@@ -266,7 +266,7 @@ Every route of the page — the page itself, its JSON data and the move endpoint
 `can:` filter (the `backend` chain adds the login and the rest):
 
 ```php
-$routes->group('backend/tasks', ['namespace' => 'Modules\Tasks\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('tasks'), ['namespace' => 'Modules\Tasks\Controllers'], static function (RouteCollection $routes): void {
     $board = ['filter' => 'can:tasks-board.view'];
 
     $routes->get('/', 'Board::index', $board + ['as' => 'tasks-board']);
@@ -292,7 +292,7 @@ return $this->render('Modules\Tasks\Views\board\index', [
     'columns'  => $this->columns($user, $project),
     // … projects, project, seesAll, canAdd
     'options'  => [
-        'dataUrl' => site_url('backend/tasks/board/data') . ($project !== null ? '?project=' . $project : ''),
+        'dataUrl' => backend_url('tasks/board/data') . ($project !== null ? '?project=' . $project : ''),
         'css'     => asset('tasks::css/tasks.css'),
         'texts'   => [
             'moved'      => lang('Tasks.board.moved'),

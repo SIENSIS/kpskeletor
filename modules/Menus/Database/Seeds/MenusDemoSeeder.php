@@ -44,7 +44,7 @@ final class MenusDemoSeeder extends DemoSeeder
         }
 
         $this->item($demo, $main, null, 40, $this->page('contacte'), ['ca' => 'Contacte', 'es' => 'Contacto', 'en' => 'Contact']);
-        $this->item($demo, $main, null, 50, $this->page('intranet'), ['ca' => 'Intranet'], ['visibility' => 'users', 'icon' => 'bi bi-lock']);
+        $this->item($demo, $main, null, 50, $this->page(backend_path() === 'intranet' ? 'area-interna' : 'intranet'), ['ca' => 'Intranet'], ['visibility' => 'users', 'icon' => 'bi bi-lock']);
 
         $footer = (int) $demo->insert('menus', ['name' => 'Peu de pàgina', 'location' => 'footer', 'created_at' => $now, 'updated_at' => $now]);
         $this->item($demo, $footer, null, 10, $this->page('avis-legal'), ['ca' => 'Avís legal', 'es' => 'Aviso legal', 'en' => 'Legal notice']);

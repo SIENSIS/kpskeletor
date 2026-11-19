@@ -36,7 +36,7 @@ final class EventReminder extends NotificationType
         return new NotificationMessage(
             lang('Events.notifications.reminderTitle', [(string) ($this->data['title'] ?? '')]),
             lang('Events.notifications.reminderBody', [(string) ($this->data['start'] ?? '')]),
-            url: $code !== '' ? 'backend/calendar/event/' . rawurlencode($code) . ($date !== '' ? '?date=' . rawurlencode($date) : '') : 'backend/calendar',
+            url: $code !== '' ? backend_link('calendar/event/' . rawurlencode($code) . ($date !== '' ? '?date=' . rawurlencode($date) : '')) : backend_link('calendar'),
         );
     }
 }

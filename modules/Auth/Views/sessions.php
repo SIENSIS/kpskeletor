@@ -36,7 +36,7 @@
                     <td><?= ui_date($row['last_seen_at'], 'datetime') ?></td>
                     <td class="text-end">
                         <?php if ($canRevoke && ! $row['current']): ?>
-                            <form action="<?= esc(site_url('backend/profile/sessions/' . (int) $row['id'] . '/revoke')) ?>" method="post" class="d-inline">
+                            <form action="<?= esc(backend_url('profile/sessions/' . (int) $row['id'] . '/revoke')) ?>" method="post" class="d-inline">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="<?= esc(lang('Auth.sessions.confirmRevoke')) ?>"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i><?= esc(lang('Auth.sessions.revoke')) ?></button>
                             </form>
@@ -50,7 +50,7 @@
 <?php $body = (string) ob_get_clean() ?>
 <?php ob_start() ?>
 <?php if ($canRevoke && count($sessions) > 1): ?>
-    <form action="<?= esc(site_url('backend/profile/sessions/revoke-others')) ?>" method="post" class="text-end">
+    <form action="<?= esc(backend_url('profile/sessions/revoke-others')) ?>" method="post" class="text-end">
         <?= csrf_field() ?>
         <button type="submit" class="btn btn-outline-danger btn-sm" data-confirm="<?= esc(lang('Auth.sessions.confirmRevokeOthers')) ?>"><i class="bi bi-x-octagon me-1" aria-hidden="true"></i><?= esc(lang('Auth.sessions.revokeOthers')) ?></button>
     </form>
@@ -80,7 +80,7 @@
                         <td><?= $token['last_used'] !== null ? ui_date($token['last_used'], 'datetime') : esc(lang('Auth.sessions.never')) ?></td>
                         <td class="text-end">
                             <?php if ($canRevoke): ?>
-                                <form action="<?= esc(site_url('backend/profile/tokens/' . (int) $token['id'] . '/revoke')) ?>" method="post" class="d-inline">
+                                <form action="<?= esc(backend_url('profile/tokens/' . (int) $token['id'] . '/revoke')) ?>" method="post" class="d-inline">
                                     <?= csrf_field() ?>
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="<?= esc(lang('Auth.sessions.confirmRevokeToken')) ?>"><i class="bi bi-trash me-1" aria-hidden="true"></i><?= esc(lang('Auth.sessions.revokeToken')) ?></button>
                                 </form>

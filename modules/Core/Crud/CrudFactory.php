@@ -14,7 +14,7 @@ use Kpcrudy\Crud;
  *
  * ```php
  * // Config/Routes.php
- * CrudFactory::routes($routes, 'news-posts', 'backend/news/posts', '\Modules\News\Controllers\Posts::index');
+ * CrudFactory::routes($routes, 'news-posts', backend_path('news/posts'), '\Modules\News\Controllers\Posts::index');
  *
  * // Controllers/Posts.php (extends BackendController)
  * $crud = $this->crud('news-posts')->setTable('news_posts')->…;

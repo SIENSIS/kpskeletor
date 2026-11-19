@@ -11,8 +11,8 @@ if (auth()->user() === null || ! can('core-notifications.list')) {
 $unread = (new \Modules\Core\Notifications\Inbox((int) auth()->id()))->unreadCount();
 $label  = lang('Core.notifications.bell', [$unread]);
 $config = json_encode([
-    'url'     => site_url('backend/notifications/bell'),
-    'readAll' => site_url('backend/notifications/read-all'),
+    'url'     => backend_url('notifications/bell'),
+    'readAll' => backend_url('notifications/read-all'),
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <div class="dropdown notification-bell" data-component="core/ui/bell" data-options="<?= esc((string) $config, 'attr') ?>">
@@ -23,7 +23,7 @@ $config = json_encode([
     <div class="dropdown-menu dropdown-menu-end p-0 bell-menu">
         <div class="d-flex align-items-center justify-content-between gap-2 px-3 py-2 border-bottom">
             <strong class="small"><?= esc(lang('Core.notifications.title')) ?></strong>
-            <form action="<?= esc(site_url('backend/notifications/read-all')) ?>" method="post" class="m-0" data-bell-read-all>
+            <form action="<?= esc(backend_url('notifications/read-all')) ?>" method="post" class="m-0" data-bell-read-all>
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-link btn-sm p-0"><?= esc(lang('Core.notifications.markAllRead')) ?></button>
             </form>
@@ -32,8 +32,8 @@ $config = json_encode([
             <p class="small text-body-secondary px-3 py-3 mb-0" data-bell-placeholder><?= esc(lang('Core.notifications.loading')) ?></p>
         </div>
         <div class="d-flex border-top">
-            <a class="dropdown-item text-center small py-2" href="<?= esc(site_url('backend/notifications')) ?>"><?= esc(lang('Core.notifications.seeAll')) ?></a>
-            <a class="dropdown-item text-center small py-2 border-start" href="<?= esc(site_url('backend/profile/notifications')) ?>"><?= esc(lang('Core.notifications.preferencesShort')) ?></a>
+            <a class="dropdown-item text-center small py-2" href="<?= esc(backend_url('notifications')) ?>"><?= esc(lang('Core.notifications.seeAll')) ?></a>
+            <a class="dropdown-item text-center small py-2 border-start" href="<?= esc(backend_url('profile/notifications')) ?>"><?= esc(lang('Core.notifications.preferencesShort')) ?></a>
         </div>
     </div>
 </div>

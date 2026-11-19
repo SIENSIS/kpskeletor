@@ -22,16 +22,16 @@ final class SettingsTabs
         $tabs = [];
 
         foreach ($this->editor->modules() as $slug => $module) {
-            $tabs[] = ['id' => $slug, 'label' => self::moduleLabel($module), 'url' => site_url('backend/settings/' . $slug), 'icon' => $slug === 'core' ? 'bi bi-sliders' : 'bi bi-box'];
+            $tabs[] = ['id' => $slug, 'label' => self::moduleLabel($module), 'url' => backend_url('settings/' . $slug), 'icon' => $slug === 'core' ? 'bi bi-sliders' : 'bi bi-box'];
         }
 
-        $tabs[] = ['id' => 'theme', 'label' => lang('Settings.tabs.theme'), 'url' => site_url('backend/settings/theme'), 'icon' => 'bi bi-palette'];
+        $tabs[] = ['id' => 'theme', 'label' => lang('Settings.tabs.theme'), 'url' => backend_url('settings/theme'), 'icon' => 'bi bi-palette'];
 
         if ($security) {
-            $tabs[] = ['id' => 'security', 'label' => lang('Settings.tabs.security'), 'url' => site_url('backend/settings/security'), 'icon' => 'bi bi-shield-lock'];
+            $tabs[] = ['id' => 'security', 'label' => lang('Settings.tabs.security'), 'url' => backend_url('settings/security'), 'icon' => 'bi bi-shield-lock'];
         }
 
-        $tabs[] = ['id' => 'actions', 'label' => lang('Settings.tabs.actions'), 'url' => site_url('backend/settings/actions'), 'icon' => 'bi bi-tools'];
+        $tabs[] = ['id' => 'actions', 'label' => lang('Settings.tabs.actions'), 'url' => backend_url('settings/actions'), 'icon' => 'bi bi-tools'];
 
         return array_map(static fn (array $tab): array => $tab + ['active' => $tab['id'] === $current], $tabs);
     }

@@ -46,6 +46,19 @@ class App extends BaseConfig
 
     /**
      * --------------------------------------------------------------------------
+     * Back-office path
+     * --------------------------------------------------------------------------
+     *
+     * The first path segment of the back office (D-40-01): `app.backendPath` in `.env`,
+     * chosen at install time (`app:install --backend-path=<slug>`) and changed later only with
+     * `php spark app:backend-path <new>`. Lowercase letters, digits and hyphens, 2–30
+     * characters. Read it with `backend_path()` / `backend_url()`
+     * (`Modules\Core\Routing\BackendPath`).
+     */
+    public string $backendPath = 'backend';
+
+    /**
+     * --------------------------------------------------------------------------
      * URI PROTOCOL
      * --------------------------------------------------------------------------
      *

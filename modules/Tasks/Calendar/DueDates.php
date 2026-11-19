@@ -106,7 +106,7 @@ final class DueDates implements CalendarSource
             calendar: self::CALENDAR,
             visibility: 'restricted',
             users: $users,
-            url: '/backend/tasks/tasks/show/' . Crud::maskId($id, 'tasks'),
+            url: '/' . backend_link('tasks/tasks/show/' . Crud::maskId($id, 'tasks')),
             reminders: true,
         );
     }

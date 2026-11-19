@@ -89,9 +89,10 @@ if (! function_exists('page_config_json')) {
         $walk(is_array($texts) ? $texts : [], '');
 
         return json_encode([
-            'baseUrl' => rtrim(base_url('/'), '/') . '/',
-            'locale'  => service('request')->getLocale(),
-            'i18n'    => $flat,
+            'baseUrl'     => rtrim(base_url('/'), '/') . '/',
+            'backendPath' => backend_path(),
+            'locale'      => service('request')->getLocale(),
+            'i18n'        => $flat,
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
     }
 }

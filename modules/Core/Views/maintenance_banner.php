@@ -7,5 +7,5 @@
 <div class="maintenance-banner alert alert-danger d-flex flex-wrap align-items-center gap-2 py-1 px-2 mb-0 small" role="status" data-maintenance>
     <i class="bi bi-cone-striped" aria-hidden="true"></i>
     <span><?= esc(lang('Core.maintenance.banner')) ?></span>
-    <a href="<?= esc(site_url('backend/settings/actions'), 'attr') ?>" class="alert-link"><?= esc(lang('Core.maintenance.manage')) ?></a>
+    <a href="<?= esc(backend_url('settings/actions'), 'attr') ?>" class="alert-link"><?= esc(lang('Core.maintenance.manage')) ?></a>
 </div>

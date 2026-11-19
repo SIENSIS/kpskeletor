@@ -90,6 +90,6 @@ final class UsersSummary extends AsyncWidget
 
     public function renderData(array $data, array $options): string
     {
-        return $this->view('Modules\Users\Views\widgets\summary', $data + ['url' => site_url('backend/users')]);
+        return $this->view('Modules\Users\Views\widgets\summary', $data + ['url' => backend_url('users')]);
     }
 }

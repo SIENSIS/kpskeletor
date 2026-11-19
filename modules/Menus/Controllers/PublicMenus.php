@@ -56,7 +56,7 @@ final class PublicMenus extends BackendController
             ->unsetExport()
             ->defaultOrder('name', 'asc');
 
-        $crud->addOperation('items', static fn (string $id): ResponseInterface => redirect()->to(site_url('backend/menus/items/' . (int) $id)), [
+        $crud->addOperation('items', static fn (string $id): ResponseInterface => redirect()->to(backend_url('menus/items/' . (int) $id)), [
             'method'     => 'get',
             'permission' => 'edit',
             'label'      => lang('Menus.public.editItems'),

@@ -44,7 +44,7 @@ final class GroupLayout extends BackendController
         $options = new WidgetOptions();
         $posted  = $this->request->getPost('widgets');
         $posted  = is_array($posted) ? $posted : [];
-        $back    = site_url('backend/dashboard/groups/' . $group);
+        $back    = backend_url('dashboard/groups/' . $group);
         $result  = [];
         $errors  = [];
 
@@ -139,7 +139,7 @@ final class GroupLayout extends BackendController
             ];
         }
 
-        $this->breadcrumb(lang('Dashboard.groups.title'), site_url('backend/dashboard/groups'))->breadcrumb($groups[$group]['title']);
+        $this->breadcrumb(lang('Dashboard.groups.title'), backend_url('dashboard/groups'))->breadcrumb($groups[$group]['title']);
 
         return $this->render('Modules\Dashboard\Views\groups', [
             'title'      => lang('Dashboard.groups.title'),
@@ -148,7 +148,7 @@ final class GroupLayout extends BackendController
             'groups'     => $groups,
             'group'      => $group,
             'rows'       => $rows,
-            'formAction' => site_url('backend/dashboard/groups/' . $group),
+            'formAction' => backend_url('dashboard/groups/' . $group),
         ]);
     }
 

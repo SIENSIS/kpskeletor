@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\Menus\Services;
 
+use Modules\Core\Routing\BackendPath;
+
 /**
  * The target of a menu item or custom link: a `type` and a `value`.
  *
@@ -40,6 +42,17 @@ final class LinkTarget
     }
 
     /**
+     * The value to store: an internal back-office address is written with the canonical prefix
+     * (`BackendPath::store()`, D-40-02), so a later change of the prefix keeps it working.
+     */
+    public static function storedValue(string $type, string $value): string
+    {
+        $value = trim($value);
+
+        return $type === self::URL && UrlValidator::isInternal($value) ? BackendPath::store($value) : $value;
+    }
+
+    /**
      * Why a target cannot be saved, or null when it can: internal paths and route names must be
      * answered by a route (a link must lead somewhere).
      */
@@ -49,6 +62,7 @@ final class LinkTarget
 
         if ($type === self::URL) {
             $url = UrlValidator::check($value);
+            $url = $url !== null && UrlValidator::isInternal($url) ? BackendPath::resolve($url) : $url;
 
             if ($url === null) {
                 return lang('Menus.errors.url');
@@ -86,6 +100,7 @@ final class LinkTarget
     {
         if ($type === self::URL) {
             $url = UrlValidator::check($value);
+            $url = $url !== null && UrlValidator::isInternal($url) ? BackendPath::resolve($url) : $url;
 
             if ($url === null) {
                 return null;

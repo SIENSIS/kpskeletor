@@ -54,7 +54,7 @@ final class SystemVersion extends Widget
             'newer'     => $newer,
             'checkedAt' => is_string($status['checkedAt'] ?? null) ? $status['checkedAt'] : null,
             'error'     => is_string($status['error'] ?? null) ? $status['error'] : null,
-            'url'       => site_url('backend/updates'),
+            'url'       => backend_url('updates'),
         ]);
     }
 }

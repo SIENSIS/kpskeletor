@@ -28,10 +28,10 @@
         <div class="alert alert-warning mb-0" role="note"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><?= esc(lang('Backup.form.passwordWarning')) ?></div>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/backups/create'),
+            'action'      => backend_url('backups/create'),
             'fields'      => $fields,
             'submitLabel' => lang('Backup.action.create'),
-            'cancelUrl'   => site_url('backend/backups'),
+            'cancelUrl'   => backend_url('backups'),
         ]) ?>
     </div>
 </div>

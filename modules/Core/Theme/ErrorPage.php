@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Theme;
 
 use CodeIgniter\HTTP\IncomingRequest;
+use Modules\Core\Routing\BackendPath;
 use Throwable;
 
 /**
@@ -31,7 +32,7 @@ final class ErrorPage
 
             return $theme->render('errors/' . $code, [
                 'message' => $message,
-                'homeUrl' => base_url($theme->area() === 'backend' ? 'backend' : '/'),
+                'homeUrl' => base_url($theme->area() === 'backend' ? backend_path() : '/'),
                 'title'   => lang('Core.errors.' . self::key($code) . '.title'),
             ], ['saveData' => false]);
         } catch (Throwable $e) {
@@ -79,6 +80,6 @@ final class ErrorPage
 
         $path = trim($request->getPath(), '/');
 
-        return $path === 'backend' || str_starts_with($path, 'backend/');
+        return BackendPath::contains($path);
     }
 }

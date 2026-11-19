@@ -37,7 +37,7 @@ $secrets = is_array($job['secrets'] ?? null) ? $job['secrets'] : [];
                     <?php endif ?>
                 </div>
             <?php endif ?>
-            <a class="btn btn-primary" href="<?= esc(site_url('backend/backups'), 'attr') ?>"><?= esc(lang('Backup.title')) ?></a>
+            <a class="btn btn-primary" href="<?= esc(backend_url('backups'), 'attr') ?>"><?= esc(lang('Backup.title')) ?></a>
         <?php elseif ($status === 'failed'): ?>
             <div class="alert alert-danger mb-0" role="alert"><i class="bi bi-x-octagon me-1" aria-hidden="true"></i><?= esc((string) ($job['message'] ?? lang('Backup.error.unexpected'))) ?></div>
         <?php else: ?>

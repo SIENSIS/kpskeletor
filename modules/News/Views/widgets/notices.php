@@ -29,7 +29,7 @@
                 <?php else: ?>
                     <form method="post" action="<?= esc($item['markUrl'], 'attr') ?>">
                         <?= csrf_field() ?>
-                        <input type="hidden" name="return" value="backend">
+                        <input type="hidden" name="return" value="<?= esc(backend_path(), 'attr') ?>">
                         <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap">
                             <i class="bi bi-check2" aria-hidden="true"></i> <?= esc(lang('News.markRead')) ?>
                         </button>

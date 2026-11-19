@@ -6,6 +6,7 @@ namespace Modules\Core\I18n;
 
 use CodeIgniter\HTTP\SiteURI;
 use Config\LocaleUrls as LocaleUrlsConfig;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * The language of public URLs (service `localeurls`, docs/i18n.md "Language in the URL",
@@ -63,7 +64,9 @@ final class LocaleUrls
     {
         $first = explode('/', trim($path, '/'), 2)[0];
 
-        return ! in_array(strtolower($first), $this->config->excluded, true);
+        $first = strtolower($first);
+
+        return $first !== BackendPath::current() && ! in_array($first, $this->config->excluded, true);
     }
 
     /**

@@ -161,13 +161,13 @@ final class Users extends BackendController
                 return $crud->backToList('danger', lang('Users.users.cannotImpersonate'));
             }
 
-            return redirect()->to(site_url('backend'))->with('warning', lang('Auth.impersonation.banner', [$user->username]));
+            return redirect()->to(backend_url())->with('warning', lang('Auth.impersonation.banner', [$user->username]));
         }, ['label' => lang('Users.ops.impersonate'), 'icon' => 'bi bi-incognito', 'confirm' => lang('Users.ops.impersonateConfirm'),
             'visible' => static fn (?array $row): bool => $row === null || (($user = $target($row)) !== null && (new Impersonation())->allowed($actor, $user))]);
 
         $crud->addOperation(
             'access',
-            static fn (string $id): ResponseInterface => redirect()->to(site_url('backend/users/access/' . (int) $id)),
+            static fn (string $id): ResponseInterface => redirect()->to(backend_url('users/access/' . (int) $id)),
             ['label' => lang('Users.ops.access'), 'icon' => 'bi bi-person-lock', 'method' => 'get', 'visible' => $other]
         );
 

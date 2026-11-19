@@ -29,11 +29,11 @@
         <input type="text" class="form-control font-monospace w-auto" id="code" name="code" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" autocomplete="one-time-code" required autofocus>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/profile/two-factor/app'),
+            'action'      => backend_url('profile/two-factor/app'),
             'fields'      => $fields,
             'title'       => lang('Auth.twoFactor.appTitle'),
             'submitLabel' => lang('Auth.twoFactor.activate'),
-            'cancelUrl'   => site_url('backend/profile/two-factor'),
+            'cancelUrl'   => backend_url('profile/two-factor'),
         ]) ?>
     </div>
 </div>
