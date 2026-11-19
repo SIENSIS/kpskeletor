@@ -118,13 +118,11 @@ New tests (all in the suite):
 Results:
 
 ```
-vendor/bin/phpunit                         Tests: 1354, Assertions: 17966 — 1353 passed; DocumentationTest::testRelativeLinksResolve
-                                           failed only because this report did not exist yet when it ran;
-                                           re-run after writing it: tests/unit/Docs OK (13 tests, 320 assertions)
+vendor/bin/phpunit                         OK (1361 tests, 18012 assertions)
 vendor/bin/phpstan analyse                 [OK] No errors
-vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 1013 files that can be fixed
+vendor/bin/php-cs-fixer fix --dry-run      Found 0 of 1015 files that can be fixed
 php spark modules:sync                     Mòduls sincronitzats.
-php spark permissions:check                Permisos correctes: 169 permís(os) al catàleg, 344 ruta(es) comprovades.
+php spark permissions:check                Permisos correctes: 169 permís(os) al catàleg, 345 ruta(es) comprovades.
 php spark csp:check                        No hi ha scripts, gestors ni estils en línia a les vistes del projecte.
 ```
 
