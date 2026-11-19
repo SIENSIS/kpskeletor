@@ -343,7 +343,12 @@ answers 503 with `Retry-After` and the theme's maintenance page drawn without th
 was turned on (a restore allows only `progress/backup/*`); `schedule:run` and the poor man's cron
 do nothing. Paths under `progress/*` return the JSON progress of long jobs and skip the filters
 that read the database or the session (`moduleenabled`, `cspmodules`, `authsession`,
-`csrftoken`); they must never return secrets. Restores and `app:update` turn it on and off
+`csrftoken`); they must never return secrets. Two exist: `progress/backup/<job>` (a restore) and
+`progress/install/<job>` (the web installer, session 39: only for an existing job of the last
+hour, `WebInstaller::PROGRESS_LIMIT` requests per minute and IP, answers status, step, label,
+percentage and log lines; the installer guard lets it through before installation). The job id
+(128 random bits) is the capability; `security:check --probe` checks every `progress/*` route for
+secret-looking keys. Restores and `app:update` turn it on and off
 (docs/backup-restore.md, docs/updates.md) without any bypass.
 
 The 503 page is the theme's `errors/maintenance` view in the `blank` layout, like the other error

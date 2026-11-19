@@ -41,6 +41,11 @@ final class Installer
 
     private readonly InstallState $state;
 
+    private ?InstallProgress $progress = null;
+
+    /** The step being run, for the failure report. */
+    private string $currentStep = 'checks';
+
     /**
      * @param Closure(): ModuleSynchronizer|null $synchronizer
      */
@@ -136,14 +141,46 @@ final class Installer
     /**
      * Installs the application.
      *
-     * @param bool $keepEnv Console only: an existing `.env` (no lock file) is kept and used; the
-     *                      database options are ignored and missing keys are added to it.
+     * @param bool                 $keepEnv  Console only: an existing `.env` (no lock file) is kept and used; the
+     *                                        database options are ignored and missing keys are added to it.
+     * @param InstallProgress|null $progress Told each step and the failing one (InstallProgress)
      *
      * @throws InstallException
      */
-    public function install(InstallOptions $options, ?InstallPrompt $prompt = null, bool $keepEnv = false): InstallResult
+    public function install(InstallOptions $options, ?InstallPrompt $prompt = null, bool $keepEnv = false, ?InstallProgress $progress = null): InstallResult
+    {
+        $this->progress    = $progress;
+        $this->currentStep = 'checks';
+
+        try {
+            return $this->run($options, $prompt, $keepEnv);
+        } catch (Throwable $e) {
+            $this->progress?->failed($this->currentStep, $e instanceof InstallException ? $e->getMessage() : lang('Install.error.unexpected'));
+
+            throw $e;
+        } finally {
+            $this->progress = null;
+        }
+    }
+
+    /**
+     * Reports a step to the listener and remembers it for the failure report.
+     *
+     * @param array<string, scalar> $params
+     */
+    private function step(string $code, int $done = 0, int $total = 0, array $params = []): void
+    {
+        $this->currentStep = $code;
+        $this->progress?->step($code, $done, $total, $params);
+    }
+
+    /**
+     * @throws InstallException
+     */
+    private function run(InstallOptions $options, ?InstallPrompt $prompt, bool $keepEnv): InstallResult
     {
         $result = new InstallResult();
+        $this->step('checks');
 
         if ($this->state->isLocked() || ($this->state->hasEnv() && ! $keepEnv)) {
             throw new InstallException(lang('Install.error.configured'));
@@ -157,6 +194,8 @@ final class Installer
         }
 
         // 2-3. Keys and .env content, applied to this process.
+        $this->step('env');
+
         if ($keepEnv) {
             $keys = [];
 
@@ -179,11 +218,14 @@ final class Installer
             $this->runtime->apply($values);
         }
 
+        $this->step('database');
         $this->checkDatabase();
 
         // 4. modules:sync.
         try {
-            $report = $this->synchronizer()->sync();
+            $report = $this->synchronizer()->sync(progress: function (string $code, int $done, int $total, array $params): void {
+                $this->step($code, $done, $total, $params);
+            });
         } catch (SyncFailedException $e) {
             throw new InstallException(lang('Install.error.sync') . ' ' . implode(' ', $e->errors));
         }
@@ -195,6 +237,7 @@ final class Installer
         }
 
         // 5. The first superadmin.
+        $this->step('superadmin');
         $user                 = $this->createSuperadmin($options);
         $result->superadminId = (int) $user->id;
 
@@ -206,6 +249,7 @@ final class Installer
                 $this->loadDemo($options->demo, $report->order, $options->environment, $result);
             } catch (DemoDataException|InstallException $e) {
                 $result->demoError = $e->getMessage();
+                $this->progress?->log('Install.progress.demoFailed');
             }
         }
 
@@ -215,12 +259,18 @@ final class Installer
 
         // 7. .env and the lock file, last.
         if (! $keepEnv) {
+            $this->step('envFile');
+
             if ($this->state->rootWritable()) {
                 $this->env->write($this->state->envPath(), $result->env);
                 $result->envWritten = true;
+                $this->progress?->log('Install.progress.envWritten');
+            } else {
+                $this->progress?->log('Install.progress.envToCopy');
             }
         }
 
+        $this->step('lock');
         $this->state->writeLock([
             'installed_at' => Time::now()->toDateTimeString(),
             'version'      => Version::CORE,
@@ -303,9 +353,13 @@ final class Installer
             }
         }
 
+        $modules = array_values(array_filter($order, static fn (string $module): bool => in_array($module, $wanted, true)));
+
         try {
-            foreach ($order as $module) {
-                if (in_array($module, $wanted, true) && $manager->load($module)) {
+            foreach ($modules as $i => $module) {
+                $this->step('demo', $i + 1, count($modules), ['module' => $module]);
+
+                if ($manager->load($module)) {
                     $result->demoLoaded[] = $module;
                 }
             }

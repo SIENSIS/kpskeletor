@@ -55,12 +55,15 @@ final class ModuleSynchronizer
      * @param bool                               $prune        Remove permissions no manifest generates any more…
      * @param Closure(list<string>): bool|null   $confirmPrune …after this confirmation (required with $prune)
      * @param list<string>|null                  $demo         Load the demo data of these modules (null: none; []: every enabled module with a demo seeder)
+     * @param (Closure(string, int, int, array<string, scalar>): void)|null $progress Told each step (code, done, total, params): `migrations`, `modules`, `permissions`, `settings`, `assets`, `groups`, `api` (the web installer's progress)
      *
      * @throws SyncFailedException when a manifest or a dependency is invalid (nothing is changed)
      */
-    public function sync(bool $prune = false, ?Closure $confirmPrune = null, ?array $demo = null): SyncReport
+    public function sync(bool $prune = false, ?Closure $confirmPrune = null, ?array $demo = null, ?Closure $progress = null): SyncReport
     {
-        $report = new SyncReport();
+        $report   = new SyncReport();
+        $progress ??= static function (string $code, int $done, int $total, array $params): void {
+        };
 
         // 1. Discover, validate, check dependencies, permissions and API routes.
         $modules = $this->discovery->discover();
@@ -91,12 +94,15 @@ final class ModuleSynchronizer
         $report->namespacesChanged = $this->namespaceFile->write($folders);
 
         // 2. Migrations: third-party packages as they ship, then modules in dependency order.
-        foreach (ModuleMigrator::PACKAGE_NAMESPACES as $namespace) {
-            $report->migrations[$namespace] = $this->migrator->migrate($namespace);
-        }
+        $namespaces = [...ModuleMigrator::PACKAGE_NAMESPACES];
 
         foreach ($report->order as $name) {
-            $report->migrations[$modules[$name]->namespace] = $this->migrator->migrate($modules[$name]->namespace);
+            $namespaces[] = $modules[$name]->namespace;
+        }
+
+        foreach ($namespaces as $i => $namespace) {
+            $progress('migrations', $i + 1, count($namespaces), ['namespace' => $namespace]);
+            $report->migrations[$namespace] = $this->migrator->migrate($namespace);
         }
 
         // 2b/3. Seed on first install, then upsert the registry.
@@ -105,8 +111,9 @@ final class ModuleSynchronizer
         $now      = Time::now()->toDateTimeString();
         $enable   = $this->enablesNewModules($known === []);
 
-        foreach ($report->order as $name) {
+        foreach ($report->order as $i => $name) {
             $manifest = $manifests[$name];
+            $progress('modules', $i + 1, count($report->order), ['module' => $name]);
 
             if (! isset($known[$name])) {
                 if ($this->seed($name)) {
@@ -130,6 +137,7 @@ final class ModuleSynchronizer
         $report->missing = array_values(array_diff(array_keys($known), array_keys($modules)));
 
         // 4. Permission catalogue; stale permissions are removed only with --prune + confirmation.
+        $progress('permissions', 0, 0, []);
         $result                     = $this->permissions->upsert($catalogue);
         $report->permissionsAdded   = $result['added'];
         $report->permissionsUpdated = $result['updated'];
@@ -154,6 +162,7 @@ final class ModuleSynchronizer
         }
 
         // 6. Settings definitions, widgets, tasks, notification types, menu link types, calendars, API.
+        $progress('settings', 0, 0, []);
         $ordered = [];
 
         foreach ($report->order as $name) {
@@ -163,6 +172,7 @@ final class ModuleSynchronizer
         $report->declarationsChanged = $this->declarations->store($this->declarations->build($ordered));
 
         // 7. Assets of the Core, the modules and the themes, and the asset manifest.
+        $progress('assets', 0, 0, []);
         $report->assets = ($this->assets ?? new AssetPublisher())->publish();
 
         // 8. Invalidate the caches derived from the manifests.
@@ -172,6 +182,7 @@ final class ModuleSynchronizer
 
         // 9. The reserved groups and Shield's groups, permissions and group matrix, computed
         //    from the `groups` table, the catalogue and the grants.
+        $progress('groups', 0, 0, []);
         $groups = new GroupRegistry($this->permissions);
         $groups->ensureReserved();
         $groups->mirror();
@@ -179,6 +190,7 @@ final class ModuleSynchronizer
 
         // 10. The OpenAPI document of api/v1 (writable/api/openapi.json), after the catalogue and
         //     the declarations so every resource describes itself with the current manifests.
+        $progress('api', 0, 0, []);
         $openApi                 = ($this->openApi ?? new OpenApiDocument())->write();
         $report->openApiChanged  = $openApi['changed'];
         $report->openApiPaths    = $openApi['paths'];

@@ -31,6 +31,14 @@ final class InstallState
         return rtrim($this->writablePath, '/\\') . DIRECTORY_SEPARATOR . self::LOCK_FILE;
     }
 
+    /**
+     * The folder of the web installer's jobs (InstallJobs): progress and one-time results.
+     */
+    public function jobsPath(): string
+    {
+        return rtrim($this->writablePath, '/\\') . DIRECTORY_SEPARATOR . 'install-jobs';
+    }
+
     public function hasEnv(): bool
     {
         return is_file($this->envPath());

@@ -1708,7 +1708,7 @@ both supported:
     database, except the paths allowed when it was turned on; `schedule:run` and the poor man's
     cron do nothing meanwhile. Paths under `progress/*` return the JSON progress of long jobs
     from files and skip the filters that read the database or the session; they never return
-    secrets;
+    secrets (`progress/backup/<job>`, and the web installer's `progress/install/<job>`);
   * keeps the current `.env` (database credentials and base URL of the new server) and, after a
     confirmation, merges only the secrets from the backup (`encryption.key`, `app.maskKey`,
     `backup.password`); `--with-env` restores the whole `.env` (console only). The UI never writes
@@ -1879,6 +1879,16 @@ and in the back office (Core, permission `security.check`, superadmin and admin 
   page is not served over HTTPS. It uses the same service as the CLI. When the project root is
   not writable by the web server (the recommended setup), it shows the `.env` content for the
   operator to copy instead of writing it.
+  **Progress** (session 39): while it installs, the page shows a progress bar and a short log
+  (the installer reports its steps through `Modules\Core\Install\InstallProgress`; messages are
+  language keys, never secrets). A valid POST from the page's script starts a job
+  (`InstallJobs`: random 32-hex id, files `0600` in `writable/install-jobs/`, one hour) and runs
+  it after the response (`fastcgi_finish_request()`); the page polls `progress/install/<job>`
+  (status, step, percentage, log; rate limited per IP, 404 for an unknown or expired job) and
+  opens `install/result/<job>`, which shows the one-time values (the `.env` to copy, demo
+  passwords) once and deletes them, or the failing step. Without JavaScript, with
+  `php spark serve` or mod_php, it installs inside the request as before. One installation at a
+  time (lock). Both job pages keep answering once installed, until the job expires.
   Before installation every other page redirects to it and production still forces HTTPS
   (D-18-01, D-18-02). Passwords are never command-line options (hidden prompts or
   `INSTALL_DB_PASSWORD` / `INSTALL_ADMIN_PASSWORD`, D-18-03); demo data follows the installed

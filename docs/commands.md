@@ -21,7 +21,9 @@ the site's default language (`Core.defaultLocale`; the examples below are in Eng
 | `app:update [--dry-run] [--yes] [--password]` | Updates the application to the newest release of `updates.repository`: checks (newer version, no local changes, maintenance off, signed release, backup password), downloads and **verifies** the archive (SHA-256 + Ed25519 minisign signature) or the git tag (`git verify-tag`) before anything changes, maintenance mode, a full backup, the new code, `composer install --no-dev`, `modules:sync`, `app:cache-clear`, maintenance off. On failure maintenance mode stays on and the backup is named. `--dry-run` shows the plan. See `docs/updates.md`. | Updates module; the deploy user (writes the code); `updates.repository` and its keys, a backup password, `git`/`composer` and network access. Exit 1 when a check or a step fails. |
 | `app:cache-clear` | Clears the Core's caches (every `CoreCache` scope, through `CacheInvalidator`, and the theme registry) and CodeIgniter's whole cache, then fires the `cache.cleared` event so modules can clear caches they keep elsewhere. CodeIgniter's own `cache:clear` cannot be replaced (D-00-43). Settings › Actions › "Clear caches" does the same. | Writes `writable/cache`. Exit 1 when a cache cannot be cleared. |
 
-The web installer (`/install`) is the same service with a form; see `README.md`.
+The web installer (`/install`) is the same service with a form; see `README.md`. Under PHP-FPM
+(or LiteSpeed) it installs after answering and shows its progress (`progress/install/<job>`,
+then `install/result/<job>`); otherwise it installs inside the request.
 
 ## Modules
 

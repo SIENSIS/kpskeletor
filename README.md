@@ -38,6 +38,9 @@ INSTALL_DB_PASSWORD=… INSTALL_ADMIN_PASSWORD=… php spark app:install --no-in
 On your own computer: `php spark app:install --env=development --db=sqlite --demo`, then
 `php spark serve` (http://localhost:8080). Alternatively, open the site in a browser before
 installing: every page leads to the web installer `/install`, which disappears once installed.
+While it installs it shows a progress bar and a log of its steps, then the result page (the
+`.env` to copy and the demo passwords are shown there once); without JavaScript, or with
+`php spark serve`, it installs inside the request and shows the same result page.
 With `php spark serve` and `http://localhost` it opens over HTTP without a certificate; on a real
 web server it is redirected to HTTPS (`docs/security.md`, "Installer").
 

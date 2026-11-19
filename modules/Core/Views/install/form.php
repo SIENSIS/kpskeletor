@@ -10,13 +10,14 @@
  * @var bool                                    $rootWritable
  * @var string                                  $envPath
  * @var int                                     $minPassword
+ * @var bool                                    $scripts     Core scripts published (progress page)
  */
 
 $invalid = static fn (string $field): string => isset($errors[$field]) ? ' is-invalid' : '';
 $error   = static fn (string $field): string => isset($errors[$field]) ? '<div class="invalid-feedback" id="' . esc($field) . '-error">' . esc($errors[$field]) . '</div>' : '';
 $aria    = static fn (string $field): string => isset($errors[$field]) ? ' aria-invalid="true" aria-describedby="' . esc($field) . '-error"' : '';
 ?>
-<?= view('Modules\Core\Views\install\_head', ['base' => $base, 'title' => lang('Install.web.title')]) ?>
+<?= view('Modules\Core\Views\install\_head', ['base' => $base, 'title' => lang('Install.web.title'), 'scripts' => $scripts]) ?>
 <main class="container py-4 py-md-5">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-9 col-xl-8">
@@ -35,8 +36,10 @@ $aria    = static fn (string $field): string => isset($errors[$field]) ? ' aria-
                 <div class="alert alert-danger" role="alert"><?= esc($message !== '' ? $message : lang('Install.error.invalid')) ?></div>
             <?php endif ?>
 
-            <form method="post" action="" novalidate>
+            <form method="post" action="" novalidate data-component="core/install/progress">
                 <?= csrf_field() ?>
+                <?php /* Set to 1 by core/install/progress.js: this browser can show the progress page. */ ?>
+                <input type="hidden" name="progress" value="0" data-install-progress-flag>
 
                 <div class="card mb-3">
                     <div class="card-header fw-semibold"><?= esc(lang('Install.web.site')) ?></div>
@@ -147,10 +150,11 @@ $aria    = static fn (string $field): string => isset($errors[$field]) ? ' aria-
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i><?= esc(lang('Install.web.submit')) ?></button>
+                <button type="submit" class="btn btn-primary btn-lg" data-install-submit><i class="bi bi-check2-circle me-1" aria-hidden="true"></i><?= esc(lang('Install.web.submit')) ?></button>
             </form>
         </div>
     </div>
 </main>
+<?= view('Modules\Core\Views\install\_scripts', ['scripts' => $scripts]) ?>
 </body>
 </html>
