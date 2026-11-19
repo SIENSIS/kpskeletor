@@ -285,6 +285,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-35-04 | 35 | WCAG AA colours of the default theme: darker text shades derived from the palette | Accepted (proposal) |
 | D-38-01 | 38 | Settings zone of the back-office menu grouped in five containers (decide) | Decided |
 | D-40-01 | 40 | Configurable back-office path chosen at install time (decide) | Applied (decided) |
+| D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Decided |
+| D-41-02 | 41 | In development, Devtools may write module code from the back office (decide) | Decided |
+| D-41-03 | 41 | Devtools answers only local requests, to the superadmin, with re-authentication for writes (decide) | Decided |
+| D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Open |
+| D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2891,4 +2896,48 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Decided
 - **Decision (2026-11-19):** «Instal·lar + comanda per canviar-la» (alternative C). The back-office path is `app.backendPath` in `.env` (default `backend`), chosen at install time with `app:install --backend-path=<slug>` and a field of the web installer, with the validation rules of the proposal; new stored links are relative and old `backend/…` links keep working. **In addition**, a console command `php spark app:backend-path <new>` changes it later: it validates the new path like the installer, turns maintenance mode on, rewrites `app.backendPath` in `.env` (or prints the line to copy when `.env` is not writable), rewrites the stored links that still carry the old prefix, clears the caches and the menu cache, logs a security event and turns maintenance off; never from the back office. **Must change:** `deploy/40-backend-path.md` (scope and tests), specification "Installer and CLI" and "Security baseline", `docs/commands.md` (session 40), `CLAUDE.md` (session 40, when the prefix becomes configurable).
 - **Applied in:** `docs/specification.md` ("Installer and CLI": back-office path and the `app:backend-path` command), `deploy/40-backend-path.md` (scope and tests); the code, `CLAUDE.md` and the remaining docs are session 40's.
+
+## D-41-01 — A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide)
+
+- **Where:** owner's request of 2026-11-19 (a development module to build CRUDs and packages from the back office); specification "The module contract" (manifest keys); `deploy/41-devtools.md`.
+- **Problem:** Remembering every CRUD variant (audited, re-authentication, read-only, exports, API…) is hard; a visual generator helps, but a screen that writes PHP into `modules/` must never be usable in production.
+- **Proposal:** A module `Devtools` (disabled by default) holds the CRUD recipes (41), the code generator (42) and the package builder (43). Its routes exist only when `ENVIRONMENT === 'development'`; a new boolean manifest key `$developmentOnly` makes `modules:sync`, `modules:enable`, `modules:install` and the Modules screen refuse it outside development (a sync in production disables it and logs it); `security:check` reports an error when such a module is enabled outside development.
+- **Alternatives:** A) Console only (an interactive `make:crud` and a recipes page): no screen writes code, less visual. B) A separate package installed only on developers' machines (not in the skeleton's repository).
+- **Status:** Decided
+- **Decision (2026-11-19):** «Crea un mòdul devtools amb tots els panys». As proposed; sessions 41–43 build it. **Must change:** `ModuleManifest`, `ManifestValidator`, the module commands and screen, `security:check`, `docs/creating-a-module.md`, `docs/security.md`, specification "The module contract".
+
+## D-41-02 — In development, Devtools may write module code from the back office (decide)
+
+- **Where:** `CLAUDE.md` and specification "Security baseline" (module code is installed only from the console; `security:check` wants `modules/` not writable by the web user); `deploy/42-devtools-generator.md`.
+- **Problem:** The generator writes migrations, controllers, manifests and tests into `modules/` from a web request, which the skeleton otherwise never allows.
+- **Proposal:** Allowed only behind every lock of D-41-01 and D-41-03 (development, loopback, superadmin, re-authentication), only after a preview of every file, refused when a file changed after the preview, logged with `activity_log()`. Production keeps the rule unchanged.
+- **Alternatives:** A) The screen only shows the files and the console writes them (`make:module --definition=<file.json>`).
+- **Status:** Decided
+- **Decision (2026-11-19):** «… un motor de generació que em permeti a través de UI crear el màxim de codi amb l'ajuda visual i vista prèvia», for local development with `php spark serve`. As proposed. **Must change:** `CLAUDE.md` and `docs/security.md` (the development-only exception), session 42.
+
+## D-41-03 — Devtools answers only local requests, to the superadmin, with re-authentication for writes (decide)
+
+- **Where:** `deploy/41-devtools.md`; `docs/security.md`.
+- **Problem:** A development site can still be reachable from the network (a laptop on a shared Wi-Fi, a shared development server).
+- **Proposal:** A Devtools filter answers 404 unless the client address is a loopback address and the `Host` is `localhost` or a loopback address (proxy headers are not trusted); resource `devtools` with `devtools.view` and `devtools.write`, no default grants (superadmin only); every write needs `reauth` and `ratelimit:forms`.
+- **Alternatives:** A) No loopback check (any client of a development site could use it).
+- **Status:** Decided
+- **Decision (2026-11-19):** «amb tots els panys». As proposed. **Must change:** session 41.
+
+## D-42-01 — `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide)
+
+- **Where:** `deploy/42-devtools-generator.md` (adding a table or CRUD to an existing module); `CLAUDE.md` ("ask before adding a dependency").
+- **Problem:** Adding a resource to an existing module means changing its `Config/Module.php`, `Config/Routes.php` and language files. Editing PHP with text replacements is fragile; a parser with a format-preserving printer changes only what it must. The library is already in `vendor/` through the development tools, but not a direct dependency.
+- **Proposal:** `composer require --dev nikic/php-parser:^5` (BSD-3-Clause; development only, like Devtools); the generator edits existing PHP files with it and shows the diff in the preview.
+- **Alternatives:** A) No dependency: for existing modules the preview shows the snippets to paste into the manifest, routes and language files by hand (new files are still written). B) Regenerate the whole manifest from a stored definition (loses manual changes).
+- **Status:** Open
+
+## D-43-01 — Signing packages from the local Devtools form, with safeguards for the key (decide)
+
+- **Where:** `deploy/43-devtools-packages.md`; `docs/updates.md` and `docs/installing-modules.md` (the secret key stays on the publisher's computer).
+- **Problem:** Signing needs the minisign secret key and its password. From the console they can be read from a file and a hidden prompt; the owner also wants to paste them into a form, since Devtools runs locally. In development, CodeIgniter's debug toolbar stores every request's variables in `writable/debugbar/` (`Config\Toolbar::$collectVarData = true`), the development error page shows the posted data, and `withInput()` copies it into the session: the key could be left on disk without anyone noticing.
+- **Proposal:** Both ways: `modules:package --sign=<key file>` (password without echo) and the local form (secret key as text or uploaded file, read in memory, plus its password). The form keeps every Devtools lock and: no toolbar collection for that request, no `withInput()` or flash data, no logging of the values (the activity log records only the file and the key id), every exception caught with a generic message, `sodium_memzero` after use, `autocomplete="off"`, `Cache-Control: no-store`; a test checks that nothing under `writable/` contains the key after signing. The signature is verified with the Core's `Minisign` before it is offered.
+- **Alternatives:** A) Console only (the screen shows the command). B) Keep the secret key encrypted in `writable/` for repeated use (convenient, but the key would live on the development machine's disk next to the project).
+- **Status:** Decided
+- **Decision (2026-11-19):** «… podria demanar la clau en el moment de fer la signatura … s'executa en local». As proposed, with the safeguards above. **Must change:** session 43, `docs/devtools.md`, `docs/installing-modules.md`.
 

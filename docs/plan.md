@@ -840,7 +840,30 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Tests:** the suite with the default; a case with `admin`; installer validation; e2e.
 - **Depends on:** 39 (installer field); D-40-01 decided (install-time choice plus `app:backend-path`).
 - **Risks:** the widest change after the release (≈ 380 places in code, ≈ 950 in tests, stored
-  links); it merges itself into `main` (last planned session).
+  links).
+
+## 41 — Devtools module: development-only tools and their locks (`deploy/41-devtools.md`)
+
+- **Goal:** a `Devtools` module usable only in development, from the local machine, by the
+  superadmin (D-41-01, D-41-03), with the CRUD recipes page (the "cheat sheet" of CRUD variants).
+- **Files:** `modules/Devtools/`, `ModuleManifest` (`$developmentOnly`), module commands and
+  screen, a `security:check` check.
+- **Tests:** one per lock.
+- **Depends on:** 40 (order only).
+
+## 42 — Devtools: visual code generator with preview (`deploy/42-devtools-generator.md`)
+
+- **Goal:** a wizard (module, tables, demo data, CRUD options, API, menu, permissions) that
+  previews and then writes the files, on one engine shared with `make:module` (D-41-02).
+- **Tests:** plans against fixtures; generated modules pass the checks and their own tests.
+- **Depends on:** 41; D-42-01 **(decide)** for editing existing modules' PHP files.
+
+## 43 — Devtools: module packages and signing (`deploy/43-devtools-packages.md`)
+
+- **Goal:** `modules:package` and a screen that build, validate and sign packages; signing from
+  the console or the local form with the key's safeguards (D-43-01).
+- **Tests:** packages install with `modules:install`; signatures verify; no trace of the key.
+- **Depends on:** 42. Merges itself into `main` (last planned session).
 
 ---
 
