@@ -155,6 +155,7 @@ s'aturen i te'l recorden. Pots fer-ho al mateix xat de la sessió o en un de nou
 | 46 | `46-module-sections.md` | Seccions dels mòduls: notícies, calendari, galeria, carrusel, logotips, incrustats | |
 | 47 | `47-reusable-blocks.md` | Blocs reutilitzables, zones del tema, peu en columnes i models de portada | |
 | 48 | `48-contact.md` | Formulari de contacte amb protecció antispam | |
+| 49 | `49-icon-picker.md` | Selector d'icones als camps d'icona i botó «Insereix una icona» a l'editor (D-49-01 i D-49-02 decidides) | |
 
 Fitxers auxiliars: `next.md` (executa la sessió següent), `decide.md` (et pregunta els dubtes
 oberts un per un i aplica les decisions), `continue.md` (reprèn una sessió inacabada) i
