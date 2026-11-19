@@ -925,6 +925,21 @@ granularity instead of collapsing it into read/create/update/delete.
 
 ## Cross-module services (Core)
 
+### Site search (D-50-01, session 50)
+
+* A Core search index of its own (tables `search_documents` and `search_terms`, the same on
+  MariaDB and SQLite) fed by modules: a module declares `$searchSources` (`<module>.<key>`) and
+  calls `service('search')->index(SearchDocument)` / `remove()` on every change; each source can
+  rebuild itself (`php spark search:reindex [<Module>]`, also after `modules:sync`).
+* Terms are normalised per language (lower case, accents folded, stop words removed); weights:
+  title ×5, meta title / keywords ×3, summary / meta description ×2, body ×1, recency as a
+  tiebreak. Each document stores its audience (public, signed-in, groups) and publish window, and
+  **the query filters by them**: a visitor never finds drafts, scheduled, private or other groups'
+  content; a disabled module's documents are skipped.
+* Public page `search` (`?q=`, with the language prefix), a search box in the public navbar
+  (theme option `showSearch`, on), rate limit `Core.searchRateLimit` (30 per minute per IP); no
+  public API endpoint for now. Pages and News are the first sources.
+
 ### Notifications
 
 * `notify(User|int|array $recipients, NotificationType $notification)` or by group / permission
@@ -1593,6 +1608,20 @@ both supported:
   default), rate limits per IP and email, at most 2 links, blocked words; no third-party captcha.
   Mail from the site's address with the visitor only in `Reply-To`, no auto-reply, no attachments;
   messages deleted after 365 days (setting, minimum 30).
+
+### Assistant (D-51-01, D-51-02, session 51)
+
+* A chat bubble on the public site that answers without any external service or AI: frequently
+  asked questions (`assistant-faqs`: question and answer per language, keywords, links, audience,
+  order; also the search source `assistant.faqs`), then the site search (only what the visitor may
+  see), then the contact form (when the Contact module is enabled).
+* Disabled by default (module and setting `Assistant.enabled`); `POST assistant/ask` with CSRF,
+  20 messages per minute per IP and session, 300 characters at most, JSON answers rendered without
+  `innerHTML` of user text; settings `Assistant.greeting`, `Assistant.results` (3),
+  `Assistant.sources`, `Assistant.offerContact`; admin all, editor list/add/edit.
+* Nothing stored by default; `Assistant.logUnanswered` (off) keeps only unanswered questions,
+  without IP, user, session or exact time, emails and long numbers masked, deleted after 90 days
+  (setting, minimum 7); the bubble's privacy text says so when it is on.
 
 ### Updates
 
