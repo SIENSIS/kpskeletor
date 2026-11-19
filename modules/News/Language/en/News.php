@@ -69,8 +69,8 @@ return [
         'event_all_day' => 'All-day event',
     ],
     'help' => [
-        'slug'         => 'Lower-case words separated by hyphens. Leave it blank to build it from the Catalan title.',
-        'categorySlug' => 'Used in news/category/{slug}. Leave it blank to build it from the Catalan name.',
+        'slug'         => 'Lower-case words separated by hyphens. Leave it blank to build it from the title in {0}.',
+        'categorySlug' => 'Used in news/category/{slug}. Leave it blank to build it from the name in {0}.',
         'visibility'   => 'Public: anyone, on the public site. Private: signed-in users. Groups: only the selected groups.',
         'groups'       => 'Only used when the visibility is “Groups”.',
         'priority'     => 'Only for notices.',

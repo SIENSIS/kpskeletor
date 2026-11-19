@@ -67,13 +67,14 @@ final class BirthdayGreetingsTest extends UsersTestCase
 
     public function testTheMessageIsTheAdministratorsInTheUsersLanguage(): void
     {
+        setting('Core.defaultLocale', 'ca'); // the shipped default (the tests run with app.defaultLocale=en)
         setting('Users.birthdayGreeting', ['ca' => 'Molts anys, {name}! Bon dia de part de la direcció.', 'es' => '¡Felicidades, {name}!']);
         setting('Users.birthdayGreetingSharedOnly', false);
         (new BirthdayGreetings())->sendToday(new DateTimeImmutable('2027-05-17'));
 
         $this->assertSame('Molts anys, Profe A! Bon dia de part de la direcció.', $this->render((int) $this->teacher->id, 'ca'));
         $this->assertSame('¡Felicidades, Profe B!', $this->render((int) $this->private->id, 'es'));
-        $this->assertSame('Molts anys, Profe A! Bon dia de part de la direcció.', BirthdayGreetings::message('en', 'Profe A'), 'A language without a text uses the Catalan one.');
+        $this->assertSame('Molts anys, Profe A! Bon dia de part de la direcció.', BirthdayGreetings::message('en', 'Profe A'), 'A language without a text uses the site\'s default language (Catalan).');
     }
 
     public function testWithoutAStoredGreetingEachLanguageGetsItsDefault(): void
@@ -144,6 +145,7 @@ final class BirthdayGreetingsTest extends UsersTestCase
 
     public function testTheStoredGreetingsAreMergedIntoOneTranslatedSetting(): void
     {
+        setting('Core.defaultLocale', 'ca'); // the shipped default (the tests run with app.defaultLocale=en)
         require_once dirname(__DIR__) . '/Database/Migrations/2026-11-17-100001_MergeBirthdayGreetingSettings.php';
         $migration = new \Modules\Users\Database\Migrations\MergeBirthdayGreetingSettings(\Config\Database::forge('tests'));
         $db        = db_connect();
@@ -160,7 +162,7 @@ final class BirthdayGreetingsTest extends UsersTestCase
 
         \Config\Services::resetSingle('settings'); // forget the values read before the migration
         $this->assertSame('Cheers, Profe A!', BirthdayGreetings::message('en', 'Profe A'));
-        $this->assertSame('Molts anys, Profe A!', BirthdayGreetings::message('es', 'Profe A'), 'Spanish had no text: the Catalan one.');
+        $this->assertSame('Molts anys, Profe A!', BirthdayGreetings::message('es', 'Profe A'), 'Spanish had no text: the default language\'s (Catalan).');
 
         $migration->down();
         $this->assertSame(['birthdayGreetingCa', 'birthdayGreetingEn'], array_column($db->table('settings')->whereIn('key', ['birthdayGreetingCa', 'birthdayGreetingEs', 'birthdayGreetingEn', 'birthdayGreeting'])->orderBy('key')->get()->getResultArray(), 'key'));

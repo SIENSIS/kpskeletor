@@ -94,7 +94,7 @@ return [
         'visibility'  => 'Public to-do tasks appear on the public page (and anyone can download their attachments).',
         'attachments' => 'Up to 5 files (PDF, text, images, office documents). Private files: only who can see the to-do task downloads them.',
         'estimate'    => 'Hours of work expected. Only visible with the "estimates" permission.',
-        'slug'        => 'Part of the public address tasks/project/…; generated from the Catalan name when empty.',
+        'slug'        => 'Part of the public address tasks/project/…; generated from the name in {0} when empty.',
         'endsOn'      => 'Shown in the calendar "Project deadlines".',
     ],
     'complete'        => 'Complete',

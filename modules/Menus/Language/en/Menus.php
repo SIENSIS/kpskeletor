@@ -166,7 +166,7 @@ return [
         'route'         => 'There is no route with that name (or it needs parameters).',
         'type'          => 'Unknown link type.',
         'choice'        => 'Choose one of the options.',
-        'labelRequired' => 'The label in Catalan is required.',
+        'labelRequired' => 'The label in {0} is required.',
         'labelLength'   => 'Labels have at most 100 characters.',
         'parent'        => 'The chosen parent does not belong to this menu.',
         'cycle'         => 'An entry cannot go inside itself or inside its own entries.',

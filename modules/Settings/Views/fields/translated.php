@@ -1,7 +1,7 @@
 <?php
 /**
  * A translated text (type `translated`): one input per available locale of the site, each with
- * its language's name; an empty text uses the Catalan one (docs/settings.md).
+ * its language's name; an empty text uses the default language's one (docs/settings.md).
  *
  * @var \Modules\Settings\Forms\Field  $field
  * @var string                         $id

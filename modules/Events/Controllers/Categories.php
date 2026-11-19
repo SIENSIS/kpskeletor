@@ -12,7 +12,7 @@ use Modules\Events\Services\EventRepository;
 
 /**
  * Categories of the events (`backend/events/categories`, resource `events-categories`):
- * translated name and description (Catalan required), a colour for the calendar, a unique slug
+ * translated name and description (the site's default language required), a colour for the calendar, a unique slug
  * (the public calendar's filter `calendar?category=<slug>`), order and an active flag. Deleting a
  * category leaves its events without category (foreign key `SET NULL`).
  */
@@ -24,12 +24,10 @@ final class Categories extends BackendController
 
         $crud->setTable('event_categories')
             ->setSubject(lang('Events.category'), lang('Events.categories'))
-            ->setTranslations('event_category_translations', 'category_id', 'locale', ['name', 'description'], ContentTranslations::LOCALES, [
-                'required'  => ['ca'],
-                'types'     => ['name' => 'text', 'description' => 'textarea'],
-                'rules'     => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[255]'],
-                'fallbacks' => ['*' => ['ca']],
-            ])
+            ->setTranslations('event_category_translations', 'category_id', 'locale', ['name', 'description'], ContentTranslations::locales(), ContentTranslations::crudOptions([
+                'types' => ['name' => 'text', 'description' => 'textarea'],
+                'rules' => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[255]'],
+            ]))
             ->fieldType('active', 'boolean')
             ->fieldType('color', 'color')
             ->fieldType('position', 'number', ['attrs' => ['min' => 0, 'max' => 9999]])
@@ -75,7 +73,7 @@ final class Categories extends BackendController
         $slug = trim((string) ($data['slug'] ?? ''));
 
         if ($id === null || array_key_exists('slug', $data)) {
-            $data['slug'] = Slugger::unique('event_categories', $slug !== '' ? $slug : (string) ($translations['ca']['name'] ?? ''), $id, fallback: 'category');
+            $data['slug'] = Slugger::unique('event_categories', $slug !== '' ? $slug : ContentTranslations::defaultText($translations, 'name'), $id, fallback: 'category');
         }
 
         if (array_key_exists('color', $data)) {

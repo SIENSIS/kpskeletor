@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\News\Services;
 
 use CodeIgniter\I18n\Time;
+use Modules\Core\Content\ContentTranslations;
 use Modules\Core\Content\PublishWorkflow;
 use Modules\News\Notifications\NewNotice;
 
@@ -134,7 +135,7 @@ final class Publisher
     }
 
     /**
-     * The title of a post in Catalan (stored in the notification; the reader's language is used
+     * The title of a post in the site's default language (stored in the notification; the reader's language is used
      * for the rest of the text).
      */
     private function title(int $id): string
@@ -142,6 +143,6 @@ final class Publisher
         $rows  = db_connect()->table('news_translations')->select('locale, title')->where('news_id', $id)->get()->getResultArray();
         $texts = array_column($rows, 'title', 'locale');
 
-        return (string) ($texts[NewsRepository::FALLBACK_LOCALE] ?? reset($texts) ?: '');
+        return ContentTranslations::defaultText($texts);
     }
 }

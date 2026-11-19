@@ -166,7 +166,7 @@ return [
         'route'         => 'No hi ha cap ruta amb aquest nom (o necessita paràmetres).',
         'type'          => 'Tipus d\'enllaç desconegut.',
         'choice'        => 'Trieu una de les opcions.',
-        'labelRequired' => 'L\'etiqueta en català és obligatòria.',
+        'labelRequired' => 'L\'etiqueta en {0} és obligatòria.',
         'labelLength'   => 'Les etiquetes tenen com a màxim 100 caràcters.',
         'parent'        => 'El pare triat no pertany a aquest menú.',
         'cycle'         => 'Una entrada no pot anar dins d\'ella mateixa ni dins de les seves entrades.',

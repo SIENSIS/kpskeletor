@@ -8,7 +8,41 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- The language in public URLs (D-37-02): `/qui-som` in the site's default language,
+  `/es/quienes-somos` in Spanish; internal links keep the prefix (the application's `site_url()`),
+  a language switch next to the light/dark switch links to the same page in every language (theme
+  option `languageSwitch`), `hreflang` alternates and a sitemap with every translation;
+  `Config\LocaleUrls` (`$enabled`, `$excluded`). Back office, API and sign-in pages are unchanged
+  (`docs/i18n.md`, "Language in the URL").
+- `ContentTranslations::locales()`, `codes()`, `defaultLocale()`, `defaultName()`, `crudOptions()`, `apiOptions()`,
+  `defaultText()` and `keepUnavailable()`: the content languages of a module come from the site's
+  locales (`docs/i18n.md`, "Content languages"); `CalendarEvent::translated()` for per-language
+  calendar titles; `Modules\Core\Tests\ContentLocalesTrait` for module tests with another
+  language set.
+
+### Changed
+
+- **Removed** the constants `ContentTranslations::LOCALES`, `ContentTranslations::FALLBACK_LOCALE`,
+  `NewsRepository::FALLBACK_LOCALE`, `News\Controllers\Posts::LOCALES` and
+  `TranslatedText::FALLBACK_LOCALE` (D-37-01). Modules that used them: replace them as described in
+  `docs/i18n.md` ("Upgrading a module written for 1.0.0").
+- The settings `Core.defaultLocale` and `Core.locales` offer every supported locale
+  (`Config\App::$supportedLocales`) instead of a fixed ca/es/en list.
+- The required content language is the site's default language (`Core.defaultLocale`), not always
+  Catalan; a language no longer offered keeps its texts but they are neither shown nor edited.
+
+### Fixed
+
+- Content forms, readers and APIs (News, Pages, Events, Menus, Tasks) only offered Catalan,
+  Spanish and English and always required Catalan: a language added by configuration now reaches
+  every translated form, reader and API, slugs and activity summaries use the default language's
+  text, and kpapy's translated fields fall back to the site's default language.
+- The calendar titles of birthdays and to-do task due dates are written in every site language;
+  FullCalendar loads its locale file for any vendored language.
+- Help texts and messages that named Catalan (slug help of News posts, News categories and Tasks
+  projects; the required label of Menus) name the site's default language.
 
 ## [1.0.0] - 2026-11-18
 

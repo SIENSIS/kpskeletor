@@ -130,7 +130,7 @@ final class MenuItems extends BackendController
         activity_log('Menus', $itemId === null ? 'item_added' : 'item_edited', [
             'resource'  => 'menus-public',
             'record_id' => (string) $saved,
-            'summary'   => $menu['name'] . ' › ' . ($data['labels']['ca'] ?? ''),
+            'summary'   => $menu['name'] . ' › ' . ContentTranslations::defaultText($data['labels']),
             'before'    => $before === null ? null : self::summary($before),
             'after'     => self::summary($data['row'] + ['labels' => $data['labels']]),
         ]);
@@ -153,7 +153,7 @@ final class MenuItems extends BackendController
         activity_log('Menus', 'item_deleted', [
             'resource'  => 'menus-public',
             'record_id' => (string) $itemId,
-            'summary'   => $menu['name'] . ' › ' . MenuRepository::label($item['labels'], 'ca') . ($count > 1 ? ' (+' . ($count - 1) . ')' : ''),
+            'summary'   => $menu['name'] . ' › ' . ContentTranslations::defaultText($item['labels']) . ($count > 1 ? ' (+' . ($count - 1) . ')' : ''),
             'before'    => self::summary($item),
         ]);
 
@@ -208,7 +208,8 @@ final class MenuItems extends BackendController
             'choices'      => $choices,
             'parents'      => (new MenuRepository())->parentOptions($menu['id'], $itemId, $locale),
             'groups'       => $groups,
-            'locales'      => ContentTranslations::LOCALES,
+            'locales'      => ContentTranslations::locales(),
+            'required'     => ContentTranslations::defaultLocale(),
             'visibilities' => array_combine(MenuRepository::VISIBILITIES, array_map(static fn (string $v): string => lang('Menus.visibility.' . $v), MenuRepository::VISIBILITIES)),
             'action'       => site_url('backend/menus/items/' . $menu['id'] . '/save'),
             'backUrl'      => site_url('backend/menus/items/' . $menu['id']),
@@ -228,7 +229,7 @@ final class MenuItems extends BackendController
         $labels = [];
         $posted = $this->request->getPost('labels');
 
-        foreach (array_keys(ContentTranslations::LOCALES) as $locale) {
+        foreach (ContentTranslations::codes() as $locale) {
             $label = trim((string) (is_array($posted) && is_scalar($posted[$locale] ?? null) ? $posted[$locale] : ''));
 
             if (mb_strlen($label) > 100) {
@@ -238,8 +239,8 @@ final class MenuItems extends BackendController
             $labels[$locale] = mb_substr($label, 0, 100);
         }
 
-        if ($labels['ca'] === '') {
-            $errors[] = lang('Menus.errors.labelRequired');
+        if ($labels[ContentTranslations::defaultLocale()] === '') {
+            $errors[] = lang('Menus.errors.labelRequired', [ContentTranslations::defaultName()]);
         }
 
         $type    = $post('type');

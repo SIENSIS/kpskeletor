@@ -11,13 +11,12 @@ use Modules\Core\I18n\Locales;
  * (locale => text). The manifest's `default` is a language key (its text in every supported
  * locale) or a map; the Settings form shows one input per available locale of the site.
  *
- * The text for a locale: the stored text of that locale, else the Catalan one (a locale added
- * later has no text yet), else the default of that locale, else the Catalan default.
+ * The text for a locale: the stored text of that locale, else the one of the site's default
+ * language (`Locales::default()`; a locale added later has no text yet), else the default of that
+ * locale, else the default of the site's default language.
  */
 final class TranslatedText
 {
-    public const FALLBACK_LOCALE = 'ca';
-
     /**
      * The text of a `translated` setting in a locale (default: the current one).
      */
@@ -41,9 +40,10 @@ final class TranslatedText
      */
     public static function resolve(array $texts, array $defaults, string $locale): string
     {
-        $base = explode('-', $locale, 2)[0];
+        $base     = explode('-', $locale, 2)[0];
+        $fallback = Locales::default();
 
-        foreach ([[$texts, $locale], [$texts, $base], [$texts, self::FALLBACK_LOCALE], [$defaults, $locale], [$defaults, $base], [$defaults, self::FALLBACK_LOCALE]] as [$map, $key]) {
+        foreach ([[$texts, $locale], [$texts, $base], [$texts, $fallback], [$defaults, $locale], [$defaults, $base], [$defaults, $fallback]] as [$map, $key]) {
             if (isset($map[$key]) && trim($map[$key]) !== '') {
                 return $map[$key];
             }
@@ -54,7 +54,7 @@ final class TranslatedText
 
     /**
      * The text of a language key in every supported locale (only the locales whose language
-     * files define it, so the Catalan fallback applies to the others).
+     * files define it, so the default language's fallback applies to the others).
      *
      * @return array<string, string>
      */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Tasks\Tests;
 
 use Modules\Core\Permissions\CrudPermissions;
+use Modules\Core\Tests\ContentLocalesTrait;
 use Modules\Dashboard\Tests\DashboardTestCase;
 
 /**
@@ -14,6 +15,7 @@ use Modules\Dashboard\Tests\DashboardTestCase;
  */
 abstract class TasksTestCase extends DashboardTestCase
 {
+    use ContentLocalesTrait;
     use TasksFixtures;
 
     protected array $widgetModules = ['Core', 'Dashboard', 'Users', 'Tasks'];
@@ -21,6 +23,7 @@ abstract class TasksTestCase extends DashboardTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->useShippedContentLocales();
         CrudPermissions::reset();
     }
 

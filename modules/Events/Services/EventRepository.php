@@ -17,7 +17,7 @@ use Modules\Core\Security\HtmlSanitizer;
 /**
  * Read queries of the calendar: the occurrences of the events a user may see in a date range
  * (recurrences expanded), one event's details, the categories, all with the texts in the user's
- * language (Catalan fallback). Visibility always comes from `EventVisibility`.
+ * language (fallback: the site's default language). Visibility always comes from `EventVisibility`.
  */
 final class EventRepository
 {

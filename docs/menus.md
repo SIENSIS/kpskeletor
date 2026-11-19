@@ -84,7 +84,7 @@ Two screens (`modules/Menus`, decisions D-21-01 … D-21-06).
   (`backend/menus/items/<menu>`, `menus-public.edit`): drag the handle (mouse, pen, touch), use
   the arrow keys on it (up/down reorder, right nests under the previous item, left takes it out)
   or the buttons, then "Save the order". Without JavaScript the buttons apply one move each.
-- Item: label per language (Catalan required), type and target — `url` (an `https://`/`http://`
+- Item: label per site language (the site's default language required, `docs/i18n.md`), type and target — `url` (an `https://`/`http://`
   URL or a path of the site starting with `/`), `route` (a GET route name without parameters) or
   a module link type (`pages.page`, `news.category`…) — parent (three levels at most), icon,
   window (new tab adds `rel="noopener noreferrer"`), CSS class and visibility (everyone,

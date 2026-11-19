@@ -36,6 +36,8 @@ icons, hide, relocate, custom groups and links, per group). Full description: `d
 D-21-01 (names, URLs, Core contracts) decided by the owner as built (Decisions 21); D-21-02 … D-21-06 accepted
 (`docs/decisions.md`).
 
+Session 37 (D-37-01): translated texts use the site's languages and require its default language through `Modules\Core\Content\ContentTranslations` (`locales()`, `crudOptions()`, `defaultText()`…); never write a language code (`tests/unit/I18n/ContentLanguagesTest.php`). Tests `Tests/ContentLocalesTest.php` (`Modules\Core\Tests\ContentLocalesTrait`).
+
 ## Open tasks
 
 - Done in session 29: `Config/Events.php` answers `moduleUninstalling`: deletes the customisations of the module's back-office entries and the public items of its link types. (`docs/installing-modules.md`)

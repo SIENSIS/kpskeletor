@@ -69,8 +69,8 @@ return [
         'event_all_day' => 'Tot el dia',
     ],
     'help' => [
-        'slug'         => 'Paraules en minúscules separades per guions. Deixeu-ho en blanc per crear-la a partir del títol en català.',
-        'categorySlug' => 'S’usa a news/category/{slug}. Deixeu-ho en blanc per crear-lo a partir del nom en català.',
+        'slug'         => 'Paraules en minúscules separades per guions. Deixeu-ho en blanc per crear-la a partir del títol en {0}.',
+        'categorySlug' => 'S’usa a news/category/{slug}. Deixeu-ho en blanc per crear-lo a partir del nom en {0}.',
         'visibility'   => 'Pública: tothom, a la web pública. Privada: usuaris identificats. Grups: només els grups seleccionats.',
         'groups'       => 'Només s’usa quan la visibilitat és «Grups».',
         'priority'     => 'Només per als avisos.',

@@ -24,7 +24,7 @@ use Modules\Events\Services\Recurrence;
 /**
  * Administration of the events (`backend/events`, resource `events-events`; docs/events.md):
  *
- * - translated title and description (Catalan required; the description is rich text sanitised
+ * - translated title and description (the site's default language required; the description is rich text sanitised
  *   with HTMLPurifier), dates in the site's time zone, recurrence, category, colour, location;
  * - visibility `public` / `private` / `restricted`; for `restricted`, the audience: groups (only
  *   those the user may assign, `AssignableGroups`, checked again on save) and users, both in
@@ -51,13 +51,11 @@ final class Events extends BackendController
 
         $crud->setTable('events')
             ->setSubject(lang('Events.event'), lang('Events.events'))
-            ->setTranslations('event_translations', 'event_id', 'locale', ['title', 'description'], ContentTranslations::LOCALES, [
-                'required'  => ['ca'],
-                'types'     => ['title' => 'text', 'description' => 'textarea'],
-                'rules'     => ['title' => 'required|max_length[190]', 'description' => 'permit_empty|max_length[100000]'],
-                'fallbacks' => ['*' => ['ca']],
-                'attrs'     => ['description' => RichTextEditor::attrs()],
-            ])
+            ->setTranslations('event_translations', 'event_id', 'locale', ['title', 'description'], ContentTranslations::locales(), ContentTranslations::crudOptions([
+                'types' => ['title' => 'text', 'description' => 'textarea'],
+                'rules' => ['title' => 'required|max_length[190]', 'description' => 'permit_empty|max_length[100000]'],
+                'attrs' => ['description' => RichTextEditor::attrs()],
+            ]))
             ->setRelationNN('groups', 'event_audience', 'groups', 'event_id', 'group_id', 'title', [
                 // Only the groups the user may assign are offered (and saved); links to other
                 // groups set by someone else are kept (kpcrudy only rewrites offered options).

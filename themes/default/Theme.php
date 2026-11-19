@@ -100,6 +100,13 @@ final class Theme extends ThemeManifest
             'default' => true,
             'label'   => 'ThemeDefault.options.modeSwitch',
         ],
+        // The language switch of the public site (partial language_switch; shown only when the
+        // site offers more than one language, docs/i18n.md "Choosing the language").
+        'languageSwitch' => [
+            'type'    => 'bool',
+            'default' => true,
+            'label'   => 'ThemeDefault.options.languageSwitch',
+        ],
         'sidebarColor' => [
             'type'    => 'color',
             'default' => '#1e293b',

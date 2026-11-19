@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Modules\Pages\Services;
 
 use CodeIgniter\I18n\Time;
+use Modules\Core\I18n\Locales;
 use XMLWriter;
 
 /**
  * The XML sitemap of the public site (sitemaps.org protocol 0.9, written with XMLWriter): the
  * home page and every page that is **published, public and not marked `noindex`**, once per
- * distinct path (a page translated with other slugs has one URL per language), with its last
- * change. A page whose canonical URL is set elsewhere is left out (search engines index the
+ * language it is translated in (public URLs carry the language: `/es/quienes-somos`, D-37-02),
+ * with its last change; the home page once per available language. A page whose canonical URL is set elsewhere is left out (search engines index the
  * canonical one). Private pages, drafts, scheduled pages and trashed pages never appear.
  */
 final class SitemapBuilder
@@ -26,7 +27,15 @@ final class SitemapBuilder
     public function entries(): array
     {
         $home    = (new HomePageResolver())->id();
-        $entries = [['loc' => site_url('/'), 'lastmod' => '']];
+        $urls    = service('localeurls');
+        $entries = [];
+        $homes   = [];
+
+        foreach (Locales::available() as $locale) {
+            $homes[] = count($entries);
+            $entries[] = ['loc' => $urls->url('', $locale), 'lastmod' => ''];
+        }
+
         $rows    = PageVisibility::apply(db_connect()->table('pages')->select('pages.id, pages.updated_at, pages.created_at'), null, 'pages', true)
             ->where('pages.noindex', 0)
             ->orderBy('pages.parent_id')->orderBy('pages.position')->orderBy('pages.id')
@@ -38,14 +47,16 @@ final class SitemapBuilder
             $lastmod = $this->date(is_string($row['updated_at']) ? $row['updated_at'] : (is_string($row['created_at']) ? $row['created_at'] : null));
 
             if ($id === $home) {
-                $entries[0]['lastmod'] = $lastmod;
+                foreach ($homes as $index) {
+                    $entries[$index]['lastmod'] = $lastmod;
+                }
 
                 continue;
             }
 
-            foreach ($this->tree->paths($id) as $locale => $path) {
+            foreach ($this->tree->translatedPaths($id) as $locale => $path) {
                 if (! isset($canonical[$id][$locale])) {
-                    $entries[] = ['loc' => site_url($path), 'lastmod' => $lastmod];
+                    $entries[] = ['loc' => $urls->url($path, $locale), 'lastmod' => $lastmod];
                 }
             }
         }

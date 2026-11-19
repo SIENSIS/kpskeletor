@@ -39,7 +39,7 @@ final class TaskRepository
     }
 
     /**
-     * Project names in the request language (Catalan fallback, then the slug).
+     * Project names in the request language (fallback: the site's default language, then the slug).
      *
      * @return array<int, string> id => name
      */
@@ -65,7 +65,7 @@ final class TaskRepository
     }
 
     /**
-     * Name and description of projects in the request language (Catalan fallback).
+     * Name and description of projects in the request language (fallback: the site's default language).
      *
      * @param list<int> $ids
      *

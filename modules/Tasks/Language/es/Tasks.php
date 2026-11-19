@@ -94,7 +94,7 @@ return [
         'visibility'  => 'Las tareas públicas aparecen en la página pública (y cualquiera puede descargar sus adjuntos).',
         'attachments' => 'Hasta 5 archivos (PDF, texto, imágenes, documentos de oficina). Archivos privados: solo los descarga quien puede ver la tarea.',
         'estimate'    => 'Horas de trabajo previstas. Solo visible con el permiso de estimaciones.',
-        'slug'        => 'Parte de la dirección pública tasks/project/…; se genera a partir del nombre en catalán si está vacía.',
+        'slug'        => 'Parte de la dirección pública tasks/project/…; se genera a partir del nombre en {0} si está vacía.',
         'endsOn'      => 'Aparece en el calendario «Fechas límite de los proyectos».',
     ],
     'complete'        => 'Completar',

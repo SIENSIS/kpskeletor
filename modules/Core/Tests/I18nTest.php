@@ -7,8 +7,10 @@ namespace Modules\Core\Tests;
 use Config\App;
 use Config\Services;
 use Modules\Auth\Tests\AuthTestCase;
+use Modules\Core\I18n\DefaultLocaleOptions;
 use Modules\Core\I18n\Language;
 use Modules\Core\I18n\LocaleNegotiator;
+use Modules\Core\I18n\LocaleOptions;
 use Modules\Core\I18n\Locales;
 use Modules\Core\Notifications\RecipientLocale;
 
@@ -104,6 +106,18 @@ final class I18nTest extends AuthTestCase
         setting('Core.defaultLocale', 'en');
         $this->assertSame('en', Locales::default());
         $this->assertSame(['es' => 'Español', 'en' => 'English'], Locales::names());
+    }
+
+    public function testTheLanguageSettingsOfferEverySupportedLocale(): void
+    {
+        config(App::class)->defaultLocale = 'ca';
+        $this->assertSame(['ca' => 'Català', 'es' => 'Español', 'en' => 'English'], (new LocaleOptions())->options());
+        $this->assertSame(['' => lang('Core.settings.defaultLocaleConfig', ['Català']), 'ca' => 'Català', 'es' => 'Español', 'en' => 'English'], (new DefaultLocaleOptions())->options());
+
+        // A language added by configuration can be chosen without changing the Core (session 37).
+        config(App::class)->supportedLocales = ['ca', 'es', 'en', 'fr'];
+        $this->assertArrayHasKey('fr', (new LocaleOptions())->options());
+        $this->assertArrayHasKey('fr', (new DefaultLocaleOptions())->options());
     }
 
     public function testAGuestGetsTheBrowserLanguageOrTheCatalanDefault(): void

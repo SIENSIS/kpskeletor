@@ -7,6 +7,7 @@ namespace Config;
 use Modules\Api\Auth\TokenAuthenticator;
 use Modules\Api\TwoFactor\EmailCodeProvider;
 use Modules\Api\TwoFactor\TotpProvider;
+use Modules\Core\I18n\Locales;
 use Modules\Core\Permissions\CrudPermissions;
 use Modules\Core\Security\MaskKey;
 use Throwable;
@@ -101,6 +102,10 @@ class Kpapy extends \Kpapy\Config\Kpapy
         parent::__construct();
 
         $this->maskKey = MaskKey::value();
+
+        // Translated fields fall back to the site's default language (Core.defaultLocale), not only
+        // to Config\App::$defaultLocale (docs/i18n.md, "Content languages").
+        $this->localeFallbacks = [Locales::default()];
 
         if (! function_exists('setting')) {
             return;

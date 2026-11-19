@@ -99,7 +99,7 @@ final class PageTree
     }
 
     /**
-     * Title of a page in a language (else Catalan, else any).
+     * Title of a page in a language (else the site's default language, else any available one).
      */
     public function title(int $id, string $locale): string
     {
@@ -108,7 +108,7 @@ final class PageTree
 
     /**
      * The public path of a page in a language (`about/team`): each level's slug in that language,
-     * else in Catalan, else any; null when the page is not in the tree.
+     * else in the site's default language, else any; null when the page is not in the tree.
      */
     public function path(int $id, string $locale): ?string
     {
@@ -137,6 +137,27 @@ final class PageTree
             $path = $this->path($id, $locale);
 
             if ($path !== null && ! in_array($path, $paths, true)) {
+                $paths[$locale] = $path;
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * The page's path in every available language it has a translation in (locale => path), for
+     * the language switch, the `hreflang` links and the sitemap (public URLs carry the language,
+     * D-37-02).
+     *
+     * @return array<string, string>
+     */
+    public function translatedPaths(int $id): array
+    {
+        $this->load();
+        $paths = [];
+
+        foreach (\Modules\Core\I18n\Locales::available() as $locale) {
+            if (isset($this->texts[$id][$locale]) && ($path = $this->path($id, $locale)) !== null) {
                 $paths[$locale] = $path;
             }
         }

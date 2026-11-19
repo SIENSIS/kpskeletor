@@ -12,8 +12,8 @@ use Modules\Core\Text\Slugger;
 /**
  * Back office of the projects, `backend/tasks/projects` (resource `tasks-projects`). The name and
  * description are translated (tutorial 2: `setTranslations()` over `task_project_translations`,
- * Catalan required, Catalan fallback in the list); the slug is the public URL
- * `tasks/project/<slug>` (generated from the Catalan name when empty); `ends_on` is the deadline
+ * the site's languages, its default one required and the fallback in the list); the slug is the public URL
+ * `tasks/project/<slug>` (generated from the default language's name when empty); `ends_on` is the deadline
  * shown in the calendar by the provider `ProjectDeadlines` (pull).
  */
 final class Projects extends BackendController
@@ -24,12 +24,10 @@ final class Projects extends BackendController
 
         $crud->setTable('task_projects')
             ->setSubject(lang('Tasks.project'), lang('Tasks.projects'))
-            ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], ContentTranslations::LOCALES, [
-                'required'  => ['ca'],
-                'types'     => ['name' => 'text', 'description' => 'textarea'],
-                'rules'     => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[2000]'],
-                'fallbacks' => ['*' => ['ca']],
-            ])
+            ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], ContentTranslations::locales(), ContentTranslations::crudOptions([
+                'types' => ['name' => 'text', 'description' => 'textarea'],
+                'rules' => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[2000]'],
+            ]))
             ->fieldType('color', 'color')
             ->fieldType('ends_on', 'date')
             ->fieldType('active', 'boolean')
@@ -46,7 +44,7 @@ final class Projects extends BackendController
             ])
             ->setDefault('color', '#0d6efd')
             ->setDefault('active', 1)
-            ->setHelp('slug', lang('Tasks.help.slug'))
+            ->setHelp('slug', lang('Tasks.help.slug', [ContentTranslations::defaultName()]))
             ->setHelp('ends_on', lang('Tasks.help.endsOn'))
             ->displayAs([
                 'name'        => lang('Tasks.fields.name'),
@@ -58,15 +56,15 @@ final class Projects extends BackendController
                 'created_at'  => lang('Tasks.fields.created_at'),
                 'updated_at'  => lang('Tasks.fields.updated_at'),
             ])
-            ->beforeInsert(static fn (array $data): array => self::slug($data, null, (string) ($crud->postedTranslations()['ca']['name'] ?? '')))
-            ->beforeUpdate(static fn (array $data, string $id): array => self::slug($data, (int) $id, (string) ($crud->postedTranslations()['ca']['name'] ?? '')))
+            ->beforeInsert(static fn (array $data): array => self::slug($data, null, ContentTranslations::defaultText($crud->postedTranslations(), 'name')))
+            ->beforeUpdate(static fn (array $data, string $id): array => self::slug($data, (int) $id, ContentTranslations::defaultText($crud->postedTranslations(), 'name')))
             ->defaultOrder('id', 'desc');
 
         return $this->renderCrud($crud);
     }
 
     /**
-     * A unique slug: the one given, or one made from the Catalan name.
+     * A unique slug: the one given, or one made from the default language's name.
      *
      * @param array<string, mixed> $data
      *

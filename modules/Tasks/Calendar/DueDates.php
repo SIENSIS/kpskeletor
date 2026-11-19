@@ -100,11 +100,7 @@ final class DueDates implements CalendarSource
         $zone = new DateTimeZone(function_exists('site_timezone') ? site_timezone() : 'UTC');
 
         return new CalendarEvent(
-            title: [
-                'ca' => lang('Tasks.cal.dueTitle', [(string) $row['title']], 'ca'),
-                'es' => lang('Tasks.cal.dueTitle', [(string) $row['title']], 'es'),
-                'en' => lang('Tasks.cal.dueTitle', [(string) $row['title']], 'en'),
-            ],
+            title: CalendarEvent::translated('Tasks.cal.dueTitle', [(string) $row['title']]),
             start: new DateTimeImmutable(substr($due, 0, 10) . ' 00:00:00', $zone),
             allDay: true,
             calendar: self::CALENDAR,

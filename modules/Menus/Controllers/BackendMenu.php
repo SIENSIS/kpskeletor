@@ -127,7 +127,7 @@ final class BackendMenu extends BackendController
             'parent'    => $nodes[$key]['parent'],
             'parents'   => $options,
             'zones'     => self::zoneLabels(),
-            'locales'   => ContentTranslations::LOCALES,
+            'locales'   => ContentTranslations::locales(),
             'action'    => site_url('backend/menus/backend/entry'),
             'backUrl'   => self::url($scope),
             'canReset'  => $this->can('menus-backend.reset'),
@@ -142,7 +142,7 @@ final class BackendMenu extends BackendController
         $labels = [];
         $posted = $this->request->getPost('labels');
 
-        foreach (array_keys(ContentTranslations::LOCALES) as $locale) {
+        foreach (ContentTranslations::codes() as $locale) {
             $label = is_array($posted) && is_scalar($posted[$locale] ?? null) ? trim((string) $posted[$locale]) : '';
 
             if (mb_strlen($label) > 100) {
@@ -154,6 +154,7 @@ final class BackendMenu extends BackendController
 
         $parent = (string) $this->request->getPost('parent');
         $before = $layout->store()->get($key, $scope);
+        $labels = ContentTranslations::keepUnavailable($labels, $before['labels'] ?? []);
 
         try {
             $layout->saveEntry(

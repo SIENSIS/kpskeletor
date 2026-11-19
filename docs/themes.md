@@ -178,7 +178,7 @@ an empty value keeps the light one. For `--bs-primary` the layouts also print
 
 Default theme options: `logo`, `logoDark` (logo for dark backgrounds), `primaryColor`,
 `primaryColorDark`, `defaultMode` (auto, light, dark), `forceMode` (empty, light, dark: forces a
-mode and hides the switch), `modeSwitch` (show the light/dark switch), `sidebarColor`, `font`
+mode and hides the switch), `modeSwitch` (show the light/dark switch), `languageSwitch` (show the public language switch, `docs/i18n.md`), `sidebarColor`, `font`
 (system, serif, mono), `footerText`, `cookieNotice`.
 
 ## Light and dark mode

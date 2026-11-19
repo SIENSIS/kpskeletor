@@ -53,7 +53,7 @@ final class EventsApi
 
                 return $refused === [] ? $builder : $builder->whereNotIn('events.id', $refused);
             })
-            ->setTranslations('event_translations', 'event_id', 'locale', ['title', 'description'], ContentTranslations::LOCALES, ['required' => ['ca']])
+            ->setTranslations('event_translations', 'event_id', 'locale', ['title', 'description'], ContentTranslations::codes(), ContentTranslations::apiOptions())
             ->fields(['id', 'title', 'description', 'starts_at', 'ends_at', 'all_day', 'location', 'url', 'category', 'calendar', 'color', 'visibility', 'status', 'organiser', 'recurrence', 'updated_at'])
             ->listFields(['id', 'title', 'starts_at', 'ends_at', 'all_day', 'location', 'category', 'calendar', 'color', 'visibility', 'status', 'recurrence'])
             ->fieldType('all_day', 'bool')

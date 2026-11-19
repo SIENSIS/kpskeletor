@@ -48,7 +48,7 @@ final class PublicMenusTest extends MenusTestCase
         $footer = $this->menu('Peu', 'footer');
         $this->item($footer, 'Avís legal', 'url', '/avis-legal');
 
-        $html = (string) $this->send('GET', '/')->response()->getBody();
+        $html = (string) $this->send('GET', 'en')->response()->getBody(); // the English home page (/en/)
 
         $this->assertStringContainsString('data-menu="primary"', $html);
         $this->assertStringContainsString('dropdown-toggle', $html, 'Items with children are dropdowns.');

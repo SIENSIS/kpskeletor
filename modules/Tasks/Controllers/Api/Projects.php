@@ -12,7 +12,7 @@ use Modules\Core\Content\ContentTranslations;
 /**
  * API resource `api/v1/tasks/projects` (tutorial 11, kpapy): the projects with the same
  * permissions as their CRUD (`setResource('tasks-projects')`), the name and description in the
- * requested language (`?lang=ca|es|en|*`, Catalan required). No trash (like the CRUD).
+ * requested language (`?lang=<locale>|*`, the site's default language required). No trash (like the CRUD).
  */
 final class Projects extends Controller
 {
@@ -21,7 +21,7 @@ final class Projects extends Controller
         return (new Resource())
             ->setTable('task_projects')
             ->setResource('tasks-projects')
-            ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], array_keys(ContentTranslations::LOCALES), ['required' => ['ca']])
+            ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], ContentTranslations::codes(), ContentTranslations::apiOptions())
             ->fieldType('active', 'bool')
             ->fieldType('ends_on', 'date')
             ->fields(['id', 'slug', 'name', 'description', 'color', 'ends_on', 'active', 'created_at', 'updated_at'])

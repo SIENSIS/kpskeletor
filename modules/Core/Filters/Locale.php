@@ -12,8 +12,9 @@ use Modules\Core\I18n\LocaleNegotiator;
 
 /**
  * Global filter `locale` (before `authsession`): sets the request's and the language service's
- * locale from the browser (`Accept-Language`) or the site's default, among the available
- * locales. For a logged-in user `authsession` then applies the profile's language; the API
+ * locale. On a public page it is the language of the URL (its prefix, else the site's default;
+ * Modules\Core\I18n\LocaleUrls, D-37-02); elsewhere the browser (`Accept-Language`), else the
+ * site's default, among the available locales. For a logged-in user `authsession` then applies the profile's language; the API
  * negotiates its own (`apilocale`).
  */
 final class Locale implements FilterInterface
@@ -27,7 +28,8 @@ final class Locale implements FilterInterface
             return null;
         }
 
-        $locale = (new LocaleNegotiator())->negotiate(null, $request->getHeaderLine('Accept-Language'));
+        $locale = service('localeurls')->locale()
+            ?? (new LocaleNegotiator())->negotiate(null, $request->getHeaderLine('Accept-Language'));
         $request->setLocale($locale);
         service('language')->setLocale($locale);
 

@@ -88,7 +88,7 @@ final class BirthdayGreetings
      */
     public static function message(string $locale, string $name): string
     {
-        // The administrator's text of that language, else the Catalan one, else the default.
+        // The administrator's text of that language, else the site's default language's, else the default.
         $message = TranslatedText::get('Users.birthdayGreeting', $locale);
 
         if ($message === '') {

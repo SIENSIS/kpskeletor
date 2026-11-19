@@ -208,7 +208,7 @@ public function index(): ResponseInterface
     return (new Resource())
         ->setTable('task_projects')
         ->setResource('tasks-projects')      // the same name as the CRUD
-        ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], array_keys(ContentTranslations::LOCALES), ['required' => ['ca']])
+        ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], ContentTranslations::codes(), ContentTranslations::apiOptions())
         ->fields(['id', 'slug', 'name', 'description', 'color', 'ends_on', 'active', 'created_at', 'updated_at'])
         ->listFields(['id', 'slug', 'name', 'color', 'ends_on', 'active'])
         ->writeFields(['slug', 'name', 'description', 'color', 'ends_on', 'active'])

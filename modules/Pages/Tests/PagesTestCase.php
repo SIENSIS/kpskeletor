@@ -8,6 +8,7 @@ use CodeIgniter\I18n\Time;
 use Kpcrudy\Crud;
 use Modules\Auth\Tests\AuthTestCase;
 use Modules\Core\Permissions\CrudPermissions;
+use Modules\Core\Tests\ContentLocalesTrait;
 
 /**
  * Base of the Pages feature tests: the Auth fixture (every module migrated, catalogue and default
@@ -16,9 +17,12 @@ use Modules\Core\Permissions\CrudPermissions;
  */
 abstract class PagesTestCase extends AuthTestCase
 {
+    use ContentLocalesTrait;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->useShippedContentLocales();
         CrudPermissions::reset();
         service('theme')->reset();
     }

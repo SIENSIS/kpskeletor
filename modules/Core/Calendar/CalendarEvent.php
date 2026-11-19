@@ -7,13 +7,14 @@ namespace Modules\Core\Calendar;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
+use Modules\Core\I18n\Locales;
 
 /**
  * One event of the calendar API (docs/calendar.md): what a module publishes with
  * `service('calendar')->publish()` or returns from a `CalendarProvider`.
  *
- * - `title` and `description`: a text, or texts per language (`['ca' => …, 'es' => …]`; Catalan
- *   is the fallback). The description is plain text or HTML (sanitised when stored and shown).
+ * - `title` and `description`: a text, or texts per language (locale => text; the site's
+ *   default language is the fallback, `translated()` builds them from a language line). The description is plain text or HTML (sanitised when stored and shown).
  * - `start` / `end`: any time zone (stored in UTC); `end` is optional (one hour, or one day for
  *   `allDay`); all-day events use the dates of `start` and `end` (end inclusive).
  * - `calendar`: a calendar declared in the module's manifest (`$calendars`), written
@@ -95,7 +96,7 @@ final class CalendarEvent
     }
 
     /**
-     * The titles per language (non-empty ones; a plain text is Catalan).
+     * The titles per language (non-empty ones; a plain text is in the site's default language).
      *
      * @return array<string, string>
      */
@@ -113,20 +114,38 @@ final class CalendarEvent
     }
 
     /**
-     * The title in a language, with the Catalan fallback.
+     * A language line in every language of the site (locale => text), for a title or description.
+     *
+     * @param list<mixed> $args
+     *
+     * @return array<string, string>
+     */
+    public static function translated(string $key, array $args = []): array
+    {
+        $texts = [];
+
+        foreach (Locales::available() as $locale) {
+            $texts[$locale] = lang($key, $args, $locale);
+        }
+
+        return $texts;
+    }
+
+    /**
+     * The title in a language, with the fallback to the site's default language.
      */
     public function titleIn(string $locale): string
     {
         $titles = $this->titles();
 
-        return $titles[$locale] ?? $titles['ca'] ?? (string) reset($titles);
+        return $titles[$locale] ?? $titles[Locales::default()] ?? (string) reset($titles);
     }
 
     public function descriptionIn(string $locale): string
     {
         $texts = $this->descriptions();
 
-        return $texts[$locale] ?? $texts['ca'] ?? (string) (reset($texts) ?: '');
+        return $texts[$locale] ?? $texts[Locales::default()] ?? (string) (reset($texts) ?: '');
     }
 
     /**
@@ -137,7 +156,7 @@ final class CalendarEvent
     private static function texts(string|array $value): array
     {
         if (is_string($value)) {
-            return trim($value) === '' ? [] : ['ca' => $value];
+            return trim($value) === '' ? [] : [Locales::default() => $value];
         }
 
         $texts = [];

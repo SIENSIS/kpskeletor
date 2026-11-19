@@ -370,6 +370,10 @@ return [
         'watching'  => 'Watching the asset sources (Ctrl+C to stop)…',
         'published' => 'Assets republished at {0}.',
     ],
+    'languageSwitch' => [
+        'label'   => 'Language',
+        'current' => 'Language: {0}',
+    ],
     'mode' => [
         'label' => 'Colour mode',
         'light' => 'Light',
@@ -449,7 +453,7 @@ return [
     'settings' => [
         'defaultLocale' => 'Default language',
         'defaultLocaleHelp' => 'Language of visitors whose browser asks for none of the available languages, of new users and of emails to users without a language.',
-        'defaultLocaleConfig' => 'As configured (Catalan)',
+        'defaultLocaleConfig' => 'As configured ({0})',
         'locales' => 'Available languages',
         'localesHelp' => 'Users and visitors can only use the checked languages (at least one).',
         'pwa'             => 'Installable web app (PWA)',

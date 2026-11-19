@@ -12,6 +12,7 @@
  * @var array<string, string>                     $groups
  * @var list<string>                              $permissions
  * @var array<string, string>                     $locales
+ * @var string                                    $required
  * @var string                                    $action
  * @var string|null                               $deleteUrl
  * @var string                                    $backUrl
@@ -45,8 +46,8 @@ $parent       = (string) $old('parent', $link['parent'] ?? '');
             <legend class="h6"><?= esc(lang('Menus.fields.label')) ?></legend>
             <?php foreach ($locales as $locale => $language): ?>
                 <div class="col-md-4">
-                    <label class="form-label" for="f-label-<?= esc($locale, 'attr') ?>"><?= esc($language) ?><?= $locale === 'ca' ? ' *' : '' ?></label>
-                    <input type="text" class="form-control" id="f-label-<?= esc($locale, 'attr') ?>" name="labels[<?= esc($locale, 'attr') ?>]" maxlength="100" value="<?= esc((string) ($labels[$locale] ?? ''), 'attr') ?>"<?= $locale === 'ca' ? ' required' : '' ?>>
+                    <label class="form-label" for="f-label-<?= esc($locale, 'attr') ?>"><?= esc($language) ?><?= $locale === $required ? ' *' : '' ?></label>
+                    <input type="text" class="form-control" id="f-label-<?= esc($locale, 'attr') ?>" name="labels[<?= esc($locale, 'attr') ?>]" maxlength="100" value="<?= esc((string) ($labels[$locale] ?? ''), 'attr') ?>"<?= $locale === $required ? ' required' : '' ?>>
                 </div>
             <?php endforeach ?>
         </fieldset>

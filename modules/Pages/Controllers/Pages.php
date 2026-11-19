@@ -29,7 +29,7 @@ use RuntimeException;
  *
  * - the list as a tree (`tree('parent_id')`, siblings by `position`), filters by status and
  *   visibility, search by title and slug; the home page is marked;
- * - multilingual texts (`setTranslations()`, Catalan required): title, slug, summary, body (the
+ * - multilingual texts (`setTranslations()`, the site's default language required): title, slug, summary, body (the
  *   rich-text editor, sanitised with HTMLPurifier before kpcrudy reads the form), SEO fields;
  * - slugs generated from the title when empty, unique per parent and language, never a reserved
  *   first segment (PageSlugs); the parent field offers the tree without the page's subtree;
@@ -52,9 +52,8 @@ final class Pages extends BackendController
 
         $crud->setTable('pages')
             ->setSubject(lang('Pages.page'), lang('Pages.pages'))
-            ->setTranslations('page_translations', 'page_id', 'locale', PageRepository::TEXTS, ContentTranslations::LOCALES, [
-                'required' => ['ca'],
-                'types'    => [
+            ->setTranslations('page_translations', 'page_id', 'locale', PageRepository::TEXTS, ContentTranslations::locales(), ContentTranslations::crudOptions([
+                'types' => [
                     'title' => 'text', 'slug' => 'text', 'summary' => 'textarea', 'body' => 'textarea',
                     'meta_title' => 'text', 'meta_description' => 'textarea', 'canonical' => 'text',
                 ],
@@ -67,9 +66,8 @@ final class Pages extends BackendController
                     'meta_description' => 'permit_empty|max_length[300]',
                     'canonical'        => 'permit_empty|max_length[500]|valid_url_strict[https]',
                 ],
-                'fallbacks' => ['*' => ['ca']],
-                'attrs'     => ['body' => RichTextEditor::attrs(RichTextEditor::images('pages'))],
-            ])
+                'attrs' => ['body' => RichTextEditor::attrs(RichTextEditor::images('pages'))],
+            ]))
             ->setRelationNN('groups', 'page_groups', 'groups', 'page_id', 'group_id', 'title', ['order' => 'title'])
             ->setRelation('author_id', 'users', 'username')
             ->fieldType('parent_id', 'select', ['options' => $tree->options($this->editedId(), $locale)])

@@ -79,9 +79,16 @@ The skeleton ships these modules:
     `Language` service (configurable chain in `Config\App` / a setting) used for every module
     and for kpcrudy's texts.
   * Supported locales `ca`, `es`, `en`, negotiated from the user's profile, then the browser,
-    then the default; the site can restrict the available ones: settings `Core.defaultLocale`
-    (empty = `Config\App::$defaultLocale`) and `Core.locales` (checkboxes, at least one; the
-    default is always one of the available locales).
+    then the default (public pages: the language of their URL); the site
+    can restrict the available ones: settings `Core.defaultLocale` (empty =
+    `Config\App::$defaultLocale`) and `Core.locales` (checkboxes, at least one, offering every
+    supported locale; the default is always one of the available locales).
+  * Public URLs carry the language: a path without a prefix is in the site's default language
+    (`/qui-som`), the other available languages carry their code as the first segment
+    (`/es/quienes-somos`); non-public paths (back office, API, sign-in, files…) never do. Internal
+    links keep the current prefix, the public header has a language switch next to the light/dark
+    switch (links to the same page in each language; default theme, option `languageSwitch`), and
+    public pages list their `hreflang` alternates; the sitemap lists every translation.
 * **Every module shipped with the skeleton (Core included) is complete in Catalan, Spanish and
   English:**
   * language files (`Language/en|ca|es/<Name>.php`) with the same keys in the three languages;
@@ -92,7 +99,8 @@ The skeleton ships these modules:
   * the theme's strings and the user guide.
   No hard-coded text. A CI test checks that the three languages have exactly the same keys.
   **Content** (pages, news, events) can be multilingual per module, with kpcrudy's
-  `setTranslations()`, with Catalan as the required language. Third-party modules should ship
+  `setTranslations()`, in the site's languages (`Core.locales`) with the site's default language
+  (`Core.defaultLocale`, Catalan by default) as the required one (session 37, D-37-01). Third-party modules should ship
   at least Catalan or Spanish; missing texts follow the fallback chain.
 
 ## Required libraries: kpcrudy and kpapy

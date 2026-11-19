@@ -3,7 +3,7 @@
  * Public layout: header with the site logo and the `primary` menu location (`menu('primary')`,
  * partial `public_menu`), content with an optional sidebar region, footer with the `footer` menu
  * location, SEO meta tags ($meta) and the
- * cookie notice (theme option), theme switch. Regions: header, sidebar, footer, home.
+ * cookie notice (theme option), language switch, theme switch. Regions: header, sidebar, footer, home.
  *
  * @var string|null $title
  */
@@ -19,7 +19,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
 <a class="visually-hidden-focusable skip-link" href="#main"><?= esc(lang('Core.ui.skipToContent')) ?></a>
 <header class="site-header border-bottom bg-body">
     <nav class="navbar navbar-expand-md container" aria-label="<?= esc(lang('Core.ui.mainMenu')) ?>">
-        <?= theme_partial('brand', ['brandClass' => 'navbar-brand']) ?>
+        <?= theme_partial('brand', ['brandClass' => 'navbar-brand', 'brandUrl' => site_url('/')]) ?>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu" aria-expanded="false" aria-label="<?= esc(lang('Core.ui.openMenu')) ?>">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -27,7 +27,8 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
             <?= theme_partial('public_menu', ['location' => 'primary']) ?>
             <?= theme_region('public', 'header') ?>
         </div>
-        <?= theme_partial('theme_switch', ['switchClass' => 'site-theme-switch ms-md-2']) ?>
+        <?= theme_partial('language_switch', ['switchClass' => 'site-language-switch ms-md-2']) ?>
+        <?= theme_partial('theme_switch', ['switchClass' => 'site-theme-switch ms-md-1']) ?>
     </nav>
 </header>
 <main id="main" class="site-main flex-grow-1 py-4" tabindex="-1">

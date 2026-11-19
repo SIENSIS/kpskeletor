@@ -7,8 +7,8 @@ subscribable feeds) and the calendar API for other modules (`docs/calendar.md`).
 
 ## What it does
 
-- **Events** (`events`, texts in `event_translations`: title and rich-text description; Catalan
-  required, Spanish and English optional): start and optional end (stored in UTC, edited and
+- **Events** (`events`, texts in `event_translations`: title and rich-text description; one
+  per site language, the site's default language required, `docs/i18n.md`): start and optional end (stored in UTC, edited and
   shown in the site's time zone), all day, location, organiser, category, colour, link, status
   (`confirmed`, `tentative`, `cancelled`), visibility, recurrence. Events published by
   other modules (`docs/calendar.md`) have `calendar`, `source_module`, `source_key`,

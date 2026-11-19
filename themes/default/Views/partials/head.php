@@ -1,6 +1,7 @@
 <?php
 /**
- * <head> content shared by every layout: charset, viewport, title, SEO meta (public layout), the
+ * <head> content shared by every layout: charset, viewport, title, SEO meta (public layout:
+ * also the `hreflang` alternates of the page in every language, D-37-02), the
  * colour-mode script (before the stylesheets: no flash of the wrong colours), the theme's
  * stylesheets (root theme first), the PWA links, the CSRF token for scripts (only when the page
  * already has a session) and the CSS variables set by the theme options.
@@ -25,6 +26,15 @@ $pwa = pwa_enabled();
 <?php endif ?>
 <?php if (! empty($meta['canonical'])): ?>
     <link rel="canonical" href="<?= esc(ui_safe_url($meta['canonical'])) ?>">
+<?php endif ?>
+<?php $alternates = empty($meta['robots']) ? service('localeurls')->hreflang() : []; ?>
+<?php if (count($alternates) > 1): ?>
+<?php foreach ($alternates as $hreflang => $href): ?>
+    <link rel="alternate" hreflang="<?= esc($hreflang, 'attr') ?>" href="<?= esc(ui_safe_url($href)) ?>">
+<?php endforeach ?>
+<?php if (isset($alternates[\Modules\Core\I18n\Locales::default()])): ?>
+    <link rel="alternate" hreflang="x-default" href="<?= esc(ui_safe_url($alternates[\Modules\Core\I18n\Locales::default()])) ?>">
+<?php endif ?>
 <?php endif ?>
 <?php if (! empty($meta['og'])): ?>
     <meta property="og:site_name" content="<?= esc($siteName) ?>">

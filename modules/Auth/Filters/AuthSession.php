@@ -308,6 +308,11 @@ final class AuthSession implements FilterInterface
 
     private function applyLocale(IncomingRequest $request, int $userId): void
     {
+        // A public page is in the language of its URL (D-37-02), whoever reads it.
+        if (service('localeurls')->locale() !== null) {
+            return;
+        }
+
         $locale = model(UserProfileModel::class)->forUser($userId)['locale'] ?? null;
 
         // Only a locale the site offers (Core.locales); otherwise the `locale` filter's choice stays.

@@ -7,7 +7,7 @@ namespace Modules\Core\I18n;
 /**
  * Chooses the locale of a request among the site's available locales: the user's profile, then
  * the browser (`Accept-Language`, by quality; `ca-ES` matches `ca`), then the site's default
- * (docs/i18n.md).
+ * (docs/i18n.md). Public pages take the language of their URL instead (LocaleUrls).
  */
 final class LocaleNegotiator
 {

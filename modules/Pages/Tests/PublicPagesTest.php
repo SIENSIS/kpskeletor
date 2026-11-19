@@ -21,19 +21,25 @@ final class PublicPagesTest extends PagesTestCase
 
         $this->assertStringContainsString('Text de Qui som', $this->body('GET', 'qui-som'));
         $this->assertStringContainsString('Text de Equip', $this->body('GET', 'qui-som/equip'));
-        // The Spanish slug finds the page too; the texts follow the visitor's language (en → Catalan
-        // fallback) and the canonical URL is the path in that language.
-        $spanish = $this->body('GET', 'quienes-somos');
-        $this->assertStringContainsString('Text de Qui som', $spanish);
-        $this->assertStringContainsString('<link rel="canonical" href="' . site_url('qui-som') . '">', $spanish);
-        $this->assertStringContainsString('Text de Equip', $this->body('GET', 'quienes-somos/equip'));
+        // Public URLs carry the language (D-37-02): /es/ with the Spanish slugs; a slug of another
+        // language goes to the page's path in the URL's language (301).
+        $urls    = service('localeurls');
+        $spanish = $this->body('GET', 'es/quienes-somos');
+        $this->assertStringContainsString('Text de Quiénes somos', $spanish);
+        $this->assertStringContainsString('<link rel="canonical" href="' . $urls->url('quienes-somos', 'es') . '">', $spanish);
+        $this->assertStringContainsString('<link rel="alternate" hreflang="ca" href="' . $urls->url('qui-som', 'ca') . '">', $spanish);
+        $this->assertStringContainsString('<link rel="alternate" hreflang="x-default" href="' . $urls->url('qui-som', 'ca') . '">', $spanish);
+        $this->assertStringNotContainsString('<link rel="alternate" hreflang="en"', $spanish, 'No English translation: no English alternate.');
+        $this->send('GET', 'quienes-somos')->assertRedirectTo($urls->url('qui-som', 'ca'));
+        $this->send('GET', 'es/qui-som')->assertRedirectTo($urls->url('quienes-somos', 'es'));
+        $this->assertStringContainsString('Text de Equip', $this->body('GET', 'es/quienes-somos/equip'), 'Untranslated child: the default language\'s text.');
 
         $this->assertNotFound('GET', 'equip');
         $this->assertNotFound('GET', 'qui-som/no-existeix');
         $this->assertNotFound('GET', 'no-existeix');
 
         $page = $this->body('GET', 'qui-som/equip');
-        $this->assertStringContainsString('<link rel="canonical" href="' . site_url('qui-som/equip') . '">', $page);
+        $this->assertStringContainsString('<link rel="canonical" href="' . $urls->url('qui-som/equip', 'ca') . '">', $page);
         $this->assertStringNotContainsString('noindex', $page);
     }
 
@@ -90,14 +96,15 @@ final class PublicPagesTest extends PagesTestCase
         $this->assertStringNotContainsString('Text de Inici', $this->body('GET', '/'), 'No setting: the theme\'s home.');
 
         service('settings')->set('Pages.homePage', (string) $home);
-        $page = $this->body('GET', '/');
-        $this->assertStringContainsString('Home', $page, 'In the visitor\'s language (en).');
-        $this->assertStringContainsString('<link rel="canonical" href="' . site_url('/') . '">', $page);
-        $this->send('GET', 'inici')->assertRedirectTo(site_url('/'));
+        $this->assertStringContainsString('Text de Inici', $this->body('GET', '/'), 'Without a prefix: the default language.');
+        $page = $this->body('GET', 'en');
+        $this->assertStringContainsString('Home', $page, 'In the language of the URL (/en/).');
+        $this->assertStringContainsString('<link rel="canonical" href="' . service('localeurls')->url('', 'en') . '">', $page);
+        $this->send('GET', 'inici')->assertRedirectTo(service('localeurls')->url('', 'ca'));
 
         // The setting stores the id: renaming the slug keeps the home page (D-20-01).
         db_connect()->table('page_translations')->where('page_id', $home)->where('locale', 'ca')->update(['slug' => 'portada']);
-        $this->assertStringContainsString('Home', $this->body('GET', '/'));
+        $this->assertStringContainsString('Home', $this->body('GET', 'en'));
 
         service('settings')->set('Pages.homePage', (string) $private);
         $this->assertStringNotContainsString('Text de Privada', $this->body('GET', '/'), 'Guests do not see a private home page.');
@@ -154,6 +161,12 @@ final class PublicPagesTest extends PagesTestCase
             $urls[] = (string) $url->loc;
         }
 
-        $this->assertSame([site_url('/'), site_url('qui-som'), site_url('quienes-somos'), site_url('copia'), site_url('qui-som/equip')], $urls, 'Even for a signed-in visitor.');
+        $at = static fn (string $path, string $locale): string => service('localeurls')->url($path, $locale);
+        $this->assertSame([
+            $at('', 'ca'), $at('', 'es'), $at('', 'en'),            // the home page in every language
+            $at('qui-som', 'ca'), $at('quienes-somos', 'es'),       // one URL per translation (D-37-02)
+            $at('copia', 'ca'),                                     // its Spanish text is canonical elsewhere
+            $at('qui-som/equip', 'ca'),
+        ], $urls, 'Even for a signed-in visitor.');
     }
 }
