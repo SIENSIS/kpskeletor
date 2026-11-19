@@ -78,7 +78,9 @@ final class SettingsGroupsTest extends MenusTestCase
         $tree   = (new BackendLayout())->tree(null);
         $groups = array_values(array_filter($tree['settings'], static fn (array $node): bool => $node['kind'] === 'group'));
 
-        $this->assertSame(array_keys(self::GROUPS), array_column($groups, 'key'));
+        // The editor lists every declared group of the enabled modules: the fixture enables
+        // Devtools too, whose own group comes last (D-41-04; disabled outside development).
+        $this->assertSame([...array_keys(self::GROUPS), 'group.development'], array_column($groups, 'key'));
         $this->assertSame('', $groups[0]['permission']);
         $this->assertSame(['Users.users', 'Users.groups', 'users-matrix'], array_column($groups[0]['children'], 'key'));
 

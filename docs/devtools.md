@@ -13,7 +13,7 @@ php spark modules:enable Devtools   # installed disabled ($enabledByDefault = fa
 php spark serve                     # http://localhost:8080
 ```
 
-Sign in as a **superadmin** and open *Configuració › Sistema › Eines de desenvolupament*
+Sign in as a **superadmin** and open *Configuració › Desenvolupament › Eines de desenvolupament*
 (`backend/devtools`, under the back-office prefix):
 
 - **CRUD recipes** (`backend/devtools/recipes`): one card per variant of a back-office CRUD and
@@ -39,6 +39,10 @@ Every lock has a test (`modules/Devtools/Tests/DevtoolsLocksTest.php`, `LocalOnl
 | 4 | Local requests only: client `REMOTE_ADDR` in `127.0.0.0/8` or `::1` (proxy headers are never trusted) **and** `Host` `localhost` or a loopback address; otherwise 404. The routes are not registered for other web requests (so no login redirect reveals them), and the `devtools` route filter checks again | `Config/Routes.php`, `Filters/LocalOnly.php` |
 | 5 | Resource `devtools` (single resource, prefix override): `devtools.view` (screens) and `devtools.write` (writes files or runs commands), granted to nobody — superadmins hold every permission. Write routes use `DevtoolsRoutes::WRITE`: `devtools`, `can:devtools.write`, `reauth`, `ratelimit:forms` | `Config/Module.php`, `Routing/DevtoolsRoutes.php` |
 | 6 | Packaging: it is part of the repository and of release archives (`docs/updates.md`), made inert by 1–4 | `docs/security.md` |
+
+The menu entry is in its own settings group, **Desenvolupament** (`group.development`, declared by
+the module, D-41-04): a group is shown only while one of its entries is visible, so nobody but a
+superadmin on a development copy ever sees it.
 
 Every Devtools screen shows the banner "Development tools: never enabled in production".
 

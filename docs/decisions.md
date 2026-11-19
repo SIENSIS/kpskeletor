@@ -297,7 +297,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Applied (decided) |
 | D-41-02 | 41 | In development, Devtools may write module code from the back office (decide) | Decided |
 | D-41-03 | 41 | Devtools answers only local requests, to the superadmin, with re-authentication for writes (decide) | Applied (decided) |
-| D-41-04 | 41 | Devtools menu entry under the Core's Sistema group | Accepted (proposal) |
+| D-41-04 | 41 | Devtools menu entry in its own settings group "Desenvolupament" | Applied (decided) |
 | D-41-05 | 41 | Devtools routes not registered for non-local web requests; a docs viewer for the recipes' links | Accepted (proposal) |
 | D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Decided |
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
@@ -3034,13 +3034,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Decided
 - **Decision (2026-11-19):** «amb tots els panys». As proposed. **Must change:** session 41.
 
-## D-41-04 — Devtools menu entry under the Core's Sistema group
+## D-41-04 — Devtools menu entry in its own settings group "Desenvolupament"
 
-- **Where:** `deploy/41-devtools.md` ("under the **Sistema** group of D-38-01 — or its own group"); `modules/Devtools/Config/Module.php`.
+- **Where:** `deploy/41-devtools.md` ("under the **Sistema** group of D-38-01 — or its own group"); `modules/Devtools/Config/Module.php`; D-38-01 (settings entries go in one of the Core's groups).
 - **Problem:** Where the single Devtools entry goes in the settings zone.
-- **Proposal (built):** `'zone' => 'settings', 'parent' => 'group.system'` (order 99, last): one entry does not justify a new group, and D-38-01 says settings entries go in one of the Core's groups. Sessions 42–43 add their screens inside Devtools, not as menu entries.
-- **Alternatives:** A) A new Core group "Desenvolupament" (a Core change for one dev-only entry).
-- **Status:** Accepted (proposal)
+- **Proposal (first build):** under the Core's `group.system` (order 99): one entry does not justify a new group.
+- **Alternatives:** A) Its own group "Desenvolupament", declared by the module (no Core change; a group is shown only while one of its entries is visible).
+- **Status:** Applied (decided)
+- **Decision (2026-11-19, on pull request #59):** «posar l'eina dins group development … sí, fes-ho». Alternative A: the manifest declares `['group' => 'group.development', 'label' => 'Devtools.menu.group', 'icon' => 'bi bi-cone-striped', 'order' => 90, 'zone' => 'settings']` and the entry has `'parent' => 'group.development'`. Nobody but a superadmin on a development copy sees it (no permission or no route: the group is hidden). The only exception to D-38-01's rule, recorded in `CLAUDE.md` and `docs/menus.md`. Test: `modules/Devtools/Tests/DevtoolsMenuTest.php`.
 
 ## D-41-05 — Devtools routes not registered for non-local web requests; a docs viewer for the recipes' links
 

@@ -8,7 +8,7 @@ return [
     'banner'     => 'Herramientas de desarrollo: nunca activadas en producción.',
     'bannerHelp' => 'Solo responden en este ordenador (http://localhost) mientras CI_ENVIRONMENT es development.',
     'module'     => ['description' => 'Herramientas solo para desarrollo: recetas de CRUD y, más adelante, el generador de código y el constructor de paquetes.'],
-    'menu'       => ['tools' => 'Herramientas de desarrollo'],
+    'menu'       => ['group' => 'Desarrollo', 'tools' => 'Herramientas de desarrollo'],
     'res'        => ['tools' => 'Herramientas de desarrollo'],
     'perm'       => ['write' => 'Escribir ficheros y ejecutar órdenes desde las herramientas de desarrollo'],
     'locks'      => [

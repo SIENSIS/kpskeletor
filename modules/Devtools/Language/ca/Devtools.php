@@ -8,7 +8,7 @@ return [
     'banner'     => 'Eines de desenvolupament: mai activades en producció.',
     'bannerHelp' => 'Només responen en aquest ordinador (http://localhost) mentre CI_ENVIRONMENT és development.',
     'module'     => ['description' => 'Eines només per a desenvolupament: receptes de CRUD i, més endavant, el generador de codi i el constructor de paquets.'],
-    'menu'       => ['tools' => 'Eines de desenvolupament'],
+    'menu'       => ['group' => 'Desenvolupament', 'tools' => 'Eines de desenvolupament'],
     'res'        => ['tools' => 'Eines de desenvolupament'],
     'perm'       => ['write' => 'Escriure fitxers i executar ordres des de les eines de desenvolupament'],
     'locks'      => [

@@ -12,7 +12,8 @@ D-41-03): the CRUD recipes (session 41), the code generator (session 42) and the
 - Single resource `tools` with the prefix override `devtools` (page + extra `write`):
   `devtools.view` (screens), `devtools.write` (anything that writes files or runs commands).
 - Default grants: **none** (superadmins hold every permission; D-41-03).
-- Menu: settings zone, `parent => group.system`, order 99 (D-41-04); route name `devtools`.
+- Menu: its own settings group `group.development` ("Desenvolupament", order 90, declared in the
+  manifest; shown only while its entry is visible) with the entry `tools` (D-41-04); route name `devtools`.
 - No tables, settings, widgets, tasks, notifications, API, CSP sources or outbound hosts.
 - Manifest: `$developmentOnly = true`, `$enabledByDefault = false`, requires Core and Auth (`reauth`).
 
@@ -38,7 +39,7 @@ D-41-03): the CRUD recipes (session 41), the code generator (session 42) and the
 
 ## Decisions
 
-D-41-01 … D-41-03 (decided), D-41-04 (menu under Sistema), D-41-05 (routes not registered for
+D-41-01 … D-41-03 (decided), D-41-04 (own menu group Desenvolupament), D-41-05 (routes not registered for
 non-local requests; docs viewer); D-41-02, D-42-01, D-43-01 apply to sessions 42–43.
 
 ## Open tasks

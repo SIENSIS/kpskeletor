@@ -60,7 +60,8 @@ disabled module's entry) puts the entry at the root of its zone, as for any othe
 module may declare its own group (`['group' => 'group.shop', 'label' => …, 'zone' => …]`); keys
 start with `group.` and never collide with route names. Group entries are customised like any
 other entry with the Menus module (rename, move, hide); customisations are stored per entry key,
-and the keys of the grouped entries did not change.
+and the keys of the grouped entries did not change. The development-only `Devtools` module declares its own group `group.development`
+("Desenvolupament", order 90, D-41-04); like every group it is hidden while it has no visible entry.
 
 `modules:sync` stores the normalised entries in `module_declarations` (kind `menu`); regular
 requests never load the manifests.

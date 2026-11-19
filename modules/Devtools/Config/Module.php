@@ -40,8 +40,13 @@ final class Module extends ModuleManifest
     /** Nobody: superadmins hold every permission (D-41-03). */
     public array $defaultGrants = [];
 
+    /**
+     * Its own group in the settings zone, after the Core's (D-41-04): shown only while one of its
+     * entries is visible, so nobody but a superadmin in development ever sees it.
+     */
     public array $menu = [
-        ['resource' => 'tools', 'label' => 'Devtools.menu.tools', 'icon' => 'bi bi-tools', 'order' => 99, 'zone' => 'settings', 'parent' => 'group.system'],
+        ['group' => 'group.development', 'label' => 'Devtools.menu.group', 'icon' => 'bi bi-cone-striped', 'order' => 90, 'zone' => 'settings'],
+        ['resource' => 'tools', 'label' => 'Devtools.menu.tools', 'icon' => 'bi bi-tools', 'order' => 1, 'zone' => 'settings', 'parent' => 'group.development'],
     ];
 
     /** Nothing to back up: Devtools keeps no data. */

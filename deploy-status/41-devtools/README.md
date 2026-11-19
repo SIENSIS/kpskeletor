@@ -46,7 +46,7 @@ D-41-04, D-41-05 accepted (`docs/decisions.md`).
 | Language `Core.php`, `SecurityCheck.php` (ca/es/en) | Messages above; `Core.activity.devonly_disabled` |
 
 **Module `modules/Devtools/`:** `Config/Module.php` (single resource `tools`, prefix `devtools`,
-extra `write`, no grants, menu `settings` › `group.system`), `Config/Routes.php`,
+extra `write`, no grants, menu: its own settings group `group.development` with the entry), `Config/Routes.php`,
 `Config/Registrar.php` (alias `devtools`), `Filters/LocalOnly.php`, `Routing/DevtoolsRoutes.php`
 (`VIEW`, `WRITE`, `define()`), `Controllers/{Home,Recipes,Docs}.php`, `Recipes/RecipeBook.php`,
 `Recipes/DocPage.php`, `Views/{index,recipes,docs,_banner}.php`, `Assets/js/copy.js`, language
@@ -62,7 +62,11 @@ files, `CLAUDE.md`. No tables, settings or API.
 
 ## Decisions and deviations
 
-- D-41-04 (accepted): the menu entry goes under the Core's **Sistema** group, not a new group.
+- D-41-04 (decided by the owner on the pull request): the entry is in its own settings group
+  **Desenvolupament** (`group.development`, declared by the module, order 90). A group is shown
+  only while one of its entries is visible, so admins and other users never see an empty heading,
+  and nobody sees it outside development (no route). The Menus editor lists it like any declared
+  group of an enabled module (Devtools is disabled outside development).
 - D-41-05 (accepted): route filters run after the `backend` chain, so with the filter alone a
   signed-out request from the network got the login redirect (revealing the URLs). The routes are
   therefore also **not registered** for non-local web requests (console still sees them); the
@@ -77,7 +81,7 @@ files, `CLAUDE.md`. No tables, settings or API.
 INSTALL_ADMIN_PASSWORD='…' php spark app:install --env=development --url=http://localhost:8080/ --db=sqlite --demo --2fa=none --no-interaction
 php spark modules:enable Devtools
 php spark serve
-# sign in as the superadmin → Configuració › Sistema › Eines de desenvolupament
+# sign in as the superadmin → Configuració › Desenvolupament › Eines de desenvolupament
 # http://localhost:8080/backend/devtools/recipes
 ```
 
@@ -109,7 +113,7 @@ Playwright against `php spark serve`, demo data, superadmin, device scale factor
 
 | File | Caption |
 |---|---|
-| `screenshots/01-devtools-home.png` | Devtools home: banner, the CRUD recipes tool and the six locks; menu entry under Sistema |
+| `screenshots/01-devtools-home.png` | Devtools home: banner, the CRUD recipes tool and the six locks; menu entry in its own group, Desenvolupament |
 | `screenshots/02-recipes.png` | CRUD recipes, full page: contents and the 16 cards (what, when, code, source, doc link) |
 | `screenshots/03-recipes-dark.png` | Recipes in dark mode |
 | `screenshots/04-recipes-phone.png` | Recipes at phone width (390 px) |
@@ -122,7 +126,7 @@ New tests: `modules/Devtools/Tests/DevtoolsLocksTest.php` (manifest; no route ou
 development; loopback addresses/hosts accepted; network clients, `X-Forwarded-For` and foreign
 hosts → 404; disabled module → 404; `devtools.view` needed, admins refused; every route has
 `VIEW`/`WRITE`; a write route needs `devtools.write` and re-authentication and answers 404 from the
-network; no inline code in the views), `LocalOnlyTest.php` (18 cases), `RecipesTest.php` (every
+network; no inline code in the views), `LocalOnlyTest.php` (18 cases), `DevtoolsMenuTest.php` (own group shown to the superadmin where the routes exist, never empty for admins/editors/users, absent without the routes), `RecipesTest.php` (every
 recipe's source file, doc heading and texts in ca/es/en exist; page renders for the superadmin,
 403 for others; code escaped; docs viewer refuses unknown names), `modules/Core/Tests/DevelopmentOnlyTest.php`
 (manifest key, enable refused also as a dependency, sync disables and logs, first sync, Modules
@@ -133,11 +137,11 @@ Results (SQLite, PHP 8.3):
 
 | Check | Result |
 |---|---|
-| `vendor/bin/phpunit` | **1478 tests, 19506 assertions**, 12 min 59 s: 1 failure, `ReauthTest::testPostIsNotReplayedAndJsonGets401`, which also failed on `main` before this session (baseline: 1432 tests, the same failure). Cause: the owner's commit `edac5e2` ("Hide index.php from site URIs") and a test that hard-coded `index.php/auth/reauth`; fixed in this session (it now compares with `site_url('auth/reauth')`), `ReauthTest` 14/14 OK afterwards |
+| `vendor/bin/phpunit` | **OK (1481 tests, 19522 assertions)**, 13 min 07 s, after the menu-group change (D-41-04). The first run (1478 tests) had one failure, `ReauthTest::testPostIsNotReplayedAndJsonGets401`, also red on `main` since commit `edac5e2` (hidden `index.php`; the test hard-coded `index.php/auth/reauth`), fixed in this session |
 | `vendor/bin/phpstan analyse` | No errors (level 6) |
 | `vendor/bin/php-cs-fixer fix --dry-run` | 0 of 1056 files to fix |
 | `php spark modules:sync` | OK (Devtools installed disabled; enabled with `modules:enable` in development) |
-| `php spark permissions:check` | Permisos correctes: 171 permisos, 349 rutes |
+| `php spark permissions:check` | Permisos correctes: 171 permisos, 349 rutes (also after the menu-group change) |
 | `php spark csp:check` | No inline scripts, handlers or styles |
 | `php spark assets:publish --check` | Up to date |
 | `php spark security:check` (development) | `installation.devtools` info; the 6 errors are the development install's own (environment, debug, HTTPS ×3, demo data) |

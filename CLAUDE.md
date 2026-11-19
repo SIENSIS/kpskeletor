@@ -97,7 +97,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - **Menus:** back-office entries only in the manifest `$menu` (resource or route + permission,
   `zone` `sidebar`/`settings`/`user`, `parent`, `order`); a `settings` entry goes in one of the
   Core's groups (`'parent' => 'group.access'|'group.security'|'group.api'|'group.customisation'|'group.system'`,
-  D-38-01); the menu is generated, filtered by permission and cached per group set
+  D-38-01; the one exception is the development-only `Devtools`, in its own `group.development`,
+  D-41-04); the menu is generated, filtered by permission and cached per group set
   (`docs/menus.md`). Password inputs get the Core's show/hide button by themselves
   (`data-no-reveal` to opt out; `docs/frontend.md`). Security headers, rate limits
   (`ratelimit:<limit>`, `RateLimiter`), `safe_redirect()` and `OutboundClient`: `docs/security.md`,

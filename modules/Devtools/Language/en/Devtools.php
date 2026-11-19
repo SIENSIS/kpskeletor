@@ -8,7 +8,7 @@ return [
     'banner'     => 'Development tools: never enabled in production.',
     'bannerHelp' => 'They answer only on this computer (http://localhost) while CI_ENVIRONMENT is development.',
     'module'     => ['description' => 'Development-only tools: CRUD recipes, and later the code generator and the package builder.'],
-    'menu'       => ['tools' => 'Development tools'],
+    'menu'       => ['group' => 'Development', 'tools' => 'Development tools'],
     'res'        => ['tools' => 'Development tools'],
     'perm'       => ['write' => 'Write files and run commands from the development tools'],
     'locks'      => [
