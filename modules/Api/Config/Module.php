@@ -46,8 +46,8 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['resource' => 'api', 'label' => 'Api.menu.tokens', 'icon' => 'bi bi-key', 'order' => 80, 'zone' => 'settings'],
-        ['route' => 'api-docs', 'permission' => 'api.docs', 'label' => 'Api.menu.docs', 'icon' => 'bi bi-book', 'order' => 81, 'zone' => 'settings'],
+        ['resource' => 'api', 'label' => 'Api.menu.tokens', 'icon' => 'bi bi-key', 'order' => 80, 'zone' => 'settings', 'parent' => 'group.api'],
+        ['route' => 'api-docs', 'permission' => 'api.docs', 'label' => 'Api.menu.docs', 'icon' => 'bi bi-book', 'order' => 81, 'zone' => 'settings', 'parent' => 'group.api'],
         ['route' => 'api-personal-tokens', 'permission' => 'api.tokens', 'label' => 'Api.menu.personal', 'icon' => 'bi bi-key', 'order' => 25, 'zone' => 'user'],
     ];
 

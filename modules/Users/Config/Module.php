@@ -77,9 +77,9 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['resource' => 'users', 'label' => 'Users.menu.users', 'icon' => 'bi bi-people', 'order' => 60, 'zone' => 'settings'],
-        ['resource' => 'groups', 'label' => 'Users.menu.groups', 'icon' => 'bi bi-diagram-3', 'order' => 61, 'zone' => 'settings'],
-        ['route' => 'users-matrix', 'permission' => 'users-matrix.view', 'label' => 'Users.menu.matrix', 'icon' => 'bi bi-grid-3x3', 'order' => 62, 'zone' => 'settings'],
+        ['resource' => 'users', 'label' => 'Users.menu.users', 'icon' => 'bi bi-people', 'order' => 60, 'zone' => 'settings', 'parent' => 'group.access'],
+        ['resource' => 'groups', 'label' => 'Users.menu.groups', 'icon' => 'bi bi-diagram-3', 'order' => 61, 'zone' => 'settings', 'parent' => 'group.access'],
+        ['route' => 'users-matrix', 'permission' => 'users-matrix.view', 'label' => 'Users.menu.matrix', 'icon' => 'bi bi-grid-3x3', 'order' => 62, 'zone' => 'settings', 'parent' => 'group.access'],
     ];
 
     /** @var list<string> Dashboard widget "Users summary" (active users, online, without 2FA). */

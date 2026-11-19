@@ -43,7 +43,7 @@ final class Module extends ModuleManifest
     ];
 
     public array $menu = [
-        ['resource' => 'backups', 'label' => 'Backup.menu.backups', 'icon' => 'bi bi-archive', 'order' => 86, 'zone' => 'settings'],
+        ['resource' => 'backups', 'label' => 'Backup.menu.backups', 'icon' => 'bi bi-archive', 'order' => 86, 'zone' => 'settings', 'parent' => 'group.system'],
     ];
 
     /**

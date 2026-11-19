@@ -28,10 +28,39 @@ public array $menu = [
 | `icon` | `bi bi-circle` | Bootstrap Icons classes |
 | `order` | 100 | ascending; ties by key |
 | `zone` | `sidebar` | `sidebar`, `settings` (sidebar, under a heading), `user` (the user menu)… |
-| `parent` | none | nests the entry |
+| `parent` | none | nests the entry (in the `settings` zone: one of the Core's groups, below) |
+| `group` | — | declares a **group heading** with this key (`group.<name>`) instead of a link: no `resource`, `route` or `permission` |
 
 Every entry has a **stable key**: `<Module>.<resource>` (e.g. `News.posts`) or the route name.
 The same resource in a second zone gets `<key>@<zone>`. Customisations refer to these keys.
+
+### Groups of the settings zone (D-38-01)
+
+The Core declares five group headings in the `settings` zone. They have no route and no
+permission and are shown only while one of their children is visible, so a user with one
+settings screen sees one group with one entry. A module puts each of its `settings` entries in
+the group that fits with `'parent' => '<group key>'` (or the constants
+`Modules\Core\Menus\MenuDefinitions::GROUP_*`):
+
+| Key | Label (ca) | What goes there | Skeleton entries |
+|---|---|---|---|
+| `group.access` | Usuaris i accés | who can sign in and what they may do | Users, Groups, Permissions |
+| `group.security` | Seguretat | security policies, audits, logs | Security settings, Security status, Activity log |
+| `group.api` | API | API access and its documentation | API tokens, API documentation |
+| `group.customisation` | Personalització | how the back office looks and what it includes | Modules, Back-office menu, Dashboard widgets |
+| `group.system` | Sistema | configuration and maintenance of the site | Settings, Scheduled tasks, Backups, Updates |
+
+```php
+['route' => 'shop-settings', 'permission' => 'shop-settings.view', 'label' => 'Shop.menu.settings',
+    'zone' => 'settings', 'parent' => 'group.system', 'order' => 90],
+```
+
+Children are sorted by their `order`. A `parent` that does not exist (an unknown group, a
+disabled module's entry) puts the entry at the root of its zone, as for any other parent. A
+module may declare its own group (`['group' => 'group.shop', 'label' => …, 'zone' => …]`); keys
+start with `group.` and never collide with route names. Group entries are customised like any
+other entry with the Menus module (rename, move, hide); customisations are stored per entry key,
+and the keys of the grouped entries did not change.
 
 `modules:sync` stores the normalised entries in `module_declarations` (kind `menu`); regular
 requests never load the manifests.

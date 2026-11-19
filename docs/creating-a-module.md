@@ -161,7 +161,11 @@ public array $menu = [
 ```
 
 An entry names a `resource` (its list/view permission) or a `route` plus a `permission`; `zone`
-is `sidebar` (default), `settings` or `user`.
+is `sidebar` (default), `settings` or `user`. An entry in the `settings` zone goes in one of the
+Core's groups with `parent`: `group.access` (users and access), `group.security` (security
+settings and logs), `group.api` (API), `group.customisation` (how the back office looks) or
+`group.system` (configuration and maintenance); see [`menus.md`](menus.md), "Groups of the
+settings zone".
 
 **Settings** ([`settings.md`](settings.md)): declared with `type`, `default`, `rules`, `label`,
 `help` and an optional `group`; the Settings module generates the form (permission

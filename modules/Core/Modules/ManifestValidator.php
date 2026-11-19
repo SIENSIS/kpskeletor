@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Modules;
 
 use Modules\Core\Config\ModuleManifest;
+use Modules\Core\Menus\MenuDefinitions;
 use Modules\Core\Menus\MenuLinkType;
 use Modules\Core\Settings\SettingOptionsProvider;
 use Modules\Core\Widgets\WidgetInterface;
@@ -31,7 +32,7 @@ final class ManifestValidator
 
     public const SETTING_TYPES = ['string', 'text', 'int', 'float', 'bool', 'select', 'email', 'url', 'color', 'json', 'list', 'translated', 'multiselect'];
 
-    public const MENU_KEYS = ['resource', 'route', 'permission', 'label', 'icon', 'order', 'zone', 'parent'];
+    public const MENU_KEYS = ['resource', 'route', 'permission', 'group', 'label', 'icon', 'order', 'zone', 'parent'];
 
     public const CSP_DIRECTIVES = [
         'default-src', 'script-src', 'style-src', 'img-src', 'font-src', 'connect-src', 'media-src',
@@ -303,7 +304,19 @@ final class ManifestValidator
 
             $this->requireString($entry, 'label', "{$key}['label']");
 
-            if (array_key_exists('resource', $entry)) {
+            if (array_key_exists('group', $entry)) {
+                $group = $entry['group'];
+
+                if (! is_string($group) || preg_match(MenuDefinitions::GROUP_KEY, $group) !== 1) {
+                    $this->error("{$key}['group']", 'menuGroup', [is_string($group) ? $group : get_debug_type($group)]);
+                }
+
+                foreach (['resource', 'route', 'permission'] as $forbidden) {
+                    if (array_key_exists($forbidden, $entry)) {
+                        $this->error("{$key}['{$forbidden}']", 'menuGroupLink', [$forbidden]);
+                    }
+                }
+            } elseif (array_key_exists('resource', $entry)) {
                 $resource = $entry['resource'];
 
                 if (! is_string($resource) || ! array_key_exists($resource, $resources)) {

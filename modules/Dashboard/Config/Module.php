@@ -48,7 +48,7 @@ final class Module extends ModuleManifest
 
     public array $menu = [
         ['route' => 'dashboard', 'permission' => 'dashboard.view', 'label' => 'Dashboard.menu.home', 'icon' => 'bi bi-speedometer2', 'order' => 1, 'zone' => 'sidebar'],
-        ['route' => 'dashboard-groups', 'permission' => 'dashboard.configure', 'label' => 'Dashboard.menu.groups', 'icon' => 'bi bi-grid-1x2', 'order' => 72, 'zone' => 'settings'],
+        ['route' => 'dashboard-groups', 'permission' => 'dashboard.configure', 'label' => 'Dashboard.menu.groups', 'icon' => 'bi bi-grid-1x2', 'order' => 72, 'zone' => 'settings', 'parent' => 'group.customisation'],
     ];
 
     /** Its two tables are backed up with the database; no files. */
