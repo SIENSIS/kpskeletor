@@ -10,6 +10,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- Settings menu groups (D-38-01): the `settings` zone of the back-office sidebar shows five Core
+  groups — Usuaris i accés, Seguretat, API, Personalització, Sistema — each visible only while
+  one of its entries is; menu group entries in manifests (`'group' => 'group.<name>'`,
+  `MenuDefinitions::GROUP_*`) and a `parent` pointing to them (`docs/menus.md`, "Groups of the
+  settings zone").
+- Public account link (theme option `showAccountLink`, on by default): "Entra" for visitors,
+  "Administració" for users who can open the back office, "El meu compte" for the rest
+  (`Modules\Core\Frontend\AccountLink`, partial `account_link`; `docs/themes.md`).
+- Show/hide button on every password field (`core/forms/password-reveal.js`): automatic for module
+  views and kpcrudy forms, opt-out with `data-no-reveal`; the field is hidden again on submit and
+  on `pagehide` (`docs/frontend.md`, "Password fields").
+
 - The language in public URLs (D-37-02): `/qui-som` in the site's default language,
   `/es/quienes-somos` in Spanish; internal links keep the prefix (the application's `site_url()`),
   a language switch next to the light/dark switch links to the same page in every language (theme
@@ -23,6 +35,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
   language set.
 
 ### Changed
+
+- The settings entries of Users, Settings, Core, Activity, Api, Menus, Dashboard, Backup and
+  Updates now have a `parent` (a Core group); their keys did not change, so saved back-office
+  menu customisations still apply. The Activity log's `order` is 85 (was 84). A module's own
+  `settings` entries without `parent` still show at the root of the zone: add
+  `'parent' => 'group.system'` (or the group that fits).
 
 - **Removed** the constants `ContentTranslations::LOCALES`, `ContentTranslations::FALLBACK_LOCALE`,
   `NewsRepository::FALLBACK_LOCALE`, `News\Controllers\Posts::LOCALES` and

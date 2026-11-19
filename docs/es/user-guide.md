@@ -30,7 +30,13 @@ documentación técnica para desarrolladores y administradores está en inglés 
 
 ### Entrar
 
-Abre `/login`, escribe el **Correo electrónico** y la **Contraseña** y pulsa **Entrar**.
+Abre `/login` (en la web pública, **Entrar** al final de la barra de menú), escribe el **Correo
+electrónico** y la **Contraseña** y pulsa **Entrar**. Con la sesión iniciada, el mismo lugar de la
+barra dice **Administración** (o **Mi cuenta** si no tienes ninguna pantalla de la administración).
+
+- El botón del ojo junto a cada campo de contraseña muestra lo que has escrito (**Mostrar la
+  contraseña**) y lo vuelve a ocultar; la contraseña siempre vuelve a quedar oculta al enviar el
+  formulario.
 
 - **Recuérdame en este dispositivo** (si aparece) mantiene la sesión abierta en ese navegador
   durante unos días (14 por defecto). No lo uses en ordenadores compartidos.
@@ -309,8 +315,15 @@ Barra lateral › **Menús** (`/backend/menus/public`): los menús de la web pú
   botones, y después guarda el orden. Los elementos que apuntan a algo que ya no existe llevan la
   marca **Destino no disponible**.
 
-Los administradores también pueden personalizar el menú del back-office (Configuración › **Menú
-del back-office**); cada entrada mantiene su permiso esté donde esté.
+La parte **Configuración** de la barra lateral está agrupada: **Usuarios y acceso** (usuarios,
+grupos, permisos), **Seguridad** (configuración de seguridad, estado de seguridad, registro de
+actividad), **API** (tokens, documentación), **Personalización** (widgets del panel, menú del
+back-office, módulos) y **Sistema** (configuración, tareas programadas, copias de seguridad,
+actualizaciones). Cada grupo solo aparece si puedes abrir alguna de sus entradas.
+
+Los administradores también pueden personalizar el menú del back-office (**Personalización** ›
+**Menú del back-office**); cada entrada mantiene su permiso esté donde esté, y los grupos se
+pueden renombrar, mover u ocultar como cualquier entrada.
 
 ## Noticias
 

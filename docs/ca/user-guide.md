@@ -31,7 +31,13 @@ l'API. La documentació tècnica per a desenvolupadors i administradors és en a
 
 ### Entrar
 
-Obre `/login`, escriu l'**Adreça electrònica** i la **Contrasenya** i prem **Entra**.
+Obre `/login` (a la web pública, **Entra** al final de la barra de menú), escriu l'**Adreça
+electrònica** i la **Contrasenya** i prem **Entra**. Amb la sessió iniciada, el mateix lloc de la
+barra diu **Administració** (o **El meu compte** si no tens cap pantalla de l'administració).
+
+- El botó de l'ull al costat de cada camp de contrasenya mostra el que has escrit (**Mostra la
+  contrasenya**) i el torna a amagar; la contrasenya sempre torna a quedar amagada en enviar el
+  formulari.
 
 - **Recorda'm en aquest dispositiu** (si apareix) manté la sessió oberta en aquest navegador durant
   uns quants dies (14 per defecte). No ho facis servir en ordinadors compartits.
@@ -313,8 +319,15 @@ Barra lateral › **Menús** (`/backend/menus/public`): els menús del web públ
   botons, i després desa l'ordre. Els elements que apunten a una cosa que ja no existeix porten
   la marca **Destí no disponible**.
 
-Els administradors també poden personalitzar el menú del back-office (Configuració › **Menú del
-back-office**); cada entrada manté el seu permís sigui on sigui.
+La part **Configuració** de la barra lateral està agrupada: **Usuaris i accés** (usuaris, grups,
+permisos), **Seguretat** (configuració de seguretat, estat de seguretat, registre d'activitat),
+**API** (tokens, documentació), **Personalització** (ginys del tauler, menú del back-office,
+mòduls) i **Sistema** (configuració, tasques programades, còpies de seguretat, actualitzacions).
+Cada grup només apareix si pots obrir alguna de les seves entrades.
+
+Els administradors també poden personalitzar el menú del back-office (**Personalització** › **Menú
+del back-office**); cada entrada manté el seu permís sigui on sigui, i els grups es poden
+reanomenar, moure o amagar com qualsevol entrada.
 
 ## Notícies
 

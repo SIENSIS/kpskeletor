@@ -30,7 +30,12 @@ your activity and personal API tokens. Developers and administrators: see the ot
 
 ### Logging in
 
-Open `/login`, type your **Email address** and **Password** and press **Log in**.
+Open `/login` (on the public website, **Sign in** — **Entra** in Catalan — at the end of the menu bar), type your **Email
+address** and **Password** and press **Log in**. Once signed in, the same place of the public
+menu bar reads **Administration** (or **My account** when you have no back-office screen).
+
+- The eye button next to every password field shows what you typed (**Show the password**) and
+  hides it again; the password is always hidden again when the form is sent.
 
 - **Remember me on this device** (when offered) keeps you signed in on that browser for a
   limited number of days (14 by default). Do not use it on shared computers.
@@ -299,8 +304,15 @@ Sidebar › **Menus** (`/backend/menus/public`): the menus of the public website
   buttons, and then save the order. Items whose target no longer exists are marked **Target not
   available**.
 
-Administrators can also customise the back-office menu (Settings › **Back-office menu**); entries
-keep their permission wherever they are placed.
+The **Settings** part of the sidebar is grouped: **Users and access** (users, groups,
+permissions), **Security** (security settings, security status, activity log), **API** (tokens,
+documentation), **Customisation** (dashboard widgets, back-office menu, modules) and **System**
+(settings, scheduled tasks, backups, updates). Each group appears only when you can open one of
+its entries.
+
+Administrators can also customise the back-office menu (**Customisation** › **Back-office
+menu**); entries keep their permission wherever they are placed, and the groups can be renamed,
+moved or hidden like any entry.
 
 ## News
 

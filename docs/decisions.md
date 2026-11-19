@@ -285,7 +285,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-35-04 | 35 | WCAG AA colours of the default theme: darker text shades derived from the palette | Accepted (proposal) |
 | D-37-01 | 37 | Content languages from the site's locales: helpers, removed constants and language changes | Accepted (proposal) |
 | D-37-02 | 37 | Public language switch and the language of public URLs (decide) | Applied (decided) |
-| D-38-01 | 38 | Settings zone of the back-office menu grouped in five containers (decide) | Decided |
+| D-38-01 | 38 | Settings zone of the back-office menu grouped in five containers (decide) | Applied (decided) |
+| D-38-02 | 38 | Menu group entries declared with a `group` key in `$menu` (keys `group.<name>`) (decide) | Open |
+| D-38-03 | 38 | Who sees "Administració" on the public site, and where it links | Accepted (proposal) |
+| D-38-04 | 38 | The web installer's password fields get the button in session 39 | Accepted (proposal) |
+| D-38-05 | 38 | Order and icons inside the settings groups | Accepted (proposal) |
 | D-40-01 | 40 | Configurable back-office path chosen at install time (decide) | Applied (decided) |
 | D-41-01 | 41 | A `Devtools` module only for development, with the manifest key `$developmentOnly` (decide) | Decided |
 | D-41-02 | 41 | In development, Devtools may write module code from the back office (decide) | Decided |
@@ -2890,6 +2894,41 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Leave it flat and let each site group entries with the Menus module's back-office menu editor (already possible, no code). B) Three groups as first suggested by the owner (Security with users and the log, APIs, Customisation), leaving backups and updates loose.
 - **Status:** Decided
 - **Decision (2026-11-19):** «endavant, crea un prompt per reorganitzar-ho». The owner accepted grouping the settings zone in generic containers; session 38 builds the five groups of the proposal. **Must change:** `deploy/38-settings-menu.md` (created), the manifests' `settings` entries, `docs/menus.md`, `docs/creating-a-module.md`, specification "Menus".
+- **Applied in:** session 38: `modules/Core/Config/Module.php` (the five groups), `modules/Core/Menus/MenuDefinitions.php` (`GROUP_*`), `modules/Core/Modules/ManifestValidator.php`, the `settings` entries of Users, Settings, Core, Activity, Api, Menus, Dashboard, Backup and Updates (`parent`), `docs/menus.md`, `docs/creating-a-module.md`, specification "Menus" and the example manifest; tests `modules/Menus/Tests/SettingsGroupsTest.php`. How the groups are declared: D-38-02.
+
+## D-38-02 — Menu group entries declared with a `group` key in `$menu` (keys `group.<name>`) (decide)
+
+- **Where:** D-38-01 ("the Core declares five group entries, no route, no permission"); `docs/menus.md`; `ManifestValidator::MENU_KEYS`.
+- **Problem:** Until now every manifest menu entry had a route and a permission, and its key was the resource key or the route name. A group heading has neither, so it needs another way to be declared and a stable key that modules can name as `parent` (a public convention for third-party modules) and the Menus module can store customisations for.
+- **Proposal:** A new optional manifest key `group`: `['group' => 'group.system', 'label' => …, 'icon' => …, 'order' => …, 'zone' => 'settings']` declares a heading of kind `group` whose key is the given value; it must match `group.<name>` (lower case) and cannot be combined with `resource`, `route` or `permission` (the validator refuses it). The Core's keys are `group.access`, `group.security`, `group.api`, `group.customisation`, `group.system` (constants `MenuDefinitions::GROUP_*`); any module may declare its own group the same way. Built so the names can still change (one constant per key, one place in the Core manifest).
+- **Alternatives:** A) Groups only in the Core, as a constant list in `MenuDefinitions` (no new manifest key; modules cannot add groups). B) Keys like `Core.settings-access` following `<Module>.<resource>` (could collide with a future Core resource).
+- **Status:** Open
+
+## D-38-03 — Who sees "Administració" on the public site, and where it links
+
+- **Where:** `deploy/38-settings-menu.md` ("Administració for signed-in users who can open the back office (their profile otherwise); build the URLs from route names, not from the `backend` string").
+- **Problem:** "Can open the back office" is not one permission (the dashboard is a module), and the Core must not name a module.
+- **Proposal:** `Modules\Core\Frontend\AccountLink`: guests get "Entra" → the route `login`; a signed-in user whose generated back-office menu (already filtered by permission) has an entry in the `sidebar` or `settings` zone gets "Administració" → the first such entry (the dashboard in the skeleton); otherwise "El meu compte" → the first entry of their `user` zone (the profile); nothing when there is none. The theme option `showAccountLink` (default on) shows it; the partial `account_link` sits at the end of the collapsible navbar.
+- **Alternatives:** A) Check `dashboard.view` and link the route `dashboard` (names a module in the Core). B) Always link `backend` (breaks with session 40's configurable path).
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Core/Frontend/AccountLink.php`, `themes/default/Views/partials/account_link.php`, `themes/default/Views/layouts/public.php`, `themes/default/Theme.php`; test `modules/Core/Tests/AccountLinkTest.php`; `docs/themes.md` ("Account link").
+
+## D-38-04 — The web installer's password fields get the button in session 39
+
+- **Where:** `deploy/38-settings-menu.md` ("Today's fields: … the web installer"; "pages that do not load the Core's JavaScript get it the same way").
+- **Problem:** The web installer's pages are standalone (no theme, no database) and load no JavaScript; the Core's ES modules are published to `public/assets/` by `assets:publish`, which runs during the installation, so before installing they may not exist. Loading them would need new routes that serve module files before installation.
+- **Proposal:** Leave the installer without the button in session 38 (it works as before: a plain password field). Session 39 adds JavaScript to the installer (`core/install/progress.js`); when it loads the Core's scripts, `core/app.js` (or its own entry calling `initPasswordReveal()`) gives its password fields the button with no change to the fields.
+- **Alternatives:** A) Serve `password-reveal.js` and `config.js` from a controller route under `install/` before installation (new URLs, more code for one page). B) Publish the Core's assets from the installer's GET (the web server writing to `public/` before installation).
+- **Status:** Accepted (proposal)
+- **Applied in:** `docs/frontend.md` ("Password fields"), `docs/progress.md` (notes for session 39).
+
+## D-38-05 — Order and icons inside the settings groups
+
+- **Where:** `deploy/38-settings-menu.md` ("order inside groups by the entries' `order`").
+- **Problem:** The Activity log (84) and Security status (84) had the same order, so the log came first by key, against the listed order "security settings, security status, activity log"; the groups need icons.
+- **Proposal:** Activity log `order` 85 (its key does not change). Group icons: `bi-person-lock`, `bi-shield-lock`, `bi-plug`, `bi-sliders`, `bi-hdd-stack`; group orders 60, 65, 70, 75, 80. Inside Customisation the order is Dashboard widgets (72), Back-office menu (74), Modules (80), and inside System: Settings (70), Scheduled tasks (85), Backups (86), Updates (87), as the entries already declared.
+- **Status:** Accepted (proposal)
+- **Applied in:** `modules/Activity/Config/Module.php`, `modules/Core/Config/Module.php`.
 
 ## D-40-01 — Configurable back-office path chosen at install time (decide)
 
