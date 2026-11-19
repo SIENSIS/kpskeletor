@@ -15,7 +15,7 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   a new default language is required on the next edit, existing records stay readable.
 - Slugs, activity summaries and notification titles use the default language's text (else the
   first one filled in); help texts and the Menus "label required" message name that language.
-- **Public language switch** (added at the owner's request during the session, D-37-02 open):
+- **Public language switch** (added at the owner's request during the session, D-37-02 decided as built):
   the default theme's public header shows a globe with the current code next to the light/dark
   switch; visitors choose among the site's languages (cookie `kp_locale`, which wins over the
   browser), and a signed-in user's choice becomes their profile language. Hidden with a single
@@ -67,7 +67,7 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   deprecated alias: a constant cannot follow a setting), and the behaviour when languages are
   added, removed or the default changes. The specification's "Catalan as the required language"
   now reads "the site's default language".
-- **D-37-02** (decide, **Open**): the public language switch's URL `POST language`, cookie
+- **D-37-02** (decided by the owner on 2026-11-19: cookie + profile, as built): the public language switch's URL `POST language`, cookie
   `kp_locale` and event `localeChosen`, built as proposed; alternatives: a language prefix in the
   URL, `?lang=` links, or keeping a signed-in user's public choice apart from the profile.
 - Earlier gaps fixed because they blocked the goal: the language settings only offered ca/es/en;
