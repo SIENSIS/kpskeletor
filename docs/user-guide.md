@@ -272,10 +272,10 @@ text empty only if the image is decorative.
 
 Sidebar › **Pages** (`/backend/pages`): the pages of the public website.
 
-- The form has one tab per language (Catalan is required): **Title**, **Slug** (part of the
+- The form has one tab per language of the site (the site's default language is required): **Title**, **Slug** (part of the
   address; made from the title when empty), **Summary**, **Text**, the search-engine fields
   (**Meta title**, **Meta description**) and the featured image. Untranslated texts fall back to
-  Catalan.
+  the site's default language.
 - **Parent page** places the page in a section: its address starts with the parent's.
 - **Visibility**: **Public**, **Signed-in users**, or **Groups** (only the members of the chosen
   groups).

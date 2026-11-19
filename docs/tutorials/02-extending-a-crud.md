@@ -35,36 +35,38 @@ $this->forge->createTable('task_project_translations');
 ```
 
 In the CRUD, `setTranslations()` names that table, its two key columns, the translated fields and
-the languages. The site's languages come from the Core (`ContentTranslations::LOCALES`), never a
-hard-coded list:
+the languages. The site's languages come from the Core (`ContentTranslations::locales()`, the
+available locales of `Core.locales`), never a hard-coded list, and `ContentTranslations::crudOptions()`
+adds the required language and the fallbacks (the site's default language):
 
 ```php
 $crud->setTable('task_projects')
     ->setSubject(lang('Tasks.project'), lang('Tasks.projects'))
-    ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], ContentTranslations::LOCALES, [
-        'required'  => ['ca'],
-        'types'     => ['name' => 'text', 'description' => 'textarea'],
-        'rules'     => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[2000]'],
-        'fallbacks' => ['*' => ['ca']],
-    ])
+    ->setTranslations('task_project_translations', 'project_id', 'locale', ['name', 'description'], ContentTranslations::locales(), ContentTranslations::crudOptions([
+        'types' => ['name' => 'text', 'description' => 'textarea'],
+        'rules' => ['name' => 'required|max_length[120]', 'description' => 'permit_empty|max_length[2000]'],
+    ]))
     ->columns(['name', 'color', 'ends_on', 'active'])
     ->fields(['name', 'description', 'slug', 'color', 'ends_on', 'active'])
 ```
 
-- The form shows one tab per language; only Catalan is required (the default language,
-  `docs/i18n.md`); empty languages are not stored.
-- `fallbacks` shows the Catalan name in the list when the user's language has none.
+- The form shows one tab per site language; only the site's default language is required
+  (`Core.defaultLocale`, Catalan unless changed; `docs/i18n.md`); empty languages are not stored.
+  A language added to the site by configuration appears here without changing the module.
+- The `fallbacks` option (from `crudOptions()`) shows the default language's name in the list
+  when the user's language has none.
 - `name` and `description` are used in `columns()`, `fields()` and `searchFields()` like any other
   field.
 - The form posts `kp_tr[<locale>][<field>]`; `$crud->postedTranslations()` gives them to a hook.
-  The Tasks module uses it to build the slug from the Catalan name:
+  The Tasks module uses it to build the slug from the default language's name
+  (`ContentTranslations::defaultText()`: that language, else the first one filled in):
 
 ```php
-->beforeInsert(static fn (array $data): array => self::slug($data, null, (string) ($crud->postedTranslations()['ca']['name'] ?? '')))
+->beforeInsert(static fn (array $data): array => self::slug($data, null, ContentTranslations::defaultText($crud->postedTranslations(), 'name')))
 ```
 
 Other screens read the names through `TaskRepository::projectNames()` (the request language,
-then Catalan, then the slug). That is why the finished to-do task form shows the project as a
+then the site's default language, then the slug). That is why the finished to-do task form shows the project as a
 `select` of those names instead of tutorial 1's `setRelation()`:
 
 ```php

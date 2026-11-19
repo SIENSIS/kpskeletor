@@ -10,7 +10,7 @@ siblings by **Order**), with their address, status, visibility and dates; filter
 visibility, search by title and slug (a search or filter shows a flat list). The page chosen as
 home page carries a **Home** badge.
 
-The form has one tab per language (Catalan required): **title**, **slug**, **summary**, **text**
+The form has one tab per site language (the site's default language required, `docs/i18n.md`): **title**, **slug**, **summary**, **text**
 (the rich-text editor), **meta title**, **meta description** and **canonical URL**; then the
 **parent page**, **order**, **template**, **visibility** and **groups**, **publication date**,
 **hide from search engines** and the **featured image**.
@@ -40,8 +40,8 @@ One resource named `pages`: `pages.{list,show,add,edit,delete,export,trash,resto
   slug that clashes is refused, a generated one gets `-2`, `-3`…
 - A root page cannot take the first segment of another route (`news`, `login`, `install`…) or
   `api`, `assets`, `backend`, `themes`, `uploads`, `vendor`, `writable`.
-- A path is resolved with the slugs of any language (the current one first, then Catalan); the
-  texts follow the visitor's language with the Catalan fallback (D-20-05).
+- A path is resolved with the slugs of any language (the current one first, then the site's default
+  language); the texts follow the visitor's language with the fallback to the default language (D-20-05).
 - The public route is a catch-all with the lowest priority (`Config\Routing::$prioritize`):
   every other route wins, and `backend/…` / `api/…` are never pages (D-20-04).
 

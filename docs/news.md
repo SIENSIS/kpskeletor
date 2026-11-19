@@ -7,8 +7,8 @@ the Core; a kpapy resource; the Storage service; HTMLPurifier; demo data; tests.
 
 ## What it does
 
-- **Posts** (`news`, texts in `news_translations`: title, summary, body; Catalan required,
-  Spanish and English optional): type `article` or `notice`, category, visibility, status,
+- **Posts** (`news`, texts in `news_translations`: title, summary, body; one per site
+  language, the site's default language required, `docs/i18n.md`): type `article` or `notice`, category, visibility, status,
   publication and expiry dates, a cover image, an author. Notices also have a **priority**
   (`info`, `warning`, `critical`) and can be **pinned**.
 - **Categories** (`news_categories` + `news_category_translations`): slug, order, active.

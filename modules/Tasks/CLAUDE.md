@@ -69,6 +69,8 @@ scheduler's jobs. Never just "task" in texts or docs. The folder `Tasks/` holds 
 D-32-01 (`$enabledByDefault` manifest key, decided by the owner as built), D-32-02 … D-32-05 (accepted;
 `docs/decisions.md`); D-00-56 (naming), D-00-32 (`themes/tasks-demo`).
 
+Session 37 (D-37-01): translated texts use the site's languages and require its default language through `Modules\Core\Content\ContentTranslations` (`locales()`, `crudOptions()`, `defaultText()`…); never write a language code (`tests/unit/I18n/ContentLanguagesTest.php`). Tests `Tests/ContentLocalesTest.php`, `Tests/ContentLocalesApiTest.php` (`Modules\Core\Tests\ContentLocalesTrait`).
+
 ## Open tasks
 
 - A change to a tutorial's code must update its text in `docs/tutorials/` (excerpts are copied

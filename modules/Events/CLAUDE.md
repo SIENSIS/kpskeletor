@@ -49,6 +49,8 @@ D-24-01 (names, URLs, configuration) and D-24-02 (assignable groups) decided by 
 D-24-10 accepted (`docs/decisions.md`); D-00-04, D-00-40, D-00-41. Session 25: D-25-01 (iCal URLs and
 API names, decided as built by the owner), D-25-02 … D-25-07 accepted.
 
+Session 37 (D-37-01): translated texts use the site's languages and require its default language through `Modules\Core\Content\ContentTranslations` (`locales()`, `crudOptions()`, `defaultText()`…); never write a language code (`tests/unit/I18n/ContentLanguagesTest.php`). Tests `Tests/ContentLocalesTest.php`, `Tests/ContentLocalesApiTest.php` (`Modules\Core\Tests\ContentLocalesTrait`).
+
 ## Open tasks
 
 - Done in session 29: `CalendarService::purgeModule()` is now part of the Core's `CalendarPublisher` contract: the Core's Uninstaller calls it for the uninstalled module (unless `--keep-data`); no `Config/Events.php` (D-00-04). (`docs/installing-modules.md`)

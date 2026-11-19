@@ -8,7 +8,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- `ContentTranslations::locales()`, `codes()`, `defaultLocale()`, `crudOptions()`, `apiOptions()`,
+  `defaultText()` and `keepUnavailable()`: the content languages of a module come from the site's
+  locales (`docs/i18n.md`, "Content languages"); `CalendarEvent::translated()` for per-language
+  calendar titles; `Modules\Core\Tests\ContentLocalesTrait` for module tests with another
+  language set.
+
+### Changed
+
+- **Removed** the constants `ContentTranslations::LOCALES`, `ContentTranslations::FALLBACK_LOCALE`,
+  `NewsRepository::FALLBACK_LOCALE`, `News\Controllers\Posts::LOCALES` and
+  `TranslatedText::FALLBACK_LOCALE` (D-37-01). Modules that used them: replace them as described in
+  `docs/i18n.md` ("Upgrading a module written for 1.0.0").
+- The required content language is the site's default language (`Core.defaultLocale`), not always
+  Catalan; a language no longer offered keeps its texts but they are neither shown nor edited.
+
+### Fixed
+
+- Content forms, readers and APIs (News, Pages, Events, Menus, Tasks) only offered Catalan,
+  Spanish and English and always required Catalan: a language added by configuration now reaches
+  every translated form, reader and API, slugs and activity summaries use the default language's
+  text, and kpapy's translated fields fall back to the site's default language.
+- The calendar titles of birthdays and to-do task due dates are written in every site language;
+  FullCalendar loads its locale file for any vendored language.
 
 ## [1.0.0] - 2026-11-18
 

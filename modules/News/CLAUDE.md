@@ -27,7 +27,7 @@ description: `docs/news.md`.
 ## Main pieces
 
 - `Services/NewsVisibility.php` (who reads what; the only place the rule lives),
-  `NewsRepository.php` (read queries with texts in the user's language, Catalan fallback),
+  `NewsRepository.php` (read queries with texts in the user's language, fallback to the site's default language),
   `Publisher.php` (publish, notify once, release scheduled, expire), `ReadReceipts.php`,
   `FeedWriter.php` (RSS with XMLWriter). From the Core: `Modules\Core\Security\HtmlSanitizer`
   (HTMLPurifier) and `Modules\Core\Text\Slugger` (moved there in session 19 for Pages and Events);
@@ -51,6 +51,8 @@ Notices with an event date (`event_starts_at`, `event_ends_at`, `event_all_day`;
 (`Services/NoticeCalendar.php`, also the calendar's `CalendarSource`); every write and state
 change calls `NoticeCalendar::sync()` (CRUD `afterWrite`, publish/unpublish, `Publisher`).
 Tests `Tests/NoticeCalendarTest.php`. D-25-06.
+
+Session 37 (D-37-01): translated texts use the site's languages and require its default language through `Modules\Core\Content\ContentTranslations` (`locales()`, `crudOptions()`, `defaultText()`…); never write a language code (`tests/unit/I18n/ContentLanguagesTest.php`). Tests `Tests/ContentLocalesTest.php`, `Tests/ContentLocalesApiTest.php` (`Modules\Core\Tests\ContentLocalesTrait`).
 
 ## Open tasks
 

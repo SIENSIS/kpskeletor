@@ -33,6 +33,8 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
 D-20-01 decided by the owner (names and URLs as built; the home page chosen from a list of pages,
 stored as the id), D-20-02 … D-20-07 accepted (`docs/decisions.md`).
 
+Session 37 (D-37-01): translated texts use the site's languages and require its default language through `Modules\Core\Content\ContentTranslations` (`locales()`, `crudOptions()`, `defaultText()`…); never write a language code (`tests/unit/I18n/ContentLanguagesTest.php`). Tests `Tests/ContentLocalesTest.php` (`Modules\Core\Tests\ContentLocalesTrait`).
+
 ## Open tasks
 
 - Session 21: the Menus module consumes `Menu/PageLink.php`.

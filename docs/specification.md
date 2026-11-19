@@ -92,7 +92,8 @@ The skeleton ships these modules:
   * the theme's strings and the user guide.
   No hard-coded text. A CI test checks that the three languages have exactly the same keys.
   **Content** (pages, news, events) can be multilingual per module, with kpcrudy's
-  `setTranslations()`, with Catalan as the required language. Third-party modules should ship
+  `setTranslations()`, in the site's languages (`Core.locales`) with the site's default language
+  (`Core.defaultLocale`, Catalan by default) as the required one (session 37, D-37-01). Third-party modules should ship
   at least Catalan or Spanish; missing texts follow the fallback chain.
 
 ## Required libraries: kpcrudy and kpapy
