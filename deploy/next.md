@@ -20,7 +20,10 @@
      branches into `main`.
 5. Say which session you are going to run (number and title), then follow its file from start to
    end.
-6. If session 36 is done: it merges itself into `main`; if its branch is still unmerged, merge it
+6. Session 36 released version 1.0.0; sessions 37 and later were added afterwards from the
+   owner's reviews and run the same way (step 4). When the last session file in `deploy/` (the
+   highest NN) is done: it merges itself into `main`; if its branch is still unmerged, merge it
    with the procedure of the session files (never force-push; if `main` cannot be pushed, ask me
-   to merge the pull request). Then tell me the project is complete and to create the `v1.0.0`
-   tag.
+   to merge the pull request). Then tell me the planned sessions are complete, and remind me to
+   release a new version when there are changes under `[Unreleased]` in `CHANGELOG.md`
+   (`docs/updates.md`, "Release process").

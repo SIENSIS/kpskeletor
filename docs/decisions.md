@@ -283,6 +283,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-35-02 | 35 | Secret scanning with the gitleaks release binary, not the GitHub Action | Accepted (proposal) |
 | D-35-03 | 35 | One minisign verifier in the Core (`Modules\Core\Security\Minisign`) | Accepted (proposal) |
 | D-35-04 | 35 | WCAG AA colours of the default theme: darker text shades derived from the palette | Accepted (proposal) |
+| D-38-01 | 38 | Settings zone of the back-office menu grouped in five containers (decide) | Decided |
+| D-40-01 | 40 | Configurable back-office path chosen at install time (decide) | Open |
 
 ## D-00-01 — Branch names and pushing to `main`
 
@@ -2870,3 +2872,21 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal:** Keep the palette and the `primaryColor` option, and let the theme CSS use darker (light mode) or `*-text-emphasis` (dark mode) shades for **text** only: `--kp-primary-text` (primary mixed with 15 % black), the next Bootstrap shades for outline buttons, 75 % opacity for disabled labels; FullCalendar events get `contrastColor` (black or white, whichever contrasts more) from the server. Also fixed: ARIA names of the editor's pickers, `role="img"` on labelled icons, `role="button"` on the dashboard's toggle link, keyboard access to scrolled tables (`core/ui/scroll-regions.js`). Documented in `docs/themes.md`.
 - **Alternatives:** A) A darker default primary colour (changes every site's look). B) White back-office background (loses the card contrast).
 - **Status:** Accepted (proposal)
+
+## D-38-01 — Settings zone of the back-office menu grouped in five containers (decide)
+
+- **Where:** owner's review of 2026-11-19 (point 5); specification "Menus" (back-office menu); `docs/menus.md`; every manifest with entries in the `settings` zone.
+- **Problem:** The `settings` zone lists fifteen entries side by side (users, groups, permissions, settings, security settings, security status, activity log, API tokens, API documentation, modules, back-office menu, dashboard widgets, backups, updates, scheduled tasks), which is hard to scan.
+- **Proposal:** The Core declares five group entries in the `settings` zone (no route or permission; shown only while a child is visible) and module entries point to them with `parent`: **Usuaris i accés** (users, groups, permissions), **Seguretat** (security settings, security status, activity log), **API** (tokens, documentation), **Personalització** (modules, back-office menu, dashboard widgets), **Sistema** (general settings, backups, updates, scheduled tasks). Entry keys do not change, so saved customisations keep applying; the group keys become a documented convention for third-party modules.
+- **Alternatives:** A) Leave it flat and let each site group entries with the Menus module's back-office menu editor (already possible, no code). B) Three groups as first suggested by the owner (Security with users and the log, APIs, Customisation), leaving backups and updates loose.
+- **Status:** Decided
+- **Decision (2026-11-19):** «endavant, crea un prompt per reorganitzar-ho». The owner accepted grouping the settings zone in generic containers; session 38 builds the five groups of the proposal. **Must change:** `deploy/38-settings-menu.md` (created), the manifests' `settings` entries, `docs/menus.md`, `docs/creating-a-module.md`, specification "Menus".
+
+## D-40-01 — Configurable back-office path chosen at install time (decide)
+
+- **Where:** owner's review of 2026-11-19 (point 6); specification (every passage naming `backend/`), `CLAUDE.md`, all module routes, `app/Config/Filters.php`, `app/Config/Auth.php`, the installer; `deploy/40-backend-path.md`.
+- **Problem:** The back office always lives under `/backend`. The owner wants to choose another path (`/admin`, `/private`, `/intranet`…) when installing. The prefix is written about 380 times in code and is stored inside data (notification links, dashboard quick links, back-office menu links), so changing it after a site is in use breaks links, bookmarks and customisations.
+- **Proposal:** A `.env` key `app.backendPath` (default `backend`), read by configuration at boot (never from the database: routes are built before any query). Chosen with `app:install --backend-path=<slug>` and a field of the web installer, and documented as a choice made **once, at install time**. Rules: lowercase letters, digits and hyphens, 2–30 characters, one path segment, not a reserved top-level path (`api`, `install`, `progress`, `login`, `logout`, `register`, `auth`, `uploads`, `assets`, `themes`, `ical`, other modules' top-level routes, `robots.txt`, `sitemap.xml`…); Pages refuses it as a top-level page slug, and the demo page `intranet` is renamed if the path chosen is `intranet`. New stored links are saved relative to the back office and resolved when shown; stored links that start with `backend/` keep working. Not changeable from the back office; changing it later is not supported in this session.
+- **Alternatives:** A) A setting in the database (Settings › Security): routes cannot read the database at boot, and a wrong value could lock everybody out. B) Keep `/backend` fixed and use a web-server rewrite (`/admin` → `/backend`): no code, but the application still writes `/backend` in its links. C) The proposal plus a console command `app:backend-path <new>` that changes it later (maintenance mode, rewrites the stored links, clears caches, logs it): about one more day.
+- **Status:** Open
+
