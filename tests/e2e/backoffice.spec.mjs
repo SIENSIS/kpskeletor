@@ -5,6 +5,12 @@
 // tutorial module is disabled by default: the e2e site enables it (docs/development.md).
 import { test, expect, checkPage, checkSkipLink, backend } from './support.mjs';
 
+/** Whether a URL is under the back-office prefix (with or without `/index.php`). */
+const inBackOffice = (href) => {
+    const path = new URL(href).pathname.replace(/^\/index\.php(?=\/)/, '');
+    return path === backend() || path.startsWith(backend() + '/');
+};
+
 const screens = [
     [backend(), 'dashboard'],
     [backend('news'), 'news-reader'],
@@ -45,7 +51,7 @@ test('every menu entry opens', async ({ page }) => {
     const origin = new URL(page.url()).origin;
     const links = await page.locator('a[href]').evaluateAll((anchors) => anchors.map((a) => a.href));
     const targets = [...new Set(links)]
-        .filter((href) => href.startsWith(origin) && (new URL(href).pathname === backend() || new URL(href).pathname.startsWith(backend('') + '/')))
+        .filter((href) => href.startsWith(origin) && inBackOffice(href))
         .filter((href) => !/logout|\/export|download/.test(href))
         .map((href) => href.split('#')[0]);
 

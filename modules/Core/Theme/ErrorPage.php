@@ -32,7 +32,7 @@ final class ErrorPage
 
             return $theme->render('errors/' . $code, [
                 'message' => $message,
-                'homeUrl' => ($theme->area() === 'backend' ? backend_url() : base_url('/')),
+                'homeUrl' => base_url($theme->area() === 'backend' ? backend_path() : '/'),
                 'title'   => lang('Core.errors.' . self::key($code) . '.title'),
             ], ['saveData' => false]);
         } catch (Throwable $e) {
