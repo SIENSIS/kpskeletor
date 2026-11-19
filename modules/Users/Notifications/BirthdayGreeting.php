@@ -44,7 +44,7 @@ final class BirthdayGreeting extends NotificationType
         return new NotificationMessage(
             lang('Users.greetings.title'),
             BirthdayGreetings::message(service('language')->getLocale(), (string) ($this->data['name'] ?? '')),
-            url: 'backend/profile',
+            url: backend_link('profile'),
         );
     }
 }

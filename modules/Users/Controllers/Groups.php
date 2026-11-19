@@ -105,7 +105,7 @@ final class Groups extends BackendController
             ->afterDelete(static fn (string $id, array $row) => $registry->deleted((string) $row['name']));
 
         if ($this->can('users-matrix.view')) {
-            $crud->addHeaderAction(lang('Users.matrix.title'), 'backend/users/permissions', ['icon' => 'bi bi-grid-3x3']);
+            $crud->addHeaderAction(lang('Users.matrix.title'), backend_path('users/permissions'), ['icon' => 'bi bi-grid-3x3']);
         }
 
         return $this->renderCrud($crud);

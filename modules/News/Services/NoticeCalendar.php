@@ -125,7 +125,7 @@ final class NoticeCalendar implements CalendarSource
             calendar: self::CALENDAR,
             visibility: $visibility,
             groups: $visibility === 'restricted' ? self::groups($id) : [],
-            url: '/backend/news/read/' . Crud::maskId($id, 'news'),
+            url: '/' . backend_link('news/read/' . Crud::maskId($id, 'news')),
             reminders: true,
         );
     }

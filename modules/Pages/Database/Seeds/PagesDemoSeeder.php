@@ -20,6 +20,15 @@ use Modules\Pages\Services\Revisions;
  */
 final class PagesDemoSeeder extends DemoSeeder
 {
+    /**
+     * The slug of the demo page "Intranet": `intranet`, or `area-interna` when the back office
+     * itself lives at `/intranet` (D-40-01).
+     */
+    public static function intranetSlug(): string
+    {
+        return backend_path() === 'intranet' ? 'area-interna' : 'intranet';
+    }
+
     public function load(DemoData $demo): void
     {
         $now    = Time::now();
@@ -65,7 +74,7 @@ final class PagesDemoSeeder extends DemoSeeder
 
         $intranet = $this->page($demo, $now, $author, [
             'position' => 5, 'visibility' => 'private', 'template' => 'sidebar',
-            'texts'    => ['ca' => ['Intranet', 'intranet', 'Informació per a les persones usuàries identificades.', '<p>Documents i procediments interns.</p>']],
+            'texts'    => ['ca' => ['Intranet', self::intranetSlug(), 'Informació per a les persones usuàries identificades.', '<p>Documents i procediments interns.</p>']],
         ]);
 
         $this->page($demo, $now, $author, [

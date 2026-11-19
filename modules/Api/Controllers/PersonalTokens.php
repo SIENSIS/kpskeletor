@@ -26,7 +26,7 @@ final class PersonalTokens extends BackendController
         $newToken = session()->getFlashdata('apiNewToken');
         session()->remove('apiNewToken');
 
-        $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))->breadcrumb(lang('Api.personal.title'));
+        $this->breadcrumb(lang('Auth.profile.title'), backend_url('profile'))->breadcrumb(lang('Api.personal.title'));
 
         return $this->render('Modules\Api\Views\tokens\personal', [
             'title'       => lang('Api.personal.title'),
@@ -50,20 +50,20 @@ final class PersonalTokens extends BackendController
         try {
             $token = (new Tokens())->create($user, is_string($name) ? $name : '', array_values(array_filter($scopes, 'is_string')), is_numeric($days) ? (int) $days : 0);
         } catch (InvalidArgumentException $e) {
-            return redirect()->to(site_url('backend/profile/api-tokens'))->withInput()->with('error', $e->getMessage());
+            return redirect()->to(backend_url('profile/api-tokens'))->withInput()->with('error', $e->getMessage());
         }
 
         session()->setFlashdata('apiNewToken', $token['token']);
 
-        return redirect()->to(site_url('backend/profile/api-tokens'))->with('success', lang('Api.personal.created'));
+        return redirect()->to(backend_url('profile/api-tokens'))->with('success', lang('Api.personal.created'));
     }
 
     public function revoke(int $id): RedirectResponse
     {
         if (! (new Tokens())->revoke($this->currentUser(), $id)) {
-            return redirect()->to(site_url('backend/profile/api-tokens'))->with('error', lang('Api.personal.notFound'));
+            return redirect()->to(backend_url('profile/api-tokens'))->with('error', lang('Api.personal.notFound'));
         }
 
-        return redirect()->to(site_url('backend/profile/api-tokens'))->with('success', lang('Api.personal.revoked'));
+        return redirect()->to(backend_url('profile/api-tokens'))->with('success', lang('Api.personal.revoked'));
     }
 }

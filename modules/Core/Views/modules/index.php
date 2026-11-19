@@ -22,12 +22,12 @@ $statusColors = [
 <?php if (is_array($confirm ?? null)): ?>
     <div class="alert alert-warning" role="alert" data-enable-dependencies>
         <p class="mb-2"><?= esc(lang('Core.toggle.dependenciesDisabled', [$confirm['module'], implode(', ', $confirm['dependencies'])])) ?></p>
-        <form action="<?= esc(site_url('backend/modules/enable/' . $confirm['module']), 'attr') ?>" method="post" class="d-inline">
+        <form action="<?= esc(backend_url('modules/enable/' . $confirm['module']), 'attr') ?>" method="post" class="d-inline">
             <?= csrf_field() ?>
             <input type="hidden" name="dependencies" value="1">
             <button type="submit" class="btn btn-sm btn-warning"><?= esc(lang('Core.toggle.enableDependencies', [implode(', ', $confirm['dependencies'])])) ?></button>
         </form>
-        <a class="btn btn-sm btn-link" href="<?= esc(site_url('backend/modules'), 'attr') ?>"><?= esc(lang('Core.ui.cancel')) ?></a>
+        <a class="btn btn-sm btn-link" href="<?= esc(backend_url('modules'), 'attr') ?>"><?= esc(lang('Core.ui.cancel')) ?></a>
     </div>
 <?php endif ?>
 
@@ -44,7 +44,7 @@ $statusColors = [
 
 <?php ob_start() ?>
 <?php if ($can['sync']): ?>
-    <form action="<?= esc(site_url('backend/modules/sync'), 'attr') ?>" method="post" class="mb-3">
+    <form action="<?= esc(backend_url('modules/sync'), 'attr') ?>" method="post" class="mb-3">
         <?= csrf_field() ?>
         <button type="submit" class="btn btn-outline-primary btn-sm" data-confirm="<?= esc(lang('Core.modules.confirmSync'), 'attr') ?>"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i><?= esc(lang('Core.modules.sync')) ?></button>
         <span class="small text-body-secondary ms-2"><?= esc(lang('Core.modules.syncHelp')) ?></span>
@@ -94,12 +94,12 @@ $statusColors = [
                     <div class="d-inline-flex flex-nowrap gap-1 justify-content-end">
                         <?php if ($can['toggle'] && ! $row['core'] && in_array($row['status'], ['enabled', 'disabled'], true)): ?>
                             <?php if ($row['enabled']): ?>
-                                <form action="<?= esc(site_url('backend/modules/disable/' . $name), 'attr') ?>" method="post">
+                                <form action="<?= esc(backend_url('modules/disable/' . $name), 'attr') ?>" method="post">
                                     <?= csrf_field() ?>
                                     <button type="submit" class="btn btn-sm btn-outline-secondary" data-confirm="<?= esc(lang('Core.modules.confirmDisable', [$name]), 'attr') ?>"><?= esc(lang('Core.modules.disable')) ?></button>
                                 </form>
                             <?php else: ?>
-                                <form action="<?= esc(site_url('backend/modules/enable/' . $name), 'attr') ?>" method="post">
+                                <form action="<?= esc(backend_url('modules/enable/' . $name), 'attr') ?>" method="post">
                                     <?= csrf_field() ?>
                                     <button type="submit" class="btn btn-sm btn-primary" data-confirm="<?= esc(lang('Core.modules.confirmEnable', [$name]), 'attr') ?>"><?= esc(lang('Core.modules.enable')) ?></button>
                                 </form>
@@ -111,7 +111,7 @@ $statusColors = [
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <?php foreach ($row['demoLoaded'] ? ['reload', 'remove'] : ['load'] as $action): ?>
                                         <li>
-                                            <form action="<?= esc(site_url('backend/modules/demo/' . $name), 'attr') ?>" method="post">
+                                            <form action="<?= esc(backend_url('modules/demo/' . $name), 'attr') ?>" method="post">
                                                 <?= csrf_field() ?>
                                                 <input type="hidden" name="action" value="<?= esc($action, 'attr') ?>">
                                                 <button type="submit" class="dropdown-item" data-confirm="<?= esc(lang('Core.demo.confirm.' . $action, [$name]), 'attr') ?>"><?= esc(lang('Core.modules.demo.' . $action)) ?></button>
@@ -122,7 +122,7 @@ $statusColors = [
                             </div>
                         <?php endif ?>
                         <?php if ($can['uninstall'] && ! $row['core'] && $row['dependants'] === [] && in_array($row['status'], ['enabled', 'disabled', 'error'], true) && $name !== 'Core'): ?>
-                            <a class="btn btn-sm btn-outline-danger" href="<?= esc(site_url('backend/modules/uninstall/' . $name), 'attr') ?>"><?= esc(lang('Core.modules.uninstall')) ?></a>
+                            <a class="btn btn-sm btn-outline-danger" href="<?= esc(backend_url('modules/uninstall/' . $name), 'attr') ?>"><?= esc(lang('Core.modules.uninstall')) ?></a>
                         <?php endif ?>
                     </div>
                 </td>

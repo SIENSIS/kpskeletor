@@ -3,7 +3,7 @@
  * regenerated token from the response, parses JSON and turns JSON errors into toasts.
  *
  *   import { get, post } from 'core/http.js';
- *   const data = await post('backend/news/posts/1/publish', { json: { at: '2026-01-01' } });
+ *   const data = await post(backendUrl('news/posts/1/publish'), { json: { at: '2026-01-01' } });
  */
 import { baseUrl, t } from 'core/config.js';
 import { toast } from 'core/ui/toast.js';

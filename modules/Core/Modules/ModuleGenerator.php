@@ -153,7 +153,7 @@ final class ModuleGenerator
         $lower    = strtolower($name);
 
         return [
-            '{{crudClaude}}'      => "\n- `{$resource}` (crud − `import`): the kpcrudy CRUD of `{$crudTable}`, `backend/{$lower}/{$key}`.",
+            '{{crudClaude}}'      => "\n- `{$resource}` (crud − `import`): the kpcrudy CRUD of `{$crudTable}`, `<back office>/{$lower}/{$key}`.",
             '{{apiClaude}}'       => $api ? "\n- API: `api/v1/" . ApiScaffold::path($name, $crudTable) . "` (kpapy, same resource `{$resource}`; scopes = its permissions)." : '',
             '{{crudGrantClaude}}' => ", `{$resource}.*`",
             '{{apiRouteClaude}}'  => $api ? '; the API route has the `kpapy` filter' : '',

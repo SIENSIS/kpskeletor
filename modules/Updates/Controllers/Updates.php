@@ -46,7 +46,7 @@ final class Updates extends BackendController
     {
         @set_time_limit(120);
         $status = service('updatechecker')->check();
-        $back   = redirect()->to(site_url('backend/updates'));
+        $back   = redirect()->to(backend_url('updates'));
 
         if (is_string($status['error'] ?? null)) {
             return $back->with('error', lang('Updates.msg.checkFailed', [$status['error']]));

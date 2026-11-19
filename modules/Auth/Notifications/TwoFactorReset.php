@@ -38,7 +38,7 @@ final class TwoFactorReset extends NotificationType
         return new NotificationMessage(
             lang('Auth.notifications.twoFactorResetTitle'),
             lang('Auth.notifications.twoFactorResetBody'),
-            'backend/profile/two-factor',
+            backend_link('profile/two-factor'),
         );
     }
 }

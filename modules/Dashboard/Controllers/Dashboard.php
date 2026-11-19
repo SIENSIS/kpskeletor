@@ -47,7 +47,7 @@ final class Dashboard extends BackendController
         $actions = [];
 
         if ($this->can('dashboard.configure')) {
-            $actions[] = ['label' => lang('Dashboard.groups.title'), 'url' => site_url('backend/dashboard/groups'), 'icon' => 'bi bi-grid-1x2'];
+            $actions[] = ['label' => lang('Dashboard.groups.title'), 'url' => backend_url('dashboard/groups'), 'icon' => 'bi bi-grid-1x2'];
         }
 
         return $this->render('Modules\Dashboard\Views\dashboard', [
@@ -58,8 +58,8 @@ final class Dashboard extends BackendController
             'hidden'     => $hidden,
             'ownLayout'  => $layout->hasUserLayout($user),
             'sizes'      => array_combine(WidgetSizes::ALL, array_map(WidgetSizes::label(...), WidgetSizes::ALL)),
-            'saveUrl'    => site_url('backend/dashboard/layout'),
-            'resetUrl'   => site_url('backend/dashboard/layout/reset'),
+            'saveUrl'    => backend_url('dashboard/layout'),
+            'resetUrl'   => backend_url('dashboard/layout/reset'),
         ]);
     }
 
@@ -82,15 +82,15 @@ final class Dashboard extends BackendController
             ];
         }
 
-        $this->breadcrumb(lang('Dashboard.title'), site_url('backend'))->breadcrumb(lang('Dashboard.customize'));
+        $this->breadcrumb(lang('Dashboard.title'), backend_url())->breadcrumb(lang('Dashboard.customize'));
 
         return $this->render('Modules\Dashboard\Views\customize', [
             'title'    => lang('Dashboard.customize'),
             'subtitle' => lang('Dashboard.customizeHelp'),
             'icon'     => 'bi bi-sliders',
             'rows'     => $rows,
-            'saveUrl'  => site_url('backend/dashboard/layout'),
-            'resetUrl' => site_url('backend/dashboard/layout/reset'),
+            'saveUrl'  => backend_url('dashboard/layout'),
+            'resetUrl' => backend_url('dashboard/layout/reset'),
         ]);
     }
 
@@ -163,7 +163,7 @@ final class Dashboard extends BackendController
 
     private function dataUrl(string $id, object $widget): ?string
     {
-        return $widget instanceof AsyncWidgetInterface ? site_url('backend/dashboard/widgets/' . $id . '/data') : null;
+        return $widget instanceof AsyncWidgetInterface ? backend_url('dashboard/widgets/' . $id . '/data') : null;
     }
 
     private function wantsJson(): bool
@@ -177,6 +177,6 @@ final class Dashboard extends BackendController
             return $this->json($status < 400 ? ['message' => $message] : ['error' => $message], $status);
         }
 
-        return redirect()->to(site_url('backend'))->with($type, $message);
+        return redirect()->to(backend_url())->with($type, $message);
     }
 }

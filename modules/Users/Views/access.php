@@ -63,7 +63,7 @@
     </section>
 
     <div class="d-flex justify-content-end gap-2">
-        <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend/users'), 'attr') ?>"><?= esc(lang('Core.ui.cancel')) ?></a>
+        <a class="btn btn-outline-secondary" href="<?= esc(backend_url('users'), 'attr') ?>"><?= esc(lang('Core.ui.cancel')) ?></a>
         <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1" aria-hidden="true"></i><?= esc(lang('Core.ui.save')) ?></button>
     </div>
 </form>

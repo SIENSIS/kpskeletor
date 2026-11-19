@@ -55,7 +55,7 @@ $routes->group('', ['namespace' => 'Modules\Auth\Controllers'], static function 
     $routes->get('files/avatar/(:segment)', 'AvatarController::show/$1', ['as' => 'auth-avatar']);
 });
 
-$routes->group('backend/profile', ['namespace' => 'Modules\Auth\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('profile'), ['namespace' => 'Modules\Auth\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('/', 'ProfileController::index', ['as' => 'auth-profile', 'filter' => 'can:auth-profile.view']);
     $routes->post('/', 'ProfileController::update', ['filter' => 'can:auth-profile.edit']);
     $routes->get('password', 'ProfileController::password', ['as' => 'auth-profile-password', 'filter' => 'can:auth-profile.view']);

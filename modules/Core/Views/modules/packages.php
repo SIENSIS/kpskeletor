@@ -17,7 +17,7 @@ $colors = ['uploaded' => 'info', 'pending' => 'warning', 'installing' => 'warnin
 <p class="small text-body-secondary"><?= esc(lang('Core.packages.intro')) ?></p>
 <p class="small"><?= esc(lang('Core.packages.howToRun')) ?> <code>php spark modules:install --pending</code></p>
 <?php if ($can['upload']): ?>
-    <a class="btn btn-primary btn-sm mb-3" href="<?= esc(site_url('backend/modules/packages/upload'), 'attr') ?>"><i class="bi bi-upload me-1" aria-hidden="true"></i><?= esc(lang('Core.packages.upload')) ?></a>
+    <a class="btn btn-primary btn-sm mb-3" href="<?= esc(backend_url('modules/packages/upload'), 'attr') ?>"><i class="bi bi-upload me-1" aria-hidden="true"></i><?= esc(lang('Core.packages.upload')) ?></a>
 <?php endif ?>
 <?php if ($rows === []): ?>
     <p class="text-body-secondary mb-0"><?= esc(lang('Core.packages.none')) ?></p>
@@ -44,9 +44,9 @@ $colors = ['uploaded' => 'info', 'pending' => 'warning', 'installing' => 'warnin
                     <td class="small d-none d-md-table-cell"><?= ui_date(($row['processed_at'] ?? $row['approved_at'] ?? $row['created_at']) . ' UTC', 'datetime') ?></td>
                     <td class="text-end">
                         <div class="d-inline-flex gap-1">
-                            <a class="btn btn-sm btn-outline-secondary" href="<?= esc(site_url('backend/modules/packages/' . $row['id']), 'attr') ?>"><?= esc(lang('Core.packages.details')) ?></a>
+                            <a class="btn btn-sm btn-outline-secondary" href="<?= esc(backend_url('modules/packages/' . $row['id']), 'attr') ?>"><?= esc(lang('Core.packages.details')) ?></a>
                             <?php if (in_array($row['status'], ['uploaded', 'pending'], true) && ($row['action'] === 'uninstall' ? $can['uninstall'] : $can['upload'])): ?>
-                                <form action="<?= esc(site_url('backend/modules/packages/' . $row['id'] . '/discard'), 'attr') ?>" method="post">
+                                <form action="<?= esc(backend_url('modules/packages/' . $row['id'] . '/discard'), 'attr') ?>" method="post">
                                     <?= csrf_field() ?>
                                     <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="<?= esc(lang('Core.packages.confirmDiscard'), 'attr') ?>"><?= esc(lang('Core.packages.discard')) ?></button>
                                 </form>

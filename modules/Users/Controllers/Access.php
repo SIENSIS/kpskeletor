@@ -25,7 +25,7 @@ final class Access extends BackendController
         [$actor, $target] = $this->users($id);
         $access           = new UserAccess();
 
-        $this->breadcrumb(lang('Users.users.title'), site_url('backend/users'))->breadcrumb((string) $target->username);
+        $this->breadcrumb(lang('Users.users.title'), backend_url('users'))->breadcrumb((string) $target->username);
 
         return $this->render('Modules\Users\Views\access', [
             'title'       => lang('Users.access.title', [$target->username]),
@@ -34,14 +34,14 @@ final class Access extends BackendController
             'email'       => UserAccounts::email((int) $target->id),
             'groups'      => $access->groups($actor, $target),
             'permissions' => $access->permissions($actor, $target),
-            'formAction'  => site_url('backend/users/access/' . (int) $target->id),
+            'formAction'  => backend_url('users/access/' . (int) $target->id),
         ]);
     }
 
     public function save(int|string $id): RedirectResponse
     {
         [$actor, $target] = $this->users($id);
-        $back             = site_url('backend/users/access/' . (int) $target->id);
+        $back             = backend_url('users/access/' . (int) $target->id);
         $groups           = $this->request->getPost('groups');
         $permissions      = $this->request->getPost('permissions');
 

@@ -9,14 +9,16 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Authentication\Authenticators\Session;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * `forcereset`: a user whose password must be changed (Shield's forced reset) only reaches the
  * password-change screen of the back office until it is done. Unlike Shield's `force-reset`
- * filter it can cover `backend/*` without redirecting the password screen to itself.
+ * filter it can cover the back office without redirecting the password screen to itself.
  */
 final class ForcePasswordReset implements FilterInterface
 {
+    /** Paths written with the canonical prefix (`BackendPath::store()`). */
     public const ALLOWED = ['backend/profile/password'];
 
     /**
@@ -37,7 +39,7 @@ final class ForcePasswordReset implements FilterInterface
             return null;
         }
 
-        if (in_array(trim($request->getPath(), '/'), self::ALLOWED, true)) {
+        if (in_array(BackendPath::store(trim($request->getPath(), '/')), self::ALLOWED, true)) {
             return null;
         }
 

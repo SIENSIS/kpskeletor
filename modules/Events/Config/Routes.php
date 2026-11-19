@@ -21,10 +21,10 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-CrudFactory::routes($routes, 'events-categories', 'backend/events/categories', '\Modules\Events\Controllers\Categories::index');
-CrudFactory::routes($routes, 'events-events', 'backend/events', '\Modules\Events\Controllers\Events::index');
+CrudFactory::routes($routes, 'events-categories', backend_path('events/categories'), '\Modules\Events\Controllers\Categories::index');
+CrudFactory::routes($routes, 'events-events', backend_path('events'), '\Modules\Events\Controllers\Events::index');
 
-$routes->group('backend/calendar', ['namespace' => 'Modules\Events\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('calendar'), ['namespace' => 'Modules\Events\Controllers'], static function (RouteCollection $routes): void {
     $view = ['filter' => 'can:events-calendar.view'];
 
     $routes->get('/', 'CalendarView::index', $view + ['as' => 'events-calendar']);

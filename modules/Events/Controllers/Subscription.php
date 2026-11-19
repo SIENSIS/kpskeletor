@@ -33,7 +33,7 @@ final class Subscription extends BackendController
         $row    = $feeds->token($user);
         $url    = $secret === null ? null : IcalFeeds::url($secret);
 
-        $this->breadcrumb(lang('Events.calendarTitle'), site_url('backend/calendar'));
+        $this->breadcrumb(lang('Events.calendarTitle'), backend_url('calendar'));
 
         return $this->render('Modules\Events\Views\subscription\index', [
             'title'      => lang('Events.subscription.title'),
@@ -72,7 +72,7 @@ final class Subscription extends BackendController
             activity_log('Events', 'ical_revoked', ['resource' => 'events-calendar', 'record_id' => (int) $user->id]);
         }
 
-        return redirect()->to(site_url('backend/calendar/subscription'))->with('success', lang('Events.subscription.revoked'));
+        return redirect()->to(backend_url('calendar/subscription'))->with('success', lang('Events.subscription.revoked'));
     }
 
     public function filters(): ResponseInterface
@@ -81,7 +81,7 @@ final class Subscription extends BackendController
         $feeds = new IcalFeeds();
 
         if ($feeds->token($user) === null) {
-            return redirect()->to(site_url('backend/calendar/subscription'));
+            return redirect()->to(backend_url('calendar/subscription'));
         }
 
         $feeds->setFilters(
@@ -91,6 +91,6 @@ final class Subscription extends BackendController
         );
         activity_log('Events', 'ical_filters', ['resource' => 'events-calendar', 'record_id' => (int) $user->id]);
 
-        return redirect()->to(site_url('backend/calendar/subscription'))->with('success', lang('Events.subscription.filtersSaved'));
+        return redirect()->to(backend_url('calendar/subscription'))->with('success', lang('Events.subscription.filtersSaved'));
     }
 }

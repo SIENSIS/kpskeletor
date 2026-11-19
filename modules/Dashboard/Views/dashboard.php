@@ -37,7 +37,7 @@ $config = [
 <?= $this->section('content') ?>
 <div class="dashboard" data-component="dashboard/dashboard" data-options-id="dashboard-config">
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3 dashboard-bar">
-        <a class="btn btn-sm btn-outline-secondary" href="<?= esc(site_url('backend/dashboard/customize'), 'attr') ?>" data-dashboard-edit role="button" aria-pressed="false">
+        <a class="btn btn-sm btn-outline-secondary" href="<?= esc(backend_url('dashboard/customize'), 'attr') ?>" data-dashboard-edit role="button" aria-pressed="false">
             <i class="bi bi-arrows-move me-1" aria-hidden="true"></i><span data-dashboard-edit-label data-done="<?= esc(lang('Dashboard.done'), 'attr') ?>"><?= esc(lang('Dashboard.customize')) ?></span>
         </a>
         <?php if ($ownLayout): ?>

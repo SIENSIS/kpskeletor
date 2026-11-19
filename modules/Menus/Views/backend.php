@@ -20,22 +20,22 @@ $scopeName = $scope === null ? lang('Menus.backend.everyone') : $groups[$scope][
 <?= $this->section('content') ?>
 <nav aria-label="<?= esc(lang('Menus.backend.scopes'), 'attr') ?>" class="mb-3">
     <ul class="nav nav-pills flex-wrap gap-1">
-        <li class="nav-item"><a class="nav-link<?= $scope === null ? ' active' : '' ?>" href="<?= esc(site_url('backend/menus/backend'), 'attr') ?>"<?= $scope === null ? ' aria-current="page"' : '' ?>><?= esc(lang('Menus.backend.everyone')) ?></a></li>
+        <li class="nav-item"><a class="nav-link<?= $scope === null ? ' active' : '' ?>" href="<?= esc(backend_url('menus/backend'), 'attr') ?>"<?= $scope === null ? ' aria-current="page"' : '' ?>><?= esc(lang('Menus.backend.everyone')) ?></a></li>
         <?php foreach ($groups as $name => $group): ?>
-            <li class="nav-item"><a class="nav-link<?= $scope === $name ? ' active' : '' ?>" href="<?= esc(site_url('backend/menus/backend') . '?group=' . rawurlencode($name), 'attr') ?>"<?= $scope === $name ? ' aria-current="page"' : '' ?>><?= esc($group['title']) ?></a></li>
+            <li class="nav-item"><a class="nav-link<?= $scope === $name ? ' active' : '' ?>" href="<?= esc(backend_url('menus/backend') . '?group=' . rawurlencode($name), 'attr') ?>"<?= $scope === $name ? ' aria-current="page"' : '' ?>><?= esc($group['title']) ?></a></li>
         <?php endforeach ?>
     </ul>
 </nav>
 <p class="text-body-secondary small"><?= esc(lang($scope === null ? 'Menus.backend.helpEveryone' : 'Menus.backend.helpGroup', [$scopeName])) ?></p>
 <div class="d-flex flex-wrap gap-2 mb-3">
     <?php if ($canCustomise && $scope === null): ?>
-        <a class="btn btn-outline-primary" href="<?= esc(site_url('backend/menus/backend/group/new'), 'attr') ?>"><i class="bi bi-folder-plus me-1" aria-hidden="true"></i><?= esc(lang('Menus.custom.addGroup')) ?></a>
+        <a class="btn btn-outline-primary" href="<?= esc(backend_url('menus/backend/group/new'), 'attr') ?>"><i class="bi bi-folder-plus me-1" aria-hidden="true"></i><?= esc(lang('Menus.custom.addGroup')) ?></a>
     <?php endif ?>
     <?php if ($canLinks && $scope === null): ?>
-        <a class="btn btn-outline-primary" href="<?= esc(site_url('backend/menus/backend/link/new'), 'attr') ?>"><i class="bi bi-link-45deg me-1" aria-hidden="true"></i><?= esc(lang('Menus.custom.addLink')) ?></a>
+        <a class="btn btn-outline-primary" href="<?= esc(backend_url('menus/backend/link/new'), 'attr') ?>"><i class="bi bi-link-45deg me-1" aria-hidden="true"></i><?= esc(lang('Menus.custom.addLink')) ?></a>
     <?php endif ?>
     <?php if ($canReset): ?>
-        <form method="post" action="<?= esc(site_url('backend/menus/backend/reset'), 'attr') ?>" class="d-inline">
+        <form method="post" action="<?= esc(backend_url('menus/backend/reset'), 'attr') ?>" class="d-inline">
             <?= csrf_field() ?>
             <input type="hidden" name="group" value="<?= esc((string) $scope, 'attr') ?>">
             <button type="submit" class="btn btn-outline-warning" name="reset" value="scope" data-confirm="<?= esc(lang('Menus.backend.resetScopeConfirm', [$scopeName]), 'attr') ?>"<?= $scopeCount === 0 ? ' disabled' : '' ?>><i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.resetScope', [$scopeName])) ?></button>
@@ -43,7 +43,7 @@ $scopeName = $scope === null ? lang('Menus.backend.everyone') : $groups[$scope][
         </form>
     <?php endif ?>
 </div>
-<form method="post" action="<?= esc(site_url('backend/menus/backend/order'), 'attr') ?>" class="card shadow-sm mb-4"<?= $canCustomise ? ' data-component="menus/tree-editor" data-mode="backend" data-max-depth="4" data-moved-text="' . esc(lang('Menus.tree.moved'), 'attr') . '"' : '' ?>>
+<form method="post" action="<?= esc(backend_url('menus/backend/order'), 'attr') ?>" class="card shadow-sm mb-4"<?= $canCustomise ? ' data-component="menus/tree-editor" data-mode="backend" data-max-depth="4" data-moved-text="' . esc(lang('Menus.tree.moved'), 'attr') . '"' : '' ?>>
     <?= csrf_field() ?>
     <input type="hidden" name="group" value="<?= esc((string) $scope, 'attr') ?>">
     <input type="hidden" name="reset" value="entry">
@@ -68,7 +68,7 @@ $scopeName = $scope === null ? lang('Menus.backend.everyone') : $groups[$scope][
 <?php if ($orphans !== []): ?>
     <section class="card shadow-sm border-warning" aria-labelledby="orphans-title">
         <div class="card-header"><h2 class="h6 mb-0" id="orphans-title"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.orphans')) ?></h2></div>
-        <form method="post" action="<?= esc(site_url('backend/menus/backend/orphans'), 'attr') ?>">
+        <form method="post" action="<?= esc(backend_url('menus/backend/orphans'), 'attr') ?>">
             <?= csrf_field() ?>
             <div class="card-body">
                 <p class="small text-body-secondary"><?= esc(lang('Menus.backend.orphansHelp')) ?></p>

@@ -63,7 +63,7 @@ $oldDays   = (int) (old('days') ?? $defaultDays);
         <p class="small text-body-secondary mb-0"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i><?= esc(lang('Api.personal.reauthNote')) ?></p>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/profile/api-tokens'),
+            'action'      => backend_url('profile/api-tokens'),
             'fields'      => $fields,
             'title'       => lang('Api.personal.create'),
             'submitLabel' => lang('Api.personal.createButton'),
@@ -96,7 +96,7 @@ $oldDays   = (int) (old('days') ?? $defaultDays);
                                 </td>
                                 <td class="d-none d-lg-table-cell"><?= $token['expires_at'] !== null ? ui_date($token['expires_at'], 'datetime') : esc(lang('Api.tokens.never')) ?></td>
                                 <td class="text-end">
-                                    <form action="<?= esc(site_url('backend/profile/api-tokens/' . (int) $token['id'] . '/revoke')) ?>" method="post" class="d-inline">
+                                    <form action="<?= esc(backend_url('profile/api-tokens/' . (int) $token['id'] . '/revoke')) ?>" method="post" class="d-inline">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="<?= esc(lang('Api.personal.confirmRevoke'), 'attr') ?>"><i class="bi bi-trash me-1" aria-hidden="true"></i><?= esc(lang('Api.personal.revoke')) ?></button>
                                     </form>

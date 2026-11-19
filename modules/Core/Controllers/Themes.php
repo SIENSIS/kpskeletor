@@ -27,7 +27,7 @@ final class Themes extends BackendController
 {
     public function index(): string
     {
-        $this->breadcrumb(lang('Core.modules.title'), site_url('backend/modules'))->breadcrumb(lang('Core.modules.tabs.themes'));
+        $this->breadcrumb(lang('Core.modules.title'), backend_url('modules'))->breadcrumb(lang('Core.modules.tabs.themes'));
 
         return $this->render('Modules\Core\Views\modules\themes', [
             'title'  => lang('Core.modules.title'),
@@ -46,7 +46,7 @@ final class Themes extends BackendController
     {
         $area = (string) $this->request->getPost('area');
         $slug = (string) $this->request->getPost('theme');
-        $back = redirect()->to(site_url('backend/modules/themes'));
+        $back = redirect()->to(backend_url('modules/themes'));
 
         if (! in_array($area, ThemeManager::AREAS, true) || ! isset($this->themes()[$slug]) || $this->themes()[$slug]['error'] !== null) {
             return $back->with('error', lang('Core.themes.invalid'));
@@ -78,7 +78,7 @@ final class Themes extends BackendController
             return $this->uninstallPage($slug, $e->getMessage());
         }
 
-        return redirect()->to(site_url('backend/modules/packages'))->with('success', lang('Core.packages.uninstallRequested', [$slug]));
+        return redirect()->to(backend_url('modules/packages'))->with('success', lang('Core.packages.uninstallRequested', [$slug]));
     }
 
     private function uninstallPage(string $slug, ?string $error = null): string
@@ -89,16 +89,16 @@ final class Themes extends BackendController
             throw PageNotFoundException::forPageNotFound();
         }
 
-        $this->breadcrumb(lang('Core.modules.title'), site_url('backend/modules'))
-            ->breadcrumb(lang('Core.modules.tabs.themes'), site_url('backend/modules/themes'))
+        $this->breadcrumb(lang('Core.modules.title'), backend_url('modules'))
+            ->breadcrumb(lang('Core.modules.tabs.themes'), backend_url('modules/themes'))
             ->breadcrumb(lang('Core.modules.uninstallTitle', [$themes[$slug]['name']]));
 
         return $this->render('Modules\Core\Views\modules\uninstall', [
             'title'    => lang('Core.modules.uninstallTitle', [$themes[$slug]['name']]),
             'icon'     => 'bi bi-trash',
             'module'   => ['name' => $themes[$slug]['name'], 'version' => $themes[$slug]['version'], 'description' => '', 'dependants' => []],
-            'action'   => site_url('backend/modules/themes/uninstall/' . $slug),
-            'cancel'   => site_url('backend/modules/themes'),
+            'action'   => backend_url('modules/themes/uninstall/' . $slug),
+            'cancel'   => backend_url('modules/themes'),
             'keepData' => false,
             'error'    => $error,
         ]);

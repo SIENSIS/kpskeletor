@@ -24,11 +24,11 @@ $variants = ['ok' => 'success', 'info' => 'info', 'warning' => 'warning', 'error
         </div>
         <p class="small text-body-secondary mb-3"><?= esc(lang('SecurityCheck.checkedAt')) ?>: <?= $report->checkedAt !== '' ? ui_date($report->checkedAt . ' UTC', 'datetime') : '—' ?> · <?= esc(lang('SecurityCheck.console')) ?> <code>php spark security:check</code></p>
         <div class="d-flex flex-wrap gap-2">
-            <form action="<?= esc(site_url('backend/security/refresh'), 'attr') ?>" method="post">
+            <form action="<?= esc(backend_url('security/refresh'), 'attr') ?>" method="post">
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-outline-primary"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i><?= esc(lang('SecurityCheck.refresh')) ?></button>
             </form>
-            <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend/security/probe'), 'attr') ?>"><i class="bi bi-broadcast me-1" aria-hidden="true"></i><?= esc(lang('SecurityCheck.probe.run')) ?></a>
+            <a class="btn btn-outline-secondary" href="<?= esc(backend_url('security/probe'), 'attr') ?>"><i class="bi bi-broadcast me-1" aria-hidden="true"></i><?= esc(lang('SecurityCheck.probe.run')) ?></a>
         </div>
         <?php $body = (string) ob_get_clean() ?>
         <?= theme_component('card', ['title' => lang('SecurityCheck.summaryTitle'), 'icon' => 'bi bi-clipboard-check', 'body' => $body]) ?>

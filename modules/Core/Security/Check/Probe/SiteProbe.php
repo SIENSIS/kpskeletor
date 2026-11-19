@@ -173,7 +173,7 @@ final class SiteProbe implements SecurityCheck
         $external = 'https://kp-security-probe.invalid/';
         $followed = [];
 
-        foreach (['login?return=', 'backend?return=', '?return='] as $path) {
+        foreach (['login?return=', backend_path() . '?return=', '?return='] as $path) {
             $location = $client->request('GET', $this->base . $path . rawurlencode($external))->header('location');
 
             if ($location !== '' && str_contains(strtolower($location), 'kp-security-probe.invalid')) {

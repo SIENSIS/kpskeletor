@@ -34,10 +34,10 @@
         <p class="small text-body-secondary mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i><?= esc(lang('Backup.form.restoreSteps')) ?></p>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/backups/recover/' . $code),
+            'action'      => backend_url('backups/recover/' . $code),
             'fields'      => $fields,
             'submitLabel' => lang('Backup.action.restore'),
-            'cancelUrl'   => site_url('backend/backups'),
+            'cancelUrl'   => backend_url('backups'),
         ]) ?>
     </div>
 </div>

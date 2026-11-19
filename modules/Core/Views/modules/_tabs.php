@@ -5,9 +5,9 @@
  * @var string $tab
  */
 $tabs = [
-    'modules'  => ['url' => site_url('backend/modules'), 'icon' => 'bi bi-boxes'],
-    'packages' => ['url' => site_url('backend/modules/packages'), 'icon' => 'bi bi-box-seam'],
-    'themes'   => ['url' => site_url('backend/modules/themes'), 'icon' => 'bi bi-palette'],
+    'modules'  => ['url' => backend_url('modules'), 'icon' => 'bi bi-boxes'],
+    'packages' => ['url' => backend_url('modules/packages'), 'icon' => 'bi bi-box-seam'],
+    'themes'   => ['url' => backend_url('modules/themes'), 'icon' => 'bi bi-palette'],
 ];
 ?>
 <ul class="nav nav-tabs mb-3 flex-nowrap overflow-x-auto" data-modules-tabs>

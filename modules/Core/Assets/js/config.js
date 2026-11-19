@@ -43,6 +43,18 @@ export function baseUrl(path = '') {
 }
 
 /**
+ * A back-office URL under the installed prefix (`app.backendPath`, D-40-01):
+ * backendUrl('news/posts') = '<base>/admin/news/posts'. Prefer URLs printed by the server in
+ * data attributes; use this only for paths the script builds itself.
+ */
+export function backendUrl(path = '') {
+    const prefix = config().backendPath || 'backend';
+    const rest = String(path).replace(/^\/+/, '');
+
+    return baseUrl(rest === '' ? prefix : prefix + '/' + rest);
+}
+
+/**
  * Reads a JSON data block (<script type="application/json" id="…">).
  */
 export function jsonData(id) {

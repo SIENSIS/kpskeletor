@@ -47,12 +47,12 @@ $methods = [
                     <?php if ($method === $key): ?>
                         <?= ui_badge(lang('Auth.twoFactor.active'), 'success') ?>
                     <?php elseif ($canEdit && $key === 'email'): ?>
-                        <form action="<?= esc(site_url('backend/profile/two-factor/email')) ?>" method="post">
+                        <form action="<?= esc(backend_url('profile/two-factor/email')) ?>" method="post">
                             <?= csrf_field() ?>
                             <button type="submit" class="btn btn-outline-primary btn-sm"><?= esc(lang('Auth.twoFactor.use')) ?></button>
                         </form>
                     <?php elseif ($canEdit && $totpAvailable): ?>
-                        <a class="btn btn-outline-primary btn-sm" href="<?= esc(site_url('backend/profile/two-factor/app')) ?>"><?= esc(lang('Auth.twoFactor.use')) ?></a>
+                        <a class="btn btn-outline-primary btn-sm" href="<?= esc(backend_url('profile/two-factor/app')) ?>"><?= esc(lang('Auth.twoFactor.use')) ?></a>
                     <?php elseif ($key === 'totp' && ! $totpAvailable): ?>
                         <span class="small text-body-secondary"><?= esc(lang('Auth.twoFactor.noEncryptionKey')) ?></span>
                     <?php endif ?>
@@ -63,7 +63,7 @@ $methods = [
             <?php if ($required): ?>
                 <p class="small text-body-secondary mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i><?= esc(lang('Auth.twoFactor.requiredByGroup')) ?></p>
             <?php else: ?>
-                <form action="<?= esc(site_url('backend/profile/two-factor/disable')) ?>" method="post">
+                <form action="<?= esc(backend_url('profile/two-factor/disable')) ?>" method="post">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-danger btn-sm" data-confirm="<?= esc(lang('Auth.twoFactor.confirmDisable')) ?>"><i class="bi bi-shield-x me-1" aria-hidden="true"></i><?= esc(lang('Auth.twoFactor.disable')) ?></button>
                 </form>
@@ -79,7 +79,7 @@ $methods = [
         <?php else: ?>
             <p><?= esc(lang('Auth.twoFactor.codesLeft', [$codesLeft])) ?></p>
             <?php if ($canEdit): ?>
-                <form action="<?= esc(site_url('backend/profile/two-factor/recovery-codes')) ?>" method="post">
+                <form action="<?= esc(backend_url('profile/two-factor/recovery-codes')) ?>" method="post">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-secondary btn-sm" data-confirm="<?= esc(lang('Auth.twoFactor.confirmRegenerate')) ?>"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i><?= esc(lang('Auth.twoFactor.regenerate')) ?></button>
                 </form>

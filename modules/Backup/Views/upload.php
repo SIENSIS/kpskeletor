@@ -20,11 +20,11 @@ $error = $errors['backup'] ?? null;
         </div>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/backups/upload'),
+            'action'      => backend_url('backups/upload'),
             'fields'      => $fields,
             'multipart'   => true,
             'submitLabel' => lang('Backup.action.upload'),
-            'cancelUrl'   => site_url('backend/backups'),
+            'cancelUrl'   => backend_url('backups'),
         ]) ?>
     </div>
 </div>

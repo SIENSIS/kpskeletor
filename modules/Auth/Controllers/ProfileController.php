@@ -138,7 +138,7 @@ final class ProfileController extends BackendController
 
         LoginListener::rememberThemeMode($data['theme_mode']);
 
-        return redirect()->to(site_url('backend/profile'))->withCookies()->with('success', lang('Auth.profile.saved'));
+        return redirect()->to(backend_url('profile'))->withCookies()->with('success', lang('Auth.profile.saved'));
     }
 
     public function password(): RedirectResponse|string
@@ -146,10 +146,10 @@ final class ProfileController extends BackendController
         $user = $this->currentUser();
 
         if (Impersonation::active()) {
-            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+            return redirect()->to(backend_url('profile'))->with('error', lang('Auth.impersonation.refused'));
         }
 
-        $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))->breadcrumb(lang('Auth.profile.passwordTitle'));
+        $this->breadcrumb(lang('Auth.profile.title'), backend_url('profile'))->breadcrumb(lang('Auth.profile.passwordTitle'));
 
         return $this->render('Modules\Auth\Views\password', [
             'title'     => lang('Auth.profile.passwordTitle'),
@@ -166,7 +166,7 @@ final class ProfileController extends BackendController
     public function changePassword()
     {
         if (Impersonation::active()) {
-            return redirect()->to(site_url('backend/profile'))->with('error', lang('Auth.impersonation.refused'));
+            return redirect()->to(backend_url('profile'))->with('error', lang('Auth.impersonation.refused'));
         }
 
         $user     = $this->currentUser();
@@ -175,7 +175,7 @@ final class ProfileController extends BackendController
         $wait     = $throttle->loginBlockedFor($ip, (string) $user->email);
 
         if ($wait > 0) {
-            return redirect()->to(site_url('backend/profile/password'))
+            return redirect()->to(backend_url('profile/password'))
                 ->with('error', lang('Auth.msg.throttled', [max(1, (int) ceil($wait / 60))]));
         }
 
@@ -184,7 +184,7 @@ final class ProfileController extends BackendController
         if (! is_string($current) || ! service('passwords')->verify($current, (string) $user->password_hash)) {
             $throttle->loginFailed($ip, (string) $user->email);
 
-            return redirect()->to(site_url('backend/profile/password'))->with('errors', ['current_password' => lang('Auth.profile.currentPasswordWrong')]);
+            return redirect()->to(backend_url('profile/password'))->with('errors', ['current_password' => lang('Auth.profile.currentPasswordWrong')]);
         }
 
         $data = [
@@ -195,7 +195,7 @@ final class ProfileController extends BackendController
         ];
 
         if (! $this->validateData($data, ResetPasswordController::passwordRules())) {
-            return redirect()->to(site_url('backend/profile/password'))->with('errors', $this->validator->getErrors());
+            return redirect()->to(backend_url('profile/password'))->with('errors', $this->validator->getErrors());
         }
 
         $result  = (new PasswordChanger())->change($user, $data['password']);
@@ -206,7 +206,7 @@ final class ProfileController extends BackendController
             $tracker->regenerate($row);
         }
 
-        return redirect()->to(site_url('backend/profile'))->with('success', lang('Auth.profile.passwordChanged', [$result['sessions']]));
+        return redirect()->to(backend_url('profile'))->with('success', lang('Auth.profile.passwordChanged', [$result['sessions']]));
     }
 
     /**

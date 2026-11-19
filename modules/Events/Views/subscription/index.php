@@ -49,12 +49,12 @@
             <p class="mb-3"><?= ui_badge(lang($row === null ? 'Events.subscription.none' : 'Events.subscription.revokedState'), 'secondary', 'bi bi-slash-circle') ?></p>
         <?php endif ?>
         <div class="d-flex flex-wrap gap-2">
-            <form method="post" action="<?= esc(site_url('backend/calendar/subscription/generate'), 'attr') ?>"<?= $active ? ' data-confirm="' . esc(lang('Events.subscription.regenerateConfirm'), 'attr') . '"' : '' ?>>
+            <form method="post" action="<?= esc(backend_url('calendar/subscription/generate'), 'attr') ?>"<?= $active ? ' data-confirm="' . esc(lang('Events.subscription.regenerateConfirm'), 'attr') . '"' : '' ?>>
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i><?= esc(lang($active ? 'Events.subscription.regenerate' : 'Events.subscription.generate')) ?></button>
             </form>
             <?php if ($active): ?>
-                <form method="post" action="<?= esc(site_url('backend/calendar/subscription/revoke'), 'attr') ?>" data-confirm="<?= esc(lang('Events.subscription.revokeConfirm'), 'attr') ?>">
+                <form method="post" action="<?= esc(backend_url('calendar/subscription/revoke'), 'attr') ?>" data-confirm="<?= esc(lang('Events.subscription.revokeConfirm'), 'attr') ?>">
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-danger"><i class="bi bi-x-circle me-1" aria-hidden="true"></i><?= esc(lang('Events.subscription.revoke')) ?></button>
                 </form>
@@ -89,7 +89,7 @@
                 </fieldset>
             <?php endif ?>
             <?= theme_component('form_layout', [
-                'action'      => site_url('backend/calendar/subscription/filters'),
+                'action'      => backend_url('calendar/subscription/filters'),
                 'fields'      => (string) ob_get_clean(),
                 'title'       => lang('Events.subscription.filters'),
                 'submitLabel' => lang('Events.subscription.saveFilters'),

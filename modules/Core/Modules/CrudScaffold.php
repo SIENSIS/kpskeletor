@@ -83,7 +83,7 @@ final class CrudScaffold
             '--namespace', 'Modules\\' . $module,
             '--extends', BackendController::class,
             '--controller', ucfirst($key),
-            '--route', 'backend/' . strtolower($module) . '/' . $key,
+            '--route', backend_path(strtolower($module) . '/' . $key),
             '--as', self::resource($module, $table),
             '--filter', 'backend',
         ];

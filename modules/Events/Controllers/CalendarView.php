@@ -9,6 +9,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Core\Controllers\BackendController;
+use Modules\Core\Routing\BackendPath;
 use Modules\Events\Services\CalendarComponent;
 use Modules\Events\Services\Calendars;
 use Modules\Events\Services\EventDetails;
@@ -47,15 +48,15 @@ final class CalendarView extends BackendController
         return $this->render('Modules\Events\Views\calendar\index', [
             'calendars'  => array_values($service->visibleTo($user)),
             'hidden'     => $service->hidden($user),
-            'saveUrl'    => site_url('backend/calendar/calendars'),
+            'saveUrl'    => backend_url('calendar/calendars'),
             'title'      => lang('Events.calendarTitle'),
             'icon'       => 'bi bi-calendar3',
             'categories' => $repository->categories(),
             'selected'   => max(0, (int) $this->request->getGet('category')),
-            'options'    => CalendarComponent::options(site_url('backend/calendar/feed'), 'events-category'),
+            'options'    => CalendarComponent::options(backend_url('calendar/feed'), 'events-category'),
             'actions'    => [
-                ...($this->can('events-events.list') ? [['label' => lang('Events.manage'), 'url' => site_url('backend/events'), 'icon' => 'bi bi-pencil-square']] : []),
-                ['label' => lang('Events.subscription.menu'), 'url' => site_url('backend/calendar/subscription'), 'icon' => 'bi bi-rss'],
+                ...($this->can('events-events.list') ? [['label' => lang('Events.manage'), 'url' => backend_url('events'), 'icon' => 'bi bi-pencil-square']] : []),
+                ['label' => lang('Events.subscription.menu'), 'url' => backend_url('calendar/subscription'), 'icon' => 'bi bi-rss'],
             ],
         ]);
     }
@@ -73,7 +74,7 @@ final class CalendarView extends BackendController
         $service  = new Calendars();
         $shown    = array_values(array_diff(array_keys($service->visibleTo($user)), $service->hidden($user)));
         $rows     = (new EventRepository())->occurrences($user, $range[0], $range[1], false, ['category' => $category, 'calendars' => $shown]);
-        $base     = site_url('backend/calendar/event');
+        $base     = backend_url('calendar/event');
         $events   = array_map(static fn (array $row): array => EventRepository::toFeed($row, $base), $rows);
 
         // Provided events have no category: a category filter shows only own events.
@@ -92,21 +93,21 @@ final class CalendarView extends BackendController
         $event = $this->visible($code, $user);
         $date  = $this->request->getGet('date');
 
-        $this->breadcrumb(lang('Events.calendarTitle'), site_url('backend/calendar'));
+        $this->breadcrumb(lang('Events.calendarTitle'), backend_url('calendar'));
 
         return $this->render('Modules\Events\Views\calendar\show', [
             'title'     => (string) $event['title'],
             'icon'      => 'bi bi-calendar-event',
             'event'     => EventDetails::build($event, is_string($date) ? $date : null),
             'reminders' => (bool) ($event['allow_reminders'] ?? true),
-            'exportUrl' => site_url('backend/calendar/event/' . $code . '/export.ics'),
+            'exportUrl' => backend_url('calendar/event/' . $code . '/export.ics'),
             'managedBy' => is_string($event['source_module'] ?? null) && $event['source_module'] !== '' ? self::moduleLabel($event['source_module']) : null,
             'sourceUrl' => self::sourceUrl($event['source_url'] ?? null),
             'reminder'  => (new Reminders())->of((int) $event['id'], (int) $user->id),
             'options'   => array_map('intval', (array) config(\Modules\Events\Config\Calendar::class)->reminderOptions),
-            'formUrl'   => site_url('backend/calendar/event/' . $code . '/reminder'),
-            'backUrl'   => site_url('backend/calendar'),
-            'editUrl'   => $this->can('events-events.edit') && ($event['source_module'] ?? null) === null ? site_url('backend/events/edit/' . $code) : null,
+            'formUrl'   => backend_url('calendar/event/' . $code . '/reminder'),
+            'backUrl'   => backend_url('calendar'),
+            'editUrl'   => $this->can('events-events.edit') && ($event['source_module'] ?? null) === null ? backend_url('events/edit/' . $code) : null,
         ]);
     }
 
@@ -117,7 +118,7 @@ final class CalendarView extends BackendController
     {
         $event = $this->visible($code, $this->currentUser());
 
-        return IcalExport::download((new IcalFeeds())->single($event, site_url('backend/calendar/event/' . $code)), (string) $event['title'], $this->response);
+        return IcalExport::download((new IcalFeeds())->single($event, backend_url('calendar/event/' . $code)), (string) $event['title'], $this->response);
     }
 
     /**
@@ -144,7 +145,7 @@ final class CalendarView extends BackendController
             return $this->json(['hidden' => $hidden]);
         }
 
-        return redirect()->to(site_url('backend/calendar'))->with('success', lang('Events.calendars.saved'));
+        return redirect()->to(backend_url('calendar'))->with('success', lang('Events.calendars.saved'));
     }
 
     public function reminder(string $code): RedirectResponse
@@ -156,12 +157,12 @@ final class CalendarView extends BackendController
         $minutes = $value === '' ? null : (int) $value;
 
         if ($minutes !== null && (! in_array($minutes, $allowed, true) || ! (bool) ($event['allow_reminders'] ?? true))) {
-            return redirect()->to(site_url('backend/calendar/event/' . $code))->with('error', lang('Events.errors.reminder'));
+            return redirect()->to(backend_url('calendar/event/' . $code))->with('error', lang('Events.errors.reminder'));
         }
 
         (new Reminders())->set((int) $event['id'], (int) $user->id, $minutes);
 
-        return redirect()->to(site_url('backend/calendar/event/' . $code))
+        return redirect()->to(backend_url('calendar/event/' . $code))
             ->with('success', lang($minutes === null ? 'Events.reminderRemoved' : 'Events.reminderSaved'));
     }
 
@@ -192,7 +193,7 @@ final class CalendarView extends BackendController
         }
 
         if (str_starts_with($url, '/') && ! str_starts_with($url, '//')) {
-            return site_url(ltrim($url, '/'));
+            return site_url(ltrim(BackendPath::resolve($url), '/'));
         }
 
         return preg_match('#^https?://[^/@]+(/|$)#', $url) === 1 ? $url : null;

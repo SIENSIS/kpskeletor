@@ -11,6 +11,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Shield\Entities\User;
 use Modules\Auth\Services\AuthPolicy;
 use Modules\Auth\Services\TwoFactor;
+use Modules\Core\Routing\BackendPath;
 
 /**
  * `force2fa` filter (`backend/*`): a user in a group whose policy is `required`
@@ -20,6 +21,7 @@ use Modules\Auth\Services\TwoFactor;
 final class ForceTwoFactor implements FilterInterface
 {
     /** Back-office paths reachable before 2FA is set up. */
+    /** Paths written with the canonical prefix (`BackendPath::store()`). */
     private const ALLOWED = ['backend/profile/two-factor', 'backend/profile/password'];
 
     /**
@@ -35,7 +37,7 @@ final class ForceTwoFactor implements FilterInterface
             return null;
         }
 
-        $path = trim($request->getPath(), '/');
+        $path = BackendPath::store(trim($request->getPath(), '/'));
 
         foreach (self::ALLOWED as $allowed) {
             if ($path === $allowed || str_starts_with($path, $allowed . '/')) {
@@ -52,7 +54,7 @@ final class ForceTwoFactor implements FilterInterface
         }
 
         // The set-up page explains why (no flash message: it would repeat it).
-        return redirect()->to(site_url('backend/profile/two-factor'));
+        return redirect()->to(backend_url('profile/two-factor'));
     }
 
     /**

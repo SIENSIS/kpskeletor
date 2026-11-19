@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="card-footer bg-transparent d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <a class="btn btn-outline-secondary btn-sm" href="<?= esc(site_url('backend/news'), 'attr') ?>"><i class="bi bi-arrow-left" aria-hidden="true"></i> <?= esc(lang('News.backToNews')) ?></a>
+        <a class="btn btn-outline-secondary btn-sm" href="<?= esc(backend_url('news'), 'attr') ?>"><i class="bi bi-arrow-left" aria-hidden="true"></i> <?= esc(lang('News.backToNews')) ?></a>
         <?php if ($post['read']): ?>
             <span class="text-success small"><i class="bi bi-check2-all" aria-hidden="true"></i> <?= esc(lang('News.read')) ?></span>
         <?php else: ?>

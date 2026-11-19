@@ -43,13 +43,13 @@ $query = $scope === null ? '' : '&group=' . rawurlencode($scope);
             </span>
             <?php if ($canCustomise): ?>
                 <?= theme_view('Modules\Menus\Views\tree_buttons', ['moveKey' => $key, 'label' => (string) $node['text']]) ?>
-                <a class="btn btn-sm btn-outline-primary" href="<?= esc(site_url('backend/menus/backend/entry') . '?key=' . rawurlencode($key) . $query, 'attr') ?>"><i class="bi bi-pencil me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.retouch')) ?></a>
+                <a class="btn btn-sm btn-outline-primary" href="<?= esc(backend_url('menus/backend/entry') . '?key=' . rawurlencode($key) . $query, 'attr') ?>"><i class="bi bi-pencil me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.retouch')) ?></a>
             <?php endif ?>
             <?php if ($custom && $scope === null && ($node['kind'] === 'group' ? $canCustomise : $canLinks)): ?>
-                <a class="btn btn-sm btn-outline-secondary" href="<?= esc(site_url('backend/menus/backend/custom/' . (int) substr($key, 7)), 'attr') ?>"><i class="bi bi-gear me-1" aria-hidden="true"></i><?= esc(lang($node['kind'] === 'group' ? 'Menus.custom.editGroup' : 'Menus.custom.editLink')) ?></a>
+                <a class="btn btn-sm btn-outline-secondary" href="<?= esc(backend_url('menus/backend/custom/' . (int) substr($key, 7)), 'attr') ?>"><i class="bi bi-gear me-1" aria-hidden="true"></i><?= esc(lang($node['kind'] === 'group' ? 'Menus.custom.editGroup' : 'Menus.custom.editLink')) ?></a>
             <?php endif ?>
             <?php if ($canReset && $node['customised']): ?>
-                <button type="submit" class="btn btn-sm btn-outline-warning" name="key" value="<?= esc($key, 'attr') ?>" formaction="<?= esc(site_url('backend/menus/backend/reset'), 'attr') ?>" data-confirm="<?= esc(lang('Menus.backend.resetEntryConfirm', [(string) $node['text']]), 'attr') ?>"><i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.reset')) ?></button>
+                <button type="submit" class="btn btn-sm btn-outline-warning" name="key" value="<?= esc($key, 'attr') ?>" formaction="<?= esc(backend_url('menus/backend/reset'), 'attr') ?>" data-confirm="<?= esc(lang('Menus.backend.resetEntryConfirm', [(string) $node['text']]), 'attr') ?>"><i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.reset')) ?></button>
             <?php endif ?>
         </div>
         <ul class="menu-tree-list list-unstyled" data-tree-list>

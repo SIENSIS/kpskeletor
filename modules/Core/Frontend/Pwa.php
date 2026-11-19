@@ -59,7 +59,7 @@ final class Pwa
     public function manifest(): array
     {
         $name  = site_name();
-        $start = $this->startArea() === 'backend' ? base_url('backend') : base_url('/');
+        $start = $this->startArea() === 'backend' ? backend_url() : base_url('/');
         $icons = [];
 
         foreach (self::SIZES as $size) {

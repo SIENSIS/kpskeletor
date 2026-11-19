@@ -20,10 +20,10 @@ $manifest ??= null;
         <?= view('Modules\Backup\Views\_field', ['name' => 'password', 'label' => lang('Backup.field.password'), 'type' => 'password', 'autocomplete' => 'off', 'errors' => $errors]) ?>
         <?php $fields = (string) ob_get_clean() ?>
         <?= theme_component('form_layout', [
-            'action'      => site_url('backend/backups/verify/' . $code),
+            'action'      => backend_url('backups/verify/' . $code),
             'fields'      => $fields,
             'submitLabel' => lang('Backup.action.verify'),
-            'cancelUrl'   => site_url('backend/backups'),
+            'cancelUrl'   => backend_url('backups'),
         ]) ?>
     </div>
     <?php if ($manifest !== null): ?>

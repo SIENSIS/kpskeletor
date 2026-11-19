@@ -57,7 +57,7 @@ final class Requests extends BackendController
 
             session()->setFlashdata('success', lang('Tasks.requestAccepted'));
 
-            return redirect()->to(site_url('backend/tasks/tasks/edit/' . Crud::maskId($taskId, 'tasks')));
+            return redirect()->to(backend_url('tasks/tasks/edit/' . Crud::maskId($taskId, 'tasks')));
         }, [
             'label'      => lang('Tasks.accept'),
             'icon'       => 'bi bi-check2',

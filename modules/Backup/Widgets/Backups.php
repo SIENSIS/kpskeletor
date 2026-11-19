@@ -58,7 +58,7 @@ final class Backups extends Widget
             'last'      => $repository->latest(),
             'scheduled' => $scheduled,
             'next'      => $next,
-            'url'       => site_url('backend/backups'),
+            'url'       => backend_url('backups'),
         ]);
     }
 }

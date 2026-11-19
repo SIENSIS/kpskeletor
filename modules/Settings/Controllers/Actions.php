@@ -33,7 +33,7 @@ final class Actions extends BackendController
 {
     public function index(): string
     {
-        $this->breadcrumb(lang('Settings.title'), site_url('backend/settings'))->breadcrumb(lang('Settings.tabs.actions'));
+        $this->breadcrumb(lang('Settings.title'), backend_url('settings'))->breadcrumb(lang('Settings.tabs.actions'));
 
         return $this->render('Modules\Settings\Views\actions', [
             'title'       => lang('Settings.title'),
@@ -141,6 +141,6 @@ final class Actions extends BackendController
 
     private function back(string $type, string $message): RedirectResponse
     {
-        return redirect()->to(site_url('backend/settings/actions'))->with($type, $message);
+        return redirect()->to(backend_url('settings/actions'))->with($type, $message);
     }
 }

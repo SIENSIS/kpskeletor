@@ -45,7 +45,7 @@ $routes->group('api/v1', static function (RouteCollection $routes): void {
 $routes->get('auth/api-login/(:segment)', '\Modules\Api\Controllers\LoginDenyController::show/$1', ['as' => 'api-login-deny']);
 $routes->post('auth/api-login/(:segment)', '\Modules\Api\Controllers\LoginDenyController::deny/$1', ['filter' => 'ratelimit:forms']);
 
-$routes->group('backend', ['namespace' => 'Modules\Api\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path(), ['namespace' => 'Modules\Api\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('profile/api-tokens', 'PersonalTokens::index', ['as' => 'api-personal-tokens', 'filter' => 'can:api.tokens']);
     $routes->post('profile/api-tokens', 'PersonalTokens::create', ['filter' => ['can:api.tokens', 'reauth']]);
     $routes->post('profile/api-tokens/(:num)/revoke', 'PersonalTokens::revoke/$1', ['filter' => 'can:api.tokens']);
@@ -55,4 +55,4 @@ $routes->group('backend', ['namespace' => 'Modules\Api\Controllers'], static fun
     $routes->get('api/docs/try-it.js', 'Docs::script', ['filter' => 'can:api.docs']);
 });
 
-CrudFactory::routes($routes, 'api', 'backend/api/tokens', '\Modules\Api\Controllers\Tokens::index');
+CrudFactory::routes($routes, 'api', backend_path('api/tokens'), '\Modules\Api\Controllers\Tokens::index');

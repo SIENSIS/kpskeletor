@@ -42,7 +42,7 @@ final class Board extends BackendController
             'seesAll'  => TaskRepository::seesAll($user),
             'canAdd'   => $this->can('tasks-tasks.add'),
             'options'  => [
-                'dataUrl' => site_url('backend/tasks/board/data') . ($project !== null ? '?project=' . $project : ''),
+                'dataUrl' => backend_url('tasks/board/data') . ($project !== null ? '?project=' . $project : ''),
                 'css'     => asset('tasks::css/tasks.css'),
                 'texts'   => [
                     'moved'      => lang('Tasks.board.moved'),
@@ -78,7 +78,7 @@ final class Board extends BackendController
 
             return $json
                 ? $this->response->setStatusCode(403)->setJSON(['message' => lang('Tasks.board.forbidden')])
-                : redirect()->to(site_url('backend/tasks'))->with('error', lang('Tasks.board.forbidden'));
+                : redirect()->to(backend_url('tasks'))->with('error', lang('Tasks.board.forbidden'));
         }
 
         $status = $this->postedStatus();
@@ -86,7 +86,7 @@ final class Board extends BackendController
         if ($status === null) {
             return $json
                 ? $this->response->setStatusCode(422)->setJSON(['message' => lang('Tasks.board.invalidStatus')])
-                : redirect()->to(site_url('backend/tasks'))->with('error', lang('Tasks.board.invalidStatus'));
+                : redirect()->to(backend_url('tasks'))->with('error', lang('Tasks.board.invalidStatus'));
         }
 
         if ($status !== $task['status']) {
@@ -102,7 +102,7 @@ final class Board extends BackendController
 
         return $json
             ? $this->response->setJSON(['id' => $code, 'status' => $status, 'message' => lang('Tasks.board.moved')])
-            : redirect()->to(site_url('backend/tasks'))->with('success', lang('Tasks.board.moved'));
+            : redirect()->to(backend_url('tasks'))->with('success', lang('Tasks.board.moved'));
     }
 
     /**
@@ -141,8 +141,8 @@ final class Board extends BackendController
                 'labels'    => array_map(static fn (string $label): string => lang('Tasks.labels.' . $label), TaskRepository::labels($row['labels'])),
                 'assignees' => array_values(array_map(static fn (int $id): string => $users[$id] ?? '#' . $id, $row['assignees'])),
                 'canMove'   => $editAll || in_array((int) $user->id, $row['assignees'], true),
-                'moveUrl'   => site_url('backend/tasks/board/' . $code . '/move'),
-                'url'       => $this->can('tasks-tasks.show') ? site_url('backend/tasks/tasks/show/' . $code) : null,
+                'moveUrl'   => backend_url('tasks/board/' . $code . '/move'),
+                'url'       => $this->can('tasks-tasks.show') ? backend_url('tasks/tasks/show/' . $code) : null,
             ];
         }
 

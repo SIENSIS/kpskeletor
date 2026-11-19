@@ -96,15 +96,15 @@ final class Backups extends BackendController
                     $repository->delete($row['file']);
                 }
             })
-            ->addHeaderAction(lang('Backup.action.create'), 'backend/backups/create', ['icon' => 'bi bi-plus-lg', 'class' => 'btn-primary', 'permission' => 'create'])
-            ->addAction(lang('Backup.action.download'), 'backend/backups/download/{kp_id}', ['icon' => 'bi bi-download', 'permission' => 'download', 'visible' => static fn (array $row): bool => $row['file'] !== null])
-            ->addAction(lang('Backup.action.verify'), 'backend/backups/verify/{kp_id}', ['icon' => 'bi bi-shield-check', 'permission' => 'list', 'visible' => static fn (array $row): bool => $row['file'] !== null]);
+            ->addHeaderAction(lang('Backup.action.create'), backend_path('backups/create'), ['icon' => 'bi bi-plus-lg', 'class' => 'btn-primary', 'permission' => 'create'])
+            ->addAction(lang('Backup.action.download'), backend_path('backups/download/{kp_id}'), ['icon' => 'bi bi-download', 'permission' => 'download', 'visible' => static fn (array $row): bool => $row['file'] !== null])
+            ->addAction(lang('Backup.action.verify'), backend_path('backups/verify/{kp_id}'), ['icon' => 'bi bi-shield-check', 'permission' => 'list', 'visible' => static fn (array $row): bool => $row['file'] !== null]);
 
         // `restore` is also kpcrudy's own trash operation (this CRUD has no trash), so the
         // buttons of `backup.restore` are decided here; the routes check it again (`can:` + `reauth`).
         if ($this->can('backup.restore')) {
-            $crud->addHeaderAction(lang('Backup.action.upload'), 'backend/backups/upload', ['icon' => 'bi bi-upload'])
-                ->addAction(lang('Backup.action.restore'), 'backend/backups/recover/{kp_id}', ['icon' => 'bi bi-arrow-counterclockwise', 'visible' => static fn (array $row): bool => $row['file'] !== null]);
+            $crud->addHeaderAction(lang('Backup.action.upload'), backend_path('backups/upload'), ['icon' => 'bi bi-upload'])
+                ->addAction(lang('Backup.action.restore'), backend_path('backups/recover/{kp_id}'), ['icon' => 'bi bi-arrow-counterclockwise', 'visible' => static fn (array $row): bool => $row['file'] !== null]);
         }
 
         return $this->renderCrud($crud);
@@ -145,7 +145,7 @@ final class Backups extends BackendController
             return $this->form('create', ['errors' => ['password' => $e->getMessage()], 'type' => $type]);
         }
 
-        return redirect()->to(site_url('backend/backups'))->with('success', lang('Backup.msg.created', [$row['file'], ui_bytes((int) $row['size'])]));
+        return redirect()->to(backend_url('backups'))->with('success', lang('Backup.msg.created', [$row['file'], ui_bytes((int) $row['size'])]));
     }
 
     public function verifyForm(string $code): string
@@ -267,7 +267,7 @@ final class Backups extends BackendController
         ]);
         activity_log('Backup', 'upload', ['resource' => 'backup', 'summary' => $name, 'changes' => ['original' => mb_substr($file->getClientName(), 0, 120)]]);
 
-        return redirect()->to(site_url('backend/backups/recover/' . Crud::maskId($id, self::MASK)))->with('success', lang('Backup.msg.uploaded', [$name]));
+        return redirect()->to(backend_url('backups/recover/' . Crud::maskId($id, self::MASK)))->with('success', lang('Backup.msg.uploaded', [$name]));
     }
 
     /**
@@ -275,7 +275,7 @@ final class Backups extends BackendController
      */
     private function form(string $view, array $data): string
     {
-        $this->breadcrumb(lang('Backup.title'), site_url('backend/backups'))->breadcrumb(lang('Backup.page.' . $view));
+        $this->breadcrumb(lang('Backup.title'), backend_url('backups'))->breadcrumb(lang('Backup.page.' . $view));
 
         return $this->render('Modules\Backup\Views\\' . $view, $data + [
             'title'     => lang('Backup.page.' . $view),
@@ -300,7 +300,7 @@ final class Backups extends BackendController
             'failed' => lang('Backup.page.jobFailed'),
             default  => lang('Backup.page.job'),
         };
-        $this->breadcrumb(lang('Backup.title'), site_url('backend/backups'))->breadcrumb($title);
+        $this->breadcrumb(lang('Backup.title'), backend_url('backups'))->breadcrumb($title);
 
         return $this->render('Modules\Backup\Views\job', [
             'title'       => $title,
@@ -308,7 +308,7 @@ final class Backups extends BackendController
             'job'         => $job,
             'env'         => $env,
             'progressUrl' => site_url('progress/backup/' . $id),
-            'pageUrl'     => site_url('backend/backups/jobs/' . $id),
+            'pageUrl'     => backend_url('backups/jobs/' . $id),
         ]);
     }
 

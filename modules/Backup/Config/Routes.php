@@ -20,7 +20,7 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-$routes->group('backend/backups', ['namespace' => 'Modules\Backup\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('backups'), ['namespace' => 'Modules\Backup\Controllers'], static function (RouteCollection $routes): void {
     $create  = ['filter' => 'can:backup.create'];
     $list    = ['filter' => 'can:backup.list'];
     $restore = ['filter' => ['can:backup.restore', 'reauth']];
@@ -37,7 +37,7 @@ $routes->group('backend/backups', ['namespace' => 'Modules\Backup\Controllers'],
     $routes->get('jobs/(:segment)', 'Backups::job/$1', ['filter' => 'can:backup.restore']);
 });
 
-CrudFactory::routes($routes, 'backup', 'backend/backups', '\Modules\Backup\Controllers\Backups::index');
+CrudFactory::routes($routes, 'backup', backend_path('backups'), '\Modules\Backup\Controllers\Backups::index');
 
 // No rate limit: it reads one small file, and the limiter's settings live in the database being restored.
 $routes->get('progress/backup/(:segment)', '\Modules\Backup\Controllers\Jobs::progress/$1');

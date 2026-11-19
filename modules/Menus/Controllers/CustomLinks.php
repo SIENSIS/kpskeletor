@@ -73,7 +73,7 @@ final class CustomLinks extends BackendController
 
         $errors = [];
         $link   = $this->validated($kind, $id, $errors);
-        $back   = $id === null ? site_url('backend/menus/backend/' . $kind . '/new') : site_url('backend/menus/backend/custom/' . $id);
+        $back   = $id === null ? backend_url('menus/backend/' . $kind . '/new') : backend_url('menus/backend/custom/' . $id);
 
         if ($errors !== []) {
             return redirect()->to($back)->withInput()->with('error', implode(' ', $errors));
@@ -93,7 +93,7 @@ final class CustomLinks extends BackendController
             'after'     => self::summary($link),
         ]);
 
-        return redirect()->to(site_url('backend/menus/backend'))->with('success', lang('Menus.custom.saved'));
+        return redirect()->to(backend_url('menus/backend'))->with('success', lang('Menus.custom.saved'));
     }
 
     public function delete(int $id): ResponseInterface
@@ -120,7 +120,7 @@ final class CustomLinks extends BackendController
             'before'    => self::summary($link),
         ]);
 
-        return redirect()->to(site_url('backend/menus/backend'))->with('success', lang('Menus.custom.deleted'));
+        return redirect()->to(backend_url('menus/backend'))->with('success', lang('Menus.custom.deleted'));
     }
 
     /**
@@ -169,7 +169,7 @@ final class CustomLinks extends BackendController
         }
 
         $title = lang($link['kind'] === 'group' ? ($id === null ? 'Menus.custom.addGroup' : 'Menus.custom.editGroup') : ($id === null ? 'Menus.custom.addLink' : 'Menus.custom.editLink'));
-        $this->breadcrumb(lang('Menus.backend.title'), site_url('backend/menus/backend'))->breadcrumb($title);
+        $this->breadcrumb(lang('Menus.backend.title'), backend_url('menus/backend'))->breadcrumb($title);
 
         return $this->render('Modules\Menus\Views\custom_form', [
             'title'       => $title,
@@ -184,9 +184,9 @@ final class CustomLinks extends BackendController
             'permissions' => (new PermissionCatalogue())->enabledNames(),
             'locales'     => ContentTranslations::locales(),
             'required'    => ContentTranslations::defaultLocale(),
-            'action'      => site_url('backend/menus/backend/custom/save'),
-            'deleteUrl'   => $id === null ? null : site_url('backend/menus/backend/custom/' . $id . '/delete'),
-            'backUrl'     => site_url('backend/menus/backend'),
+            'action'      => backend_url('menus/backend/custom/save'),
+            'deleteUrl'   => $id === null ? null : backend_url('menus/backend/custom/' . $id . '/delete'),
+            'backUrl'     => backend_url('menus/backend'),
         ]);
     }
 
@@ -297,7 +297,7 @@ final class CustomLinks extends BackendController
             }
         }
 
-        return ['type' => $type, 'value' => $value, 'target' => $target, 'permission' => $permission, 'groups' => array_values(array_unique($groups))] + $link;
+        return ['type' => $type, 'value' => LinkTarget::storedValue($type, $value), 'target' => $target, 'permission' => $permission, 'groups' => array_values(array_unique($groups))] + $link;
     }
 
     /**

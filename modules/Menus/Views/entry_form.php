@@ -83,7 +83,7 @@ $chosen = (string) (old('parent') ?? ($parent ?? ''));
         <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1" aria-hidden="true"></i><?= esc(lang('Menus.save')) ?></button>
         <a class="btn btn-outline-secondary" href="<?= esc($backUrl, 'attr') ?>"><?= esc(lang('Menus.cancel')) ?></a>
         <?php if ($canReset && $stored !== null): ?>
-            <button type="submit" class="btn btn-outline-warning ms-auto" formaction="<?= esc(site_url('backend/menus/backend/reset'), 'attr') ?>" name="reset" value="entry" data-confirm="<?= esc(lang('Menus.backend.resetEntryConfirm', [$baseText]), 'attr') ?>"><i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.reset')) ?></button>
+            <button type="submit" class="btn btn-outline-warning ms-auto" formaction="<?= esc(backend_url('menus/backend/reset'), 'attr') ?>" name="reset" value="entry" data-confirm="<?= esc(lang('Menus.backend.resetEntryConfirm', [$baseText]), 'attr') ?>"><i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i><?= esc(lang('Menus.backend.reset')) ?></button>
         <?php endif ?>
     </div>
 </form>

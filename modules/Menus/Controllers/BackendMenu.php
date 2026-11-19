@@ -35,7 +35,7 @@ final class BackendMenu extends BackendController
         $groups = (new GroupRegistry())->all();
         $known  = $layout->knownKeys();
 
-        $this->breadcrumb(lang('Menus.backend.title'), site_url('backend/menus/backend'));
+        $this->breadcrumb(lang('Menus.backend.title'), backend_url('menus/backend'));
 
         if ($scope !== null) {
             $this->breadcrumb($groups[$scope]['title']);
@@ -128,7 +128,7 @@ final class BackendMenu extends BackendController
             'parents'   => $options,
             'zones'     => self::zoneLabels(),
             'locales'   => ContentTranslations::locales(),
-            'action'    => site_url('backend/menus/backend/entry'),
+            'action'    => backend_url('menus/backend/entry'),
             'backUrl'   => self::url($scope),
             'canReset'  => $this->can('menus-backend.reset'),
         ]);
@@ -246,7 +246,7 @@ final class BackendMenu extends BackendController
 
     private static function url(?string $scope): string
     {
-        return site_url('backend/menus/backend') . ($scope === null ? '' : '?group=' . rawurlencode($scope));
+        return backend_url('menus/backend') . ($scope === null ? '' : '?group=' . rawurlencode($scope));
     }
 
     private static function scopeName(?string $scope): string

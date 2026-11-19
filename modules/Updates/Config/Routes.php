@@ -15,7 +15,7 @@ use CodeIgniter\Router\RouteCollection;
  *
  * @var RouteCollection $routes
  */
-$routes->group('backend/updates', ['namespace' => 'Modules\Updates\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('updates'), ['namespace' => 'Modules\Updates\Controllers'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Updates::index', ['as' => 'updates', 'filter' => 'can:updates.view']);
     $routes->post('check', 'Updates::check', ['filter' => ['can:updates.check', 'ratelimit:forms']]);
 });

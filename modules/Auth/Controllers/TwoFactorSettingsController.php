@@ -32,7 +32,7 @@ final class TwoFactorSettingsController extends BackendController
         $newCodes  = session(self::NEW_CODES);
         session()->remove(self::NEW_CODES);
 
-        $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))->breadcrumb(lang('Auth.twoFactor.title'));
+        $this->breadcrumb(lang('Auth.profile.title'), backend_url('profile'))->breadcrumb(lang('Auth.twoFactor.title'));
 
         return $this->render('Modules\Auth\Views\two_factor_settings', [
             'title'         => lang('Auth.twoFactor.title'),
@@ -65,7 +65,7 @@ final class TwoFactorSettingsController extends BackendController
         $twoFactor = new TwoFactor();
 
         if (! $twoFactor->totpAvailable()) {
-            return redirect()->to(site_url('backend/profile/two-factor'))->with('error', lang('Auth.twoFactor.noEncryptionKey'));
+            return redirect()->to(backend_url('profile/two-factor'))->with('error', lang('Auth.twoFactor.noEncryptionKey'));
         }
 
         $secret = session(self::PENDING_SECRET);
@@ -77,8 +77,8 @@ final class TwoFactorSettingsController extends BackendController
 
         $uri = $twoFactor->totp()->provisioningUri($secret, (string) $user->email, site_name());
 
-        $this->breadcrumb(lang('Auth.profile.title'), site_url('backend/profile'))
-            ->breadcrumb(lang('Auth.twoFactor.title'), site_url('backend/profile/two-factor'))
+        $this->breadcrumb(lang('Auth.profile.title'), backend_url('profile'))
+            ->breadcrumb(lang('Auth.twoFactor.title'), backend_url('profile/two-factor'))
             ->breadcrumb(lang('Auth.twoFactor.appTitle'));
 
         return $this->render('Modules\Auth\Views\two_factor_app', [
@@ -95,13 +95,13 @@ final class TwoFactorSettingsController extends BackendController
         $code   = $this->request->getPost('code');
 
         if (! is_string($secret) || $secret === '') {
-            return redirect()->to(site_url('backend/profile/two-factor/app'));
+            return redirect()->to(backend_url('profile/two-factor/app'));
         }
 
         $codes = (new TwoFactor())->enableTotp($this->currentUser(), $secret, is_string($code) ? mb_substr($code, 0, 20) : '');
 
         if ($codes === null) {
-            return redirect()->to(site_url('backend/profile/two-factor/app'))->with('error', lang('Auth.twoFactor.wrongCode'));
+            return redirect()->to(backend_url('profile/two-factor/app'))->with('error', lang('Auth.twoFactor.wrongCode'));
         }
 
         session()->remove(self::PENDING_SECRET);
@@ -114,12 +114,12 @@ final class TwoFactorSettingsController extends BackendController
         $user = $this->currentUser();
 
         if ((new AuthPolicy())->twoFactorRequiredFor($user->getGroups())) {
-            return redirect()->to(site_url('backend/profile/two-factor'))->with('error', lang('Auth.twoFactor.cannotDisable'));
+            return redirect()->to(backend_url('profile/two-factor'))->with('error', lang('Auth.twoFactor.cannotDisable'));
         }
 
         (new TwoFactor())->disable($user);
 
-        return redirect()->to(site_url('backend/profile/two-factor'))->with('success', lang('Auth.twoFactor.disabled'));
+        return redirect()->to(backend_url('profile/two-factor'))->with('success', lang('Auth.twoFactor.disabled'));
     }
 
     public function regenerateCodes(): RedirectResponse
@@ -127,7 +127,7 @@ final class TwoFactorSettingsController extends BackendController
         $user = $this->currentUser();
 
         if (! (new TwoFactor())->enabled((int) $user->id)) {
-            return redirect()->to(site_url('backend/profile/two-factor'));
+            return redirect()->to(backend_url('profile/two-factor'));
         }
 
         $codes = (new RecoveryCodes())->generate((int) $user->id);
@@ -143,6 +143,6 @@ final class TwoFactorSettingsController extends BackendController
     {
         session()->set(self::NEW_CODES, $codes);
 
-        return redirect()->to(site_url('backend/profile/two-factor'))->with('success', $message);
+        return redirect()->to(backend_url('profile/two-factor'))->with('success', $message);
     }
 }

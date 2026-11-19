@@ -17,7 +17,7 @@
 <?= $this->section('content') ?>
 <?= $this->include('Modules\Settings\Views\_tabs') ?>
 <?php if (isset($themes) && count($themes) > 1): ?>
-    <form method="get" action="<?= esc(site_url('backend/settings/theme'), 'attr') ?>" class="row g-2 align-items-end mb-3">
+    <form method="get" action="<?= esc(backend_url('settings/theme'), 'attr') ?>" class="row g-2 align-items-end mb-3">
         <div class="col-sm-auto">
             <label for="settings-theme" class="form-label"><?= esc(lang('Settings.theme.edit')) ?></label>
             <select class="form-select" id="settings-theme" name="theme">

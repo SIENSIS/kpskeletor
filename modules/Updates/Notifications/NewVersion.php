@@ -36,7 +36,7 @@ final class NewVersion extends NotificationType
         return new NotificationMessage(
             $name === 'Core' ? lang('Updates.notification.app', [(string) ($this->data['version'] ?? '')]) : lang('Updates.notification.module', [$name, (string) ($this->data['version'] ?? '')]),
             lang('Updates.notification.body', [(string) ($this->data['installed'] ?? '')]),
-            'backend/updates',
+            backend_link('updates'),
         );
     }
 }

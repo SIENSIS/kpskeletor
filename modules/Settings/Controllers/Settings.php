@@ -69,7 +69,7 @@ final class Settings extends BackendController
         $changes = $this->editor->save($fields, $result['values']);
         $this->logged('settings_changed', $module, $changes);
 
-        return $this->saved(site_url('backend/settings/' . $slug), $changes);
+        return $this->saved(backend_url('settings/' . $slug), $changes);
     }
 
     public function security(): string
@@ -108,7 +108,7 @@ final class Settings extends BackendController
             ]);
         }
 
-        return $this->saved(site_url('backend/settings/security'), $changes);
+        return $this->saved(backend_url('settings/security'), $changes);
     }
 
     public function theme(): string
@@ -150,7 +150,7 @@ final class Settings extends BackendController
 
         $this->logged('settings_changed', 'theme:' . $slug, $changes);
 
-        return $this->saved(site_url('backend/settings/theme') . '?theme=' . rawurlencode($slug), $changes);
+        return $this->saved(backend_url('settings/theme') . '?theme=' . rawurlencode($slug), $changes);
     }
 
     /**
@@ -176,7 +176,7 @@ final class Settings extends BackendController
         }
 
         return $this->page($slug, SettingsTabs::moduleLabel($module), [
-            'action'   => site_url('backend/settings/' . $slug),
+            'action'   => backend_url('settings/' . $slug),
             'fields'   => $this->forms->render($headed, $errors === [] ? [] : $this->post(), $errors),
             'readOnly' => $readOnly,
             'intro'    => lang($readOnly ? 'Settings.ui.readOnly' : 'Settings.ui.intro'),
@@ -205,7 +205,7 @@ final class Settings extends BackendController
         }
 
         return $this->page('security', lang('Settings.tabs.security'), [
-            'action'   => site_url('backend/settings/security'),
+            'action'   => backend_url('settings/security'),
             'sections' => $sections,
             'readOnly' => false,
             'intro'    => lang('Settings.ui.securityIntro'),
@@ -224,7 +224,7 @@ final class Settings extends BackendController
             . $this->forms->render([lang('Settings.theme.options', [$themes->themes()[$slug] ?? $slug]) => $themes->optionFields($slug, $readOnly)], $old, $errors);
 
         return $this->page('theme', lang('Settings.tabs.theme'), [
-            'action'   => site_url('backend/settings/theme') . '?theme=' . rawurlencode($slug),
+            'action'   => backend_url('settings/theme') . '?theme=' . rawurlencode($slug),
             'fields'   => $fields,
             'readOnly' => $readOnly,
             'intro'    => lang($readOnly ? 'Settings.ui.readOnly' : 'Settings.theme.intro'),
@@ -238,7 +238,7 @@ final class Settings extends BackendController
      */
     private function page(string $tab, string $title, array $data): string
     {
-        $this->breadcrumb(lang('Settings.title'), site_url('backend/settings'))->breadcrumb($title);
+        $this->breadcrumb(lang('Settings.title'), backend_url('settings'))->breadcrumb($title);
 
         return $this->render('Modules\Settings\Views\form', $data + [
             'title' => lang('Settings.title'),

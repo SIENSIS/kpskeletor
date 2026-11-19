@@ -1,7 +1,7 @@
 /**
  * File manager (`data-component="files/file-manager"`, modules/Files/Views/manager.php).
  *
- * Everything comes from the JSON endpoints under `backend/files/api` (the server checks the RBAC
+ * Everything comes from the JSON endpoints under `<back office>/files/api` (the server checks the RBAC
  * permission and the folder ACL of every request; the buttons shown here only follow the rights
  * it reports):
  *

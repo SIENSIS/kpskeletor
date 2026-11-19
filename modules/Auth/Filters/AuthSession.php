@@ -275,7 +275,7 @@ final class AuthSession implements FilterInterface
             return service('response')->setStatusCode(401)->setJSON(['error' => $message]);
         }
 
-        return redirect()->to(site_url('backend'))->with('warning', $message);
+        return redirect()->to(backend_url())->with('warning', $message);
     }
 
     /**

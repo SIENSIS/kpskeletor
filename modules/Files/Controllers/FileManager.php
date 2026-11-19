@@ -23,7 +23,7 @@ final class FileManager extends BackendController
         $validator = service('storage')->validator();
 
         $config = [
-            'api'        => site_url('backend/files/api'),
+            'api'        => backend_url('files/api'),
             'css'        => asset('files::css/file-manager.css'),
             'types'      => array_keys(FileRepository::TYPES),
             'maxSize'    => $validator->maxSize(new UploadRules()),

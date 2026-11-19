@@ -18,11 +18,11 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-CrudFactory::routes($routes, 'tasks-tasks', 'backend/tasks/tasks', '\Modules\Tasks\Controllers\Tasks::index');
-CrudFactory::routes($routes, 'tasks-projects', 'backend/tasks/projects', '\Modules\Tasks\Controllers\Projects::index');
-CrudFactory::routes($routes, 'tasks-requests', 'backend/tasks/requests', '\Modules\Tasks\Controllers\Requests::index');
+CrudFactory::routes($routes, 'tasks-tasks', backend_path('tasks/tasks'), '\Modules\Tasks\Controllers\Tasks::index');
+CrudFactory::routes($routes, 'tasks-projects', backend_path('tasks/projects'), '\Modules\Tasks\Controllers\Projects::index');
+CrudFactory::routes($routes, 'tasks-requests', backend_path('tasks/requests'), '\Modules\Tasks\Controllers\Requests::index');
 
-$routes->group('backend/tasks', ['namespace' => 'Modules\Tasks\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('tasks'), ['namespace' => 'Modules\Tasks\Controllers'], static function (RouteCollection $routes): void {
     $board = ['filter' => 'can:tasks-board.view'];
 
     $routes->get('/', 'Board::index', $board + ['as' => 'tasks-board']);

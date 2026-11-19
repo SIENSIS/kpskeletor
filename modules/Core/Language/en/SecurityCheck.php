@@ -260,4 +260,8 @@ return [
         'probeUrl'     => '--only=probe needs --probe=<url>.',
         'noFile'       => 'Cannot read {0}.',
     ],
+    'backendPath' => [
+        'title' => 'Back-office path',
+        'info' => 'The back office is at {0} (app.backendPath; change it with php spark app:backend-path).',
+    ],
 ];

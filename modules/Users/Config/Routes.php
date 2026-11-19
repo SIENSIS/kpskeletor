@@ -19,7 +19,7 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-$routes->group('backend/users', ['namespace' => 'Modules\Users\Controllers'], static function (RouteCollection $routes): void {
+$routes->group(backend_path('users'), ['namespace' => 'Modules\Users\Controllers'], static function (RouteCollection $routes): void {
     $access = ['filter' => ['can:users-users.access', 'reauth']];
 
     $routes->get('access/(:num)', 'Access::show/$1', $access + ['as' => 'users-access']);
@@ -29,5 +29,5 @@ $routes->group('backend/users', ['namespace' => 'Modules\Users\Controllers'], st
     $routes->post('permissions', 'Matrix::save', ['filter' => ['can:users-matrix.edit', 'reauth']]);
 });
 
-CrudFactory::routes($routes, 'users-groups', 'backend/users/groups', '\Modules\Users\Controllers\Groups::index');
-CrudFactory::routes($routes, 'users-users', 'backend/users', '\Modules\Users\Controllers\Users::index');
+CrudFactory::routes($routes, 'users-groups', backend_path('users/groups'), '\Modules\Users\Controllers\Groups::index');
+CrudFactory::routes($routes, 'users-users', backend_path('users'), '\Modules\Users\Controllers\Users::index');

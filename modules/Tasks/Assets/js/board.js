@@ -4,7 +4,7 @@
  *
  * The page works without JavaScript: every card the user may move has a small form (status +
  * "Move"). This component:
- * - sends those forms as JSON (`POST backend/tasks/board/{id}/move`) instead of reloading;
+ * - sends those forms as JSON (`POST <back office>/tasks/board/{id}/move`) instead of reloading;
  * - adds drag and drop between the columns (cards with `draggable="true"`);
  * - after each move redraws the columns from `options.dataUrl` (the server decides what the user
  *   sees and may move) and announces the result in a live region.

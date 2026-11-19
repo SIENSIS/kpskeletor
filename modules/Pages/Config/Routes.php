@@ -19,9 +19,9 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
-CrudFactory::routes($routes, 'pages', 'backend/pages', '\Modules\Pages\Controllers\Pages::index');
+CrudFactory::routes($routes, 'pages', backend_path('pages'), '\Modules\Pages\Controllers\Pages::index');
 
-$routes->addPlaceholder('pagepath', '(?!(?:api|backend)(?:/|$))[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*');
+$routes->addPlaceholder('pagepath', '(?!(?:api|backend|' . preg_quote(backend_path(), '#') . ')(?:/|$))[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*');
 
 $routes->get('sitemap.xml', '\Modules\Pages\Controllers\Sitemap::index', ['as' => 'pages-sitemap', 'filter' => 'ratelimit:feeds']);
 $routes->get('(:pagepath)', '\Modules\Pages\Controllers\PublicPages::show/$1', ['as' => 'pages-public', 'priority' => 1]);

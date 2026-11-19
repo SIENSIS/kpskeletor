@@ -99,7 +99,7 @@ final class Inbox
                 'title' => $message->title,
                 'body'  => mb_strimwidth($message->body, 0, 160, '…'),
                 'icon'  => Notifier::iconOf($row),
-                'url'   => site_url('backend/notifications/open/' . (int) $row['id']),
+                'url'   => backend_url('notifications/open/' . (int) $row['id']),
                 'date'  => $row['created_at'] !== null ? (string) Time::parse((string) $row['created_at'])->toLocalizedString('d MMM y, HH:mm') : '',
                 'read'  => $row['read_at'] !== null,
             ];

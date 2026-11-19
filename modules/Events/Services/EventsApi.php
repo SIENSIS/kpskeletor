@@ -11,6 +11,7 @@ use DateTimeImmutable;
 use Kpapy\Http\ApiException;
 use Kpapy\Resource;
 use Modules\Core\Content\ContentTranslations;
+use Modules\Core\Routing\BackendPath;
 use Modules\Core\Security\HtmlSanitizer;
 
 /**
@@ -230,7 +231,7 @@ final class EventsApi
         $end   = $row['occurrence_end'];
         \assert($start instanceof DateTimeImmutable && $end instanceof DateTimeImmutable);
         $allDay = (bool) $row['all_day'];
-        $url    = is_string($row['source_url'] ?? null) && $row['source_url'] !== '' ? $row['source_url'] : null;
+        $url    = is_string($row['source_url'] ?? null) && $row['source_url'] !== '' ? BackendPath::resolve($row['source_url']) : null;
 
         return [
             'id'         => 'p-' . $row['uid'],

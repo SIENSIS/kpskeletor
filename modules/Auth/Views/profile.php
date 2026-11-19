@@ -86,7 +86,7 @@ $mode = $value('theme_mode', $profile['theme_mode'] ?? 'auto');
         </div>
         <?php $fields = (string) ob_get_clean() ?>
         <?php if ($canEdit): ?>
-            <?= theme_component('form_layout', ['action' => site_url('backend/profile'), 'fields' => $fields, 'title' => lang('Auth.profile.details'), 'dirtyGuard' => true]) ?>
+            <?= theme_component('form_layout', ['action' => backend_url('profile'), 'fields' => $fields, 'title' => lang('Auth.profile.details'), 'dirtyGuard' => true]) ?>
         <?php else: ?>
             <?= theme_component('card', ['title' => lang('Auth.profile.details'), 'body' => '<fieldset disabled>' . $fields . '</fieldset>']) ?>
         <?php endif ?>
@@ -107,9 +107,9 @@ $mode = $value('theme_mode', $profile['theme_mode'] ?? 'auto');
             <?php endforeach ?>
         </p>
         <div class="d-grid gap-2">
-            <a class="btn btn-outline-primary" href="<?= esc(site_url('backend/profile/password')) ?>"><i class="bi bi-key me-1" aria-hidden="true"></i><?= esc(lang('Auth.profile.changePassword')) ?></a>
-            <a class="btn btn-outline-primary" href="<?= esc(site_url('backend/profile/two-factor')) ?>"><i class="bi bi-shield-check me-1" aria-hidden="true"></i><?= esc(lang('Auth.twoFactor.title')) ?></a>
-            <a class="btn btn-outline-secondary" href="<?= esc(site_url('backend/profile/sessions')) ?>"><i class="bi bi-laptop me-1" aria-hidden="true"></i><?= esc(lang('Auth.sessions.title')) ?></a>
+            <a class="btn btn-outline-primary" href="<?= esc(backend_url('profile/password')) ?>"><i class="bi bi-key me-1" aria-hidden="true"></i><?= esc(lang('Auth.profile.changePassword')) ?></a>
+            <a class="btn btn-outline-primary" href="<?= esc(backend_url('profile/two-factor')) ?>"><i class="bi bi-shield-check me-1" aria-hidden="true"></i><?= esc(lang('Auth.twoFactor.title')) ?></a>
+            <a class="btn btn-outline-secondary" href="<?= esc(backend_url('profile/sessions')) ?>"><i class="bi bi-laptop me-1" aria-hidden="true"></i><?= esc(lang('Auth.sessions.title')) ?></a>
         </div>
         <?php $side = (string) ob_get_clean() ?>
         <?= theme_component('card', ['title' => lang('Auth.profile.account'), 'icon' => 'bi bi-person-badge', 'body' => $side]) ?>

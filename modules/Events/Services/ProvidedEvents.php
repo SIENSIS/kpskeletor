@@ -12,6 +12,7 @@ use Modules\Core\Cache\CoreCache;
 use Modules\Core\Calendar\CalendarEvent;
 use Modules\Core\Calendar\CalendarProvider;
 use Modules\Core\Registry\DeclarationRegistry;
+use Modules\Core\Routing\BackendPath;
 use Modules\Core\Security\HtmlSanitizer;
 use Throwable;
 
@@ -97,7 +98,7 @@ final class ProvidedEvents
         ];
 
         if (is_string($row['source_url'] ?? null) && $row['source_url'] !== '') {
-            $item['url'] = $row['source_url'];
+            $item['url'] = BackendPath::resolve($row['source_url']);
         }
 
         if ($row['display_color'] !== null) {

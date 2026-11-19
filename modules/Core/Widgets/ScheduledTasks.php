@@ -80,7 +80,7 @@ final class ScheduledTasks extends Widget
             'failed' => count($failed),
             'total'  => count($rows),
             'next'   => $next,
-            'url'    => site_url('backend/schedule'),
+            'url'    => backend_url('schedule'),
         ]);
     }
 }

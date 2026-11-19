@@ -36,7 +36,7 @@ final class MenuItems extends BackendController
         $target = new LinkTarget();
         $locale = $this->request->getLocale();
 
-        $this->breadcrumb(lang('Menus.public.title'), site_url('backend/menus/public'))->breadcrumb($menu['name']);
+        $this->breadcrumb(lang('Menus.public.title'), backend_url('menus/public'))->breadcrumb($menu['name']);
 
         return $this->render('Modules\Menus\Views\items', [
             'title'     => lang('Menus.items.title', [$menu['name']]),
@@ -46,9 +46,9 @@ final class MenuItems extends BackendController
             'tree'      => self::tree($rows, null, $locale),
             'types'     => $target->typeLabels(),
             'broken'    => array_keys(array_filter($rows, static fn (array $row): bool => $target->resolve($row['type'], $row['value']) === null)),
-            'orderUrl'  => site_url('backend/menus/items/' . $menuId . '/order'),
-            'newUrl'    => site_url('backend/menus/items/' . $menuId . '/new'),
-            'baseUrl'   => site_url('backend/menus/items/' . $menuId),
+            'orderUrl'  => backend_url('menus/items/' . $menuId . '/order'),
+            'newUrl'    => backend_url('menus/items/' . $menuId . '/new'),
+            'baseUrl'   => backend_url('menus/items/' . $menuId),
             'maxDepth'  => MenuRepository::MAX_DEPTH,
         ]);
     }
@@ -57,7 +57,7 @@ final class MenuItems extends BackendController
     {
         $menu  = $this->menu($menuId);
         $items = new MenuRepository();
-        $back  = site_url('backend/menus/items/' . $menuId);
+        $back  = backend_url('menus/items/' . $menuId);
         $move  = (string) $this->request->getPost('move');
 
         try {
@@ -111,7 +111,7 @@ final class MenuItems extends BackendController
         $items  = $repo->items($menuId);
         $id     = (string) $this->request->getPost('id');
         $itemId = ctype_digit($id) && $id !== '0' ? (int) $id : null;
-        $back   = site_url('backend/menus/items/' . $menuId . ($itemId === null ? '/new' : '/edit/' . $itemId));
+        $back   = backend_url('menus/items/' . $menuId . ($itemId === null ? '/new' : '/edit/' . $itemId));
 
         if ($itemId !== null && ! isset($items[$itemId])) {
             throw PageNotFoundException::forPageNotFound();
@@ -135,7 +135,7 @@ final class MenuItems extends BackendController
             'after'     => self::summary($data['row'] + ['labels' => $data['labels']]),
         ]);
 
-        return redirect()->to(site_url('backend/menus/items/' . $menuId))->with('success', lang('Menus.items.saved'));
+        return redirect()->to(backend_url('menus/items/' . $menuId))->with('success', lang('Menus.items.saved'));
     }
 
     public function delete(int $menuId, int $itemId): RedirectResponse
@@ -157,7 +157,7 @@ final class MenuItems extends BackendController
             'before'    => self::summary($item),
         ]);
 
-        return redirect()->to(site_url('backend/menus/items/' . $menuId))->with('success', lang('Menus.items.deleted', [$count]));
+        return redirect()->to(backend_url('menus/items/' . $menuId))->with('success', lang('Menus.items.deleted', [$count]));
     }
 
     /**
@@ -194,8 +194,8 @@ final class MenuItems extends BackendController
             $choices[$key] = array_map('strval', $type->options());
         }
 
-        $this->breadcrumb(lang('Menus.public.title'), site_url('backend/menus/public'))
-            ->breadcrumb($menu['name'], site_url('backend/menus/items/' . $menu['id']))
+        $this->breadcrumb(lang('Menus.public.title'), backend_url('menus/public'))
+            ->breadcrumb($menu['name'], backend_url('menus/items/' . $menu['id']))
             ->breadcrumb(lang($itemId === null ? 'Menus.items.add' : 'Menus.items.edit'));
 
         return $this->render('Modules\Menus\Views\item_form', [
@@ -211,8 +211,8 @@ final class MenuItems extends BackendController
             'locales'      => ContentTranslations::locales(),
             'required'     => ContentTranslations::defaultLocale(),
             'visibilities' => array_combine(MenuRepository::VISIBILITIES, array_map(static fn (string $v): string => lang('Menus.visibility.' . $v), MenuRepository::VISIBILITIES)),
-            'action'       => site_url('backend/menus/items/' . $menu['id'] . '/save'),
-            'backUrl'      => site_url('backend/menus/items/' . $menu['id']),
+            'action'       => backend_url('menus/items/' . $menu['id'] . '/save'),
+            'backUrl'      => backend_url('menus/items/' . $menu['id']),
         ]);
     }
 
@@ -306,7 +306,7 @@ final class MenuItems extends BackendController
             'row' => [
                 'parent_id'  => $parentId,
                 'type'       => $type,
-                'value'      => $value,
+                'value'      => LinkTarget::storedValue($type, $value),
                 'icon'       => $icon,
                 'target'     => $target,
                 'css_class'  => trim(preg_replace('/\s+/', ' ', $class) ?? ''),

@@ -69,7 +69,7 @@ final class ThemePreview extends BaseController
                     'subtitle'    => lang('Core.preview.js.subtitle'),
                     'icon'        => 'bi-braces',
                     'breadcrumbs' => [
-                        ['label' => lang('Core.ui.backOffice'), 'url' => base_url('backend')],
+                        ['label' => lang('Core.ui.backOffice'), 'url' => backend_url()],
                         ['label' => lang('Core.preview.themes'), 'url' => null],
                         ['label' => lang('Core.preview.title'), 'url' => base_url('theme-preview')],
                         ['label' => lang('Core.preview.js.title'), 'url' => null],
@@ -93,7 +93,7 @@ final class ThemePreview extends BaseController
                 'subtitle'    => lang('Core.preview.subtitle', [implode(' → ', array_column($themes, 'name'))]),
                 'icon'        => 'bi-palette',
                 'breadcrumbs' => [
-                    ['label' => lang('Core.ui.backOffice'), 'url' => base_url('backend')],
+                    ['label' => lang('Core.ui.backOffice'), 'url' => backend_url()],
                     ['label' => lang('Core.preview.themes'), 'url' => null],
                     ['label' => lang('Core.preview.title'), 'url' => null],
                 ],

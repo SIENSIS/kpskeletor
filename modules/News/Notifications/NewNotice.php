@@ -38,7 +38,7 @@ final class NewNotice extends NotificationType
         return new NotificationMessage(
             lang('News.notifications.newNoticeTitle', [(string) ($this->data['title'] ?? '')]),
             lang('News.notifications.newNoticeBody', [is_string($label) ? $label : $priority]),
-            url: $id > 0 ? 'backend/news/read/' . Crud::maskId($id, 'news') : 'backend/news',
+            url: $id > 0 ? backend_link('news/read/' . Crud::maskId($id, 'news')) : backend_link('news'),
         );
     }
 }

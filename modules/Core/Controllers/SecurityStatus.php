@@ -50,19 +50,19 @@ final class SecurityStatus extends BackendController
         (new Status())->store($report);
         activity_log('Core', 'security_check', ['resource' => 'security', 'changes' => $report->counts()]);
 
-        return redirect()->to(site_url('backend/security'))->with('success', lang('SecurityCheck.refreshed'));
+        return redirect()->to(backend_url('security'))->with('success', lang('SecurityCheck.refreshed'));
     }
 
     public function probeForm(): string
     {
-        $this->breadcrumb(lang('SecurityCheck.title'), site_url('backend/security'));
+        $this->breadcrumb(lang('SecurityCheck.title'), backend_url('security'));
         $this->breadcrumb(lang('SecurityCheck.probe.run'));
 
         return $this->render('Modules\Core\Views\security\probe', [
             'title'  => lang('SecurityCheck.probe.run'),
             'icon'   => 'bi bi-broadcast',
-            'action' => site_url('backend/security/probe'),
-            'cancel' => site_url('backend/security'),
+            'action' => backend_url('security/probe'),
+            'cancel' => backend_url('security'),
             'url'    => rtrim(config(App::class)->baseURL, '/') . '/',
         ]);
     }
@@ -79,6 +79,6 @@ final class SecurityStatus extends BackendController
         (new Status())->storeProbe($report);
         security_log('Core', 'security_probe', ['resource' => 'security', 'summary' => $url, 'changes' => $report->counts()]);
 
-        return redirect()->to(site_url('backend/security'))->with($report->hasErrors() ? 'error' : 'success', lang('SecurityCheck.probe.done', [$report->counts()['error'], $report->counts()['warning']]));
+        return redirect()->to(backend_url('security'))->with($report->hasErrors() ? 'error' : 'success', lang('SecurityCheck.probe.done', [$report->counts()['error'], $report->counts()['warning']]));
     }
 }
