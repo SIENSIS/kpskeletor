@@ -927,7 +927,7 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Tables:** search documents and terms (D-50-01).
 - **Tests:** normalisation and ranking, visibility (drafts, private, groups, disabled modules),
   reindex, rate limit, public page per language.
-- **Depends on:** 49 (order only); D-50-01 **(decide)**.
+- **Depends on:** 49 (order only); D-50-01 decided.
 
 ## 51 — Chat assistant: FAQ and site search in a chat bubble (`deploy/51-chat-assistant.md`)
 
@@ -937,7 +937,7 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Tables:** FAQs and their translations; optionally anonymised unanswered questions (D-51-02).
 - **Tests:** matching per language, visibility, endpoint security (CSRF, rate limit, input),
   e2e of the bubble (keyboard, phone, dark, axe).
-- **Depends on:** 50 (the index) and 48 (the contact form); D-51-01, D-51-02 **(decide)**.
+- **Depends on:** 50 (the index) and 48 (the contact form); D-51-01, D-51-02 decided.
   Merges itself into `main` (last planned session).
 
 ---
