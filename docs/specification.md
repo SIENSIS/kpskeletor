@@ -1233,6 +1233,20 @@ The generated forms described above (one tab per module and one for the theme), 
   `noindex` for non-public pages. Private pages require login and the right group.
 * Offers a menu link type "page" to the menu editor.
 
+* **Pages built from sections** (D-45-01, sessions 45–47): a page's layout is `article` (the body
+  above) or `sections`, an ordered list of sections edited with forms (no shortcodes: editors are
+  not technical), previewed and kept in the page's revisions. Section types are registered in the
+  Core and declared by modules in the manifest key `$sectionTypes` (keys `<module>.<name>`, a field
+  schema validated on the server, a theme view); tables `page_sections` and
+  `page_section_translations`; editor at `backend/pages/<id>/sections` with the page's permissions;
+  full-width rendering. Types: hero, quick links, cards, image and text, call to action, text
+  (Pages); news list with the main-list page of D-46-03, calendar and events list, gallery,
+  testimonials, logos, carousel (no automatic rotation by default, D-46-02) and embeds from hosts
+  allowed in Settings › Security with click to load and a clear warning for hosts that are not
+  allowed (D-46-01). **Reusable blocks** (D-47-01): named lists of sections shown inside pages or in
+  theme zones (`$zones`) with visibility rules; resource `pages-blocks`. The skeleton stays generic
+  (a company and/or a public school): models and demo data carry no institution-specific content.
+
 ### Menus
 
 The module manages two different things, in two separate screens.
@@ -1557,6 +1571,18 @@ both supported:
     "Birthdays (administration)" shows every date of birth, shared or not, to holders of
     `users-users.birthdate` (hidden by default in the calendar view), who also see the date of
     birth in the user's record.
+
+### Contact (D-48-01, D-48-02, session 48)
+
+* A public contact form (page `contact` with the language prefix, and the section type
+  `contact.form`): name, email, recipient chosen from a list kept by the administrator (addresses
+  never shown), subject, message, a required privacy checkbox. Messages are stored
+  (`contact-messages`: list, show, delete, `answer`, `archive`; recipients `contact-recipients`) and
+  notified to the recipient's users, who see only the messages addressed to them; the admin sees
+  everything. Anti-spam: honeypot, signed time trap, the Auth module's local captcha (always by
+  default), rate limits per IP and email, at most 2 links, blocked words; no third-party captcha.
+  Mail from the site's address with the visitor only in `Reply-To`, no auto-reply, no attachments;
+  messages deleted after 365 days (setting, minimum 30).
 
 ### Updates
 

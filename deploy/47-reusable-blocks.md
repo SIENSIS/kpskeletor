@@ -4,7 +4,7 @@
 > Claude Code session on the project repository. You (Claude) are reading this file from the
 > repository: follow it from start to end without waiting for more instructions.
 >
-> Added after the 1.0.0 release from the owner's requests of 2026-11-19 (blocks shown on every page (e.g. the funding notice), a footer in columns and ready-made home pages; decision D-47-01).
+> Added after the 1.0.0 release from the owner's requests of 2026-11-19 (blocks shown on every page (e.g. partner logos), a footer in columns and ready-made home pages; decision D-47-01).
 
 ## Before starting: bring `main` up to date
 
@@ -39,8 +39,8 @@
 
 ## Goal
 
-Sections defined **once** and shown in many places (the funding notice with its logos and legal
-text, partner logos…), theme zones to place them on every page, a footer in columns built from the
+Sections defined **once** and shown in many places (a strip of partner logos, a notice, a contact
+or opening-hours strip…), theme zones to place them on every page, a footer in columns built from the
 footer menu, and two ready-made home page models so nobody starts from scratch.
 
 **D-47-01 must be decided** (names, tables, the theme key for zones, URLs): if it is still Open,
@@ -51,9 +51,10 @@ hero with an overlay, a cut-out image and a wavy bottom edge; a grid of icon lin
 testimonials band; alternating image and text; a call-to-action band) and
 `docs/design/reference-home-current-site.webp` (the school's current home: a photo banner /
 carousel with a band of icon links; illustrated link tiles; a 4-column grid of news; an embedded
-360° virtual tour; a strip of logos; a certification block; the funding notice with logos and legal
-text; a footer with five columns of links). Every section type below exists to rebuild those pages
-**without code**: the people who edit pages are not technical, so they never type markup or
+360° virtual tour; a strip of logos; a certification block; a notice with logos and text; a footer with five columns of links). They
+are **layout references only**: the skeleton stays generic (a website for a company and/or a public
+school, D-47-01) and never ships their texts, images or institution-specific content. Every section
+type below exists to rebuild pages like those **without code**: the people who edit pages are not technical, so they never type markup or
 shortcodes; they pick a section, fill in a form and move it.
 
 ## Scope
@@ -74,18 +75,21 @@ shortcodes; they pick a section, fill in a form and move it.
   option for the number of columns and an optional text column (address and contact, translated);
   a footer menu without children keeps today's look.
 - **Home page models:** "New page from a model" creates a page in `sections` mode from a model
-  shipped by the Pages module (definitions in the module, placeholder texts in ca/es/en and
-  placeholder images made for the skeleton): **"Institut"** (banner, icon band, illustrated
-  quick links, latest news, embed placeholder, logos, image and text) and **"Moderna"** (hero with
-  wave, icon links, cards, testimonials, image and text, call to action). Themes and modules may
-  add models (declared like section types).
-- Demo data: the funding-notice block assigned to `public.before_footer`, a footer menu with
-  columns.
+  shipped by the Pages module (definitions in the module, neutral placeholder texts in ca/es/en
+  and placeholder images made for the skeleton, never taken from the references):
+  **"Centre educatiu"** (banner or carousel, icon band, illustrated quick links, latest news,
+  embed placeholder, logos, image and text) and **"Empresa"** (hero with wave, icon links, cards,
+  testimonials, image and text, call to action). Themes and modules may add models (declared like
+  section types). **Generic only (D-47-01):** no funding notices or institution-specific content.
+- Demo data: a neutral "partner logos" block assigned to `public.before_footer`, a footer menu
+  with columns.
 
 ## Tests
 
 - Blocks: editor, revisions, a block section inside a page, zone assignment and each visibility
   rule, language fallback, deleting a block that is in use (refused or confirmed, per D-47-01).
+- Models and demo data contain no institution-specific text (a test can check the shipped model
+  files for a short list of forbidden words, e.g. funding programme names).
 - Footer columns from the menu, with and without children; theme option.
 - Models create a page whose sections validate; placeholders are translated.
 - e2e + axe on a page with zones and the footer at three widths, light and dark; screenshots of
@@ -99,7 +103,7 @@ shortcodes; they pick a section, fill in a form and move it.
 
 ## Done when
 
-- The two reference home pages can be rebuilt from the models and edited with forms; blocks appear
+- Pages like the two references can be rebuilt from the generic models and edited with forms; blocks appear
   where they are assigned; the footer shows columns; with tests.
 - All checks pass and the tests of this session are in the suite.
 
