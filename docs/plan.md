@@ -816,10 +816,11 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
   static test against hard-coded content languages.
 - **Depends on:** 36.
 
-## 38 — Settings menu groups and the public sign-in link (`deploy/38-settings-menu.md`)
+## 38 — Settings menu groups, the public sign-in link and password reveal (`deploy/38-settings-menu.md`)
 
 - **Goal:** five groups in the settings zone (D-38-01); a sign-in / back-office link on the public
-  site (theme option).
+  site (theme option); a show/hide button on every password field (global Core enhancement,
+  opt-out `data-no-reveal`, documented in `docs/frontend.md`; owner's request of 2026-11-19).
 - **Files:** manifests' `settings` entries, Core group entries, default theme navbar and options.
 - **Tests:** groups per permission, customisations still applied, the link per user type.
 - **Depends on:** 37 (order only).
