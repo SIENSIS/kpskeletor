@@ -52,9 +52,10 @@ hero with an overlay, a cut-out image and a wavy bottom edge; a grid of icon lin
 testimonials band; alternating image and text; a call-to-action band) and
 `docs/design/reference-home-current-site.webp` (the school's current home: a photo banner /
 carousel with a band of icon links; illustrated link tiles; a 4-column grid of news; an embedded
-360° virtual tour; a strip of logos; a certification block; the funding notice with logos and legal
-text; a footer with five columns of links). Every section type below exists to rebuild those pages
-**without code**: the people who edit pages are not technical, so they never type markup or
+360° virtual tour; a strip of logos; a certification block; a notice with logos and text; a footer with five columns of links). They
+are **layout references only**: the skeleton stays generic (a website for a company and/or a public
+school, D-47-01) and never ships their texts, images or institution-specific content. Every section
+type below exists to rebuild pages like those **without code**: the people who edit pages are not technical, so they never type markup or
 shortcodes; they pick a section, fill in a form and move it.
 
 ## Scope

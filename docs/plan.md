@@ -892,8 +892,9 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 
 ## 47 — Reusable blocks, theme zones, footer columns and home page models (`deploy/47-reusable-blocks.md`)
 
-- **Goal:** blocks edited once and shown in pages or theme zones (e.g. the funding notice), a footer
-  in columns from the footer menu, the "Institut" and "Moderna" home page models.
+- **Goal:** blocks edited once and shown in pages or theme zones (e.g. partner logos), a footer in
+  columns from the footer menu, the generic "Centre educatiu" and "Empresa" home page models
+  (no institution-specific content, D-47-01).
 - **Depends on:** 46; D-47-01 **(decide)**.
 
 ## 48 — Contact module (`deploy/48-contact.md`)

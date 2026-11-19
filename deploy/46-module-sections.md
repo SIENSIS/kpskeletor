@@ -51,9 +51,10 @@ hero with an overlay, a cut-out image and a wavy bottom edge; a grid of icon lin
 testimonials band; alternating image and text; a call-to-action band) and
 `docs/design/reference-home-current-site.webp` (the school's current home: a photo banner /
 carousel with a band of icon links; illustrated link tiles; a 4-column grid of news; an embedded
-360° virtual tour; a strip of logos; a certification block; the funding notice with logos and legal
-text; a footer with five columns of links). Every section type below exists to rebuild those pages
-**without code**: the people who edit pages are not technical, so they never type markup or
+360° virtual tour; a strip of logos; a certification block; a notice with logos and text; a footer with five columns of links). They
+are **layout references only**: the skeleton stays generic (a website for a company and/or a public
+school, D-47-01) and never ships their texts, images or institution-specific content. Every section
+type below exists to rebuild pages like those **without code**: the people who edit pages are not technical, so they never type markup or
 shortcodes; they pick a section, fill in a form and move it.
 
 ## Scope
@@ -81,7 +82,11 @@ shortcodes; they pick a section, fill in a form and move it.
   `www.youtube-nocookie.com`); the CSP gets `frame-src` for exactly those origins through the
   Core's `ContentSecurity`; the iframe has a required title, `loading="lazy"`, `sandbox` with the
   minimum permissions and `referrerpolicy`; optional **click to load** (no request to the third
-  party until the visitor clicks, the default for video). Refused hosts give a clear form error.
+  party until the visitor clicks; on by default). **Owner's addition (D-46-01):** a URL whose
+  host is not allowed is refused with a message that names the host and says that an
+  administrator must add it in Settings › Security (a direct link for holders of
+  `settings.security`); a saved section whose host was later removed shows the same warning in
+  the editor and the preview and renders nothing on the public page (no broken iframe).
 
 ## Tests
 
@@ -89,7 +94,9 @@ shortcodes; they pick a section, fill in a form and move it.
   a private folder's images never appear), pagination of two lists on one page, category filters.
 - Category banner migration up/down/up and display; `/news` redirect when a main list page is set
   (and not otherwise).
-- Embeds: a host outside the list refused; the CSP of the page contains only the listed origins;
+- Embeds: a host outside the list refused with the message that names the host and the setting
+  (the link only for `settings.security` holders); a section whose host was removed later shows
+  the warning and renders nothing; the CSP of the page contains only the listed origins;
   click-to-load makes no third-party request before the click (e2e).
 - Carousel: no rotation by default; pause button; reduced motion; keyboard (e2e + axe).
 - Demo: pages "Notícies" and "Sortides" (banner + news of one category each), "Agenda" (banner +
