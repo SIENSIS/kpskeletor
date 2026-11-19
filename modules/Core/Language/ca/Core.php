@@ -6,6 +6,7 @@ return [
     'title'     => 'Nucli',
     'forbidden' => 'No teniu permís per accedir a aquesta pàgina.',
     'manifest'  => [
+        'developmentOnlyEnabled' => 'ha de ser false en un mòdul només per a desenvolupament ($developmentOnly)',
         'text' => 'ha de ser una sola línia de 255 caràcters com a màxim',
         'error'             => '{0}: {1} {2}',
         'required'          => 'és obligatori',
@@ -46,6 +47,7 @@ return [
         'apiRoute' => 'no té cap ruta que hi correspongui: {0} gestionada per {1} s\'ha de declarar a Config/Routes.php',
     ],
     'sync' => [
+        'devOnlyDisabled'       => 'S’ha desactivat {0}: és un mòdul només per a desenvolupament i aquest entorn no és de desenvolupament.',
         'namespaces'            => 'S’ha actualitzat el fitxer d’espais de noms dels mòduls.',
         'migrated'              => '{0}: s’han executat {1} migracions.',
         'seeded'                => '{0}: s’han carregat les dades inicials.',
@@ -160,6 +162,7 @@ return [
         'markRead'  => 'Marcar com a llegides (API)',
     ],
     'toggle' => [
+        'developmentOnly'      => '{0} és un mòdul només per a desenvolupament: només es pot activar quan CI_ENVIRONMENT és development.',
         'coreModule'           => '{0} és un mòdul del nucli i no es pot desactivar.',
         'hasDependants'        => '{0} no es pot desactivar: en depenen aquests mòduls actius: {1}.',
         'invalid'              => 'No es pot carregar el manifest de {0}; executeu php spark modules:sync per veure els errors.',
@@ -611,6 +614,7 @@ return [
     ],
     // Labels of the activity log actions (Activity module).
     'activity' => [
+        'devonly_disabled' => 'Mòdul només per a desenvolupament desactivat',
         'package_refused' => 'Paquet rebutjat',
         'package_failed' => 'Operació de paquet fallada',
         'package_installed' => 'Paquet instal·lat',
@@ -735,6 +739,8 @@ return [
         'description' => 'El nucli: mòduls, permisos, paràmetres, temes, notificacions i el planificador.',
     ],
     'modules' => [
+        'developmentOnly' => 'Només desenvolupament',
+        'developmentOnlyHelp' => 'Només s’activa quan CI_ENVIRONMENT és development.',
         'title' => 'Mòduls',
         'tabs' => [
             'modules' => 'Mòduls',
@@ -790,6 +796,8 @@ return [
         'notAllowed' => 'No tens permís per fer això.',
     ],
     'packages' => [
+        'developmentOnly' => '{0} és un mòdul només per a desenvolupament: només es pot instal·lar quan CI_ENVIRONMENT és development.',
+        'developmentOnlyInvalid' => 'El $developmentOnly del manifest ha de ser true o false.',
         'title' => 'Paquet {0}',
         'intro' => 'Els paquets que es pugen aquí es validen i es guarden a writable/packages. Un cop aprovats queden pendents i s\'instal·len des de la consola, igual que les sol·licituds de desinstal·lació.',
         'howToRun' => 'Les operacions pendents s\'executen amb',

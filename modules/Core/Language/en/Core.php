@@ -6,6 +6,7 @@ return [
     'title'     => 'Core',
     'forbidden' => 'You do not have permission to access this page.',
     'manifest'  => [
+        'developmentOnlyEnabled' => 'must be false in a development-only module ($developmentOnly)',
         'text' => 'must be one line of at most 255 characters',
         'error'             => '{0}: {1} {2}',
         'required'          => 'is required',
@@ -46,6 +47,7 @@ return [
         'apiRoute' => 'has no matching route: {0} handled by {1} must be declared in Config/Routes.php',
     ],
     'sync' => [
+        'devOnlyDisabled'       => '{0} disabled: it is a development-only module and this is not a development environment.',
         'namespaces'            => 'Module namespaces file updated.',
         'migrated'              => '{0}: {1} migration(s) run.',
         'seeded'                => '{0}: initial data loaded.',
@@ -160,6 +162,7 @@ return [
         'markRead'  => 'Mark as read (API)',
     ],
     'toggle' => [
+        'developmentOnly'      => '{0} is a development-only module: it can be enabled only when CI_ENVIRONMENT is development.',
         'coreModule'           => '{0} is a core module and cannot be disabled.',
         'hasDependants'        => '{0} cannot be disabled: these enabled modules depend on it: {1}.',
         'invalid'              => 'The manifest of {0} cannot be loaded; run php spark modules:sync to see the errors.',
@@ -611,6 +614,7 @@ return [
     ],
     // Labels of the activity log actions (Activity module).
     'activity' => [
+        'devonly_disabled' => 'Development-only module disabled',
         'package_refused' => 'Package refused',
         'package_failed' => 'Package operation failed',
         'package_installed' => 'Package installed',
@@ -735,6 +739,8 @@ return [
         'description' => 'The kernel: modules, permissions, settings, themes, notifications and the scheduler.',
     ],
     'modules' => [
+        'developmentOnly' => 'Development only',
+        'developmentOnlyHelp' => 'Enabled only when CI_ENVIRONMENT is development.',
         'title' => 'Modules',
         'tabs' => [
             'modules' => 'Modules',
@@ -790,6 +796,8 @@ return [
         'notAllowed' => 'You are not allowed to do this.',
     ],
     'packages' => [
+        'developmentOnly' => '{0} is a development-only module: it can be installed only when CI_ENVIRONMENT is development.',
+        'developmentOnlyInvalid' => 'The manifest\'s $developmentOnly must be true or false.',
         'title' => 'Package {0}',
         'intro' => 'Packages uploaded here are validated and kept in writable/packages. Once approved they become pending and are installed from the console, as are uninstall requests.',
         'howToRun' => 'Pending operations run with',

@@ -8,6 +8,9 @@ use FilesystemIterator;
 use Modules\Core\Config\Packages;
 use Modules\Core\Config\ProductionCheck;
 use Modules\Core\Demo\DemoDataManager;
+use Modules\Core\Models\ModuleModel;
+use Modules\Core\Modules\DevelopmentOnly;
+use Modules\Core\Modules\ModuleDiscovery;
 use Modules\Core\Security\Check\FileAccess;
 use Modules\Core\Security\Check\SecurityCheck;
 use Modules\Core\Security\Check\SecurityReport;
@@ -19,7 +22,8 @@ use Throwable;
  * Group `installation`: the web installer is closed (`writable/install.lock`), no demo data,
  * `writable/` modes (`0750` folders, `0640` files or stricter; `writable/maintenance.json` never
  * readable by others), what the web server user may write, and `public/` holding nothing but
- * `index.php` as PHP (no `.env`, no `writable`).
+ * `index.php` as PHP (no `.env`, no `writable`), and no development-only module (`Devtools`,
+ * D-41-01) enabled outside the development environment (`installation.devtools`).
  */
 final class InstallationCheck implements SecurityCheck
 {
@@ -29,7 +33,8 @@ final class InstallationCheck implements SecurityCheck
     private const SCRIPTS = ['php', 'phtml', 'phar', 'php3', 'php4', 'php5', 'php7', 'php8', 'phps', 'pht', 'cgi', 'pl', 'py', 'sh'];
 
     /**
-     * @param (\Closure(): list<string>)|null $demoModules modules with demo data loaded (tests)
+     * @param (\Closure(): list<string>)|null $demoModules    modules with demo data loaded (tests)
+     * @param (\Closure(): list<string>)|null $devOnlyModules enabled development-only modules (tests)
      */
     public function __construct(
         private readonly string $root = ROOTPATH,
@@ -39,6 +44,8 @@ final class InstallationCheck implements SecurityCheck
         private readonly ?FileAccess $access = null,
         private readonly ?\Closure $demoModules = null,
         private readonly ?Packages $packages = null,
+        private readonly ?\Closure $devOnlyModules = null,
+        private readonly DevelopmentOnly $developmentOnly = new DevelopmentOnly(),
     ) {
     }
 
@@ -53,6 +60,7 @@ final class InstallationCheck implements SecurityCheck
 
         $this->installLock($report);
         $this->demoData($report);
+        $this->developmentModules($report);
         $this->writableModes($report, $config);
         $this->webWritable($report, $config);
         $this->publicFolder($report);
@@ -103,6 +111,48 @@ final class InstallationCheck implements SecurityCheck
         } else {
             $report->error(self::GROUP, 'installation.demo', lang('SecurityCheck.demo.title'), lang('SecurityCheck.demo.loaded', [implode(', ', $modules)]), lang('SecurityCheck.demo.fix'));
         }
+    }
+
+    /**
+     * Development-only modules (D-41-01): an error when one is enabled outside the development
+     * environment, information in development.
+     */
+    private function developmentModules(SecurityReport $report): void
+    {
+        $title = lang('SecurityCheck.devtools.title');
+
+        try {
+            $modules = $this->devOnlyModules !== null ? ($this->devOnlyModules)() : $this->enabledDevelopmentModules();
+        } catch (Throwable) {
+            $report->info(self::GROUP, 'installation.devtools', $title, lang('SecurityCheck.devtools.unknown'));
+
+            return;
+        }
+
+        if ($this->developmentOnly->allowed()) {
+            $report->info(self::GROUP, 'installation.devtools', $title, lang('SecurityCheck.devtools.development', [$modules === [] ? '—' : implode(', ', $modules)]), lang('SecurityCheck.devtools.fix'));
+        } elseif ($modules === []) {
+            $report->ok(self::GROUP, 'installation.devtools', $title, lang('SecurityCheck.devtools.ok'));
+        } else {
+            $report->error(self::GROUP, 'installation.devtools', $title, lang('SecurityCheck.devtools.enabled', [implode(', ', $modules)]), lang('SecurityCheck.devtools.fix'));
+        }
+    }
+
+    /**
+     * @return list<string> enabled modules whose manifest says `$developmentOnly`
+     */
+    private function enabledDevelopmentModules(): array
+    {
+        $registry = model(ModuleModel::class, false)->allByName();
+        $modules  = [];
+
+        foreach ((new ModuleDiscovery())->discover() as $name => $module) {
+            if ($module->manifest !== null && $module->manifest->developmentOnly && ($registry[$name]['enabled'] ?? false)) {
+                $modules[] = $name;
+            }
+        }
+
+        return $modules;
     }
 
     private function writableModes(SecurityReport $report, ProductionCheck $config): void

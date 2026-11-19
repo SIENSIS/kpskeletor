@@ -49,6 +49,14 @@ abstract class ModuleManifest
      */
     public bool $enabledByDefault = true;
 
+    /**
+     * A module that exists only for development (D-41-01, e.g. `Devtools`): `modules:sync`,
+     * `modules:enable`, `modules:install` and the Modules screen refuse to enable or install it
+     * when `ENVIRONMENT` is not `development`, a sync outside development disables it (security
+     * log) and `security:check` reports it as an error. It must keep `$enabledByDefault = false`.
+     */
+    public bool $developmentOnly = false;
+
     /** Where Updates looks for new versions (e.g. "github:acme/news-module"). */
     public ?string $repository = null;
 

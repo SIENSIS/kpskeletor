@@ -6,6 +6,7 @@ return [
     'title'     => 'Núcleo',
     'forbidden' => 'No tiene permiso para acceder a esta página.',
     'manifest'  => [
+        'developmentOnlyEnabled' => 'debe ser false en un módulo solo para desarrollo ($developmentOnly)',
         'text' => 'debe ser una sola línea de 255 caracteres como máximo',
         'error'             => '{0}: {1} {2}',
         'required'          => 'es obligatorio',
@@ -46,6 +47,7 @@ return [
         'apiRoute' => 'no tiene ninguna ruta correspondiente: {0} gestionada por {1} debe declararse en Config/Routes.php',
     ],
     'sync' => [
+        'devOnlyDisabled'       => 'Se ha desactivado {0}: es un módulo solo para desarrollo y este entorno no es de desarrollo.',
         'namespaces'            => 'Se ha actualizado el archivo de espacios de nombres de los módulos.',
         'migrated'              => '{0}: se han ejecutado {1} migraciones.',
         'seeded'                => '{0}: se han cargado los datos iniciales.',
@@ -160,6 +162,7 @@ return [
         'markRead'  => 'Marcar como leídas (API)',
     ],
     'toggle' => [
+        'developmentOnly'      => '{0} es un módulo solo para desarrollo: solo se puede activar cuando CI_ENVIRONMENT es development.',
         'coreModule'           => '{0} es un módulo del núcleo y no se puede desactivar.',
         'hasDependants'        => '{0} no se puede desactivar: dependen de él estos módulos activos: {1}.',
         'invalid'              => 'No se puede cargar el manifiesto de {0}; ejecute php spark modules:sync para ver los errores.',
@@ -611,6 +614,7 @@ return [
     ],
     // Labels of the activity log actions (Activity module).
     'activity' => [
+        'devonly_disabled' => 'Módulo solo para desarrollo desactivado',
         'package_refused' => 'Paquete rechazado',
         'package_failed' => 'Operación de paquete fallida',
         'package_installed' => 'Paquete instalado',
@@ -735,6 +739,8 @@ return [
         'description' => 'El núcleo: módulos, permisos, ajustes, temas, notificaciones y el planificador.',
     ],
     'modules' => [
+        'developmentOnly' => 'Solo desarrollo',
+        'developmentOnlyHelp' => 'Solo se activa cuando CI_ENVIRONMENT es development.',
         'title' => 'Módulos',
         'tabs' => [
             'modules' => 'Módulos',
@@ -790,6 +796,8 @@ return [
         'notAllowed' => 'No tienes permiso para hacer esto.',
     ],
     'packages' => [
+        'developmentOnly' => '{0} es un módulo solo para desarrollo: solo se puede instalar cuando CI_ENVIRONMENT es development.',
+        'developmentOnlyInvalid' => 'El $developmentOnly del manifiesto debe ser true o false.',
         'title' => 'Paquete {0}',
         'intro' => 'Los paquetes que se suben aquí se validan y se guardan en writable/packages. Una vez aprobados quedan pendientes y se instalan desde la consola, igual que las solicitudes de desinstalación.',
         'howToRun' => 'Las operaciones pendientes se ejecutan con',

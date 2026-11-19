@@ -32,6 +32,9 @@ use Modules\Core\Theme\ThemeValidator;
  * anything is written, the themes included (ThemeValidator). Step 7 publishes the assets of the
  * Core, the modules and the themes and writes the asset manifest (AssetPublisher); step 10 writes
  * the OpenAPI document of `api/v1` to `writable/api/openapi.json` (OpenApiDocument).
+ *
+ * Outside the `development` environment a development-only module (`$developmentOnly`, D-41-01)
+ * is installed disabled, and one found enabled is disabled (security log).
  */
 final class ModuleSynchronizer
 {
@@ -48,6 +51,7 @@ final class ModuleSynchronizer
         private readonly ?AssetPublisher $assets = null,
         private readonly ?OpenApiDocument $openApi = null,
         private readonly ?bool $autoEnable = null,
+        private readonly DevelopmentOnly $developmentOnly = new DevelopmentOnly(),
     ) {
     }
 
@@ -123,7 +127,7 @@ final class ModuleSynchronizer
                 $registry->insert([
                     'name'         => $name,
                     'version'      => $manifest->version,
-                    'enabled'      => ($enable && $manifest->enabledByDefault) || $name === 'Core' ? 1 : 0,
+                    'enabled'      => ($enable && $manifest->enabledByDefault && ! $this->developmentOnly->refuses($manifest)) || $name === 'Core' ? 1 : 0,
                     'installed_at' => $now,
                     'updated_at'   => $now,
                 ]);
@@ -131,6 +135,13 @@ final class ModuleSynchronizer
             } elseif ($known[$name]['version'] !== $manifest->version) {
                 $registry->update($known[$name]['id'], ['version' => $manifest->version, 'updated_at' => $now]);
                 $report->upgraded[$name] = [$known[$name]['version'], $manifest->version];
+            }
+
+            // 3b. A development-only module never stays enabled outside development (D-41-01).
+            if (isset($known[$name]) && $known[$name]['enabled'] && $this->developmentOnly->refuses($manifest)) {
+                $registry->update($known[$name]['id'], ['enabled' => 0, 'updated_at' => $now]);
+                $report->devOnlyDisabled[] = $name;
+                security_log('Core', 'devonly_disabled', ['resource' => 'modules', 'summary' => $name, 'changes' => ['environment' => ENVIRONMENT]]);
             }
         }
 

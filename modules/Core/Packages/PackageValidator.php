@@ -9,6 +9,7 @@ use Modules\Core\Archive\SafeZip;
 use Modules\Core\Config\ModuleManifest;
 use Modules\Core\Config\Packages;
 use Modules\Core\Menus\MenuDefinitions;
+use Modules\Core\Modules\DevelopmentOnly;
 use Modules\Core\Modules\ManifestValidator;
 use Modules\Core\Modules\ModuleToggler;
 use Modules\Core\Modules\SemVer;
@@ -42,6 +43,7 @@ final class PackageValidator
         ?Packages $config = null,
         private readonly ManifestReader $reader = new ManifestReader(),
         private readonly ?PhpLint $lint = null,
+        private readonly DevelopmentOnly $developmentOnly = new DevelopmentOnly(),
     ) {
         $this->config = $config ?? config('Packages');
     }
@@ -265,6 +267,17 @@ final class PackageValidator
 
         if ($name === 'Core' || in_array($name, ModuleToggler::CORE_MODULES, true)) {
             throw new PackageRefused(lang('Core.packages.coreModule', [$name]));
+        }
+
+        // A development-only module (D-41-01) is installed only in the development environment.
+        $developmentOnly = $props['developmentOnly'] ?? false;
+
+        if (! is_bool($developmentOnly)) {
+            throw new PackageRefused(lang('Core.packages.developmentOnlyInvalid'));
+        }
+
+        if ($developmentOnly && ! $this->developmentOnly->allowed()) {
+            throw new PackageRefused(lang('Core.packages.developmentOnly', [$name]));
         }
 
         $version = ManifestReader::string($props, 'version');

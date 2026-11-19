@@ -67,6 +67,7 @@ $statusColors = [
                 <td>
                     <i class="<?= esc($row['icon'], 'attr') ?> me-1" aria-hidden="true"></i><strong><?= esc($name) ?></strong>
                     <?php if ($row['core']): ?> <?= ui_badge(lang('Core.modules.core'), 'dark') ?><?php endif ?>
+                    <?php if ($row['developmentOnly']): ?> <span title="<?= esc(lang('Core.modules.developmentOnlyHelp'), 'attr') ?>"><?= ui_badge(lang('Core.modules.developmentOnly'), 'warning') ?></span><?php endif ?>
                     <?php if ($row['description'] !== ''): ?><div class="small text-body-secondary"><?= esc($row['description']) ?></div><?php endif ?>
                     <?php foreach ($row['errors'] as $error): ?><div class="small text-danger"><?= esc($error) ?></div><?php endforeach ?>
                 </td>
@@ -98,6 +99,8 @@ $statusColors = [
                                     <?= csrf_field() ?>
                                     <button type="submit" class="btn btn-sm btn-outline-secondary" data-confirm="<?= esc(lang('Core.modules.confirmDisable', [$name]), 'attr') ?>"><?= esc(lang('Core.modules.disable')) ?></button>
                                 </form>
+                            <?php elseif ($row['blocked']): ?>
+                                <span class="small text-body-secondary" data-module-blocked><?= esc(lang('Core.modules.developmentOnlyHelp')) ?></span>
                             <?php else: ?>
                                 <form action="<?= esc(backend_url('modules/enable/' . $name), 'attr') ?>" method="post">
                                     <?= csrf_field() ?>
