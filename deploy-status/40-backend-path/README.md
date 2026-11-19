@@ -1,6 +1,6 @@
 # Session 40 — Configurable back-office path
 
-Branch: `claude/busy-faraday-4rveyp` · Pull request: (see `docs/progress.md`) · Date: 2026-11-19
+Branch: `claude/busy-faraday-4rveyp` · Pull request: [SIENSIS/kpskeletor#58](https://github.com/SIENSIS/kpskeletor/pull/58) · Date: 2026-11-19
 
 ## What was built
 
