@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Modules\Core\I18n;
 
 /**
- * Chooses the locale of a request among the site's available locales: the user's profile, then
- * the browser (`Accept-Language`, by quality; `ca-ES` matches `ca`), then the site's default
- * (docs/i18n.md).
+ * Chooses the locale of a request among the site's available locales: the user's profile (or
+ * the language chosen with the public switch, cookie `kp_locale`), then the browser
+ * (`Accept-Language`, by quality; `ca-ES` matches `ca`), then the site's default (docs/i18n.md).
  */
 final class LocaleNegotiator
 {
+    /** Cookie of the language chosen with the public switch (Modules\Core\Controllers\LanguageSwitch). */
+    public const COOKIE = 'kp_locale';
+
     /**
      * @param list<string>|null $available the site's available locales (default: Locales::available())
      */

@@ -370,6 +370,10 @@ return [
         'watching'  => 'Watching the asset sources (Ctrl+C to stop)…',
         'published' => 'Assets republished at {0}.',
     ],
+    'languageSwitch' => [
+        'label'   => 'Language',
+        'current' => 'Language: {0}',
+    ],
     'mode' => [
         'label' => 'Colour mode',
         'light' => 'Light',

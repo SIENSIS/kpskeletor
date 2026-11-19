@@ -22,6 +22,10 @@ $routes->get('theme-preview/ping', '\Modules\Core\Controllers\ThemePreview::ping
 $routes->get('theme-preview/ping-error', '\Modules\Core\Controllers\ThemePreview::pingError');
 $routes->get('theme-preview/(:segment)', '\Modules\Core\Controllers\ThemePreview::show/$1');
 
+// Public language switch (docs/i18n.md, "Choosing the language"): stores the choice in a cookie
+// (and, through the `localeChosen` event, in the signed-in user's profile), then goes back.
+$routes->post('language', '\Modules\Core\Controllers\LanguageSwitch::set', ['as' => 'language-switch']);
+
 // Minimal PWA (setting Core.pwa; otherwise 404). The service worker is served from the root.
 $routes->get('manifest.webmanifest', '\Modules\Core\Controllers\Pwa::manifest');
 $routes->get('sw.js', '\Modules\Core\Controllers\Pwa::serviceWorker');

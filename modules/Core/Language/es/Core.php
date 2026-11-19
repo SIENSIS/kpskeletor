@@ -370,6 +370,10 @@ return [
         'watching'  => 'Vigilando las fuentes de los recursos (Ctrl+C para detener)…',
         'published' => 'Recursos republicados a las {0}.',
     ],
+    'languageSwitch' => [
+        'label'   => 'Idioma',
+        'current' => 'Idioma: {0}',
+    ],
     'mode' => [
         'label' => 'Modo de color',
         'light' => 'Claro',

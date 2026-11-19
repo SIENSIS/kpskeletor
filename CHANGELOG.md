@@ -10,6 +10,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- A language switch on the public site (default theme, next to the light/dark switch; theme
+  option `languageSwitch`): visitors choose among the site's languages (cookie `kp_locale`), and a
+  signed-in user's choice becomes their profile language (`POST language`, event `localeChosen`,
+  D-37-02; `docs/i18n.md`, "Choosing the language").
 - `ContentTranslations::locales()`, `codes()`, `defaultLocale()`, `defaultName()`, `crudOptions()`, `apiOptions()`,
   `defaultText()` and `keepUnavailable()`: the content languages of a module come from the site's
   locales (`docs/i18n.md`, "Content languages"); `CalendarEvent::translated()` for per-language

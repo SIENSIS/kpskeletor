@@ -27,6 +27,7 @@ return [
         'forceModeHelp'        => 'Ignores the visitors\' choice and hides the switch.',
         'forceModeNone'        => 'Do not force (visitors choose)',
         'modeSwitch'           => 'Show the light/dark switch',
+        'languageSwitch'       => 'Show the language switch on the public site',
         'sidebarColor' => 'Back-office sidebar colour',
         'font'         => 'Font',
         'fontSystem'   => 'System (sans-serif)',

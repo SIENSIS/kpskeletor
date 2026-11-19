@@ -310,13 +310,17 @@ a:not([class]):hover { color: var(--bs-link-hover-color); }
 .toast-info { --bs-toast-bg: var(--bs-info-bg-subtle); --bs-toast-color: var(--bs-info-text-emphasis); }
 
 /* Theme switch */
-.theme-switch .dropdown-item.active { background-color: var(--bs-primary); color: #fff; }
+/* Theme and language switches */
+.theme-switch .dropdown-item.active,
+.language-switch .dropdown-item.active { background-color: var(--bs-primary); color: #fff; }
 .site-header .navbar { flex-wrap: wrap; }
 /* .navbar's padding would cancel the .container gutter on the same element */
 .site-header .navbar.container { padding-left: calc(var(--bs-gutter-x, 1.5rem) * 0.5); padding-right: calc(var(--bs-gutter-x, 1.5rem) * 0.5); }
-.site-theme-switch { order: 0; }
+.site-theme-switch,
+.site-language-switch { order: 0; }
 @media (max-width: 767.98px) {
     .site-header .navbar-brand { margin-right: auto; }
+    .site-language-switch,
     .site-theme-switch { order: 1; }
     .site-header .navbar-toggler { order: 2; }
     .site-header .navbar-collapse { order: 3; }

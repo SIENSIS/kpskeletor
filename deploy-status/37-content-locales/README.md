@@ -15,6 +15,11 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   a new default language is required on the next edit, existing records stay readable.
 - Slugs, activity summaries and notification titles use the default language's text (else the
   first one filled in); help texts and the Menus "label required" message name that language.
+- **Public language switch** (added at the owner's request during the session, D-37-02 open):
+  the default theme's public header shows a globe with the current code next to the light/dark
+  switch; visitors choose among the site's languages (cookie `kp_locale`, which wins over the
+  browser), and a signed-in user's choice becomes their profile language. Hidden with a single
+  language or with the theme option `languageSwitch` off.
 - Calendar titles of birthdays and to-do task due dates are written in every site language;
   FullCalendar loads its locale file for any vendored language.
 
@@ -46,7 +51,14 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   FullCalendar locale. `Core/Settings/TranslatedText.php` falls back to the default language.
 - **Settings:** `Core.defaultLocale` and `Core.locales` take their choices from the supported
   locales through `optionsProvider` (`Core/I18n/DefaultLocaleOptions.php`, `LocaleOptions.php`).
-- **No tables, routes, permissions or commands changed;** no migration (one translation row per
+- **Language switch:** `modules/Core/Controllers/LanguageSwitch.php` (`POST language`, route
+  `language-switch`; ignores locales not offered, cookie `kp_locale` for a year, HTTP-only,
+  event `localeChosen` for signed-in users, `safe_redirect()` back), `LocaleNegotiator::COOKIE`
+  read by the `locale` filter (profile → chosen → browser → default), Auth's listener in
+  `modules/Auth/Config/Events.php` saves the profile language; view
+  `themes/default/Views/partials/language_switch.php` (POST forms, no JavaScript), theme option
+  `languageSwitch`, styles in `theme.css`.
+- **No tables, permissions or commands changed;** one public route added (`POST language`); no migration (one translation row per
   locale already).
 
 ## Decisions and deviations
@@ -55,6 +67,9 @@ Branch: `claude/tender-pasteur-75mv6z` · Pull request: [SIENSIS/kpskeletor#51](
   deprecated alias: a constant cannot follow a setting), and the behaviour when languages are
   added, removed or the default changes. The specification's "Catalan as the required language"
   now reads "the site's default language".
+- **D-37-02** (decide, **Open**): the public language switch's URL `POST language`, cookie
+  `kp_locale` and event `localeChosen`, built as proposed; alternatives: a language prefix in the
+  URL, `?lang=` links, or keeping a signed-in user's public choice apart from the profile.
 - Earlier gaps fixed because they blocked the goal: the language settings only offered ca/es/en;
   help texts and a Menus message named Catalan; translated settings fell back to Catalan.
 - Tests: the suite runs with `app.defaultLocale=en` (English assertions), which would make English
@@ -95,6 +110,10 @@ New tests (all in the suite):
   code (allow-list: language files, `Database/`, `Config/`, tests, `Locales`, `Language`); the
   removed constants are not used.
 - `modules/Core/Tests/I18nTest.php::testTheLanguageSettingsOfferEverySupportedLocale`.
+- `modules/Core/Tests/LanguageSwitchTest.php`: the header offers the available languages; hidden
+  with one language or the option off; the cookie wins over the browser; locales not offered
+  ignored; only internal `return` paths; forged POST without CSRF refused; a signed-in user's
+  choice becomes the profile language (back office follows).
 
 Results:
 
@@ -135,8 +154,22 @@ Catalan optional.*
 default) is shown instead of the Catalan one; the interface texts follow the language chain
 (fr → es).*
 
+![Public language switch](screenshots/06-public-language-switch.png)
+*06 — The public language switch open on the news list (globe + current code, next to the
+light/dark switch).*
+
+![After choosing English](screenshots/07-public-after-choosing-english.png)
+*07 — The same page after choosing English: back on `/news`, interface in English, content falls
+back to the default language where there is no English text.*
+
+![Language switch, phone, dark](screenshots/08-public-language-switch-phone-dark.png)
+*08 — The switch at phone width in dark mode, next to the colour-mode switch and the menu button.*
+
 ## Known issues
 
+- The public switch changes the language through a cookie, so each page keeps one URL for every
+  language (no `hreflang` alternates for search engines; a URL prefix would be a later session,
+  D-37-02 alternative A).
 - A new language shows its code (`fr`) on tabs and checkboxes until `Core.locales.<code>` and its
   language files exist (`docs/i18n.md`, "Adding a language", step 2).
 - Composer needed the known issue 04 workaround again: `phpstan/phpstan` (zip only) installed

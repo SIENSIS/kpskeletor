@@ -284,6 +284,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-35-03 | 35 | One minisign verifier in the Core (`Modules\Core\Security\Minisign`) | Accepted (proposal) |
 | D-35-04 | 35 | WCAG AA colours of the default theme: darker text shades derived from the palette | Accepted (proposal) |
 | D-37-01 | 37 | Content languages from the site's locales: helpers, removed constants and language changes | Accepted (proposal) |
+| D-37-02 | 37 | Public language switch: URL `POST language`, cookie `kp_locale`, event `localeChosen` (decide) | Open |
 | D-38-01 | 38 | Settings zone of the back-office menu grouped in five containers (decide) | Decided |
 | D-40-01 | 40 | Configurable back-office path chosen at install time (decide) | Applied (decided) |
 
@@ -2901,3 +2902,11 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Keep the constants as deprecated aliases with the old values (third-party modules keep working but keep offering ca/es/en only). B) Make the constants dynamic through a static property (not possible for a class constant without breaking its type).
 - **Status:** Accepted (proposal)
 - **Applied in:** session 37 (`modules/Core/Content/ContentTranslations.php`, `app/Config/Kpapy.php`, `modules/Core/Calendar/CalendarEvent.php`, `modules/Core/Settings/TranslatedText.php`, the modules' controllers, services and views; tests `*/Tests/ContentLocalesTest.php`, `*/Tests/ContentLocalesApiTest.php`, `tests/unit/I18n/ContentLanguagesTest.php`), `docs/i18n.md`, `docs/specification.md`
+
+## D-37-02 — Public language switch: URL `POST language`, cookie `kp_locale`, event `localeChosen` (decide)
+
+- **Where:** owner's request of 2026-11-19 during session 37 ("in the public part the language cannot be changed; a selector is missing, automatic from the defined languages, like the light/dark mode"); specification "Languages" (negotiation: profile → browser → default), "Themes".
+- **Problem:** Visitors can only get another language through their browser's `Accept-Language`; the public site has no way to choose one. The switch adds a public URL, a cookie and a Core event (public conventions).
+- **Proposal (built):** the default theme's public header shows a switch next to the light/dark one (partial `language_switch`, theme option `languageSwitch`, on by default; hidden with a single language): a POST form per available locale (CSRF, no JavaScript) to `POST language` (route `language-switch`, `Modules\Core\Controllers\LanguageSwitch`), which ignores locales the site does not offer, stores the choice in the cookie `kp_locale` (one year, HTTP-only, `SameSite=Lax`), triggers `localeChosen` (user id, locale) for a signed-in user — the Auth module saves it as the profile language, so the back office and emails follow it — and goes back to the page (`return`, internal paths only). Negotiation becomes profile → chosen language (cookie) → browser → default. No rate limit (it only sets a cookie; CSRF protects it).
+- **Alternatives:** A) A language prefix in the URL (`/es/news/…`): best for search engines (one URL per language, `hreflang`), but every public route and stored link changes — a later session if wanted. B) `?lang=<code>` links (GET): simpler, but a state change through GET and duplicate URLs. C) For signed-in users, keep the public choice separate from the profile language (cookie only).
+- **Status:** Open

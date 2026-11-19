@@ -370,6 +370,10 @@ return [
         'watching'  => 'Vigilant les fonts dels recursos (Ctrl+C per aturar)…',
         'published' => 'Recursos republicats a les {0}.',
     ],
+    'languageSwitch' => [
+        'label'   => 'Idioma',
+        'current' => 'Idioma: {0}',
+    ],
     'mode' => [
         'label' => 'Mode de color',
         'light' => 'Clar',

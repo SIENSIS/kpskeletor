@@ -27,6 +27,7 @@ return [
         'forceModeHelp'        => 'Ignora l\'elecció dels visitants i amaga el selector.',
         'forceModeNone'        => 'No forcis (trien els visitants)',
         'modeSwitch'           => 'Mostra el selector clar/fosc',
+        'languageSwitch'       => 'Mostra el selector d\'idioma a la web pública',
         'sidebarColor' => 'Color de la barra lateral del back office',
         'font'         => 'Tipus de lletra',
         'fontSystem'   => 'Del sistema (sense serif)',

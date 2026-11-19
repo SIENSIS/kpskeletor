@@ -27,6 +27,7 @@ return [
         'forceModeHelp'        => 'Ignora la elección de los visitantes y oculta el selector.',
         'forceModeNone'        => 'No forzar (eligen los visitantes)',
         'modeSwitch'           => 'Mostrar el selector claro/oscuro',
+        'languageSwitch'       => 'Mostrar el selector de idioma en la web pública',
         'sidebarColor' => 'Color de la barra lateral del back office',
         'font'         => 'Tipo de letra',
         'fontSystem'   => 'Del sistema (sin serifa)',
