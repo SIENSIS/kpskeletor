@@ -104,6 +104,13 @@ final class InstallJob implements InstallProgress
         $this->id = $id;
         $this->jobs->update($id, ['status' => 'running']);
 
+        // Messages (e.g. the failure) in the language of the page that started the job.
+        $locale = (string) ($this->jobs->get($id)['locale'] ?? '');
+
+        if (in_array($locale, config('App')->supportedLocales, true)) {
+            service('language')->setLocale($locale);
+        }
+
         try {
             $result = $this->installer->install($options, null, false, $this);
         } catch (Throwable $e) {

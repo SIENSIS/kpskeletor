@@ -182,6 +182,13 @@ final class InstallProgressTest extends CIUnitTestCase
         $this->assertSame('failed', $data['status']);
         $this->assertSame('database', $data['step']);
         $this->assertSame(lang('Install.error.notEmpty'), $data['message']);
+
+        // In the language of the page that started the job.
+        $id = $jobs->create('es');
+        $jobs->lock($id);
+        (new InstallJob($jobs, $this->installer($state)))->run($id, $this->options(), ['loginUrl' => '', 'username' => 'owner']);
+        $this->assertSame(lang('Install.error.notEmpty', [], 'es'), $jobs->get($id)['message'] ?? null);
+        $this->assertNotSame(lang('Install.error.notEmpty', [], 'en'), lang('Install.error.notEmpty', [], 'es'));
         $this->assertFalse($jobs->isLocked());
         $this->assertFileDoesNotExist($jobs->secretsFile($id));
     }
