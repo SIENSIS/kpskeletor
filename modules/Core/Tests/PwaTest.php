@@ -62,12 +62,12 @@ final class PwaTest extends CIUnitTestCase
                     return $this->values[$key];
                 }
 
-                // Anything else comes from the config files, like the real service without a
-                // stored value (e.g. Shield's `Auth.sessionConfig`, read by `auth()` in the layout).
-                [$class, $property] = array_pad(explode('.', $key, 2), 2, '');
-                $config             = config($class);
+                // Shield's settings come from its config file, like the real service without a
+                // stored value (`Auth.sessionConfig` is read by `auth()` in the public layout).
+                $property = str_starts_with($key, 'Auth.') ? substr($key, 5) : '';
+                $auth     = config(\Config\Auth::class);
 
-                return is_object($config) && $property !== '' && property_exists($config, $property) ? $config->{$property} : null;
+                return $property !== '' && property_exists($auth, $property) ? $auth->{$property} : null;
             }
         };
         Services::injectMock('settings', $settings);
