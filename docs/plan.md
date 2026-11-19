@@ -916,6 +916,28 @@ point 4, automatic translation, is postponed: Google Cloud Translation with an i
 - **Tests:** picker e2e (search, keyboard, axe, phone, dark), icon list up to date, sanitiser rules,
   editor round trip.
 - **Depends on:** 48 (order only; reuses the icon field of 45); D-49-01, D-49-02 decided.
+
+## 50 — Site search: a Core search index fed by the modules (`deploy/50-site-search.md`)
+
+- **Goal:** a Core search index (own tables, the same on MariaDB and SQLite; terms normalised per
+  language; weights title > meta/keywords > summary > body) fed by modules through a contract
+  like the calendar (`$searchSources`, `service('search')->index()/remove()`, `search:reindex`),
+  visibility enforced in the query; Pages and News as the first sources; a public search box
+  (theme option) and results page. Owner's request of 2026-11-19 (the base of the chat assistant).
+- **Tables:** search documents and terms (D-50-01).
+- **Tests:** normalisation and ranking, visibility (drafts, private, groups, disabled modules),
+  reindex, rate limit, public page per language.
+- **Depends on:** 49 (order only); D-50-01 **(decide)**.
+
+## 51 — Chat assistant: FAQ and site search in a chat bubble (`deploy/51-chat-assistant.md`)
+
+- **Goal:** a module (disabled by default) with frequently asked questions per language and a
+  public chat bubble that answers from the FAQs and the search index (session 50), with links, and
+  offers the contact form (session 48) when nothing fits. No AI and no external service.
+- **Tables:** FAQs and their translations; optionally anonymised unanswered questions (D-51-02).
+- **Tests:** matching per language, visibility, endpoint security (CSRF, rate limit, input),
+  e2e of the bubble (keyboard, phone, dark, axe).
+- **Depends on:** 50 (the index) and 48 (the contact form); D-51-01, D-51-02 **(decide)**.
   Merges itself into `main` (last planned session).
 
 ---
