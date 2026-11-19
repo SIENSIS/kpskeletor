@@ -800,6 +800,49 @@ namespace `Modules\<Name>`, migrations named `YYYY-MM-DD-HHMMSS_CreateX`, tests 
 
 ---
 
+## After the release (owner's review of 2026-11-19)
+
+Sessions added after 1.0.0 from the owner's review (points 1, 5, 6 and 7; point 2, Synology
+Calendar, is postponed; point 3, page update dates, waits for the owner's steps to reproduce it;
+point 4, automatic translation, is being discussed). They follow the same procedure as 00–36.
+
+## 37 — Content languages from the site's locales (`deploy/37-content-locales.md`)
+
+- **Goal:** content forms, readers and APIs (News, Pages, Events, Menus, Tasks) take their
+  languages from `Locales` and require the site's default language, not a fixed ca/es/en list.
+- **Files:** `modules/Core/Content/ContentTranslations.php` and the ~20 files that write `'ca'`.
+- **Tables:** none (one translation row per locale already).
+- **Tests:** a fourth language and another default language reach every form, reader and API; a
+  static test against hard-coded content languages.
+- **Depends on:** 36.
+
+## 38 — Settings menu groups and the public sign-in link (`deploy/38-settings-menu.md`)
+
+- **Goal:** five groups in the settings zone (D-38-01); a sign-in / back-office link on the public
+  site (theme option).
+- **Files:** manifests' `settings` entries, Core group entries, default theme navbar and options.
+- **Tests:** groups per permission, customisations still applied, the link per user type.
+- **Depends on:** 37 (order only).
+
+## 39 — Web installer progress (`deploy/39-installer-progress.md`)
+
+- **Goal:** progress bar and log while the web installer works (job after the response,
+  `progress/install/<job>`, one-time result page), with the in-request fallback.
+- **Files:** `modules/Core/Install/*`, the web installer controller and views, an ES module.
+- **Tests:** steps reported in order, job files and secrets, the progress endpoint's security.
+- **Depends on:** 38 (order only).
+
+## 40 — Configurable back-office path (`deploy/40-backend-path.md`)
+
+- **Goal:** the `backend` prefix becomes `app.backendPath`, chosen at install time (D-40-01).
+- **Files:** every route file, filters, Shield redirects, helpers, installer, stored links, docs.
+- **Tests:** the suite with the default; a case with `admin`; installer validation; e2e.
+- **Depends on:** 39 (installer field) and D-40-01 **(decide)**.
+- **Risks:** the widest change after the release (≈ 380 places in code, ≈ 950 in tests, stored
+  links); it merges itself into `main` (last planned session).
+
+---
+
 ## Contradictions and open questions in the specification
 
 Each item gives where it appears, the issue, and the proposed solution. Items marked
