@@ -1,6 +1,6 @@
 # Session 44 — Web Push notifications
 
-Branch: `ccr-28ba7acf-il6cdh` · Pull request: (pending) · Date: 2026-11-20
+Branch: `ccr-28ba7acf-il6cdh` · Pull request: [SIENSIS/kpskeletor#62](https://github.com/SIENSIS/kpskeletor/pull/62) · Date: 2026-11-20
 
 ## What was built
 
