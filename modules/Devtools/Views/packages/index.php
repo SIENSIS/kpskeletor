@@ -39,43 +39,32 @@ $copy = esc(json_encode(['copied' => lang('Devtools.recipes.copied')], JSON_THRO
 
 <section class="card mb-4" aria-labelledby="sources-title">
     <div class="card-header"><h2 class="h6 mb-0" id="sources-title"><?= esc(lang('Devtools.packages.sources')) ?></h2></div>
-    <div class="table-responsive">
-        <table class="table table-sm align-middle mb-0">
-            <thead>
-                <tr>
-                    <th scope="col"><?= esc(lang('Devtools.packages.name')) ?></th>
-                    <th scope="col"><?= esc(lang('Devtools.packages.type')) ?></th>
-                    <th scope="col"><?= esc(lang('Devtools.packages.version')) ?></th>
-                    <th scope="col"><span class="visually-hidden"><?= esc(lang('Devtools.packages.build')) ?></span></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($sources as $source): ?>
-                    <tr data-package-source="<?= esc($source->name, 'attr') ?>">
-                        <th scope="row" class="fw-semibold"><?= esc($source->name) ?></th>
-                        <td><?= ui_badge(lang('Devtools.packages.types.' . $source->type), $source->isModule() ? 'primary' : 'info') ?></td>
-                        <td class="font-monospace"><?= esc($source->version) ?></td>
-                        <td class="text-end">
-                            <?php if ($canWrite): ?>
-                                <form method="post" action="<?= esc(backend_url('devtools/packages/build'), 'attr') ?>" class="d-flex flex-wrap gap-2 justify-content-end">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="type" value="<?= esc($source->type, 'attr') ?>">
-                                    <input type="hidden" name="name" value="<?= esc($source->name, 'attr') ?>">
-                                    <label class="visually-hidden" for="bump-<?= esc($source->type . '-' . $source->name, 'attr') ?>"><?= esc(lang('Devtools.packages.bump.label')) ?></label>
-                                    <select class="form-select form-select-sm w-auto" name="bump" id="bump-<?= esc($source->type . '-' . $source->name, 'attr') ?>">
-                                        <?php foreach (['none', 'patch', 'minor', 'major'] as $level): ?>
-                                            <option value="<?= esc($level, 'attr') ?>"><?= esc(lang('Devtools.packages.bump.' . $level)) ?></option>
-                                        <?php endforeach ?>
-                                    </select>
-                                    <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-box-seam" aria-hidden="true"></i> <?= esc(lang('Devtools.packages.build')) ?></button>
-                                </form>
-                            <?php endif ?>
-                        </td>
-                    </tr>
-                <?php endforeach ?>
-            </tbody>
-        </table>
-    </div>
+    <ul class="list-group list-group-flush">
+        <?php foreach ($sources as $source): ?>
+            <?php $id = 'bump-' . $source->type . '-' . $source->name ?>
+            <li class="list-group-item d-flex flex-wrap align-items-center gap-2" data-package-source="<?= esc($source->name, 'attr') ?>">
+                <div class="d-flex flex-wrap align-items-center gap-2 me-auto">
+                    <strong><?= esc($source->name) ?></strong>
+                    <?= ui_badge(lang('Devtools.packages.types.' . $source->type), $source->isModule() ? 'primary' : 'info') ?>
+                    <span class="font-monospace small"><span class="visually-hidden"><?= esc(lang('Devtools.packages.version')) ?> </span><?= esc($source->version) ?></span>
+                </div>
+                <?php if ($canWrite): ?>
+                    <form method="post" action="<?= esc(backend_url('devtools/packages/build'), 'attr') ?>" class="d-flex flex-wrap gap-2">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="type" value="<?= esc($source->type, 'attr') ?>">
+                        <input type="hidden" name="name" value="<?= esc($source->name, 'attr') ?>">
+                        <label class="visually-hidden" for="<?= esc($id, 'attr') ?>"><?= esc(lang('Devtools.packages.bump.label') . ' (' . $source->name . ')') ?></label>
+                        <select class="form-select form-select-sm w-auto" name="bump" id="<?= esc($id, 'attr') ?>">
+                            <?php foreach (['none', 'patch', 'minor', 'major'] as $level): ?>
+                                <option value="<?= esc($level, 'attr') ?>"><?= esc(lang('Devtools.packages.bump.' . $level)) ?></option>
+                            <?php endforeach ?>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-box-seam" aria-hidden="true"></i> <?= esc(lang('Devtools.packages.build')) ?><span class="visually-hidden"> <?= esc($source->name) ?></span></button>
+                    </form>
+                <?php endif ?>
+            </li>
+        <?php endforeach ?>
+    </ul>
     <div class="card-footer small text-body-secondary"><?= esc(lang('Devtools.packages.coreHelp')) ?></div>
 </section>
 
@@ -111,14 +100,14 @@ $copy = esc(json_encode(['copied' => lang('Devtools.recipes.copied')], JSON_THRO
                     <?php if ($package['minisig'] && ($package['info']['publicKey'] ?? '') !== ''): ?>
                         <p class="small mb-1"><?= esc(lang('Devtools.packages.built.publicKey')) ?></p>
                         <div class="d-flex gap-2 align-items-start mb-2">
-                            <pre class="bg-body-tertiary border rounded p-2 small mb-0 flex-grow-1 text-break"><code id="pub-<?= $i ?>"><?= esc($package['info']['publicKey']) ?></code></pre>
+                            <code class="d-block bg-body-tertiary border rounded p-2 small flex-grow-1 text-break" id="pub-<?= $i ?>"><?= esc($package['info']['publicKey']) ?></code>
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-component="devtools/copy" data-copy-target="pub-<?= $i ?>" data-options="<?= $copy ?>"><i class="bi bi-clipboard" aria-hidden="true"></i><span class="visually-hidden"> <?= esc(lang('Devtools.recipes.copy')) ?></span></button>
                         </div>
                     <?php endif ?>
                     <details class="small">
                         <summary><?= esc(lang('Devtools.packages.built.elsewhere')) ?></summary>
                         <div class="d-flex gap-2 align-items-start mt-2">
-                            <pre class="bg-body-tertiary border rounded p-2 mb-0 flex-grow-1 text-break"><code id="cmd-<?= $i ?>">minisign -Sm <?= esc($package['file']) ?> -t '<?= esc(preg_replace('/^(.+)-(\d+\.\d+\.\d+[^.]*)\.zip$/', '$1 $2', $package['file'])) ?>'</code></pre>
+                            <code class="d-block bg-body-tertiary border rounded p-2 flex-grow-1 text-break" id="cmd-<?= $i ?>">minisign -Sm <?= esc($package['file']) ?> -t '<?= esc(preg_replace('/^(.+)-(\d+\.\d+\.\d+[^.]*)\.zip$/', '$1 $2', $package['file'])) ?>'</code>
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-component="devtools/copy" data-copy-target="cmd-<?= $i ?>" data-options="<?= $copy ?>"><i class="bi bi-clipboard" aria-hidden="true"></i><span class="visually-hidden"> <?= esc(lang('Devtools.recipes.copy')) ?></span></button>
                         </div>
                     </details>

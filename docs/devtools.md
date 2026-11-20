@@ -2,8 +2,8 @@
 
 `modules/Devtools` is a module that exists **only for development** (D-41-01 … D-41-03): the
 home of tools that help to build modules from the back office. Session 41 built the module, its
-locks and the **CRUD recipes**; session 42 the **code generator**; session 43 adds the package
-builder.
+locks and the **CRUD recipes**; session 42 the **code generator**; session 43 the **package
+builder** and signing.
 
 ## Using it
 
@@ -27,6 +27,9 @@ Sign in as a **superadmin** and open *Configuració › Desenvolupament › Eine
   file and doc heading exists, so a renamed section breaks the test, not the page.
 - **Code generator** (`backend/devtools/generator`): a wizard that builds a module, or adds tables
   to an existing one, previews every file and writes them (below).
+- **Packages** (`backend/devtools/packages`): builds the installable ZIP of a module or theme,
+  validated as the installer validates it, with its SHA-256 and a minisign signature
+  ("Building and signing packages", below).
 
 ## The code generator
 
@@ -200,6 +203,93 @@ modules/Core/Tests/GeneratorEngineTest.php` and review the diff), `GeneratedModu
 (the `library` and `zoo-existing` definitions generated into `modules/`: `php -l`,
 php-cs-fixer, PHPStan, `csp:check` and **their own tests**), `modules/Devtools/Tests/
 GeneratorWizardTest.php` and `tests/e2e/devtools-generator.spec.mjs`.
+
+## Building and signing packages
+
+Session 43, D-43-01. The same engine from the console and from the screen
+(`Modules\Devtools\Packages`): `PackageSource` (the module or theme folder, its version read
+from the manifest without running it), `PackageBuilder`, `PackageSigner`, `VersionBump`.
+
+### From the console
+
+```bash
+php spark modules:package Tasks                                  # writable/devtools/packages/Tasks-0.2.0.zip + .sha256
+php spark modules:package default --theme                        # a theme (themes/default)
+php spark modules:package Tasks --out=dist --sign=~/.minisign/acme.key   # + Tasks-0.2.0.zip.minisig
+```
+
+Development only (`CI_ENVIRONMENT = development`); the Core modules (Core, Auth, Api, Users,
+Settings, Dashboard) are not packaged: they travel in release archives (`app:update`). The
+password of an encrypted key is asked without echo (`KP_SIGN_PASSWORD` for scripts); a relative
+path is read from the shell's folder.
+
+### What a package contains
+
+- **one top folder** named like the module (`Tasks/…`) or the theme slug (`default/…`), files
+  sorted, permissions 0644;
+- left out without a word: every dotfile and dot folder (`.git`, `.env`, `.idea`, `.gitkeep`…),
+  `node_modules/` and `writable/`;
+- left out and **listed** as *left out*: editor and system files (`*~`, `*.swp`, `*.bak`,
+  `*.orig`, `*.tmp`, `Thumbs.db`…) and every file whose extension `packages.extensions` would
+  refuse (`*.sh`, `*.phar`, `*.scss`…);
+- a **symbolic link** stops the build.
+
+Then the ZIP is validated with the Core's `PackageValidator::validateAndLint()`, the installer's own
+checks (single folder, manifest read without running it, name, semantic version, reserved and
+core names, sizes, zip-slip, links, extensions, zip bombs, `php -l` of every PHP file): any error
+removes it and nothing is left behind. `<zip>.sha256` is written in `sha256sum` format
+(`sha256sum -c` checks it). Rebuilding a version removes its old signature. Local changes not
+committed (`git status` of the folder) are a **warning** only: the package contains them.
+
+### From the screen
+
+*Devtools › Packages* lists the modules and themes with their version, a **Build package**
+button (WRITE: `devtools.write`, re-authentication, the forms rate limit) with an optional
+**raise the version** (patch, minor or major: the `$version` literal of the manifest and a new
+section in the module's `CHANGELOG.md`; an `## [Unreleased]` section becomes the new version's),
+the validation result (files, size, SHA-256, files left out, warnings) and the built packages with
+download links for the ZIP, `.sha256` and `.minisig` (served by the controller from
+`writable/devtools/packages/`, names matching `PackageStore::NAME_PATTERN` only, never from
+`public/`), the minisign command for signing on another computer and, once signed, the public key.
+
+### Signing
+
+minisign-compatible (Ed25519, pre-hashed BLAKE2b `ED`, trusted comment `<Name> <version>`),
+implemented with libsodium: the secret key file (`untrusted comment` + base64 of `Ed`, the KDF
+`Sc` (scrypt, `sodium_crypto_pwhash_scryptsalsa208sha256`) or none (`minisign -G -W`), `B2`, salt,
+limits, key id, secret key, checksum) is decrypted in memory with its password (a wrong password
+fails the BLAKE2b checksum: a clear error), the package is signed, `<zip>.minisig` is written and
+then **verified with the Core's `Modules\Core\Security\Minisign`** against the public key derived
+from the secret key. The public key line (`RW…`) is shown, to put in `packages.publicKeys`
+(`docs/installing-modules.md`, "Signatures"); `<zip>.json` keeps the public facts (key id, public
+key, SHA-256). The signatures are byte for byte those of the minisign 0.11 CLI (Ed25519 is
+deterministic; `Tests/Fixtures/minisign`).
+
+### Signing from the local form (D-43-01)
+
+*Sign* opens `backend/devtools/packages/sign`: the secret key (pasted, or a file read in memory)
+and its password (the Core's show/hide button). Safeguards, each one tested
+(`PackagesScreenTest`):
+
+- the key and the password are never written anywhere: no temporary file of ours (PHP removes its
+  own upload file at the end of the request), no session, no `withInput()`, no flash data, no
+  log; the activity log records only "signed `<file>` with key id `<id>`"; they are wiped with
+  `sodium_memzero` and are `#[\SensitiveParameter]` (never in a backtrace);
+- **the debug toolbar never stores them**: the controller reads the fields and then empties the
+  request's POST data, `$_REQUEST`, the uploaded files and the raw body before doing anything else
+  (`Packages::scrub()`), because the toolbar's *after* filter writes the POST data of every
+  request to `writable/debugbar/` whatever `collectVarData` says; a test posts a key and checks
+  that no file under `writable/`, the session, the activity log and what the toolbar collects
+  contain it;
+- every exception is caught: a generic message, never the development error page;
+- `autocomplete="off"` (and no spell checking) on both fields, `Cache-Control: no-store`, every
+  Devtools lock (development, loopback, `devtools.write`, `reauth`, rate limit);
+- **cleanup afterwards** (owner's addition): the POST answers a redirect to
+  `backend/devtools/packages/signed`, which calls the services behind `php spark debugbar:clear`,
+  `logs:clear`, `cache:clear` and `app:cache-clear` (no process is spawned), drops the session's
+  flash and old-input data, **ends the session** (the user signs in again) and logs `cleanup`.
+  The form says so. Clearing the cache also resets the rate-limit counters of this development
+  copy (D-43-02).
 
 ## The locks
 

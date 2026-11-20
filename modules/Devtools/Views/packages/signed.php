@@ -14,7 +14,7 @@
     <?php if (is_array($info)): ?>
         <p><?= esc(lang('Devtools.packages.signed.text', [$info['file'], $info['keyId']])) ?></p>
         <p class="small mb-1"><?= esc(lang('Devtools.packages.built.publicKey')) ?></p>
-        <pre class="bg-body-tertiary border rounded p-2 small text-break"><code><?= esc($info['publicKey']) ?></code></pre>
+        <code class="d-block bg-body-tertiary border rounded p-2 small text-break mb-3"><?= esc($info['publicKey']) ?></code>
         <p class="small text-body-secondary">SHA-256: <span class="font-monospace text-break"><?= esc($info['sha256']) ?></span></p>
     <?php endif ?>
     <div class="alert alert-info small" role="status"><?= esc(lang('Devtools.packages.signed.cleanup', [implode(', ', $done)])) ?></div>
