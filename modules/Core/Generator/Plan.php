@@ -36,14 +36,18 @@ final class Plan
     }
 
     /**
-     * Hash of the definition and of every touched file as it was on disk.
+     * Hash of the definition and of every existing file the plan touches, as it was on disk. New
+     * files are left out (a migration's name carries the time of the plan); the writer refuses
+     * any of them that exists by then.
      */
     public function fingerprint(): string
     {
         $state = ['definition' => $this->definition->toArray(), 'files' => []];
 
         foreach ($this->files as $path => $file) {
-            $state['files'][$path] = $file->originalHash();
+            if ($file->original !== null) {
+                $state['files'][$path] = $file->originalHash();
+            }
         }
 
         return hash('sha256', (string) json_encode($state));

@@ -45,9 +45,9 @@ trait GeneratorTestTrait
         );
     }
 
-    private function plan(ModuleDefinition $definition): Plan
+    private function plan(ModuleDefinition $definition, string $now = '2026-11-20 10:00:00'): Plan
     {
-        Time::setTestNow('2026-11-20 10:00:00');
+        Time::setTestNow($now);
 
         try {
             return (new Engine($this->context()))->plan($definition);

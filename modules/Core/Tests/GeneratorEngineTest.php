@@ -138,6 +138,16 @@ final class GeneratorEngineTest extends CIUnitTestCase
         $this->plan($this->definition('zoo-existing'));
     }
 
+    public function testThePreviewAndTheWriteAgreeAcrossASecond(): void
+    {
+        $definition = $this->definition('notes');
+        $first      = $this->plan($definition, '2026-11-20 10:00:00');
+        $second     = $this->plan($definition, '2026-11-20 10:00:01');
+
+        $this->assertNotSame(array_keys($first->files), array_keys($second->files), 'Migration names carry the time.');
+        $this->assertSame($first->fingerprint(), $second->fingerprint());
+    }
+
     public function testTheDefinitionSurvivesAJsonRoundTrip(): void
     {
         foreach (['library', 'notes', 'zoo-existing'] as $case) {

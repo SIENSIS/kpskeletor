@@ -42,7 +42,8 @@ final class TableDefinition
         $columns = [];
 
         foreach (is_array($data['columns'] ?? null) ? $data['columns'] : [] as $column) {
-            if (is_array($column) && is_string($column['name'] ?? null) && trim($column['name']) !== '') {
+            // A column without a name is kept: the validator asks for one (the wizard's new rows).
+            if (is_array($column)) {
                 $columns[] = ColumnDefinition::fromArray($column);
             }
         }

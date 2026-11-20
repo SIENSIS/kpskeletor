@@ -18,6 +18,7 @@ final class Home extends BackendController
             'title' => lang('Devtools.title'),
             'icon'  => 'bi bi-tools',
             'tools' => [
+                ['url' => backend_url('devtools/generator'), 'icon' => 'bi bi-magic', 'title' => lang('Devtools.generator.title'), 'text' => lang('Devtools.generator.intro')],
                 ['url' => backend_url('devtools/recipes'), 'icon' => 'bi bi-journal-code', 'title' => lang('Devtools.recipes.title'), 'text' => lang('Devtools.recipes.intro')],
             ],
         ]);

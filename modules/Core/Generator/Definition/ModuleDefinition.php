@@ -91,9 +91,7 @@ final class ModuleDefinition implements \JsonSerializable
     {
         return [
             'format' => self::FORMAT,
-            'module' => array_filter([
-                'name'        => $this->name,
-                'existing'    => $this->existing,
+            'module' => ['name' => $this->name, 'existing' => $this->existing] + array_filter([
                 'description' => $this->description?->toArray(),
                 'author'      => $this->author,
                 'requires'    => $this->requires,

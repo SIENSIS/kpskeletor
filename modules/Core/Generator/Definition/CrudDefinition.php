@@ -74,11 +74,12 @@ final class CrudDefinition
         $custom = [];
 
         foreach (is_array($data['customOperations'] ?? null) ? $data['customOperations'] : [] as $operation) {
-            if (! is_array($operation) || ! is_string($operation['key'] ?? null) || trim($operation['key']) === '') {
+            if (! is_array($operation)) {
                 continue;
             }
 
-            $key      = trim($operation['key']);
+            // An operation without a key is kept: the validator asks for one.
+            $key      = is_string($operation['key'] ?? null) ? trim($operation['key']) : '';
             $custom[] = [
                 'key'     => $key,
                 'label'   => Texts::from($operation['label'] ?? null, Texts::humanise($key)),

@@ -137,7 +137,8 @@ final class DevtoolsLocksTest extends DevtoolsTestCase
                 }
 
                 $filters = $routes->getFiltersForRoute((string) $from, $verb);
-                $expect  = $verb === 'GET' ? DevtoolsRoutes::VIEW : DevtoolsRoutes::WRITE;
+                $draft   = in_array(substr((string) $from, strlen($prefix) + 1), DevtoolsRoutes::DRAFT_ROUTES, true);
+                $expect  = $verb === 'GET' ? DevtoolsRoutes::VIEW : ($draft && $verb === 'POST' ? DevtoolsRoutes::DRAFT : DevtoolsRoutes::WRITE);
                 $this->assertSame($expect, $filters, "{$verb} {$from}");
                 $found++;
             }
@@ -145,6 +146,8 @@ final class DevtoolsLocksTest extends DevtoolsTestCase
 
         $this->assertGreaterThanOrEqual(3, $found);
         $this->assertSame(['devtools', 'can:devtools.write', 'reauth', 'ratelimit:forms'], DevtoolsRoutes::WRITE);
+        $this->assertSame(['devtools', 'can:devtools.view'], DevtoolsRoutes::DRAFT);
+        $this->assertSame(['generator', 'generator/load'], DevtoolsRoutes::DRAFT_ROUTES, 'Only the generator\'s draft routes skip WRITE (D-42-02).');
     }
 
     public function testAWriteRouteNeedsDevtoolsWriteAndReauthentication(): void
@@ -180,7 +183,7 @@ final class DevtoolsLocksTest extends DevtoolsTestCase
 
     public function testViewsHaveNoInlineCode(): void
     {
-        foreach (glob(dirname(__DIR__) . '/Views/*.php') ?: [] as $file) {
+        foreach ([...(glob(dirname(__DIR__) . '/Views/*.php') ?: []), ...(glob(dirname(__DIR__) . '/Views/*/*.php') ?: [])] as $file) {
             $code = (string) file_get_contents($file);
             $this->assertDoesNotMatchRegularExpression('/<script|<style|\sstyle=|\son[a-z]+=/i', $code, basename($file));
         }
