@@ -128,6 +128,14 @@ return [
         'missing' => 'writable/install.lock is missing: the web installer could run again.',
         'fix'     => 'Finish the installation with php spark app:install (it writes the lock file).',
     ],
+    'devtools' => [
+        'title'       => 'Development-only modules',
+        'ok'          => 'No development-only module is enabled.',
+        'enabled'     => 'Development-only modules are enabled outside development: {0}.',
+        'development' => 'Development environment: development-only modules may be enabled (enabled now: {0}). Never deploy with CI_ENVIRONMENT=development.',
+        'unknown'     => 'Could not be checked (database not available).',
+        'fix'         => 'Disable them: php spark modules:disable <Module> (a modules:sync outside development disables them too).',
+    ],
     'demo' => [
         'title'   => 'Demo data',
         'ok'      => 'No demo data loaded.',

@@ -260,7 +260,7 @@ final class SecurityCheckTest extends CIUnitTestCase
         return [
             new ConfigurationCheck('development', $app, $cookie, $csp, new EffectivePolicy($csp, $headers, [], [], 'development'), true, true),
             new SecretsCheck('', '', '', '', $root, ['app/Config/Secrets.php:3 (private key)']),
-            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $this->config(), new FileAccess('', static fn (string $path): bool => true), static fn (): array => ['News'], new Packages()),
+            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $this->config(), new FileAccess('', static fn (string $path): bool => true), static fn (): array => ['News'], new Packages(), static fn (): array => ['Devtools'], new \Modules\Core\Modules\DevelopmentOnly('development')),
             new DependenciesCheck(new ComposerAudit($this->config()), $root . 'missing-vendor', $this->config()),
             new OutboundCheck([], []),
         ];
@@ -287,7 +287,7 @@ final class SecurityCheckTest extends CIUnitTestCase
         return [
             new ConfigurationCheck('production', $app, $cookie, $csp, new EffectivePolicy($csp, $headers, [], [], 'production'), false, false),
             new SecretsCheck('hex2bin:' . str_repeat('ab', 32), self::MASK, self::MASK, self::MASK, $root, []),
-            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $config, new FileAccess('', static fn (string $path): bool => str_starts_with($path, $root . 'writable')), static fn (): array => [], $this->signedPackages()),
+            new InstallationCheck($root, $root . 'writable/', $root . 'public/', $config, new FileAccess('', static fn (string $path): bool => str_starts_with($path, $root . 'writable')), static fn (): array => [], $this->signedPackages(), static fn (): array => [], new \Modules\Core\Modules\DevelopmentOnly('production')),
             new DependenciesCheck(new ComposerAudit($config), $this->vendorFixture(), $config),
             new OutboundCheck(['api.github.com'], ['Updates' => ['api.github.com']]),
         ];

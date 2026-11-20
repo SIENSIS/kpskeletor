@@ -257,6 +257,7 @@ final class Module extends ModuleManifest
     public string $description = 'News.module.description';   // optional: language key or text
     public string $author      = 'ACME';                      // optional: a package may only replace a module of the same author
     public bool   $enabledByDefault = true;                   // optional: false = modules:sync installs it disabled, also on the first sync (e.g. Tasks)
+    public bool   $developmentOnly  = false;                  // optional: true = only for development (e.g. Devtools, D-41-01): installed/enabled only when CI_ENVIRONMENT is development, disabled by a sync elsewhere, an error in security:check; needs enabledByDefault = false
 
     /** Optional: where Updates looks for new versions of this module (see Updates) */
     public ?string $repository = null;                        // e.g. 'github:acme/news-module'

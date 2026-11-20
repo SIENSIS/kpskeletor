@@ -128,6 +128,14 @@ return [
         'missing' => 'Falta writable/install.lock: el instalador web podría volver a ejecutarse.',
         'fix'     => 'Termine la instalación con php spark app:install (escribe el archivo de bloqueo).',
     ],
+    'devtools' => [
+        'title'       => 'Módulos solo para desarrollo',
+        'ok'          => 'No hay ningún módulo solo para desarrollo activado.',
+        'enabled'     => 'Hay módulos solo para desarrollo activados fuera de desarrollo: {0}.',
+        'development' => 'Entorno de desarrollo: los módulos solo para desarrollo se pueden activar (activados ahora: {0}). No despliegues nunca con CI_ENVIRONMENT=development.',
+        'unknown'     => 'No se ha podido comprobar (la base de datos no está disponible).',
+        'fix'         => 'Desactívalos: php spark modules:disable <Módulo> (un modules:sync fuera de desarrollo también los desactiva).',
+    ],
     'demo' => [
         'title'   => 'Datos de demostración',
         'ok'      => 'No hay datos de demostración cargados.',

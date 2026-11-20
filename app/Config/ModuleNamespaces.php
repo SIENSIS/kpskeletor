@@ -17,6 +17,7 @@ return [
     'Modules\Backup' => __DIR__ . '/../../modules/Backup',
     'Modules\Core' => __DIR__ . '/../../modules/Core',
     'Modules\Dashboard' => __DIR__ . '/../../modules/Dashboard',
+    'Modules\Devtools' => __DIR__ . '/../../modules/Devtools',
     'Modules\Events' => __DIR__ . '/../../modules/Events',
     'Modules\Files' => __DIR__ . '/../../modules/Files',
     'Modules\Menus' => __DIR__ . '/../../modules/Menus',

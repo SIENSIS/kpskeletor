@@ -62,8 +62,21 @@ final class ManifestValidator
      */
     public function validate(ModuleManifest $manifest, string $path): array
     {
+        return $this->validateProperties(get_object_vars($manifest), $path);
+    }
+
+    /**
+     * Validates a manifest's public properties given as raw values (what `validate()` reads from
+     * the object; also usable with values read from a manifest's source).
+     *
+     * @param array<string, mixed> $properties
+     *
+     * @return list<string> Error messages; empty when the manifest is valid
+     */
+    public function validateProperties(array $properties, string $path): array
+    {
         $this->errors = [];
-        $this->raw    = get_object_vars($manifest);
+        $this->raw    = $properties;
         $folder       = basename(rtrim($path, '/\\'));
         $name         = $this->raw['name'] ?? '';
         $this->module = is_string($name) && $name !== '' ? $name : $folder;
@@ -72,6 +85,7 @@ final class ManifestValidator
         $this->checkVersion();
         $this->checkRequires();
         $this->checkRepository();
+        $this->checkFlags();
         $this->checkText('description');
         $this->checkText('author');
         $this->checkResources();
@@ -137,6 +151,23 @@ final class ManifestValidator
             if (! is_string($constraint) || ! SemVer::isConstraint($constraint)) {
                 $this->error($key, 'constraint', [is_string($constraint) ? $constraint : get_debug_type($constraint)]);
             }
+        }
+    }
+
+    /**
+     * `$enabledByDefault` and `$developmentOnly` are booleans; a development-only module is never
+     * enabled by default (D-41-01).
+     */
+    private function checkFlags(): void
+    {
+        foreach (['enabledByDefault', 'developmentOnly'] as $key) {
+            if (array_key_exists($key, $this->raw) && ! is_bool($this->raw[$key])) {
+                $this->error($key, 'mustBe', ['bool']);
+            }
+        }
+
+        if (($this->raw['developmentOnly'] ?? false) === true && ($this->raw['enabledByDefault'] ?? true) !== false) {
+            $this->error('enabledByDefault', 'developmentOnlyEnabled');
         }
     }
 

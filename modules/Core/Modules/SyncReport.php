@@ -20,6 +20,9 @@ final class SyncReport
     /** @var array<string, array{0: string, 1: string}> module => [from, to] */
     public array $upgraded = [];
 
+    /** @var list<string> development-only modules disabled because this is not development (D-41-01) */
+    public array $devOnlyDisabled = [];
+
     /** @var list<string> modules whose seeder ran */
     public array $seeded = [];
 
@@ -79,6 +82,7 @@ final class SyncReport
             || array_sum($this->migrations) > 0
             || $this->installed !== []
             || $this->upgraded !== []
+            || $this->devOnlyDisabled !== []
             || $this->seeded !== []
             || $this->permissionsAdded !== []
             || $this->permissionsUpdated !== []
@@ -118,6 +122,10 @@ final class SyncReport
 
         foreach ($this->upgraded as $module => [$from, $to]) {
             $lines[] = lang('Core.sync.upgraded', [$module, $from, $to]);
+        }
+
+        foreach ($this->devOnlyDisabled as $module) {
+            $lines[] = lang('Core.sync.devOnlyDisabled', [$module]);
         }
 
         foreach ($this->missing as $module) {

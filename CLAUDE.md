@@ -50,7 +50,7 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 
 - Everything lives in **modules** (`modules/<Name>/`), described by a typed manifest
   `Config/Module.php` (resources, menus, settings, widgets, tasks, notifications, api, csp,
-  outboundHosts, `enabledByDefault`). Never hard-code a module in the Core.
+  outboundHosts, `enabledByDefault`, `developmentOnly`). Never hard-code a module in the Core.
 - Loading only through CodeIgniter discovery; never `require` route files; `Routes.php` never
   queries the database. Each module has its own namespace (`Modules\News` → `modules/News`) listed
   in the generated `app/Config/ModuleNamespaces.php` (written by `make:module`, `modules:sync` and
@@ -97,7 +97,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 - **Menus:** back-office entries only in the manifest `$menu` (resource or route + permission,
   `zone` `sidebar`/`settings`/`user`, `parent`, `order`); a `settings` entry goes in one of the
   Core's groups (`'parent' => 'group.access'|'group.security'|'group.api'|'group.customisation'|'group.system'`,
-  D-38-01); the menu is generated, filtered by permission and cached per group set
+  D-38-01; the one exception is the development-only `Devtools`, in its own `group.development`,
+  D-41-04); the menu is generated, filtered by permission and cached per group set
   (`docs/menus.md`). Password inputs get the Core's show/hide button by themselves
   (`data-no-reveal` to opt out; `docs/frontend.md`). Security headers, rate limits
   (`ratelimit:<limit>`, `RateLimiter`), `safe_redirect()` and `OutboundClient`: `docs/security.md`,

@@ -37,7 +37,7 @@ final class ModuleOverview
     }
 
     /**
-     * @return array<string, array{name: string, icon: string, description: string, author: string, version: string, installed: string|null, latest: string|null, status: string, errors: list<string>, requires: array<string, string>, dependants: list<string>, core: bool, demo: bool, demoLoaded: bool, enabled: bool}>
+     * @return array<string, array{name: string, icon: string, description: string, author: string, version: string, installed: string|null, latest: string|null, status: string, errors: list<string>, requires: array<string, string>, dependants: list<string>, core: bool, developmentOnly: bool, blocked: bool, demo: bool, demoLoaded: bool, enabled: bool}>
      */
     public function rows(): array
     {
@@ -86,6 +86,9 @@ final class ModuleOverview
                 'requires'    => $manifest->requires ?? [],
                 'dependants'  => $dependants[$name] ?? [],
                 'core'        => in_array($name, ModuleToggler::CORE_MODULES, true),
+                // Development-only module (D-41-01) and whether it may not be enabled here.
+                'developmentOnly' => $manifest !== null && $manifest->developmentOnly,
+                'blocked'         => $manifest !== null && (new DevelopmentOnly())->refuses($manifest),
                 'demo'        => $demo->hasSeeder($name),
                 'demoLoaded'  => in_array($name, $loaded, true),
                 'enabled'     => ($row['enabled'] ?? false) === true,

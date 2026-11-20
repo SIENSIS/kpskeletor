@@ -17,7 +17,8 @@ use Modules\Core\Permissions\ShieldMatrix;
  * data or grant; enabling it again restores everything. Core modules cannot be disabled, nor a
  * module that enabled modules depend on; enabling a module whose dependencies are disabled needs
  * them enabled too (`$withDependencies`). Enabling runs the module's pending migrations (if they
- * fail the module stays disabled) and publishes its assets.
+ * fail the module stays disabled) and publishes its assets. A development-only module
+ * (`$developmentOnly`, D-41-01) is enabled only in the `development` environment.
  */
 final class ModuleToggler
 {
@@ -30,6 +31,7 @@ final class ModuleToggler
         private readonly CacheInvalidator $caches = new CacheInvalidator(),
         private readonly ?ModuleModel $registry = null,
         private readonly ?AssetPublisher $assets = null,
+        private readonly DevelopmentOnly $developmentOnly = new DevelopmentOnly(),
     ) {
     }
 
@@ -95,6 +97,12 @@ final class ModuleToggler
         $order = [];
         $this->collectDisabledDependencies($name, $manifests, $known, $order);
         $missing = array_values(array_diff($order, [$name]));
+
+        foreach ($order as $module) {
+            if (isset($manifests[$module]) && $this->developmentOnly->refuses($manifests[$module])) {
+                throw new ModuleToggleException(lang('Core.toggle.developmentOnly', [$module]));
+            }
+        }
 
         if ($missing !== [] && ! $withDependencies) {
             throw new ModuleToggleException(lang('Core.toggle.dependenciesDisabled', [$name, implode(', ', $missing)]), $missing, true);

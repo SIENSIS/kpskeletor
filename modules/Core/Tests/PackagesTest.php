@@ -10,6 +10,7 @@ use CodeIgniter\Test\DatabaseTestTrait;
 use Modules\Core\Config\Packages;
 use Modules\Core\Maintenance\MaintenanceMode;
 use Modules\Core\Models\ModuleModel;
+use Modules\Core\Modules\DevelopmentOnly;
 use Modules\Core\Modules\ModuleSynchronizer;
 use Modules\Core\Modules\SyncReport;
 use Modules\Core\Notifications\Types\PackageProcessed;
@@ -520,6 +521,31 @@ final class PackagesTest extends CIUnitTestCase
         $this->assertSame(1, $staged->expire());
         $this->assertSame('expired', $staged->find((int) $three['id'])['status']);
         $this->assertFileDoesNotExist($this->work . '/staged/' . $three['file']);
+    }
+
+    public function testADevelopmentOnlyPackageIsRefusedOutsideDevelopment(): void
+    {
+        $name = $this->uniqueModuleName();
+        $zip  = $this->modulePackage($name, '1.0.0', body: "public bool \$enabledByDefault = false;\n    public bool \$developmentOnly = true;");
+
+        try {
+            (new PackageValidator(null, new \Modules\Core\Packages\ManifestReader(), null, new DevelopmentOnly('production')))->validate($zip);
+            $this->fail('A development-only package was accepted in production.');
+        } catch (PackageRefused $e) {
+            $this->assertSame(lang('Core.packages.developmentOnly', [$name]), $e->getMessage());
+        }
+
+        $info = (new PackageValidator(null, new \Modules\Core\Packages\ManifestReader(), null, new DevelopmentOnly('development')))->validate($zip);
+        $this->assertSame($name, $info->name);
+    }
+
+    public function testAPackageWithANonBooleanDevelopmentOnlyIsRefused(): void
+    {
+        $zip = $this->modulePackage($this->uniqueModuleName(), '1.0.0', body: "public \$developmentOnly = 'yes';");
+
+        $this->expectException(PackageRefused::class);
+        $this->expectExceptionMessage(lang('Core.packages.developmentOnlyInvalid'));
+        (new PackageValidator(null, new \Modules\Core\Packages\ManifestReader(), null, new DevelopmentOnly('development')))->validate($zip);
     }
 
     // ---------------------------------------------------------------- helpers

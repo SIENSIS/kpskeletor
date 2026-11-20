@@ -388,6 +388,9 @@ final class DocumentationTest extends CIUnitTestCase
         $routes = Services::routes(false)->loadRoutes();
         $list   = [];
 
+        // Devtools registers its routes only in development (D-41-01); the suite runs in `testing`.
+        \Modules\Devtools\Routing\DevtoolsRoutes::define($routes);
+
         foreach (['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', '*'] as $verb) {
             foreach (array_keys($routes->getRoutes($verb)) as $route) {
                 $route        = (string) $route;

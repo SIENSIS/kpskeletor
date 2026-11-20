@@ -416,6 +416,29 @@ and ratio limits, and optionally a minisign signature by a trusted publisher key
 production a module copied by hand or installed without `--enable` stays disabled until an
 administrator enables it (D-29-02). See `docs/installing-modules.md`.
 
+## Development-only modules (Devtools)
+
+A module whose manifest says `$developmentOnly = true` (the `Devtools` module: CRUD recipes, and
+from sessions 42–43 a code generator and a package builder) is installed and enabled only when
+`CI_ENVIRONMENT` is `development` (D-41-01, D-41-03). Its locks, each with a test:
+
+1. its routes exist only when `ENVIRONMENT === 'development'` (`Config/Routes.php`, a constant):
+   anywhere else every Devtools URL answers 404;
+2. `modules:sync`, `modules:enable`, `modules:install` and the Modules screen refuse to enable or
+   install it outside development, and a sync there disables it (`devonly_disabled` in the
+   security log);
+3. `security:check` reports `installation.devtools` as an **error** when one is enabled outside
+   development (information in development);
+4. it answers only requests from the loopback (`127.0.0.0/8`, `::1`; `REMOTE_ADDR`, never a proxy
+   header) with a `Host` of `localhost` or a loopback address (`php spark serve`); other requests
+   get 404 (the routes are not even registered for them, and the `devtools` filter checks again);
+5. permissions `devtools.view` and `devtools.write` are granted to nobody (superadmins hold every
+   permission); every write needs `reauth` and `ratelimit:forms`.
+
+It is part of the repository, so `git archive` and the release archives contain it
+([`updates.md`](updates.md)); the locks above make it inert there. Never deploy with
+`CI_ENVIRONMENT = development`. See [`devtools.md`](devtools.md).
+
 ## Backups
 
 Backups contain `.env` and every secret, so they are always encrypted with a password of at least

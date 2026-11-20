@@ -125,6 +125,10 @@ own computer (never in CI: the signing key does not leave that computer).
 5. **Check** from a test installation that trusts the key: `php spark updates:check`, then
    `php spark app:update --dry-run` (the plan says the signature verifies).
 
+The archive contains the development-only `Devtools` module (`modules/Devtools`, part of the
+repository): it is inert in production (no routes, never enabled; `security:check` reports it if
+it ever is). Do not remove it from the archive; see [`devtools.md`](devtools.md).
+
 ## Signing releases (the owner)
 
 Releases are signed with **Ed25519** in the [minisign](https://jedisct1.github.io/minisign/)

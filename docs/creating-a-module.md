@@ -64,6 +64,7 @@ key. News' values:
 | `$author` | string (`''`) | not set; a package may only replace an installed module of the same author |
 | `$requires` | name => constraint | `['Core' => '^1.0', 'Auth' => '^0.2', 'Dashboard' => '^0.1']` |
 | `$enabledByDefault` | bool (`true`) | default; `false` installs the module disabled (the `Tasks` module, D-32-01) |
+| `$developmentOnly` | bool (`false`) | default; `true` = a module only for development (the `Devtools` module, D-41-01): installed and enabled only when `CI_ENVIRONMENT` is `development` (`modules:sync`, `modules:enable`, `modules:install`, the Modules screen), disabled by a sync anywhere else (security log), an error in `security:check`; requires `$enabledByDefault = false`. Also guard its routes with `ENVIRONMENT === 'development'` ([`devtools.md`](devtools.md)) |
 | `$repository` | ?string (`null`) | not set; where Updates looks for new versions (`'github:acme/news-module'`, [`updates.md`](updates.md)) |
 | `$resources` | key => definition | `posts`, `categories`, `mine` (crud), `read` (page), `api` (crud, for the API resource) |
 | `$defaultGrants` | group => grants | see section 3 |
