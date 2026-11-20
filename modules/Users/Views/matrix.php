@@ -41,7 +41,7 @@ foreach ($blocks as $resources) {
                         <tr>
                             <th scope="col" class="matrix-resource"><?= esc(lang('Users.matrix.resource')) ?></th>
                             <?php foreach ($groups as $name => $group): ?>
-                                <th scope="col"><?= esc($group['title']) ?><?php if (! $editable[$name]): ?> <i class="bi bi-lock text-body-secondary" title="<?= esc(lang('Users.matrix.readOnly'), 'attr') ?>" aria-label="<?= esc(lang('Users.matrix.readOnly'), 'attr') ?>"></i><?php endif ?></th>
+                                <th scope="col"><?= esc($group['title']) ?><?php if (! $editable[$name]): ?> <i class="bi bi-lock text-body-secondary" role="img" title="<?= esc(lang('Users.matrix.readOnly'), 'attr') ?>" aria-label="<?= esc(lang('Users.matrix.readOnly'), 'attr') ?>"></i><?php endif ?></th>
                             <?php endforeach ?>
                         </tr>
                     </thead>
