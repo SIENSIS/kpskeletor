@@ -6,24 +6,27 @@ namespace Modules\Pages\Services;
 
 use CodeIgniter\I18n\Time;
 use Modules\Core\Content\ContentTranslations;
+use Modules\Core\Sections\SectionData;
+use Modules\Core\Sections\SectionRegistry;
 use Modules\Core\Security\HtmlSanitizer;
 use RuntimeException;
 
 /**
  * Revisions of pages (docs/pages.md, "Revisions"): every save keeps a snapshot of the page, its
- * texts in every language and its groups, with who saved it, when and which fields changed
- * compared with the previous revision. Restoring a revision writes its content back (texts,
- * groups, template, visibility, noindex, featured image) and records a new revision; the tree
+ * texts in every language, its groups and its sections (D-45-01), with who saved it, when and
+ * which fields changed compared with the previous revision. Restoring a revision writes its
+ * content back (texts, groups, sections, layout, template, visibility, noindex, featured image)
+ * and records a new revision; the tree
  * position (parent, order) and the publication (status, date) are not restored: they have their
  * own fields and permission (`pages.publish`).
  */
 final class Revisions
 {
     /** Columns of `pages` kept in a snapshot. */
-    public const PAGE_FIELDS = ['parent_id', 'position', 'template', 'status', 'publish_at', 'visibility', 'noindex', 'featured_image'];
+    public const PAGE_FIELDS = ['parent_id', 'position', 'template', 'layout', 'status', 'publish_at', 'visibility', 'noindex', 'featured_image'];
 
     /** Columns written back by a restore. */
-    public const RESTORED_FIELDS = ['template', 'visibility', 'noindex', 'featured_image'];
+    public const RESTORED_FIELDS = ['template', 'layout', 'visibility', 'noindex', 'featured_image'];
 
     /**
      * Records a revision of the page as it is now; nothing when it equals the last revision.
@@ -59,7 +62,7 @@ final class Revisions
     /**
      * The page as it is now, or null when it does not exist.
      *
-     * @return array{page: array<string, mixed>, translations: array<string, array<string, string>>, groups: list<int>}|null
+     * @return array{page: array<string, mixed>, translations: array<string, array<string, string>>, groups: list<int>, sections: list<array<string, mixed>>}|null
      */
     public function snapshot(int $pageId): ?array
     {
@@ -72,7 +75,7 @@ final class Revisions
         $page = [];
 
         foreach (self::PAGE_FIELDS as $field) {
-            $page[$field] = $row[$field] === null ? null : (string) $row[$field];
+            $page[$field] = ($row[$field] ?? null) === null ? null : (string) $row[$field];
         }
 
         // Forms edit dates to the minute: seconds are not a change.
@@ -92,7 +95,7 @@ final class Revisions
         $groups = array_map('intval', array_column(db_connect()->table('page_groups')->select('group_id')
             ->where('page_id', $pageId)->orderBy('group_id')->get()->getResultArray(), 'group_id'));
 
-        return ['page' => $page, 'translations' => $translations, 'groups' => $groups];
+        return ['page' => $page, 'translations' => $translations, 'groups' => $groups, 'sections' => (new PageSections())->snapshot($pageId)];
     }
 
     /**
@@ -204,6 +207,10 @@ final class Revisions
                 unset($update['featured_image']); // the file is gone: keep the current image
             }
 
+            if (! in_array($update['layout'] ?? 'article', PageRepository::LAYOUTS, true)) {
+                unset($update['layout']); // revisions older than the layouts keep the current one
+            }
+
             $db->table('pages')->where('id', $pageId)->update($update);
             // Only the site's languages are restored; rows of a language no longer offered are kept.
             $codes = ContentTranslations::codes();
@@ -240,6 +247,11 @@ final class Revisions
                 if (in_array((int) $group, $existing, true)) {
                     $db->table('page_groups')->insert(['page_id' => $pageId, 'group_id' => (int) $group]);
                 }
+            }
+
+            // Sections: revisions older than session 45 have none and keep the current ones.
+            if (is_array($snapshot['sections'] ?? null)) {
+                (new PageSections())->replace($pageId, array_values($snapshot['sections']));
             }
 
             $db->transComplete();
@@ -316,6 +328,9 @@ final class Revisions
             $flat[(string) $field] = (string) ($value ?? '');
         }
 
+        // Revisions older than the layouts (session 45) were articles.
+        $flat['layout'] = ($flat['layout'] ?? '') === '' ? 'article' : $flat['layout'];
+
         foreach (is_array($snapshot['translations'] ?? null) ? $snapshot['translations'] : [] as $locale => $fields) {
             foreach (is_array($fields) ? $fields : [] as $field => $value) {
                 $text = (string) $value;
@@ -333,6 +348,44 @@ final class Revisions
         $groups        = is_array($snapshot['groups'] ?? null) ? array_map('intval', $snapshot['groups']) : [];
         $flat['groups'] = implode(',', $groups);
 
+        $sections = is_array($snapshot['sections'] ?? null) ? array_values($snapshot['sections']) : [];
+
+        if ($sections !== []) {
+            $flat['sections'] = $plain ? self::describeSections($sections) : (string) json_encode($sections, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
         return $flat;
+    }
+
+    /**
+     * The sections of a snapshot for people: one line per section (`1. Hero banner: Welcome`).
+     *
+     * @param list<mixed> $sections
+     */
+    private static function describeSections(array $sections): string
+    {
+        $registry = new SectionRegistry();
+        $locale   = service('request')->getLocale();
+        $lines    = [];
+
+        foreach ($sections as $index => $entry) {
+            if (! is_array($entry) || ! is_string($entry['type'] ?? null)) {
+                continue;
+            }
+
+            $type    = $registry->get($entry['type']);
+            $section = new SectionData(
+                $entry['type'],
+                is_array($entry['data'] ?? null) ? $entry['data'] : [],
+                is_array($entry['texts'] ?? null) ? $entry['texts'] : [],
+                is_array($entry['options'] ?? null) ? $entry['options'] : [],
+                ($entry['hidden'] ?? false) === true,
+            );
+            $summary = $type?->summary($section, $locale) ?? '';
+            $lines[] = ($index + 1) . '. ' . ($type?->label() ?? $entry['type']) . ($summary !== '' ? ': ' . $summary : '')
+                . ($section->hidden ? ' (' . lang('Pages.sections.hidden') . ')' : '');
+        }
+
+        return implode("\n", $lines);
     }
 }

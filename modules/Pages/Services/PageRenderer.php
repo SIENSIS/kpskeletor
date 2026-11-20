@@ -6,12 +6,16 @@ namespace Modules\Pages\Services;
 
 use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\View\Exceptions\ViewException;
+use Modules\Core\Sections\RenderContext;
+use Modules\Core\Sections\SectionRenderer;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\Pages\Storage\FeaturedImages;
 
 /**
  * Renders a page through the public theme with its template (`Modules\Pages\Views\templates\<key>`,
  * overridable by themes), for the public routes, the home page and the back office's preview.
+ * A page in `sections` layout (D-45-01) uses the template `sections`: its visible sections in
+ * order (`SectionRenderer`) over the whole width of the public layout (`fullWidth`).
  *
  * Meta: title and description (SEO fields, else title and summary), the canonical URL (the SEO
  * field, else the page's own path, `/` for the home page) and `noindex` for pages marked so, for
@@ -48,12 +52,16 @@ final class PageRenderer
             'image'       => $image,
         ];
 
-        return theme_view($this->view((string) $page['template']), [
+        $sections = ($page['layout'] ?? 'article') === 'sections';
+
+        return theme_view($sections ? 'Modules\Pages\Views\templates\sections' : $this->view((string) $page['template']), [
             'layout'      => theme_layout('public'),
+            'fullWidth'   => $sections,
+            'sections'    => $sections ? (new SectionRenderer())->render((new PageSections())->all($id), RenderContext::current($user, $preview)) : '',
             'meta'        => $meta,
             'title'       => (string) ($page['meta_title'] !== '' ? $page['meta_title'] : $page['title']),
             'page'        => $page,
-            'body'        => HtmlSanitizer::clean((string) $page['body']),
+            'body'        => $sections ? '' : HtmlSanitizer::clean((string) $page['body']),
             'image'       => $image,
             'children'    => (new PageRepository())->children($id, $user),
             'childUrl'    => fn (int $child): ?string => ($childPath = $this->tree->path($child, $locale)) !== null ? site_url($childPath) : null,

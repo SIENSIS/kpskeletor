@@ -16,6 +16,9 @@ final class PageRepository
     /** Translated fields of a page. */
     public const TEXTS = ['title', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical'];
 
+    /** Layouts of a page (D-45-01): its rich-text body, or an ordered list of sections. */
+    public const LAYOUTS = ['article', 'sections'];
+
     /**
      * A page (any status or visibility; trashed ones excluded) with its texts, or null.
      *

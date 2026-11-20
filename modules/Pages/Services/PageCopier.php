@@ -35,6 +35,7 @@ final class PageCopier
                 'parent_id'      => $parent,
                 'position'       => (int) $row['position'] + 1,
                 'template'       => $row['template'],
+                'layout'         => $row['layout'] ?? 'article',
                 'status'         => 'draft',
                 'publish_at'     => null,
                 'visibility'     => $row['visibility'],
@@ -63,6 +64,9 @@ final class PageCopier
             foreach ($db->table('page_groups')->select('group_id')->where('page_id', $pageId)->get()->getResultArray() as $group) {
                 $db->table('page_groups')->insert(['page_id' => $copy, 'group_id' => (int) $group['group_id']]);
             }
+
+            $sections = new PageSections();
+            $sections->replace($copy, $sections->snapshot($pageId));
 
             $db->transComplete();
         } finally {

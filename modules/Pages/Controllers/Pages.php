@@ -17,6 +17,7 @@ use Modules\Pages\Services\PageCopier;
 use Modules\Pages\Services\PageRenderer;
 use Modules\Pages\Services\PageRepository;
 use Modules\Pages\Services\PageResolver;
+use Modules\Pages\Services\PageSections;
 use Modules\Pages\Services\PageSlugs;
 use Modules\Pages\Services\PageTree;
 use Modules\Pages\Services\PageVisibility;
@@ -34,7 +35,9 @@ use RuntimeException;
  * - slugs generated from the title when empty, unique per parent and language, never a reserved
  *   first segment (PageSlugs); the parent field offers the tree without the page's subtree;
  * - publish / unpublish (`pages.publish`), preview (`show`), revisions (`show`) with restore
- *   (`edit`), duplicate (`add`). Every save records a revision (Revisions).
+ *   (`edit`), duplicate (`add`), the section editor (`edit`, `PageSections` controller). Every
+ *   save records a revision (Revisions).
+ * - the layout (D-45-01): `article` (the body) or `sections`; switching keeps the other content.
  *
  * Writes and POST operations are logged by the Core (`AuditedCrud`).
  */
@@ -72,6 +75,7 @@ final class Pages extends BackendController
             ->setRelation('author_id', 'users', 'username')
             ->fieldType('parent_id', 'select', ['options' => $tree->options($this->editedId(), $locale)])
             ->fieldType('template', 'select', ['options' => $this->templates()])
+            ->fieldType('layout', 'select', ['options' => $this->options('layouts', PageRepository::LAYOUTS)])
             ->fieldType('visibility', 'select', ['options' => $this->options('visibilities', PageVisibility::VISIBILITIES)])
             ->fieldType('status', 'readonly')
             ->fieldType('publish_at', 'datetime')
@@ -85,12 +89,12 @@ final class Pages extends BackendController
             })
             ->tree('parent_id', ['order' => 'position', 'label' => 'title'])
             ->columns(['title', 'path', 'status', 'visibility', 'publish_at', 'updated_at'])
-            ->addFields(['title', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'template', 'visibility', 'groups', 'publish_at', 'noindex', 'featured_image'])
-            ->editFields(['title', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'featured_image', 'author_id'])
+            ->addFields(['title', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'layout', 'template', 'visibility', 'groups', 'publish_at', 'noindex', 'featured_image'])
+            ->editFields(['title', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'layout', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'featured_image', 'author_id'])
             ->readonlyFields(['author_id'])
             ->rowActionsMenu()
-            ->showFields(['title', 'path', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'featured_image', 'author_id', 'created_at', 'updated_at'])
-            ->exportColumns(['title', 'path', 'slug', 'summary', 'parent_id', 'position', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'author_id', 'created_at', 'updated_at'])
+            ->showFields(['title', 'path', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'layout', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'featured_image', 'author_id', 'created_at', 'updated_at'])
+            ->exportColumns(['title', 'path', 'slug', 'summary', 'parent_id', 'position', 'layout', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'author_id', 'created_at', 'updated_at'])
             ->searchFields(['title', 'slug'])
             ->filters(['status', 'visibility'])
             ->setRules([
@@ -98,9 +102,11 @@ final class Pages extends BackendController
                 'featured_image' => 'permit_empty|max_length[32]',
                 'position'   => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[9999]',
                 'template'   => 'required|in_list[' . implode(',', array_keys($this->templates())) . ']',
+                'layout'     => 'permit_empty|in_list[' . implode(',', PageRepository::LAYOUTS) . ']',
                 'visibility' => 'required|in_list[' . implode(',', PageVisibility::VISIBILITIES) . ']',
             ])
             ->setDefault('template', 'default')
+            ->setDefault('layout', 'article')
             ->setDefault('visibility', 'public')
             ->setDefault('position', 0)
             ->setHelp('slug', lang('Pages.help.slug'))
@@ -111,12 +117,15 @@ final class Pages extends BackendController
             ->setHelp('noindex', lang('Pages.help.noindex'))
             ->setHelp('canonical', lang('Pages.help.canonical'))
             ->setHelp('template', lang('Pages.help.template'))
+            ->setHelp('layout', lang('Pages.help.layout'))
             ->setHelp('featured_image', lang('Pages.help.featuredImage'))
             ->displayAs($this->labels())
             ->callbackColumn('path', fn ($value, array $row): string => $this->pathColumn($tree, (int) $row['id'], $home, $locale))
             ->callbackColumn('status', static fn ($value, array $row): string => self::statusBadge(PageVisibility::displayStatus($row)))
             ->callbackColumn('visibility', static fn ($value): string => self::visibilityBadge((string) $value))
             ->callbackColumn('template', fn ($value): string => esc($this->templates()[(string) $value] ?? (string) $value))
+            ->callbackColumn('layout', static fn ($value): string => esc(lang('Pages.layouts.' . (in_array((string) $value, PageRepository::LAYOUTS, true) ? (string) $value : 'article'))))
+            ->callbackExport('layout', static fn ($value): string => (string) $value)
             ->callbackColumn('publish_at', static fn ($value): string => ui_date(is_string($value) ? $value : null, 'datetime'))
             ->callbackColumn('updated_at', static fn ($value): string => ui_date(is_string($value) ? $value : null, 'relative'))
             ->callbackExport('path', static fn ($value, array $row): string => (string) $tree->path((int) $row['id'], $locale))
@@ -137,6 +146,7 @@ final class Pages extends BackendController
             ->afterDelete(static function (string $id, array $row, bool $purge): void {
                 if ($purge) {
                     // Portable clean-up (foreign keys are not enforced on every database).
+                    (new PageSections())->deleteAll((int) $id);
                     db_connect()->table('page_revisions')->where('page_id', (int) $id)->delete();
                     db_connect()->table('pages')->where('parent_id', (int) $id)->update(['parent_id' => null]);
                 }
@@ -206,6 +216,13 @@ final class Pages extends BackendController
             'label'      => lang('Pages.preview'),
             'icon'       => 'bi bi-eye',
             'target'     => '_blank',
+        ]);
+
+        $crud->addOperation('sections', static fn (string $id): ResponseInterface => redirect()->to(backend_url('pages/' . (int) $id . '/sections')), [
+            'method'     => 'get',
+            'permission' => 'edit',
+            'label'      => lang('Pages.sections.title'),
+            'icon'       => 'bi bi-layout-text-window-reverse',
         ]);
 
         $crud->addOperation('revisions', fn (string $id, array $row, Crud $crud): ResponseInterface => $this->revisions((int) $id, $crud), [
@@ -360,6 +377,15 @@ final class Pages extends BackendController
             $data['template'] = 'default';
         }
 
+        // The layout (D-45-01): optional in a post; a new page is an article.
+        if (array_key_exists('layout', $data) && ! in_array((string) $data['layout'], PageRepository::LAYOUTS, true)) {
+            unset($data['layout']);
+        }
+
+        if ($id === null && ! isset($data['layout'])) {
+            $data['layout'] = 'article';
+        }
+
         return $data;
     }
 
@@ -410,7 +436,7 @@ final class Pages extends BackendController
     {
         $labels = [];
 
-        foreach (['title', 'path', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'featured_image', 'author_id', 'created_at', 'updated_at'] as $field) {
+        foreach (['title', 'path', 'slug', 'summary', 'body', 'meta_title', 'meta_description', 'canonical', 'parent_id', 'position', 'layout', 'sections', 'template', 'visibility', 'groups', 'status', 'publish_at', 'noindex', 'featured_image', 'author_id', 'created_at', 'updated_at'] as $field) {
             $labels[$field] = lang('Pages.fields.' . $field);
         }
 

@@ -49,6 +49,19 @@ final class Module extends ModuleManifest
     /** Link types of the public menu editor (Menus, session 21). */
     public array $menuLinks = [\Modules\Pages\Menu\PageLink::class];
 
+    /**
+     * Section types of pages built from sections (D-45-01; docs/sections.md): hero banner, quick
+     * links, cards, image and text, call to action and text.
+     */
+    public array $sectionTypes = [
+        \Modules\Pages\Sections\HeroSection::class,
+        \Modules\Pages\Sections\LinksSection::class,
+        \Modules\Pages\Sections\CardsSection::class,
+        \Modules\Pages\Sections\MediaTextSection::class,
+        \Modules\Pages\Sections\CtaSection::class,
+        \Modules\Pages\Sections\TextSection::class,
+    ];
+
     public array $settings = [
         'homePage' => [
             'type'            => 'select',

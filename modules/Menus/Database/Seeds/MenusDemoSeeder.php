@@ -33,6 +33,7 @@ final class MenusDemoSeeder extends DemoSeeder
 
         $main = (int) $demo->insert('menus', ['name' => 'Menú principal', 'location' => 'primary', 'created_at' => $now, 'updated_at' => $now]);
         $this->item($demo, $main, null, 10, $this->page('inici', '/'), ['ca' => 'Inici', 'es' => 'Inicio', 'en' => 'Home'], ['icon' => 'bi bi-house']);
+        $this->item($demo, $main, null, 15, $this->page('portada-seccions'), ['ca' => 'Portada amb seccions', 'es' => 'Portada con secciones', 'en' => 'Sections home'], ['icon' => 'bi bi-layout-text-window-reverse']);
         $about = $this->item($demo, $main, null, 20, $this->page('qui-som'), ['ca' => 'Qui som', 'es' => 'Quiénes somos', 'en' => 'About us']);
         $this->item($demo, $main, $about, 10, $this->page('equip', '/qui-som/equip'), ['ca' => 'Equip', 'es' => 'Equipo', 'en' => 'Team']);
         $this->item($demo, $main, $about, 20, $this->page('historia', '/qui-som/historia'), ['ca' => 'Història', 'es' => 'Historia', 'en' => 'History']);
