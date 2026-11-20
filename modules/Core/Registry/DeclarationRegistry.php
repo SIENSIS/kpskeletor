@@ -14,6 +14,7 @@ use Modules\Core\Menus\MenuDefinitions;
 /**
  * The declarations of the manifests that later services use at runtime: settings, dashboard
  * widgets, scheduled tasks, notification types, menu link types, calendars, calendar providers,
+ * section types,
  * API resources, Content-Security-Policy sources, back-office menu entries and outbound hosts
  * (`module_declarations` table).
  *
@@ -23,7 +24,7 @@ use Modules\Core\Menus\MenuDefinitions;
  */
 final class DeclarationRegistry
 {
-    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'api', 'csp', 'menu', 'outbound'];
+    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'sectionType', 'api', 'csp', 'menu', 'outbound'];
 
     /** Kinds declared as maps: their keys are qualified with the module ("News.perPage"). */
     public const MAP_KINDS = ['setting', 'calendar', 'api', 'csp', 'outbound'];
@@ -59,6 +60,7 @@ final class DeclarationRegistry
                 'notification'     => $manifest->notifications,
                 'menuLink'         => $manifest->menuLinks,
                 'calendarProvider' => $manifest->calendarProviders,
+                'sectionType'      => $manifest->sectionTypes,
             ];
             $maps = [
                 'setting'  => $manifest->settings,
@@ -210,6 +212,12 @@ final class DeclarationRegistry
     public function calendarProviders(): array
     {
         return array_keys($this->all('calendarProvider'));
+    }
+
+    /** @return array<string, string> Section type classes of enabled modules => the declaring module */
+    public function sectionTypes(): array
+    {
+        return array_map(static fn (array $declaration): string => $declaration['module'], $this->all('sectionType'));
     }
 
     /** @return array<string, array{module: string, definition: array<array-key, mixed>}> Back-office menu entries of enabled modules (key => definition) */
