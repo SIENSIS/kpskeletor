@@ -49,6 +49,15 @@ final class DevtoolsRoutes
             $routes->post('generator/load', 'Generator::load', ['filter' => self::DRAFT]);
             $routes->post('generator/write', 'Generator::write', ['filter' => self::WRITE]);
             $routes->get('generator/result', 'Generator::result', $view);
+
+            // Packages (session 43, D-43-01): building and signing are WRITE; the page after a
+            // signature runs the cleanup and ends the session.
+            $routes->get('packages', 'Packages::index', $view + ['as' => 'devtools-packages']);
+            $routes->post('packages/build', 'Packages::build', ['filter' => self::WRITE]);
+            $routes->get('packages/download/(:segment)', 'Packages::download/$1', $view);
+            $routes->get('packages/sign', 'Packages::signForm', $view);
+            $routes->post('packages/sign', 'Packages::sign', ['filter' => self::WRITE]);
+            $routes->get('packages/signed', 'Packages::signed', $view);
         });
     }
 }
