@@ -24,6 +24,7 @@ php spark make:module Books                           # empty module
 php spark make:module Books --crud=books_items        # with a kpcrudy CRUD of a new table
 php spark make:module Books --crud=books_items --api  # and its kpapy API resource (needs --crud)
 php spark make:module Books --standalone              # kept in its own repository (section 8)
+php spark make:module --definition=books.json         # generated from a definition (below)
 php spark modules:sync                                # migrations, permissions, settings, assets
 ```
 
@@ -45,6 +46,21 @@ to `CrudFactory`; `--api` runs `kpapy:make` for the same table (`api/v1/<module>
 `setResource()` = the CRUD's resource), declares it in `$api` and adds `Tests/<Name>ApiTest.php`
 (token and scopes). `make:module` also writes the generated `app/Config/ModuleNamespaces.php`; run
 `modules:sync` afterwards. Outside production the new module is enabled by the sync.
+
+### Generate first, then refine
+
+A module with tables, CRUDs and an API is faster to **generate** than to write: describe it in
+Devtools › Code generator (`backend/devtools/generator`, development only) or in a JSON definition
+(`php spark make:module --definition=<file.json>`, the same engine), check the preview and write
+it. You get the migrations, the demo seeder, the CRUD and API controllers with the options you
+chose (read only, translated fields, rich text, files, custom operations with re-authentication,
+record rules, hidden fields, masked ids), the manifest's resources, menu and default grants, the
+texts in ca/es/en, and tests that pass. Then refine by hand: the business logic of custom
+operations, relations the generator does not write (N-N, multiselects), widgets, tasks and public
+pages, and the module's `CLAUDE.md`. To add a table to an existing module, choose "Existing
+module": the manifest, routes, texts and demo seeder change (shown as a diff); migrations are
+only added. See [`devtools.md`](devtools.md#the-code-generator) and the tutorial
+[Generating a module](tutorials/15-generating-a-module.md).
 
 Work only inside `modules/<Name>/`. Do not change the Core, another module or a shared
 convention for one module's needs: write the request down and ask.

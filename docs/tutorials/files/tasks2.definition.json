@@ -1,0 +1,52 @@
+{
+    "format": 1,
+    "module": {
+        "name": "Tasks2",
+        "description": {"ca": "Tasques pendents (generat)", "es": "Tareas pendientes (generado)", "en": "To-do tasks (generated)"},
+        "author": "tutorial",
+        "requires": {"Auth": "^0.2"}
+    },
+    "tables": [
+        {
+            "name": "tasks2_projects",
+            "labels": {"singular": {"ca": "Projecte", "es": "Proyecto", "en": "Project"}, "plural": {"ca": "Projectes", "es": "Proyectos", "en": "Projects"}},
+            "demoRows": 3,
+            "columns": [
+                {"name": "name", "type": "string", "length": 120, "translated": true, "label": {"ca": "Nom", "es": "Nombre", "en": "Name"}, "faker": "company"},
+                {"name": "color", "type": "string", "length": 7, "default": "#0d6efd", "label": {"ca": "Color", "es": "Color", "en": "Colour"}, "faker": "color"},
+                {"name": "ends_on", "type": "date", "nullable": true, "label": {"ca": "Data límit", "es": "Fecha límite", "en": "Deadline"}, "faker": "futureDate"},
+                {"name": "active", "type": "boolean", "default": "1", "label": {"ca": "Actiu", "es": "Activo", "en": "Active"}}
+            ],
+            "crud": {"operations": ["list", "show", "add", "edit", "delete", "export"], "filters": ["active"]},
+            "menu": {"icon": "bi bi-folder2", "order": 20},
+            "grants": {"admin": ["*"], "editor": ["list", "show"]}
+        },
+        {
+            "name": "tasks2_todos",
+            "labels": {"singular": {"ca": "Tasca pendent", "es": "Tarea pendiente", "en": "To-do task"}, "plural": {"ca": "Tasques pendents", "es": "Tareas pendientes", "en": "To-do tasks"}},
+            "softDeletes": true,
+            "demoRows": 8,
+            "columns": [
+                {"name": "title", "type": "string", "length": 190, "label": {"ca": "Títol", "es": "Título", "en": "Title"}, "faker": "sentence"},
+                {"name": "description", "type": "text", "nullable": true, "label": {"ca": "Descripció", "es": "Descripción", "en": "Description"}},
+                {"name": "project_id", "type": "integer", "nullable": true, "foreign": {"table": "tasks2_projects", "onDelete": "SET NULL"}, "label": {"ca": "Projecte", "es": "Proyecto", "en": "Project"}},
+                {"name": "status", "type": "enum", "options": ["todo", "doing", "done"], "default": "todo", "label": {"ca": "Estat", "es": "Estado", "en": "Status"}},
+                {"name": "priority", "type": "enum", "options": ["low", "normal", "high"], "default": "normal", "label": {"ca": "Prioritat", "es": "Prioridad", "en": "Priority"}},
+                {"name": "due_on", "type": "date", "nullable": true, "label": {"ca": "Venciment", "es": "Vencimiento", "en": "Due"}},
+                {"name": "estimate_hours", "type": "decimal", "precision": 6, "scale": 2, "nullable": true, "label": {"ca": "Estimació (h)", "es": "Estimación (h)", "en": "Estimate (h)"}}
+            ],
+            "crud": {
+                "columns": ["title", "project_id", "status", "priority", "due_on"],
+                "richText": ["description"],
+                "recordRule": "own",
+                "hidden": {"estimate_hours": "estimates"},
+                "customOperations": [
+                    {"key": "complete", "label": {"ca": "Completa", "es": "Completa", "en": "Complete"}, "icon": "bi bi-check2-circle", "confirm": {"ca": "Marcar com a feta?", "es": "¿Marcar como hecha?", "en": "Mark it as done?"}}
+                ]
+            },
+            "api": {"enabled": true},
+            "menu": {"icon": "bi bi-check2-square", "order": 10},
+            "grants": {"admin": ["*"], "editor": ["list", "show", "add", "edit", "complete"], "user": ["list", "show", "add", "edit"]}
+        }
+    ]
+}

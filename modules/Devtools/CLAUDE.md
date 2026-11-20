@@ -25,7 +25,9 @@ D-41-03): the CRUD recipes (session 41), the code generator (session 42) and the
 3. `security:check` `installation.devtools` (Core `InstallationCheck`).
 4. Filter `devtools` (`Filters/LocalOnly.php`, alias in `Config/Registrar.php`) on every route.
 5. `Routing/DevtoolsRoutes.php`: `VIEW` = `devtools`, `can:devtools.view`; `WRITE` = `devtools`,
-   `can:devtools.write`, `reauth`, `ratelimit:forms`. Every route uses one of them.
+   `can:devtools.write`, `reauth`, `ratelimit:forms`; `DRAFT` = `devtools`, `can:devtools.view`
+   only for the POSTs in `DRAFT_ROUTES` that change a session draft (D-42-02). Every route uses
+   one of them (`DevtoolsLocksTest`).
 
 ## Main pieces
 
@@ -36,22 +38,33 @@ D-41-03): the CRUD recipes (session 41), the code generator (session 42) and the
   `Devtools.recipes.<id>.title|what|when`), `Recipes/DocPage.php` (docs as plain text with
   GitHub-style heading ids).
 - `Assets/js/copy.js` (copy button, `data-component="devtools/copy"`).
+- Code generator (session 42, `docs/devtools.md` "The code generator"): `Controllers/Generator.php`
+  (`backend/devtools/generator`: form + buttons (DRAFT), `preview`, `definition.json`, `load` (DRAFT),
+  `write` (WRITE), `result`), `Generator/WizardForm.php` (form ↔ definition, add/remove buttons),
+  `Generator/Draft.php` (the definition in the session), `Generator/Diff.php` (line diff),
+  `Generator/SparkRunner.php` (`modules:sync`, `modules:demo` in new processes), views
+  `generator/{form,_table,preview,result}`, `Assets/js/generator.js`. The engine is the Core's
+  (`Modules\Core\Generator`); the controller's `$testContext` / `$testRunner` are for tests only.
 
 ## Decisions
 
 D-41-01 … D-41-03 (decided), D-41-04 (own menu group Desenvolupament), D-41-05 (routes not registered for
-non-local requests; docs viewer); D-41-02, D-42-01, D-43-01 apply to sessions 42–43.
+non-local requests; docs viewer); D-41-02 and D-42-01 (generator writes code; nikic/php-parser),
+D-42-02 (DRAFT routes), D-42-03 (engine in the Core, Faker at generation time, session draft);
+D-43-01 applies to session 43.
 
 ## Open tasks
 
-- Session 42: code generator (D-41-02, `nikic/php-parser` D-42-01), with `DevtoolsRoutes::WRITE`.
+- Generator: "alter" migrations for existing tables, N-N relations and multiselects (not
+  generated yet; `docs/devtools.md`, "What it cannot generate").
 - Session 43: package builder and signing (D-43-01).
 - When a doc heading cited by a recipe changes, update `RecipeBook` (`RecipesTest` fails).
 
 ## How to test
 
 ```bash
-vendor/bin/phpunit modules/Devtools                         # locks, filter, recipes
+vendor/bin/phpunit modules/Devtools                         # locks, filter, recipes, generator wizard
+vendor/bin/phpunit modules/Core/Tests/Generator*Test.php modules/Core/Tests/GeneratedModuleChecksTest.php
 vendor/bin/phpunit modules/Core/Tests/DevelopmentOnlyTest.php
 ```
 

@@ -10,6 +10,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Code generator** (session 42, D-41-02, D-42-01 … D-42-03, `docs/devtools.md`): Devtools ›
+  Code generator (`backend/devtools/generator`, development only) — a wizard (module, tables and
+  columns with portable types and ca/es/en labels, demo data with Faker, CRUD options, API, menu
+  and default grants) that previews every file (new files and diffs of changed ones), downloads
+  and loads the definition as JSON, and writes it after re-authentication (refused when a file
+  changed after the preview; then `modules:sync` and optionally `modules:demo`; activity
+  `generated`). The engine is in the Core (`Modules\Core\Generator`): migrations, demo seeder,
+  CRUD and API controllers, file-picker handler, manifest, routes, texts and tests that pass;
+  existing modules are changed with `nikic/php-parser` (format-preserving), migrations only added.
+- `php spark make:module --definition=<file.json> [--dry-run]`: the same engine from the console.
+- `nikic/php-parser` `^5` as a development dependency (D-42-01).
+- Tutorial 15, "Generating a module with the code generator" (`docs/tutorials/`).
+
 - `Devtools` module, only for development (D-41-01 … D-41-03, `docs/devtools.md`): installed
   disabled; superadmins only (`devtools.view`, `devtools.write`), from the loopback with a local
   `Host` (`php spark serve`); **CRUD recipes** (`backend/devtools/recipes`): every CRUD/API variant
@@ -54,6 +67,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
   language set.
 
 ### Changed
+
+- `ModuleGenerator::files()` returns `make:module`'s files without writing them (the generator's
+  base); `generate()` writes them, with the same output as before.
+- Devtools: `DevtoolsRoutes::DRAFT` for the generator's draft-only POSTs (D-42-02); the lock test
+  also checks the views in subfolders.
 
 - `ManifestValidator` checks that `$enabledByDefault` and `$developmentOnly` are booleans
   (`validateProperties()` validates raw manifest values).

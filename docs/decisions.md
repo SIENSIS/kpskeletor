@@ -300,6 +300,8 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-41-04 | 41 | Devtools menu entry in its own settings group "Desenvolupament" | Applied (decided) |
 | D-41-05 | 41 | Devtools routes not registered for non-local web requests; a docs viewer for the recipes' links | Accepted (proposal) |
 | D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Decided |
+| D-42-02 | 42 | The code generator's draft-only POSTs without re-authentication or the forms rate limit (`DevtoolsRoutes::DRAFT`) | Accepted (proposal) |
+| D-42-03 | 42 | The generator engine in the Core; demo values made with Faker at generation time; one-page wizard with the draft in the session | Accepted (proposal) |
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 | D-44-01 | 44 | Web Push encryption and VAPID implemented in the Core with OpenSSL, no library (decide) | Decided |
 | D-44-02 | 44 | Web Push: channel name, tables, URLs, settings, keys and the endpoint allow-list (decide) | Decided |
@@ -3059,6 +3061,21 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) No dependency: for existing modules the preview shows the snippets to paste into the manifest, routes and language files by hand (new files are still written). B) Regenerate the whole manifest from a stored definition (loses manual changes).
 - **Status:** Decided
 - **Decision (2026-11-19):** «afegeix nikic/php-parser com a dependència de desenvolupament». As proposed: session 42 runs `composer require --dev nikic/php-parser:^5` (from Packagist; stop and report if Composer fails) and records it in `docs/dependencies.md`. **Must change:** `composer.json`/`composer.lock` and `docs/dependencies.md` (session 42).
+
+## D-42-02 — The code generator's draft-only POSTs without re-authentication or the forms rate limit (`DevtoolsRoutes::DRAFT`)
+
+- **Where:** `deploy/42-devtools-generator.md` ("writing needs `devtools.write` + `reauth`"); session 41's lock test required every Devtools POST to be `DevtoolsRoutes::WRITE` (`devtools`, `can:devtools.write`, `reauth`, `ratelimit:forms`).
+- **Problem:** The wizard's buttons (add a table, a column, an operation; check; preview; load a definition) are POSTs that only change the user's draft in the session. As WRITE routes, after the 15-minute re-authentication window a button would redirect to `auth/reauth` and the posted form would be lost (POSTs are never replayed), and the `forms` limit (10 an hour) would stop the wizard after ten clicks.
+- **Proposal (built):** A third filter set `DevtoolsRoutes::DRAFT` = `devtools` (loopback, local `Host`) + `can:devtools.view`, used only by the routes listed in `DevtoolsRoutes::DRAFT_ROUTES` (`generator`, `generator/load`); they write no file and run no command (CSRF applies). Writing stays WRITE. `DevtoolsLocksTest` pins both lists.
+- **Alternatives:** A) Every POST WRITE (lost edits, ten clicks an hour). B) Keep the wizard state only in the browser (JavaScript-only wizard, no server validation between steps).
+- **Status:** Accepted (proposal)
+
+## D-42-03 — The generator engine in the Core; demo values made with Faker at generation time; one-page wizard with the draft in the session
+
+- **Where:** `deploy/42-devtools-generator.md` ("record where; `make:module` in the Core must keep working without Devtools"; "a Faker generator per column").
+- **Proposal (built):** The engine is `Modules\Core\Generator` (definition, validator, `Engine` → `Plan`, `SourceEditor`, `PlanWriter`), used by `make:module --definition` and by Devtools; plain `make:module` keeps its templates and output (`ModuleGenerator::files()`) and needs no parser. Faker is a development dependency, so the demo values are made when the code is generated (seeded by the table name) and written into the demo seeder as literals: the seeder runs on a `--no-dev` site and gives the same rows every time. The wizard is one server-rendered form whose names follow the definition's JSON; every button posts it and the draft lives in the session, so it works without JavaScript and the re-authentication round trip returns to the preview (`GET backend/devtools/generator/preview`). The plan's fingerprint covers the definition and the existing files it changes (not the new files, whose migration names carry the time); the writer also refuses a new file that appeared. Syntax highlighting: plain escaped `<pre>` (no library). "Alter" migrations for existing tables are not generated (next step).
+- **Alternatives:** A) The engine in Devtools (then `make:module --definition` would need the development-only module). B) Faker in the generated seeder (breaks `modules:demo` without the development packages).
+- **Status:** Accepted (proposal)
 
 ## D-43-01 — Signing packages from the local Devtools form, with safeguards for the key (decide)
 

@@ -131,8 +131,10 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 
 ## Developing a module
 
-- **Start:** `/new-module <Name>` or `php spark make:module <Name> [--crud=<table>] [--api]`. Read
-  `docs/creating-a-module.md` first; copy patterns from `modules/News` (reference module) and
+- **Start:** `/new-module <Name>` or `php spark make:module <Name> [--crud=<table>] [--api]`, or
+  generate it from a definition (Devtools › Code generator in development, or
+  `php spark make:module --definition=<file.json>`; one engine, `Modules\Core\Generator`,
+  `docs/devtools.md`) and refine it. Read `docs/creating-a-module.md` first; copy patterns from `modules/News` (reference module) and
   `modules/Tasks` (tutorial module), not from memory.
 - **Work inside the module:** everything goes in `modules/<Name>/`. Do not change the Core,
   another module or a shared convention for this module's needs: if the Core must change, stop
@@ -178,7 +180,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   them, installed and uninstalled only from the console (`modules:install`, `--pending`), never by
   the web server; the Core asks other modules through events (`packageBackup`,
   `moduleUninstalling`, `moduleVersions`), and a module that keeps data about other modules
-  listens to `moduleUninstalling`.
+  listens to `moduleUninstalling`. The one exception that writes module code from a web request
+  is Devtools' code generator, in development only, behind every Devtools lock, after a preview
+  of every file and re-authentication (D-41-02, `docs/security.md`).
 - Maintenance mode only through `Modules\Core\Maintenance\MaintenanceMode` (its state is a file;
   the global `maintenance` filter answers 503; by hand: Settings › Actions or
   `php spark app:maintenance`; `maintenance.manage` holders bypass only that mode). Paths under `progress/*` serve the JSON progress of
