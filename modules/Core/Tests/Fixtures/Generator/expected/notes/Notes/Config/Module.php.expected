@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Notes\Config;
+
+use Modules\Notes\Tasks\NotesTask;
+use Modules\Notes\Widgets\NotesWidget;
+
+/**
+ * Manifest of the Notes module (see docs/specification.md, "The module contract").
+ */
+final class Module extends \Modules\Core\Config\ModuleManifest
+{
+    public string $name     = 'Notes';
+    public string $version  = '0.1.0';
+    public string $icon     = 'bi bi-box';
+    public array $requires  = ['Core' => '^1.0'];
+
+    public array $resources = [
+        'main' => ['label' => 'Notes.res.main', 'type' => 'page'],
+        'items' => ['label' => 'Notes.res.items', 'type' => 'crud', 'except' => ['trash', 'restore', 'purge']],
+    ];
+
+    public array $defaultGrants = [
+        'admin' => ['notes-main.*', 'notes-items.*'],
+    ];
+
+    public array $menu = [
+        ['resource' => 'main', 'label' => 'Notes.menu.main', 'icon' => 'bi bi-box', 'order' => 100],
+        [
+            'resource' => 'items',
+            'label' => 'Notes.menu.items',
+            'icon' => 'bi bi-table',
+            'order' => 10,
+            'parent' => 'main',
+        ],
+    ];
+
+    /** Settings (Settings › Notes): read with setting('Notes.perPage'). */
+    public array $settings = [
+        'perPage' => [
+            'type'    => 'int',
+            'default' => 20,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
+            'label'   => 'Notes.settings.perPage',
+            'help'    => 'Notes.settings.perPageHelp',
+        ],
+    ];
+
+    public array $widgets = [NotesWidget::class];
+    public array $tasks   = [NotesTask::class];
+
+    /** Content backed up beyond the module's tables, e.g. ['files' => ['modules/notes']] (storage folders). */
+    public array $backup = [];
+
+    /** API resources (kpapy, `api/v1/<path>`, docs/api.md), e.g. ['notes' => ['path' => 'notes', 'handler' => '\\Modules\\Notes\\Controllers\\Api\\Items::index']]. */
+    public array $api = [];
+
+    /** Extra Content-Security-Policy sources per directive (docs/frontend.md), e.g. ['img-src' => ['https://tiles.example.com']]. */
+    public array $csp = [];
+
+    /** HTTPS hosts this module calls through the OutboundClient (docs/outbound-requests.md). */
+    public array $outboundHosts = [];
+}

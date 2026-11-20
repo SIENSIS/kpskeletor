@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+use CodeIgniter\Router\RouteCollection;
+
+/**
+ * Routes of the Library module (discovered by CodeIgniter). Every back-office route declares its
+ * `can:` filter; the route name is "<module>-<resource>".
+ *
+ * @var RouteCollection $routes
+ */
+$routes->group(backend_path('library'), ['namespace' => 'Modules\Library\Controllers'], static function (RouteCollection $routes): void {
+    $routes->get('/', 'Home::index', ['as' => 'library-main', 'filter' => 'can:library-main.view']);
+});
+
+\Modules\Core\Crud\CrudFactory::routes($routes, 'library-shelves', backend_path('library/shelves'), '\Modules\Library\Controllers\Shelves::index');
+
+\Modules\Core\Crud\CrudFactory::routes($routes, 'library-books', backend_path('library/books'), '\Modules\Library\Controllers\Books::index');
+\Kpapy\Resource::routes($routes, 'api/v1/library/books', '\Modules\Library\Controllers\Api\Books::index', ['filter' => 'kpapy']);

@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Library\Widgets;
+
+use Modules\Core\Widgets\Widget;
+
+/**
+ * Dashboard widget of the Library module (stub; docs/widgets.md). It appears in Dashboard ›
+ * Group layouts after `php spark modules:sync` and is shown to users who hold its permission.
+ */
+final class LibraryWidget extends Widget
+{
+    public function id(): string
+    {
+        return 'library.main';
+    }
+
+    public function title(): string
+    {
+        return lang('Library.widget.title');
+    }
+
+    public function permission(): string
+    {
+        return 'library-main.view';
+    }
+
+    public function render(array $options): string
+    {
+        return $this->empty(lang('Library.widget.title'));
+    }
+}

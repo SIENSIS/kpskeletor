@@ -1,0 +1,20 @@
+{
+    "module": {"name": "Zoo", "existing": true},
+    "tables": [
+        {
+            "name": "zoo_animals",
+            "labels": {"singular": {"ca": "Animal", "es": "Animal", "en": "Animal"}, "plural": {"ca": "Animals", "es": "Animales", "en": "Animals"}},
+            "demoRows": 3,
+            "columns": [
+                {"name": "name", "type": "string", "length": 100, "label": {"ca": "Nom", "es": "Nombre", "en": "Name"}},
+                {"name": "species", "type": "enum", "options": ["cat", "dog", "bird"], "label": {"ca": "Espècie", "es": "Especie", "en": "Species"}},
+                {"name": "keeper_id", "type": "integer", "nullable": true, "foreign": {"table": "users", "onDelete": "SET NULL"}, "label": {"ca": "Cuidador", "es": "Cuidador", "en": "Keeper"}},
+                {"name": "born_on", "type": "date", "nullable": true, "label": {"ca": "Naixement", "es": "Nacimiento", "en": "Born"}}
+            ],
+            "crud": {"recordRule": "column", "ruleColumn": "keeper_id", "operations": ["list", "show", "add", "edit", "delete"], "maskIds": false},
+            "api": {"enabled": true, "public": true},
+            "menu": {"zone": "settings", "parent": "group.system", "icon": "bi bi-heart", "order": 50},
+            "grants": {"admin": ["*"], "user": ["list", "show"]}
+        }
+    ]
+}

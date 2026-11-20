@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Notes',
+    'intro' => 'This is the new Notes module.',
+    'component' => 'Example JavaScript component of the Notes module.',
+    'menu'  => ['main' => 'Notes', 'items' => 'Notes'],
+    'res'   => ['main' => 'Notes', 'items' => 'Notes'],
+    'perm'  => [],
+    'settings' => ['perPage' => 'Items per page', 'perPageHelp' => 'Number of items in the Notes lists.'],
+    'widget'   => ['title' => 'Notes'],
+    'task'     => ['description' => 'Example scheduled task of Notes'],
+    'items' => [
+        'singular' => 'Note',
+        'plural' => 'Notes',
+        'fields' => [
+            'title' => 'Title',
+            'body' => 'Text',
+            'created_by' => 'Created by',
+            'created_at' => 'Created',
+            'updated_at' => 'Updated',
+        ],
+    ],
+];

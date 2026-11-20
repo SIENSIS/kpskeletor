@@ -1,0 +1,12 @@
+changed   Zoo/CLAUDE.md
+changed   Zoo/Config/Module.php
+changed   Zoo/Config/Routes.php
+new       Zoo/Controllers/Animals.php
+new       Zoo/Controllers/Api/PublicAnimals.php
+new       Zoo/Database/Migrations/2026-11-20-100000_CreateZooAnimals.php
+changed   Zoo/Database/Seeds/ZooDemoSeeder.php
+changed   Zoo/Language/ca/Zoo.php
+changed   Zoo/Language/en/Zoo.php
+changed   Zoo/Language/es/Zoo.php
+new       Zoo/Tests/AnimalsCrudTest.php
+new       Zoo/Tests/PublicAnimalsApiTest.php

@@ -1,0 +1,74 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Zoo\Config;
+
+use Modules\Zoo\Tasks\ZooTask;
+use Modules\Zoo\Widgets\ZooWidget;
+
+/**
+ * Manifest of the Zoo module (see docs/specification.md, "The module contract").
+ */
+final class Module extends \Modules\Core\Config\ModuleManifest
+{
+    public string $name     = 'Zoo';
+    public string $version  = '0.1.0';
+    public string $icon     = 'bi bi-box';
+    public array $requires  = ['Core' => '^1.0'];
+
+    public array $resources = [
+        'main' => ['label' => 'Zoo.res.main', 'type' => 'page'],
+        'animals' => [
+            'label' => 'Zoo.res.animals',
+            'type' => 'crud',
+            'except' => ['export', 'import', 'trash', 'restore', 'purge'],
+            'extra' => ['all' => 'Zoo.perm.animals.all'],
+        ],
+    ];
+
+    public array $defaultGrants = [
+        'admin' => ['zoo-main.*', 'zoo-animals.*'],
+        'user' => ['zoo-animals.list', 'zoo-animals.show'],
+    ];
+
+    public array $menu = [
+        ['resource' => 'main', 'label' => 'Zoo.menu.main', 'icon' => 'bi bi-box', 'order' => 100],
+        [
+            'resource' => 'animals',
+            'label' => 'Zoo.menu.animals',
+            'icon' => 'bi bi-heart',
+            'order' => 50,
+            'parent' => 'group.system',
+            'zone' => 'settings',
+        ],
+    ];
+
+    /** Settings (Settings › Zoo): read with setting('Zoo.perPage'). */
+    public array $settings = [
+        'perPage' => [
+            'type'    => 'int',
+            'default' => 20,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
+            'label'   => 'Zoo.settings.perPage',
+            'help'    => 'Zoo.settings.perPageHelp',
+        ],
+    ];
+
+    public array $widgets = [ZooWidget::class];
+    public array $tasks   = [ZooTask::class];
+
+    /** Content backed up beyond the module's tables, e.g. ['files' => ['modules/zoo']] (storage folders). */
+    public array $backup = [];
+
+    /** API resources (kpapy, `api/v1/<path>`, docs/api.md), e.g. ['zoo' => ['path' => 'zoo', 'handler' => '\\Modules\\Zoo\\Controllers\\Api\\Items::index']]. */
+    public array $api = [
+        'public-animals' => ['path' => 'public/zoo/animals', 'handler' => '\Modules\Zoo\Controllers\Api\PublicAnimals::index'],
+    ];
+
+    /** Extra Content-Security-Policy sources per directive (docs/frontend.md), e.g. ['img-src' => ['https://tiles.example.com']]. */
+    public array $csp = [];
+
+    /** HTTPS hosts this module calls through the OutboundClient (docs/outbound-requests.md). */
+    public array $outboundHosts = [];
+}

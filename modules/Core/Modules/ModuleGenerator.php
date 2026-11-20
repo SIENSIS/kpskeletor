@@ -90,6 +90,28 @@ final class ModuleGenerator
      */
     public function generate(string $name, ?string $crudTable = null, bool $api = false, bool $standalone = false): string
     {
+        $path = $this->root . '/' . $name;
+
+        foreach ($this->files($name, $crudTable, $api, $standalone) as $file => $content) {
+            $this->write($path . '/' . $file, $content);
+        }
+
+        return $path;
+    }
+
+    /**
+     * The files of a new module (path inside the module => content), written by `generate()` and
+     * used by the code generator (`Modules\Core\Generator\Engine`) as the base of a module built
+     * from a definition. `$values` overrides template values (e.g. `{{crudClaude}}`).
+     *
+     * @param array<string, string> $values
+     *
+     * @return array<string, string>
+     *
+     * @throws \InvalidArgumentException when the name is invalid or the module exists
+     */
+    public function files(string $name, ?string $crudTable = null, bool $api = false, bool $standalone = false, array $values = []): array
+    {
         $error = $this->nameError($name) ?? ($crudTable !== null ? CrudScaffold::tableError($crudTable) : null);
 
         if ($error === null && $api && $crudTable === null) {
@@ -115,26 +137,27 @@ final class ModuleGenerator
             ...ApiScaffold::templateValues($name, $api ? $crudTable : null),
             ...self::claudeValues($name, $crudTable, $api),
             '{{vendor}}'         => 'your-vendor',
+            ...$values,
         ];
 
-        $path  = $this->root . '/' . $name;
-        $files = $standalone ? [...self::FILES, ...self::STANDALONE_FILES] : self::FILES;
+        $templates = $standalone ? [...self::FILES, ...self::STANDALONE_FILES] : self::FILES;
+        $files     = [];
 
-        foreach ($files as $template => $target) {
-            $content = (string) file_get_contents(__DIR__ . '/Templates/' . $template);
-            $this->write($path . '/' . strtr($target, $replace), strtr($content, $replace));
+        foreach ($templates as $template => $target) {
+            $content                           = (string) file_get_contents(__DIR__ . '/Templates/' . $template);
+            $files[strtr($target, $replace)] = strtr($content, $replace);
         }
 
         if ($api && $crudTable !== null) {
-            $content = (string) file_get_contents(__DIR__ . '/Templates/ApiTest.php.tpl');
-            $this->write($path . '/Tests/' . $name . 'ApiTest.php', strtr($content, $replace));
+            $content                                = (string) file_get_contents(__DIR__ . '/Templates/ApiTest.php.tpl');
+            $files['Tests/' . $name . 'ApiTest.php'] = strtr($content, $replace);
         }
 
         foreach (self::FOLDERS as $folder) {
-            $this->write($path . '/' . $folder . '/.gitkeep', '');
+            $files[$folder . '/.gitkeep'] = '';
         }
 
-        return $path;
+        return $files;
     }
 
     /**

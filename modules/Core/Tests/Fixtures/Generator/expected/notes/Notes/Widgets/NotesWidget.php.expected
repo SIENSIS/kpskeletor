@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Notes\Widgets;
+
+use Modules\Core\Widgets\Widget;
+
+/**
+ * Dashboard widget of the Notes module (stub; docs/widgets.md). It appears in Dashboard ›
+ * Group layouts after `php spark modules:sync` and is shown to users who hold its permission.
+ */
+final class NotesWidget extends Widget
+{
+    public function id(): string
+    {
+        return 'notes.main';
+    }
+
+    public function title(): string
+    {
+        return lang('Notes.widget.title');
+    }
+
+    public function permission(): string
+    {
+        return 'notes-main.view';
+    }
+
+    public function render(array $options): string
+    {
+        return $this->empty(lang('Notes.widget.title'));
+    }
+}

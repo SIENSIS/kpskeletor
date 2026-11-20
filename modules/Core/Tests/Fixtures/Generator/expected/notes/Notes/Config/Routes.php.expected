@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+use CodeIgniter\Router\RouteCollection;
+
+/**
+ * Routes of the Notes module (discovered by CodeIgniter). Every back-office route declares its
+ * `can:` filter; the route name is "<module>-<resource>".
+ *
+ * @var RouteCollection $routes
+ */
+$routes->group(backend_path('notes'), ['namespace' => 'Modules\Notes\Controllers'], static function (RouteCollection $routes): void {
+    $routes->get('/', 'Home::index', ['as' => 'notes-main', 'filter' => 'can:notes-main.view']);
+});
+
+\Modules\Core\Crud\CrudFactory::routes($routes, 'notes-items', backend_path('notes/items'), '\Modules\Notes\Controllers\Items::index');

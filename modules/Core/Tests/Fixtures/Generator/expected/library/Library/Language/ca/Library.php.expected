@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Library',
+    'intro' => 'Aquest és el nou mòdul Library.',
+    'component' => 'Exemple de component JavaScript del mòdul Library.',
+    'menu'  => ['main' => 'Library', 'shelves' => 'Prestatges', 'books' => 'Llibres'],
+    'res'   => ['main' => 'Library', 'shelves' => 'Prestatges', 'books' => 'Llibres'],
+    'perm'  => [
+        'books' => [
+            'lend' => 'Prestar',
+            'writeoff' => 'Donar de baixa',
+            'prices' => 'Prices',
+            'all' => 'Tots els registres',
+        ],
+    ],
+    'settings' => ['perPage' => 'Elements per pàgina', 'perPageHelp' => 'Nombre d’elements de les llistes de Library.'],
+    'widget'   => ['title' => 'Library'],
+    'task'     => ['description' => 'Tasca programada d’exemple de Library'],
+    'module' => ['description' => 'Biblioteca de l\'escola'],
+    'shelves' => [
+        'singular' => 'Prestatge',
+        'plural' => 'Prestatges',
+        'fields' => [
+            'code' => 'Codi',
+            'room' => 'Sala',
+            'created_by' => 'Creat per',
+            'created_at' => 'Creat',
+            'updated_at' => 'Modificat',
+        ],
+    ],
+    'books' => [
+        'singular' => 'Llibre',
+        'plural' => 'Llibres',
+        'fields' => [
+            'title' => 'Títol',
+            'summary' => 'Resum',
+            'isbn' => 'ISBN',
+            'status' => 'Estat',
+            'price' => 'Preu',
+            'shelf_id' => 'Prestatge',
+            'published_on' => 'Publicat',
+            'available' => 'Disponible',
+            'cover' => 'Coberta',
+            'notes' => 'Notes',
+            'created_by' => 'Creat per',
+            'created_at' => 'Creat',
+            'updated_at' => 'Modificat',
+        ],
+        'options' => ['status' => ['available' => 'Available', 'lent' => 'Lent', 'lost' => 'Lost']],
+        'ops' => [
+            'lend' => ['label' => 'Prestar', 'confirm' => 'Prestar aquest llibre?', 'done' => 'Fet.'],
+            'writeoff' => ['label' => 'Donar de baixa', 'done' => 'Fet.'],
+        ],
+        'api' => ['summary' => 'Llibres', 'description' => 'Generat pel generador de codi.'],
+    ],
+];

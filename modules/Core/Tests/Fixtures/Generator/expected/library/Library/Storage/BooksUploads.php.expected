@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Library\Storage;
+
+use Modules\Core\Storage\CrudUploadHandler;
+
+/**
+ * The file fields of `library_books` (cover): the Core's file picker on the public disk,
+ * folder `modules/library` (Storage service: allow-lists, random names, docs/storage.md). Generated
+ * by the code generator (docs/devtools.md); change the types or size here.
+ */
+final class BooksUploads extends CrudUploadHandler
+{
+    public const TYPES = 'jpg,jpeg,png,webp,pdf';
+
+    protected function folder(): string
+    {
+        return 'modules/library';
+    }
+}

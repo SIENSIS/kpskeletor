@@ -1,0 +1,91 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Library\Config;
+
+use Modules\Library\Tasks\LibraryTask;
+use Modules\Library\Widgets\LibraryWidget;
+
+/**
+ * Manifest of the Library module (see docs/specification.md, "The module contract").
+ */
+final class Module extends \Modules\Core\Config\ModuleManifest
+{
+    public string $name     = 'Library';
+    public string $version  = '0.1.0';
+    public string $author = 'kpskeletor';
+    public string $description = 'Library.module.description';
+    public string $icon     = 'bi bi-box';
+    public array $requires  = ['Core' => '^1.0', 'Auth' => '^0.2'];
+
+    public array $resources = [
+        'main' => ['label' => 'Library.res.main', 'type' => 'page'],
+        'shelves' => [
+            'label' => 'Library.res.shelves',
+            'type' => 'crud',
+            'except' => ['add', 'edit', 'delete', 'import', 'trash', 'restore', 'purge'],
+        ],
+        'books' => [
+            'label' => 'Library.res.books',
+            'type' => 'crud',
+            'extra' => [
+                'lend' => 'Library.perm.books.lend',
+                'writeoff' => 'Library.perm.books.writeoff',
+                'prices' => 'Library.perm.books.prices',
+                'all' => 'Library.perm.books.all',
+            ],
+        ],
+    ];
+
+    public array $defaultGrants = [
+        'admin' => ['library-main.*', 'library-shelves.*', 'library-books.*'],
+        'editor' => ['library-shelves.list', 'library-shelves.show', 'library-books.list', 'library-books.show', 'library-books.add', 'library-books.edit', 'library-books.lend'],
+    ];
+
+    public array $menu = [
+        ['resource' => 'main', 'label' => 'Library.menu.main', 'icon' => 'bi bi-box', 'order' => 100],
+        [
+            'resource' => 'shelves',
+            'label' => 'Library.menu.shelves',
+            'icon' => 'bi bi-bookshelf',
+            'order' => 20,
+            'parent' => 'main',
+        ],
+        [
+            'resource' => 'books',
+            'label' => 'Library.menu.books',
+            'icon' => 'bi bi-book',
+            'order' => 10,
+            'parent' => 'main',
+        ],
+    ];
+
+    /** Settings (Settings › Library): read with setting('Library.perPage'). */
+    public array $settings = [
+        'perPage' => [
+            'type'    => 'int',
+            'default' => 20,
+            'rules'   => 'required|integer|greater_than_equal_to[1]|less_than_equal_to[100]',
+            'label'   => 'Library.settings.perPage',
+            'help'    => 'Library.settings.perPageHelp',
+        ],
+    ];
+
+    public array $widgets = [LibraryWidget::class];
+    public array $tasks   = [LibraryTask::class];
+
+    /** Content backed up beyond the module's tables, e.g. ['files' => ['modules/library']] (storage folders). */
+    public array $backup = [];
+
+    /** API resources (kpapy, `api/v1/<path>`, docs/api.md), e.g. ['library' => ['path' => 'library', 'handler' => '\\Modules\\Library\\Controllers\\Api\\Items::index']]. */
+    public array $api = [
+        'books' => ['path' => 'library/books', 'handler' => '\Modules\Library\Controllers\Api\Books::index'],
+    ];
+
+    /** Extra Content-Security-Policy sources per directive (docs/frontend.md), e.g. ['img-src' => ['https://tiles.example.com']]. */
+    public array $csp = [];
+
+    /** HTTPS hosts this module calls through the OutboundClient (docs/outbound-requests.md). */
+    public array $outboundHosts = [];
+}
