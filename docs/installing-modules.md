@@ -101,6 +101,17 @@ signature with no key configured refuses the package. A package without a signat
 sites should set once their publishers sign. How a publisher signs:
 [`creating-a-module.md`](creating-a-module.md) ("Packaging as a ZIP and signing it").
 
+### Publishing a package
+
+On a development copy, `php spark modules:package <Name> --sign=<minisign.key>` (or Devtools ›
+Packages, [`devtools.md`](devtools.md#building-and-signing-packages)) builds `<Name>-<version>.zip`,
+validates it as this installer will, and writes `<Name>-<version>.zip.sha256` and
+`<Name>-<version>.zip.minisig`. Publish the three files side by side (the installer looks for
+`<file>.minisig` next to the ZIP, or `<url>.minisig`); the `.sha256` lets people check a download
+with `sha256sum -c`. The public key the command prints (`RW…`, the second line of the publisher's
+`minisign.pub`) goes in `$publicKeys` of `app/Config/Packages.php` on every site that installs the
+publisher's packages. The secret key never leaves the publisher's computer.
+
 The install (`PackageInstaller`) then checks dependencies and the Core version, refuses a module
 of another **author** (`$author` in the manifest) and a downgrade or the same version unless
 `--force`, and:

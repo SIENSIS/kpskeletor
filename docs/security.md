@@ -441,6 +441,13 @@ after the preview (content hashes), and logged (`activity_log('Devtools', 'gener
 form buttons only change the draft in the session (`DevtoolsRoutes::DRAFT`, no re-authentication,
 D-42-02). Everywhere else module code is installed only from the console.
 
+The package builder (session 43) may raise a module's version (its manifest literal and
+`CHANGELOG.md`) behind the same locks. Its signing form takes a minisign secret key and its
+password (D-43-01): the request is emptied before the debug toolbar can collect it, nothing is
+stored (disk, session, flash data, logs), errors are generic, responses `no-store`, and the next
+request clears the debug history, logs and caches and ends the session (D-43-02;
+[`devtools.md`](devtools.md#signing-from-the-local-form-d-43-01)).
+
 It is part of the repository, so `git archive` and the release archives contain it
 ([`updates.md`](updates.md)); the locks above make it inert there. Never deploy with
 `CI_ENVIRONMENT = development`. See [`devtools.md`](devtools.md).

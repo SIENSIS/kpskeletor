@@ -305,8 +305,11 @@ the skeleton's Core for the module.
 
 ## 9. Packaging as a ZIP and signing it
 
-There is no packager command yet: build the ZIP and its signature by hand. What the installer
-accepts is described in [`installing-modules.md`](installing-modules.md) ("Packages").
+On a development copy, `php spark modules:package <Name> [--sign=<minisign.key>]` (or Devtools ›
+Packages) builds the ZIP below, validates it as the installer will, writes its `.sha256` and signs
+it ([`devtools.md`](devtools.md#building-and-signing-packages)). By hand, build the ZIP and its
+signature as follows. What the installer accepts is described in
+[`installing-modules.md`](installing-modules.md) ("Packages").
 
 **Layout.** One top folder named like the module (`Books/`, the manifest at
 `Books/Config/Module.php`, class `Modules\Books\Config\Module`, `$name = 'Books'`, a semantic

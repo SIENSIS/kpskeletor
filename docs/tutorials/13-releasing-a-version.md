@@ -131,8 +131,17 @@ the matrix (or rely on a wildcard grant such as `tasks-tasks.*`).
 
 ## 4. Build the ZIP
 
-A package is a ZIP with **one top folder** named like the module. Build it from a clean checkout of
-the module, without dot files:
+On a development copy, one command builds, validates and (optionally) signs the package — the
+same checks the installer will run, plus `Tasks-0.2.0.zip.sha256`
+([`devtools.md`](../devtools.md#building-and-signing-packages); also Devtools › Packages):
+
+```bash
+php spark modules:package Tasks                          # writable/devtools/packages/Tasks-0.2.0.zip
+php spark modules:package Tasks --sign=acme.key          # + Tasks-0.2.0.zip.minisig (step 5)
+```
+
+By hand, a package is a ZIP with **one top folder** named like the module. Build it from a clean
+checkout of the module, without dot files:
 
 ```bash
 cd modules
@@ -155,7 +164,8 @@ minisign -G -p acme.pub -s acme.key                                  # once; kee
 minisign -S -s acme.key -m Tasks-0.2.0.zip -t "Tasks 0.2.0"          # writes Tasks-0.2.0.zip.minisig
 ```
 
-Publish `Tasks-0.2.0.zip` with `Tasks-0.2.0.zip.minisig` next to it. The site adds the public key
+`php spark modules:package Tasks --sign=acme.key` does the same and checks the signature
+(the password is asked without echo). Publish `Tasks-0.2.0.zip` with `Tasks-0.2.0.zip.minisig` next to it. The site adds the public key
 to `$publicKeys` in `app/Config/Packages.php`
 ([`installing-modules.md`, "Signatures"](../installing-modules.md#signatures)).
 

@@ -10,6 +10,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Module packages and signing** (session 43, D-43-01, D-43-02, `docs/devtools.md`):
+  `php spark modules:package <Name> [--theme] [--out=<dir>] [--sign=<secret key file>]` and
+  Devtools › Packages (`backend/devtools/packages`, development only) build `<Name>-<version>.zip`
+  (one top folder; dotfiles, `node_modules`, `writable`, editor files and refused extensions left
+  out; symbolic links refused), validate it with the installer's `PackageValidator`, write
+  `<zip>.sha256` and sign it minisign-compatibly with libsodium (encrypted or unencrypted keys,
+  verified with the Core's `Minisign`; the public key is shown for `packages.publicKeys`). The
+  screen can raise the version (manifest and `CHANGELOG.md`), serves the files from
+  `writable/devtools/packages/` and signs from a local form whose key and password are never
+  stored (request emptied before the debug toolbar collects it, no session or logs, generic
+  errors, `no-store`), followed by a cleanup (debug history, logs, caches) that ends the session.
+  Activity entries `packaged`, `version_raised`, `signed`, `cleanup`.
 - **Code generator** (session 42, D-41-02, D-42-01 … D-42-03, `docs/devtools.md`): Devtools ›
   Code generator (`backend/devtools/generator`, development only) — a wizard (module, tables and
   columns with portable types and ca/es/en labels, demo data with Faker, CRUD options, API, menu
