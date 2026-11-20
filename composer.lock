@@ -950,16 +950,16 @@
         },
         {
             "name": "siensis/kpcrudy",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SIENSIS/kpcrudy.git",
-                "reference": "decdc0b7057c35228bdeb2fa6653681e140e0399"
+                "reference": "f1b4c1af9d83d4698d9aaac471a3f3ff4c63e698"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SIENSIS/kpcrudy/zipball/decdc0b7057c35228bdeb2fa6653681e140e0399",
-                "reference": "decdc0b7057c35228bdeb2fa6653681e140e0399",
+                "url": "https://api.github.com/repos/SIENSIS/kpcrudy/zipball/f1b4c1af9d83d4698d9aaac471a3f3ff4c63e698",
+                "reference": "f1b4c1af9d83d4698d9aaac471a3f3ff4c63e698",
                 "shasum": ""
             },
             "require": {
@@ -986,9 +986,9 @@
             ],
             "support": {
                 "issues": "https://github.com/SIENSIS/kpcrudy/issues",
-                "source": "https://github.com/SIENSIS/kpcrudy/tree/v1.3.0"
+                "source": "https://github.com/SIENSIS/kpcrudy/tree/v1.4.0"
             },
-            "time": "2026-11-12T10:37:37+00:00"
+            "time": "2026-11-12T19:17:49+00:00"
         },
         {
             "name": "spomky-labs/otphp",
@@ -5727,5 +5727,5 @@
     "platform-overrides": {
         "php": "8.2.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
