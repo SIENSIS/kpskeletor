@@ -12,7 +12,7 @@ home page carries a **Home** badge.
 
 The form has one tab per site language (the site's default language required, `docs/i18n.md`): **title**, **slug**, **summary**, **text**
 (the rich-text editor), **meta title**, **meta description** and **canonical URL**; then the
-**parent page**, **order**, **template**, **visibility** and **groups**, **publication date**,
+**parent page**, **order**, **layout** (article or sections, see below), **template**, **visibility** and **groups**, **publication date**,
 **hide from search engines** and the **featured image**.
 
 | Operation | Permission | What it does |
@@ -21,7 +21,8 @@ The form has one tab per site language (the site's default language required, `d
 | Preview (`GET backend/pages/preview/{id}`) | `pages.show` | The page with its template, whatever its status or visibility, `noindex` |
 | Revisions (`GET backend/pages/revisions/{id}`) | `pages.show` | Who saved, when, and the changes of each revision (before / after) |
 | Restore a revision (`POST backend/pages/restorerevision/{id}`) | `pages.edit` | Texts, groups, template, visibility, noindex and image go back to that revision |
-| Duplicate (`POST backend/pages/duplicate/{id}`) | `pages.add` | A draft copy under the same parent ("(còpia)", slug `…-copia`) |
+| Duplicate (`POST backend/pages/duplicate/{id}`) | `pages.add` | A draft copy under the same parent ("(còpia)", slug `…-copia`), sections included |
+| Sections (`GET backend/pages/{id}/sections`) | `pages.edit` | The section editor of the page (below) |
 
 New pages are drafts by the user who creates them. Writes and POST operations are written to the
 activity log by the Core (`AuditedCrud`; labels `Pages.activity.*`).
@@ -91,6 +92,59 @@ A template is the view `Modules\Pages\Views\templates\<key>`; a theme overrides 
 new key) in `themes/<slug>/Views/overrides/Pages/templates/<key>.php`. An unknown template falls
 back to `default`. All templates include `Modules\Pages\Views\partials\article`.
 
+## Pages built from sections
+
+A page's **layout** (D-45-01) is **Article** (the page shows its text, as above) or **Sections**:
+an ordered list of sections edited with forms, shown over the whole width of the public layout.
+Switching keeps the other content (the text stays while the page uses sections, and the other
+way round).
+
+**For authors.** Row operation **Sections** (or `backend/pages/<id>/sections`):
+
+- the notice at the top says what the page shows and switches the layout ("Use sections" /
+  "Show the text instead");
+- **Add section** opens a gallery of the section types with a picture and a sentence each;
+  choose one, fill in its form and save;
+- every section of the list can be **edited**, **duplicated**, **hidden** (kept, not shown) or
+  **deleted**; drag it by its handle, or focus the handle and use the up and down arrow keys, then
+  **Save the order** (without JavaScript the up/down buttons move one place per click);
+- the form of a section has the language buttons ("Language of the texts") to fill in the texts
+  of each language (the default language required, the others fall back to it), the section's
+  fields (texts, images with their alternative text or "decorative", links to a page or an
+  address, icons chosen in a searchable grid, lists of items that can be added, removed and
+  reordered) and its appearance (style, background from the theme's palette or an image, spacing,
+  width) and an optional anchor;
+- **Preview** shows the page as it is now, whatever its status; every change records a
+  **revision** of the page (sections included), and restoring a revision brings its sections back.
+
+The Pages module offers six types: **Hero banner** (background image with an overlay colour,
+title, text, two buttons, side image, height, alignment, straight or wave bottom edge), **Quick
+links** (icon or image + label + link; styles icons, tiles and band; 2–6 columns), **Cards**
+(heading, introduction, cards with image, title, text and button; 2–4 columns), **Image and
+text** (image left or right, title, rich text, button), **Call to action** (title, text, button)
+and **Text** (rich text with an optional heading). Other modules add more
+([`sections.md`](sections.md)).
+
+**For developers.** Routes (`modules/Pages/Config/Routes.php`, before the CRUD's catch-all,
+filter `can:pages.edit`; the controller `Controllers/Sections.php` also checks the CRUD's
+resolver and record rules for the page, a trashed page or another page's section answers 404):
+
+| Route | What |
+|---|---|
+| `GET backend/pages/<id>/sections` | the list |
+| `GET …/sections/add` | the gallery |
+| `GET …/sections/new/<type>`, `GET …/sections/<section>` | the form (new / edit) |
+| `POST …/sections/save` | save (`id`, `type`, `f[...]`, `o[...]`, `hidden`); a validation error answers 422 with the form |
+| `POST …/sections/order` | `order` (JSON list of every section id of the page) or `move` (`<id>:up|down`) |
+| `POST …/sections/<section>/duplicate`, `…/hide` (`hidden` 1/0), `…/delete` | the row operations |
+| `POST …/sections/layout` | `layout` = `article` \| `sections` |
+
+Every change records a page revision and an activity entry (`section_added`, `section_edited`,
+`sections_reordered`, `section_duplicated`, `section_hidden`, `section_shown`, `section_deleted`,
+`layout_changed`; a refusal by the record rules is a security entry `sections_denied`). Storage:
+`Services/PageSections.php`; rendering: `PageRenderer` uses the template `templates/sections`
+(full width) with the Core's `SectionRenderer`; the type views are `Views/sections/<name>.php`.
+
 ## Home page
 
 Settings › Pages › **Home page** (`Pages.homePage`): the page to show at `/`, chosen from a list
@@ -100,8 +154,9 @@ own path redirects to `/`. Implemented through the Core's `homePage` event (D-20
 
 ## Revisions
 
-Every save (and a create, a restore, a duplicate) records a revision in `page_revisions`: the
-user, the date, the changed fields and a JSON snapshot of the page, its texts and its groups. A
+Every save (and a create, a restore, a duplicate, a change in the section editor) records a
+revision in `page_revisions`: the user, the date, the changed fields and a JSON snapshot of the
+page, its texts, its groups and its sections (with their texts in every language). A
 save that changes nothing adds none. A restore keeps the parent, order, status and publication
 date (D-20-06).
 
@@ -119,8 +174,11 @@ module (session 21): the URL of a published page, `/` for the home page, null ot
 
 ## Tables
 
-`pages`, `page_translations` (title, slug, summary, body, meta title, meta description,
-canonical per language), `page_groups`, `page_revisions` (one migration each). Featured images
+`pages` (with `layout`, added by a later migration), `page_translations` (title, slug, summary,
+body, meta title, meta description, canonical per language), `page_groups`, `page_revisions`,
+`page_sections` (page, position, type, options and non-translated values as JSON, hidden) and
+`page_section_translations` (section, locale, translated values as JSON) (one migration each).
+Section images are files of the same folder. Featured images
 are files of the Storage service (public disk, folder `modules/pages`, backed up through
 `$backup`).
 
@@ -131,6 +189,7 @@ php spark modules:demo Pages     # after Auth's demo data
 php spark serve
 ```
 
-`backend/pages` as `admin@example.com` or `editor@example.com`; then `/qui-som`,
+`backend/pages` as `admin@example.com` or `editor@example.com`; then `/portada-seccions` (a page
+built from sections; its editor: row operation **Sections**), `/qui-som`,
 `/qui-som/equip`, `/intranet` (login), `/intranet/guia-estil` (group `editor`), `/sitemap.xml`;
 choose "Inici" in Settings › Pages › Home page and open `/`.

@@ -10,6 +10,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Pages built from sections** (session 45, D-45-01, `docs/pages.md`, `docs/sections.md`): a
+  page's layout is `article` (its text) or `sections`, an ordered list of sections edited with
+  forms (no shortcodes), shown over the whole width of the public layout. Section editor at
+  `backend/pages/<id>/sections` (`pages.edit` and the page's record rules): gallery of types with
+  thumbnails, forms generated from each type's schema with language buttons, drag and drop and
+  keyboard reordering, duplicate, hide, delete, preview; every change is a page revision
+  (restoring one brings its sections back). Core registry of **section types**: new manifest key
+  `$sectionTypes` (`Modules\Core\Sections\SectionType`, keys `<module>.<name>`), field types
+  validated on the server (text, textarea, rich text, image with alt text, link checked like menu
+  items, icon, select, number, boolean, list), common options (palette background or image,
+  spacing, width, anchor, hidden) and a theme view per type. Six types in Pages: hero banner,
+  quick links (icons, tiles, band), cards, image and text, call to action, text. Tables
+  `page_sections` and `page_section_translations`, column `pages.layout`. Demo page "Portada amb
+  seccions" in the main demo menu.
+
 - **Web Push notifications** (session 44, D-44-01, D-44-02, `docs/notifications.md`): a third
   notification channel, `push`, to the browsers and installed PWAs (phone or desktop) where each
   user turns it on in Profile › Notifications ("Activate notifications on this device", devices
@@ -98,6 +113,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Changed
 
+- The default theme's public layout has a full-width mode (`$fullWidth`, used by pages built from
+  sections); a theme with its own public layout should honour it (`docs/themes.md`, "Section views
+  and palette"). Page duplicates copy the layout and sections; revision diffs show line breaks.
 - The service worker (`/sw.js`) shows push notifications and is registered while Web Push is on
   even with the PWA off; `/sw.js` and the PWA icons are served in that case too.
 - `NotificationType::CHANNELS` includes `push` and the default `defaultChannels()` returns it:

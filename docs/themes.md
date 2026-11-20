@@ -297,6 +297,32 @@ The override receives the same data as the original view (copy its `@var` docblo
 also reads `themes/*/Views`). Overrides are looked up along the chain, so a child's override wins
 over its parent's.
 
+## Section views and palette
+
+Pages built from sections (D-45-01, [`sections.md`](sections.md)) render each section type
+through a module view (`Modules\Pages\Views\sections\hero` …), overridable like any module view
+(`themes/<slug>/Views/overrides/Pages/sections/hero.php`); the section forms' controls are
+`Modules\Core\Views\sections\fields\<type>` (`overrides/Core/sections/fields/<type>.php`).
+
+The page template `sections` asks the public layout for its **full-width mode** (`$fullWidth`:
+no outer `.container`, no sidebar, no vertical padding; notices stay in a container), so
+backgrounds reach the edges; each section brings its own `.container` (or `.container-fluid`
+when its width is `full`). A theme's own public layout must honour `$fullWidth` the same way.
+
+The default theme styles sections in `Assets/css/theme.css` from variables only:
+
+| Class | Meaning |
+|---|---|
+| `kp-bg-none`, `kp-bg-light`, `kp-bg-dark`, `kp-bg-primary`, `kp-bg-image` | background from the palette: body, `--bs-tertiary-bg`, `--kp-section-dark-bg`, `--kp-section-primary-bg` (the primary colour darkened for AA contrast with white text), an image under `.kp-section-overlay` |
+| `kp-space-s|m|l` | vertical padding |
+| `kp-width-contained|full` | content in `.container` or edge to edge |
+| `kp-style-<style>` | the type's style (`icons`, `tiles`, `band` of quick links) |
+| `kp-hero-*`, `kp-overlay-*`, `kp-edge-wave` | hero heights, overlay colours and the wave bottom edge (an SVG mask painted in `--bs-body-bg`) |
+
+Dark, primary and image backgrounds carry `data-bs-theme="dark"`, so Bootstrap's text and
+component colours turn light inside them, in light and dark mode alike. A child theme changes
+`--kp-section-dark-bg` / `--kp-section-primary-bg` or the primary colour option, never the views.
+
 ## Child themes
 
 A child theme (`$parent = '<slug>'`) inherits the parent's layouts, partials, components,

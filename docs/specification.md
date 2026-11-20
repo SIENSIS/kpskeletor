@@ -240,6 +240,7 @@ Assets/js/  Assets/css/  Assets/img/    Front-end assets, published to public/as
 Widgets/                   Dashboard widgets (implement WidgetInterface)
 Tasks/                     Scheduled tasks (implement TaskInterface)
 Notifications/             Notification types (implement NotificationType)
+Sections/                  Section types of pages built from sections (extend SectionType)
 ```
 
 The **manifest** is a typed PHP class: the single source of truth for everything the skeleton
@@ -340,6 +341,9 @@ final class Module extends ModuleManifest
     /** Calendars the module publishes events to ('permission' optional), and on-the-fly event providers (see Events) */
     public array $calendars         = ['notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545', 'source' => \Modules\News\Services\NoticeCalendar::class]];
     public array $calendarProviders = [];
+
+    /** Section types of pages built from sections (SectionType classes, keys <module>.<name>; D-45-01, see Pages) */
+    public array $sectionTypes = [];
 
     /** API resources (kpapy) under /api/v1: metadata checked against Config/Routes.php (see "JSON API") */
     public array $api = ['posts' => ['path' => 'news', 'handler' => '\Modules\News\Api\Posts::index']];

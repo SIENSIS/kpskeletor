@@ -328,6 +328,24 @@ Barra lateral › **Páginas** (`/backend/pages`): las páginas de la web públi
 
 Publicar suele requerir un permiso específico; quien no puede publicar guarda borradores.
 
+### Páginas hechas con secciones
+
+Una página puede mostrar su texto (**Disposición: Artículo**) o hacerse con **secciones**
+(**Disposición: Secciones**): banners, enlaces rápidos, tarjetas, imagen y texto, llamadas a la
+acción y bloques de texto, una debajo de otra, a toda la anchura de la web. No hace falta código.
+
+1. En la lista de páginas, abrid el menú de la fila › **Secciones**.
+2. Si el aviso dice que la página muestra su texto, pulsad **Usar secciones** (el texto se
+   conserva).
+3. **Añadir una sección**, elegid el tipo en la galería, rellenad el formulario y **Guardar**. Con
+   los botones de idioma de arriba del formulario escribid los textos de cada idioma; las imágenes
+   necesitan un **texto alternativo** (qué muestra la imagen) si no las marcáis como **decorativas**.
+4. Cambiad el orden arrastrando una sección por el asa (o enfocad el asa y usad las flechas arriba
+   y abajo) y pulsad **Guardar el orden**. **Ocultar** conserva una sección sin mostrarla;
+   **Duplicar** y **Eliminar** hacen lo que dicen.
+5. **Previsualizar** muestra la página tal como es ahora. Cada cambio queda en las **Revisiones**
+   de la página, y restaurar una revisión recupera sus secciones.
+
 ## Menús
 
 Barra lateral › **Menús** (`/backend/menus/public`): los menús de la web pública.
