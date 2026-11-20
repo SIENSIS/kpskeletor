@@ -9,7 +9,8 @@ use CodeIgniter\Test\DatabaseTestTrait;
 use Modules\Core\Modules\ModuleMigrator;
 
 /**
- * Migrations of the Core: up → down → up leaves the same tables.
+ * Migrations of the Core: up → down → up leaves the same tables (session 44: the push tables and
+ * the `push` channel added to stored preferences, and removed again by down()).
  *
  * @internal
  */
@@ -31,7 +32,7 @@ final class CoreMigrationsTest extends CIUnitTestCase
     private const TABLES = [
         'modules', 'permissions', 'group_permissions', 'module_declarations', 'demo_records',
         'notifications', 'notification_preferences', 'mail_queue', 'scheduled_tasks', 'task_runs',
-        'activity_log', 'stored_files', 'groups', 'module_packages',
+        'activity_log', 'stored_files', 'groups', 'module_packages', 'push_subscriptions', 'push_queue',
     ];
 
     private const MIGRATIONS = [
@@ -50,6 +51,9 @@ final class CoreMigrationsTest extends CIUnitTestCase
         '2026-11-08-000001_CreateStoredFiles',
         '2026-11-09-000001_CreateGroups',
         '2026-11-16-000001_CreateModulePackages',
+        '2026-11-20-000001_CreatePushSubscriptions',
+        '2026-11-20-000002_CreatePushQueue',
+        '2026-11-20-000003_AddPushToNotificationPreferences',
     ];
 
     public function testUpDownUp(): void

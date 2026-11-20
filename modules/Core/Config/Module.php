@@ -95,6 +95,7 @@ final class Module extends ModuleManifest
     /** @var list<string> */
     public array $tasks = [
         \Modules\Core\Tasks\SendQueuedEmails::class,
+        \Modules\Core\Tasks\SendQueuedPush::class,
         \Modules\Core\Tasks\PurgeActivityLog::class,
         \Modules\Core\Tasks\SecurityCheckTask::class,
     ];
@@ -275,6 +276,27 @@ final class Module extends ModuleManifest
             'label'   => 'Core.settings.activityRetentionDays',
             'help'    => 'Core.settings.activityRetentionDaysHelp',
             'group'   => 'security.activity',
+        ],
+        // Web Push notifications (the `push` channel, D-44-02): off by default; the VAPID keys
+        // are in .env (php spark push:keys). `generic` sends only "You have a new notification"
+        // (a lock screen shows the message).
+        'pushEnabled' => [
+            'type'    => 'bool',
+            'default' => false,
+            'label'   => 'Push.settings.enabled',
+            'help'    => 'Push.settings.enabledHelp',
+            'group'   => 'security.notifications',
+        ],
+        'pushContent' => [
+            'type'    => 'select',
+            'default' => 'full',
+            'label'   => 'Push.settings.content',
+            'help'    => 'Push.settings.contentHelp',
+            'options' => [
+                'full'    => 'Push.settings.contentFull',
+                'generic' => 'Push.settings.contentGeneric',
+            ],
+            'group'   => 'security.notifications',
         ],
         // Extra outbound hosts, added to Config\Outbound and the manifests' $outboundHosts.
         'outboundHosts' => [

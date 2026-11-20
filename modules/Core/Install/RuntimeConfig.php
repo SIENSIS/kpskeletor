@@ -59,6 +59,12 @@ class RuntimeConfig
         foreach (['Kpcrudy', 'Kpapy'] as $name) {
             config($name)->maskKey = $app->maskKey;
         }
+
+        $push = config(\Config\Push::class);
+        $push->vapidPublicKey  = $values['push.vapidPublicKey'] ?? $push->vapidPublicKey;
+        $push->vapidPrivateKey = $values['push.vapidPrivateKey'] ?? $push->vapidPrivateKey;
+        $push->subject         = $values['push.subject'] ?? $push->subject;
+        \Modules\Core\Push\WebPush::reset();
     }
 
     /**

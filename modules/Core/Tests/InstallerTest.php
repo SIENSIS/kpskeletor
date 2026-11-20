@@ -114,6 +114,10 @@ final class InstallerTest extends CIUnitTestCase
         $this->assertStringContainsString("database.default.DBDriver = SQLite3\n", $env);
         $this->assertStringContainsString("database.default.database = site.db\n", $env);
         $this->assertStringContainsString("app.baseURL = https://intranet.example.com/\n", $env);
+        // Web Push VAPID keys and contact (session 44, D-44-02).
+        $this->assertMatchesRegularExpression('/^push\.vapidPublicKey = \'?[A-Za-z0-9_-]{87}\'?$/m', $env);
+        $this->assertMatchesRegularExpression('/^push\.vapidPrivateKey = \'?[A-Za-z0-9_-]{43}\'?$/m', $env);
+        $this->assertMatchesRegularExpression('/^push\.subject = \'?mailto:Owner@Example\.com\'?$/m', $env);
 
         // modules:sync ran.
         $this->assertTrue($this->db->tableExists('modules'));

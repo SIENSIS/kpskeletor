@@ -206,6 +206,19 @@ return [
         'modulesTitle' => 'Hosts afegits pels mòduls',
         'fix'          => 'Reviseu-la a Configuració › Seguretat (hosts sortints) i a Config\Outbound.',
     ],
+    'push' => [
+        'title'    => 'Claus Web Push',
+        'on'       => 'Les notificacions push estan activades amb un parell de claus VAPID vàlid.',
+        'offReady' => 'Les notificacions push estan desactivades; les claus VAPID estan a punt.',
+        'off'      => 'Les notificacions push estan desactivades i les claus VAPID no estan configurades.',
+        'problem'  => [
+            'missing'  => 'Les notificacions push estan activades però el .env no té claus VAPID: no s\'envia res.',
+            'invalid'  => 'Les notificacions push estan activades però les claus VAPID del .env no són vàlides: no s\'envia res.',
+            'mismatch' => 'Les notificacions push estan activades però les claus VAPID pública i privada no es corresponen: no s\'envia res.',
+            'subject'  => 'Les notificacions push estan activades però push.subject no és un contacte mailto: o https:: no s\'envia res.',
+        ],
+        'fix'      => 'Executeu php spark push:keys (push.subject = mailto:… al .env) o desactiveu el push a Configuració › Seguretat › Notificacions.',
+    ],
     'probe' => [
         'run'                => 'Executa la prova externa',
         'submit'             => 'Executa la prova',

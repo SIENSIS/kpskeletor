@@ -206,6 +206,19 @@ return [
         'modulesTitle' => 'Hosts added by modules',
         'fix'          => 'Review it in Settings › Security (outbound hosts) and Config\Outbound.',
     ],
+    'push' => [
+        'title'    => 'Web Push keys',
+        'on'       => 'Push notifications are on with a valid VAPID key pair.',
+        'offReady' => 'Push notifications are off; the VAPID keys are ready.',
+        'off'      => 'Push notifications are off and the VAPID keys are not configured.',
+        'problem'  => [
+            'missing'  => 'Push notifications are on but .env has no VAPID keys: nothing is sent.',
+            'invalid'  => 'Push notifications are on but the VAPID keys in .env are not valid: nothing is sent.',
+            'mismatch' => 'Push notifications are on but the VAPID public and private keys do not match: nothing is sent.',
+            'subject'  => 'Push notifications are on but push.subject is not a mailto: or https: contact: nothing is sent.',
+        ],
+        'fix'      => 'Run php spark push:keys (push.subject = mailto:… in .env), or turn push off in Settings › Security › Notifications.',
+    ],
     'probe' => [
         'run'                => 'Run external probe',
         'submit'             => 'Run the probe',

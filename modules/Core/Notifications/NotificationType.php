@@ -36,8 +36,11 @@ abstract class NotificationType
     public const DATABASE = 'database';
     public const EMAIL    = 'email';
 
+    /** Web Push to the devices the user turned it on in (D-44-02; only while `Core.pushEnabled`). */
+    public const PUSH = 'push';
+
     /** Every channel, in display order. */
-    public const CHANNELS = [self::DATABASE, self::EMAIL];
+    public const CHANNELS = [self::DATABASE, self::EMAIL, self::PUSH];
 
     /** Default email view: title, body and a link (`Modules\Core\Views\emails\notification`). */
     public const EMAIL_VIEW = 'Modules\Core\Views\emails\notification';
@@ -78,7 +81,8 @@ abstract class NotificationType
     }
 
     /**
-     * Channels used when the user has not chosen (and always, for mandatory types).
+     * Channels used when the user has not chosen (and always, for mandatory types). The default
+     * includes `push`: it only reaches devices the user turned push on in (opt-in per device).
      *
      * @return list<string>
      */
