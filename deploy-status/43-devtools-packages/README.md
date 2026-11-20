@@ -1,7 +1,7 @@
 # Session 43 — Devtools: module packages and signing
 
-Branch: `claude/keen-mendel-j3yrq2` (assigned by the environment) · Pull request: see
-`docs/progress.md` · Date: 2026-11-20. Decisions: D-43-01 applied (decided by the owner);
+Branch: `claude/keen-mendel-j3yrq2` (assigned by the environment) · Pull request:
+[SIENSIS/kpskeletor#61](https://github.com/SIENSIS/kpskeletor/pull/61) · Date: 2026-11-20. Decisions: D-43-01 applied (decided by the owner);
 D-43-02 accepted (proposal) (`docs/decisions.md`).
 
 ## What was built
@@ -145,8 +145,8 @@ New tests (`modules/Devtools/Tests/`):
   unexpected failure → generic message); the **cleanup** (debug history, logs, caches, flash and old
   input emptied, session ended, `cleanup` logged with the user id); `scrub()`.
 
-Results (SQLite, PHP 8.3): see the final section of `docs/progress.md` and the pull request for the
-full suite; PHPStan level 6: no errors; php-cs-fixer: 0 files to fix; `modules:sync`: nothing to
+Results (SQLite, PHP 8.3): full suite **OK (1542 tests, 239820 assertions)** in 12:37 (1520 before
+this session; `modules/Devtools` 70 tests); PHPStan level 6: no errors; php-cs-fixer: 0 files to fix; `modules:sync`: nothing to
 do; `permissions:check`: 171 permissions, 362 routes; `csp:check`: no inline code;
 `security:check` (development demo copy): 13 ok, 6 info, 7 warnings, 6 errors — the errors are
 the expected ones of a development copy (environment, debug, HTTPS, cookies, base URL, demo data),
@@ -163,4 +163,7 @@ the same without this session's changes.
 - The upload of a key file (`is_uploaded_file()`) is not covered by a feature test; the pasted key
   is (the same code path after reading).
 - The cleanup resets the rate-limit counters of the development copy (D-43-02).
+- `PackageBuilderTest::testAGeneratedModulesPackageInstalls` asks `service('autoloader')` through a
+  closure of its own: an earlier Core test leaves that service as an instance PHP does not call, so
+  a namespace the sync adds would not load (found in the full suite only).
 - Session 44 (Web Push) is next.
