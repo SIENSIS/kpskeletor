@@ -20,14 +20,14 @@ final class LibraryDemoSeeder extends DemoSeeder
     }
 
     /**
-     * 3 demo rows of `library_shelves` (made with Faker when the code was generated).
+     * 3 demo rows of `library_shelves` (made when the code was generated).
      */
     private function seedLibraryShelves(DemoData $demo): void
     {
         $rows = [
-            ['code' => 'cum-eos-repellat-ill', 'room' => 'El Páez'],
-            ['code' => 'rerum-et-iste-2', 'room' => 'L\' Alemán del Puerto'],
-            ['code' => 'iste-perspiciatis-ip', 'room' => 'Balderas del Bages'],
+            ['code' => 'Codi 1', 'room' => 'Sala 1'],
+            ['code' => 'Codi 2', 'room' => 'Sala 2'],
+            ['code' => 'Codi 3', 'room' => 'Sala 3'],
         ];
 
         foreach ($rows as $row) {
@@ -36,159 +36,105 @@ final class LibraryDemoSeeder extends DemoSeeder
     }
 
     /**
-     * 6 demo rows of `library_books` (made with Faker when the code was generated).
+     * 6 demo rows of `library_books` (made when the code was generated).
      */
     private function seedLibraryBooks(DemoData $demo): void
     {
         $rows = [
             [
                 'row' => [
-                    'isbn' => 'recusandae-hic-facil',
+                    'isbn' => 'ISBN 1',
                     'status' => 'available',
-                    'price' => '315.67',
+                    'price' => '10.00',
                     'shelf_id' => $this->firstId('library_shelves'),
-                    'published_on' => '2026-05-02',
+                    'published_on' => '2026-01-01',
                     'available' => 1,
-                    'notes' => '<p>Ex totam rerum et iste saepe quisquam. Voluptas laborum iste perspiciatis ipsam. Quia sequi maiores nesciunt pariatur soluta qui. Exercitationem sed qui omnis dolorem esse illo amet.</p>',
+                    'notes' => '<p>Notes 1</p>',
                 ],
                 'translations' => [
-                    'ca' => [
-                        'title' => 'Provident cum quam in',
-                        'summary' => '<p>Fugit dolor est autem quas exercitationem non quisquam facilis. Id error omnis tenetur officiis. Necessitatibus ex et itaque aut voluptas aspernatur quisquam.</p>',
-                    ],
-                    'es' => [
-                        'title' => 'Provident cum quam in',
-                        'summary' => '<p>Fugit dolor est autem quas exercitationem non quisquam facilis. Id error omnis tenetur officiis. Necessitatibus ex et itaque aut voluptas aspernatur quisquam.</p>',
-                    ],
-                    'en' => [
-                        'title' => 'Provident cum quam in',
-                        'summary' => '<p>Fugit dolor est autem quas exercitationem non quisquam facilis. Id error omnis tenetur officiis. Necessitatibus ex et itaque aut voluptas aspernatur quisquam.</p>',
-                    ],
+                    'ca' => ['title' => 'Títol 1', 'summary' => '<p>Resum 1</p>'],
+                    'es' => ['title' => 'Títol 1', 'summary' => '<p>Resum 1</p>'],
+                    'en' => ['title' => 'Títol 1', 'summary' => '<p>Resum 1</p>'],
                 ],
             ],
             [
                 'row' => [
-                    'isbn' => 'et-consectetur-repud',
+                    'isbn' => 'ISBN 2',
                     'status' => 'lent',
-                    'price' => '265.98',
+                    'price' => '20.00',
                     'shelf_id' => $this->firstId('library_shelves'),
-                    'published_on' => '2026-05-15',
-                    'available' => 1,
-                    'notes' => '<p>Velit perferendis repudiandae ipsum est nam qui. Voluptates sit sint et repellendus similique ipsam.</p>',
-                ],
-                'translations' => [
-                    'ca' => [
-                        'title' => 'Consequatur quisquam sit illum',
-                        'summary' => '<p>Officia praesentium impedit eaque doloribus. Optio laboriosam vel dolores assumenda et velit numquam. Consequatur eveniet in quasi eligendi aut.</p>',
-                    ],
-                    'es' => [
-                        'title' => 'Consequatur quisquam sit illum',
-                        'summary' => '<p>Officia praesentium impedit eaque doloribus. Optio laboriosam vel dolores assumenda et velit numquam. Consequatur eveniet in quasi eligendi aut.</p>',
-                    ],
-                    'en' => [
-                        'title' => 'Consequatur quisquam sit illum',
-                        'summary' => '<p>Officia praesentium impedit eaque doloribus. Optio laboriosam vel dolores assumenda et velit numquam. Consequatur eveniet in quasi eligendi aut.</p>',
-                    ],
-                ],
-            ],
-            [
-                'row' => [
-                    'isbn' => 'eveniet-voluptas-har',
-                    'status' => 'lost',
-                    'price' => '13.70',
-                    'shelf_id' => $this->firstId('library_shelves'),
-                    'published_on' => '2025-12-31',
+                    'published_on' => '2026-01-02',
                     'available' => 0,
-                    'notes' => '<p>Assumenda totam qui et nostrum quisquam ullam. Similique adipisci necessitatibus adipisci ea. Dolorem autem aut dolores corporis. Harum quis ea omnis voluptatem.</p>',
+                    'notes' => '<p>Notes 2</p>',
                 ],
                 'translations' => [
-                    'ca' => [
-                        'title' => 'Maiores deleniti qui earum ea nobis et',
-                        'summary' => '<p>Culpa sint fugit magnam pariatur consequuntur ea necessitatibus. Architecto qui voluptatum officiis illo suscipit temporibus.</p>',
-                    ],
-                    'es' => [
-                        'title' => 'Maiores deleniti qui earum ea nobis et',
-                        'summary' => '<p>Culpa sint fugit magnam pariatur consequuntur ea necessitatibus. Architecto qui voluptatum officiis illo suscipit temporibus.</p>',
-                    ],
-                    'en' => [
-                        'title' => 'Maiores deleniti qui earum ea nobis et',
-                        'summary' => '<p>Culpa sint fugit magnam pariatur consequuntur ea necessitatibus. Architecto qui voluptatum officiis illo suscipit temporibus.</p>',
-                    ],
+                    'ca' => ['title' => 'Títol 2', 'summary' => '<p>Resum 2</p>'],
+                    'es' => ['title' => 'Títol 2', 'summary' => '<p>Resum 2</p>'],
+                    'en' => ['title' => 'Títol 2', 'summary' => '<p>Resum 2</p>'],
                 ],
             ],
             [
                 'row' => [
-                    'isbn' => 'culpa-ducimus-cumque',
+                    'isbn' => 'ISBN 3',
+                    'status' => 'lost',
+                    'price' => '30.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-03',
+                    'available' => 1,
+                    'notes' => '<p>Notes 3</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 3', 'summary' => '<p>Resum 3</p>'],
+                    'es' => ['title' => 'Títol 3', 'summary' => '<p>Resum 3</p>'],
+                    'en' => ['title' => 'Títol 3', 'summary' => '<p>Resum 3</p>'],
+                ],
+            ],
+            [
+                'row' => [
+                    'isbn' => 'ISBN 4',
                     'status' => 'available',
-                    'price' => '258.49',
+                    'price' => '40.00',
                     'shelf_id' => $this->firstId('library_shelves'),
-                    'published_on' => '2026-10-02',
+                    'published_on' => '2026-01-04',
                     'available' => 0,
-                    'notes' => '<p>Et provident delectus quae est. Voluptatem deleniti dolorem consequuntur sunt ratione maxime neque velit. Maiores quis officiis et dolores perferendis. Quia ut beatae occaecati qui.</p>',
+                    'notes' => '<p>Notes 4</p>',
                 ],
                 'translations' => [
-                    'ca' => [
-                        'title' => 'Occaecati rerum quia provident repellat quod ut',
-                        'summary' => '<p>Omnis fuga ea voluptatem ducimus nobis. Quidem asperiores autem asperiores voluptatem at atque aut. Illum eum molestiae doloribus quia. Sed est assumenda incidunt id officiis dolores.</p>',
-                    ],
-                    'es' => [
-                        'title' => 'Occaecati rerum quia provident repellat quod ut',
-                        'summary' => '<p>Omnis fuga ea voluptatem ducimus nobis. Quidem asperiores autem asperiores voluptatem at atque aut. Illum eum molestiae doloribus quia. Sed est assumenda incidunt id officiis dolores.</p>',
-                    ],
-                    'en' => [
-                        'title' => 'Occaecati rerum quia provident repellat quod ut',
-                        'summary' => '<p>Omnis fuga ea voluptatem ducimus nobis. Quidem asperiores autem asperiores voluptatem at atque aut. Illum eum molestiae doloribus quia. Sed est assumenda incidunt id officiis dolores.</p>',
-                    ],
+                    'ca' => ['title' => 'Títol 4', 'summary' => '<p>Resum 4</p>'],
+                    'es' => ['title' => 'Títol 4', 'summary' => '<p>Resum 4</p>'],
+                    'en' => ['title' => 'Títol 4', 'summary' => '<p>Resum 4</p>'],
                 ],
             ],
             [
                 'row' => [
-                    'isbn' => 'officia-ea-aperiam-e',
+                    'isbn' => 'ISBN 5',
                     'status' => 'lent',
-                    'price' => '407.92',
+                    'price' => '50.00',
                     'shelf_id' => $this->firstId('library_shelves'),
-                    'published_on' => '2026-03-30',
-                    'available' => 0,
-                    'notes' => '<p>Iusto impedit et officiis excepturi est. Reprehenderit voluptates qui est. Quidem sit tempora tempora pariatur sapiente sed.</p>',
+                    'published_on' => '2026-01-05',
+                    'available' => 1,
+                    'notes' => '<p>Notes 5</p>',
                 ],
                 'translations' => [
-                    'ca' => [
-                        'title' => 'Eveniet nam molestiae blanditiis quibusdam quisquam aliquid',
-                        'summary' => '<p>Sunt voluptatem et recusandae quis quia quo. Tempore quae velit voluptas possimus quibusdam. Et eligendi distinctio iusto reprehenderit repellendus qui. Vel eligendi quisquam repudiandae dolor dolores voluptas.</p>',
-                    ],
-                    'es' => [
-                        'title' => 'Eveniet nam molestiae blanditiis quibusdam quisquam aliquid',
-                        'summary' => '<p>Sunt voluptatem et recusandae quis quia quo. Tempore quae velit voluptas possimus quibusdam. Et eligendi distinctio iusto reprehenderit repellendus qui. Vel eligendi quisquam repudiandae dolor dolores voluptas.</p>',
-                    ],
-                    'en' => [
-                        'title' => 'Eveniet nam molestiae blanditiis quibusdam quisquam aliquid',
-                        'summary' => '<p>Sunt voluptatem et recusandae quis quia quo. Tempore quae velit voluptas possimus quibusdam. Et eligendi distinctio iusto reprehenderit repellendus qui. Vel eligendi quisquam repudiandae dolor dolores voluptas.</p>',
-                    ],
+                    'ca' => ['title' => 'Títol 5', 'summary' => '<p>Resum 5</p>'],
+                    'es' => ['title' => 'Títol 5', 'summary' => '<p>Resum 5</p>'],
+                    'en' => ['title' => 'Títol 5', 'summary' => '<p>Resum 5</p>'],
                 ],
             ],
             [
                 'row' => [
-                    'isbn' => 'magnam-explicabo-por',
+                    'isbn' => 'ISBN 6',
                     'status' => 'lost',
-                    'price' => '186.16',
+                    'price' => '60.00',
                     'shelf_id' => $this->firstId('library_shelves'),
-                    'published_on' => '2026-06-25',
-                    'available' => 1,
-                    'notes' => '<p>Accusantium est laborum sit tenetur non harum incidunt. Voluptas maiores aspernatur libero saepe doloribus explicabo. Ut unde qui consequatur voluptatem illo.</p>',
+                    'published_on' => '2026-01-06',
+                    'available' => 0,
+                    'notes' => '<p>Notes 6</p>',
                 ],
                 'translations' => [
-                    'ca' => [
-                        'title' => 'Facilis qui voluptatem quia aperiam',
-                        'summary' => '<p>Suscipit enim corporis blanditiis veritatis mollitia sed. Voluptatem velit eveniet tempora nam. Quia aspernatur iste voluptas voluptas perferendis aut vel dolorum. Modi ut dolor illo dolorem quas expedita quo.</p>',
-                    ],
-                    'es' => [
-                        'title' => 'Facilis qui voluptatem quia aperiam',
-                        'summary' => '<p>Suscipit enim corporis blanditiis veritatis mollitia sed. Voluptatem velit eveniet tempora nam. Quia aspernatur iste voluptas voluptas perferendis aut vel dolorum. Modi ut dolor illo dolorem quas expedita quo.</p>',
-                    ],
-                    'en' => [
-                        'title' => 'Facilis qui voluptatem quia aperiam',
-                        'summary' => '<p>Suscipit enim corporis blanditiis veritatis mollitia sed. Voluptatem velit eveniet tempora nam. Quia aspernatur iste voluptas voluptas perferendis aut vel dolorum. Modi ut dolor illo dolorem quas expedita quo.</p>',
-                    ],
+                    'ca' => ['title' => 'Títol 6', 'summary' => '<p>Resum 6</p>'],
+                    'es' => ['title' => 'Títol 6', 'summary' => '<p>Resum 6</p>'],
+                    'en' => ['title' => 'Títol 6', 'summary' => '<p>Resum 6</p>'],
                 ],
             ],
         ];

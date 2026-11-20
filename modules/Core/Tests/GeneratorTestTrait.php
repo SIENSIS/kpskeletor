@@ -42,6 +42,7 @@ trait GeneratorTestTrait
             manifests: $manifests,
             tableExists: static fn (string $table): bool => $table === 'users',
             groups: ['superadmin', 'admin', 'editor', 'user'],
+            faker: false,
         );
     }
 

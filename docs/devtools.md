@@ -70,7 +70,11 @@ warning, the table prefix).
    or a **public** one (no token, GET only, list and show: `api/v1/public/<module>/<key>`).
 6. **Menu and permissions:** zone (sidebar under a resource of the module, or settings under one of
    the Core's groups, D-38-01), icon, order, and the default grants per group as a matrix of the
-   operations; the permission names that will be generated are listed.
+   operations; the permission names that will be generated are listed. The groups are the ones of
+   the site where the generator runs, each shown with its title (Users › Groups, e.g.
+   "Coordinador") and its internal name (`editor`). To grant a production site's own groups
+   (pupils, families…) on a development copy, copy them first with `php spark groups:export` /
+   `groups:import` (`docs/users.md`, D-42-04): no users or personal data travel.
 7. **Preview** (`backend/devtools/generator/preview`): a tree of the files with a *new* / *changed*
    badge, the full content of new files and a diff of changed ones (plain, escaped `<pre>`), the
    permissions and the next steps. The definition can be downloaded as JSON and loaded again

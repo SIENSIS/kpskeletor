@@ -23,9 +23,9 @@ final class DemoValues
 
     private ?object $faker = null;
 
-    public function __construct(string $seed)
+    public function __construct(string $seed, bool $faker = true)
     {
-        if (class_exists(\Faker\Factory::class)) {
+        if ($faker && class_exists(\Faker\Factory::class)) {
             $this->faker = \Faker\Factory::create('es_ES');
             $this->faker->seed(crc32($seed));
         }

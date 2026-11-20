@@ -22,6 +22,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 - `php spark make:module --definition=<file.json> [--dry-run]`: the same engine from the console.
 - `nikic/php-parser` `^5` as a development dependency (D-42-01).
 - Tutorial 15, "Generating a module with the code generator" (`docs/tutorials/`).
+- `php spark groups:export [<file>] [--grants]` and `groups:import <file> [--grants] [--yes]`: copy
+  the groups (titles, descriptions, 2FA policy, optionally grants; never users) to another site
+  (D-42-04). The generator's grants matrix shows each group's title and internal name.
 
 - `Devtools` module, only for development (D-41-01 … D-41-03, `docs/devtools.md`): installed
   disabled; superadmins only (`devtools.view`, `devtools.write`), from the loopback with a local

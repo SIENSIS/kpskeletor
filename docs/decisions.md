@@ -302,6 +302,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-42-01 | 42 | `nikic/php-parser` as a development dependency to edit existing manifests and routes (decide) | Decided |
 | D-42-02 | 42 | The code generator's draft-only POSTs without re-authentication or the forms rate limit (`DevtoolsRoutes::DRAFT`) | Accepted (proposal) |
 | D-42-03 | 42 | The generator engine in the Core; demo values made with Faker at generation time; one-page wizard with the draft in the session | Accepted (proposal) |
+| D-42-04 | 42 | Group titles in the generator; `groups:export` / `groups:import` to copy groups without users (owner's request) | Applied (owner's request) |
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 | D-44-01 | 44 | Web Push encryption and VAPID implemented in the Core with OpenSSL, no library (decide) | Decided |
 | D-44-02 | 44 | Web Push: channel name, tables, URLs, settings, keys and the endpoint allow-list (decide) | Decided |
@@ -3076,6 +3077,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Proposal (built):** The engine is `Modules\Core\Generator` (definition, validator, `Engine` → `Plan`, `SourceEditor`, `PlanWriter`), used by `make:module --definition` and by Devtools; plain `make:module` keeps its templates and output (`ModuleGenerator::files()`) and needs no parser. Faker is a development dependency, so the demo values are made when the code is generated (seeded by the table name) and written into the demo seeder as literals: the seeder runs on a `--no-dev` site and gives the same rows every time. The wizard is one server-rendered form whose names follow the definition's JSON; every button posts it and the draft lives in the session, so it works without JavaScript and the re-authentication round trip returns to the preview (`GET backend/devtools/generator/preview`). The plan's fingerprint covers the definition and the existing files it changes (not the new files, whose migration names carry the time); the writer also refuses a new file that appeared. Syntax highlighting: plain escaped `<pre>` (no library). "Alter" migrations for existing tables are not generated (next step).
 - **Alternatives:** A) The engine in Devtools (then `make:module --definition` would need the development-only module). B) Faker in the generated seeder (breaks `modules:demo` without the development packages).
 - **Status:** Accepted (proposal)
+
+## D-42-04 — Group titles in the generator; `groups:export` / `groups:import` to copy groups without users
+
+- **Where:** owner's review of session 42 (2026-11-20): «a part de sortir el nom intern, surti el títol … Els grups s'haurien de poder exportar, per si cal tenir els mateixos grups en local, sense necessitat de tenir un backup complet».
+- **Problem:** The generator's grants matrix showed only internal group names (`editor`), while a site may rename a reserved group's title ("Coordinador"); and a development copy does not have the production site's own groups (pupils, families, staff), so a module could not be given default grants for them, and copying them meant restoring a full backup with personal data.
+- **Built:** The matrix shows each group's title and internal name (`GeneratorContext::groupTitle()`). Two console commands in the Core, `groups:export [<file>] [--grants]` and `groups:import <file> [--grants] [--yes]` (`Modules\Core\Groups\GroupTransfer`): names, titles, descriptions, 2FA policy and optionally grants, never users; the import creates missing groups (common grants), updates the existing ones, replaces grants only with permissions that exist on the target site (wildcards matched like `GrantManager`), never changes `superadmin`, asks for confirmation, goes through `GrantManager` (`grants_changed`, `privilegesChanged`) and is logged as `groups_imported` (security). Console only: no URL.
+- **Alternatives:** A) An export/import screen in Users › Groups (a web upload that changes privileges: re-authentication and more surface). B) Accept unknown group names in the generator's definition.
+- **Status:** Applied (owner's request)
 
 ## D-43-01 — Signing packages from the local Devtools form, with safeguards for the key (decide)
 

@@ -20,29 +20,14 @@ final class ZooDemoSeeder extends DemoSeeder
     }
 
     /**
-     * 3 demo rows of `zoo_animals` (made with Faker when the code was generated).
+     * 3 demo rows of `zoo_animals` (made when the code was generated).
      */
     private function seedZooAnimals(DemoData $demo): void
     {
         $rows = [
-            [
-                'name' => 'Sandra Rosado Segundo',
-                'species' => 'cat',
-                'keeper_id' => null,
-                'born_on' => '2026-05-27',
-            ],
-            [
-                'name' => 'Francisca Maestas',
-                'species' => 'dog',
-                'keeper_id' => null,
-                'born_on' => '2026-07-21',
-            ],
-            [
-                'name' => 'Biel Aguilar Tercero',
-                'species' => 'bird',
-                'keeper_id' => null,
-                'born_on' => '2026-01-04',
-            ],
+            ['name' => 'Nom 1', 'species' => 'cat', 'keeper_id' => null, 'born_on' => '2026-01-01'],
+            ['name' => 'Nom 2', 'species' => 'dog', 'keeper_id' => null, 'born_on' => '2026-01-02'],
+            ['name' => 'Nom 3', 'species' => 'bird', 'keeper_id' => null, 'born_on' => '2026-01-03'],
         ];
 
         foreach ($rows as $row) {

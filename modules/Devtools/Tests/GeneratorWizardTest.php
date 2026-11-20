@@ -106,6 +106,21 @@ final class GeneratorWizardTest extends DevtoolsTestCase
         $this->assertSame('', Draft::get()->name);
     }
 
+    public function testTheGrantsShowEachGroupsTitleAndName(): void
+    {
+        // The site's groups as Users › Groups shows them: a reserved group renamed.
+        db_connect()->table('groups')->where('name', 'editor')->update(['title' => 'Coordinador']);
+        Generator::$testContext = new GeneratorContext(root: $this->tempRoot(), tableExists: static fn (string $table): bool => $table === 'users');
+        $this->loginSuperadmin();
+        $this->fromLocalhost();
+        Draft::put($this->definition());
+
+        $body = html_entity_decode((string) $this->send('GET', backend_path('devtools/generator'))->response()->getBody(), ENT_QUOTES);
+
+        $this->assertMatchesRegularExpression('#Coordinador\s*<code class="small ms-1" data-generator-group-name>editor</code>#', $body);
+        $this->assertStringContainsString('data-generator-group-name>admin</code>', $body);
+    }
+
     public function testValidationErrorsAreShownNextToTheirFields(): void
     {
         $this->loginSuperadmin();

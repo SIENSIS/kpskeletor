@@ -211,7 +211,7 @@ final class Generator extends BackendController
             'errors'      => $errors,
             'showErrors'  => $showErrors,
             'modules'     => $this->installedModules(),
-            'groups'      => $context->groups(),
+            'groups'      => array_combine($context->groups(), array_map($context->groupTitle(...), $context->groups())),
             'tables'      => $this->databaseTables(),
             'permissions' => $this->permissions($definition),
         ]);

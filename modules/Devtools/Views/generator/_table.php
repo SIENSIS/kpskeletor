@@ -7,7 +7,7 @@
  * @var array<string, mixed>    $table
  * @var array<string, mixed>    $module
  * @var array<string, string>   $errors
- * @var list<string>            $groups
+ * @var array<string, string>   $groups      group name => title (Users › Groups)
  * @var list<string>            $tables      database tables
  * @var list<string>            $permissions permission names of this table
  * @var list<string>            $locales
@@ -359,24 +359,27 @@ $boolean  = static fn (string $name, bool $on, string $id, string $text, string 
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($groups as $group): ?>
+                    <?php foreach ($groups as $group => $groupTitle): ?>
                         <?php if ($group === 'superadmin') {
                             continue;
                         } ?>
                         <?php $granted = (array) ($table['grants'][$group] ?? []); ?>
                         <tr>
-                            <th scope="row" class="text-start fw-normal"><?= esc($group) ?></th>
-                            <td><input class="form-check-input" type="checkbox" name="<?= $p ?>[grants][<?= esc($group, 'attr') ?>][]" value="*"<?= $checked(in_array('*', $granted, true)) ?> aria-label="<?= esc($group . ': *', 'attr') ?>"></td>
+                            <th scope="row" class="text-start fw-normal">
+                                <?= esc($groupTitle) ?>
+                                <code class="small ms-1" data-generator-group-name><?= esc($group) ?></code>
+                            </th>
+                            <td><input class="form-check-input" type="checkbox" name="<?= $p ?>[grants][<?= esc($group, 'attr') ?>][]" value="*"<?= $checked(in_array('*', $granted, true)) ?> aria-label="<?= esc($groupTitle . ' (' . $group . '): *', 'attr') ?>"></td>
                             <?php foreach ($permissions as $permission): ?>
                                 <?php $operation = substr($permission, (int) strrpos($permission, '.') + 1); ?>
-                                <td><input class="form-check-input" type="checkbox" name="<?= $p ?>[grants][<?= esc($group, 'attr') ?>][]" value="<?= esc($operation, 'attr') ?>"<?= $checked(in_array($operation, $granted, true)) ?> aria-label="<?= esc($group . ': ' . $permission, 'attr') ?>"></td>
+                                <td><input class="form-check-input" type="checkbox" name="<?= $p ?>[grants][<?= esc($group, 'attr') ?>][]" value="<?= esc($operation, 'attr') ?>"<?= $checked(in_array($operation, $granted, true)) ?> aria-label="<?= esc($groupTitle . ' (' . $group . '): ' . $permission, 'attr') ?>"></td>
                             <?php endforeach ?>
                         </tr>
                     <?php endforeach ?>
                 </tbody>
             </table>
         </div>
-        <?php foreach ($groups as $group): ?><?= $feedback($path . '.grants.' . $group) ?><?php endforeach ?>
+        <?php foreach (array_keys($groups) as $group): ?><?= $feedback($path . '.grants.' . $group) ?><?php endforeach ?>
         <p class="small mb-0"><?= esc(lang('Devtools.generator.grants.names')) ?> <?php foreach ($permissions as $permission): ?><code class="me-2" data-generator-permission><?= esc($permission) ?></code><?php endforeach ?></p>
     </div>
 </section>

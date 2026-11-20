@@ -91,7 +91,7 @@ final class ShelvesCrudTest extends AuthTestCase
      */
     private function row(array $values = []): int
     {
-        $this->db->table('library_shelves')->insert($values + ['code' => 'ut-temporibus-quis-a']);
+        $this->db->table('library_shelves')->insert($values + ['code' => 'Codi 1']);
 
         return (int) $this->db->insertID();
     }
@@ -103,7 +103,7 @@ final class ShelvesCrudTest extends AuthTestCase
      */
     private function form(): array
     {
-        return ['code' => 'ut-temporibus-quis-a', 'room' => 'El Briseño'];
+        return ['code' => 'Codi 1', 'room' => 'Sala 1'];
     }
 
     private function code(int $id): string

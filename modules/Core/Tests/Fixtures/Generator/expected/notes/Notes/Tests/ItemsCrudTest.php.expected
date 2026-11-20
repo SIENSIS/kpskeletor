@@ -91,7 +91,7 @@ final class ItemsCrudTest extends AuthTestCase
      */
     private function row(array $values = []): int
     {
-        $this->db->table('notes_items')->insert($values + ['title' => 'Ut aperiam cumque vel molestiae non']);
+        $this->db->table('notes_items')->insert($values + ['title' => 'Títol 1']);
 
         return (int) $this->db->insertID();
     }
@@ -103,10 +103,7 @@ final class ItemsCrudTest extends AuthTestCase
      */
     private function form(): array
     {
-        return [
-            'title' => 'Ut aperiam cumque vel molestiae non',
-            'body' => 'Nam hic dolor qui et quia. Unde qui amet pariatur eligendi sunt. Dolores rerum at quas et.',
-        ];
+        return ['title' => 'Títol 1', 'body' => 'Text 1'];
     }
 
     private function code(int $id): string

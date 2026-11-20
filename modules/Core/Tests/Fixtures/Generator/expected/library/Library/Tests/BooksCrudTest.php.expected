@@ -129,7 +129,7 @@ final class BooksCrudTest extends AuthTestCase
      */
     private function row(array $values = []): int
     {
-        $this->db->table('library_books')->insert($values + ['created_by' => auth()->id()] + ['isbn' => 'dolor-molestiae-maxi', 'shelf_id' => $this->parentId('library_shelves')]);
+        $this->db->table('library_books')->insert($values + ['created_by' => auth()->id()] + ['isbn' => 'ISBN 1', 'shelf_id' => $this->parentId('library_shelves')]);
 
         return (int) $this->db->insertID();
     }
@@ -142,18 +142,18 @@ final class BooksCrudTest extends AuthTestCase
     private function form(): array
     {
         return [
-            'isbn' => 'dolor-molestiae-maxi',
+            'isbn' => 'ISBN 1',
             'status' => 'available',
-            'price' => '429.82',
+            'price' => '10.00',
             'shelf_id' => (string) $this->parentId('library_shelves'),
-            'published_on' => '2026-07-01',
-            'available' => '0',
+            'published_on' => '2026-01-01',
+            'available' => '1',
             'cover' => '',
             'notes' => '<p>Text</p>',
             'kp_tr' => [
-                'ca' => ['title' => 'Rerum nam vero veniam ratione', 'summary' => '<p>Text</p>'],
-                'es' => ['title' => 'Rerum nam vero veniam ratione', 'summary' => '<p>Text</p>'],
-                'en' => ['title' => 'Rerum nam vero veniam ratione', 'summary' => '<p>Text</p>'],
+                'ca' => ['title' => 'Títol 1', 'summary' => '<p>Text</p>'],
+                'es' => ['title' => 'Títol 1', 'summary' => '<p>Text</p>'],
+                'en' => ['title' => 'Títol 1', 'summary' => '<p>Text</p>'],
             ],
         ];
     }
@@ -171,7 +171,7 @@ final class BooksCrudTest extends AuthTestCase
      */
     private function parentId(string $table): int
     {
-        $rows = ['library_shelves' => ['code' => 'ut-temporibus-quis-a']];
+        $rows = ['library_shelves' => ['code' => 'Codi 1']];
 
         if (! isset($this->parents[$table]) && isset($rows[$table])) {
             $this->db->table($table)->insert($rows[$table]);

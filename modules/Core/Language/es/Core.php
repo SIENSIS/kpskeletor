@@ -197,6 +197,16 @@ return [
     'groups' => [
         'invalidName' => 'El nombre debe empezar con una letra y solo puede tener letras minúsculas, cifras, "-" y "_" (de 2 a 50 caracteres).',
         'nameTaken' => 'El grupo "{0}" ya existe o es reservado.',
+        'transfer' => [
+            'invalidFile' => 'El fichero no es una exportación de grupos (groups:export).',
+            'cannotWrite' => 'No se puede escribir el fichero {0}.',
+            'exported' => 'Se han exportado {0} grupos a {1} (sin usuarios).',
+            'confirm' => '¿Quieres importar {0} grupos (crear los que faltan y actualizar títulos, descripciones y política de 2FA)?',
+            'confirmGrants' => '¿Quieres importar {0} grupos y SUSTITUIR sus permisos por los exportados?',
+            'imported' => 'Grupos creados: {0}. Grupos actualizados: {1}.',
+            'grantsImported' => 'Permisos sustituidos de: {0}.',
+            'skipped' => 'Permiso que no existe en este sitio, omitido: {0}',
+        ],
     ],
     'rbac' => [
         'unknownGroup' => 'El grupo «{0}» no existe.',
@@ -705,6 +715,7 @@ return [
         'module_disabled' => 'Módulo desactivado',
         'demo_loaded' => 'Datos de demostración cargados',
         'demo_removed' => 'Datos de demostración borrados',
+        'groups_imported' => 'Grupos importados',
         'grants_changed' => 'Permisos de un grupo cambiados',
         'permissions_granted' => 'Permisos dados a un usuario',
         'permissions_revoked' => 'Permisos retirados a un usuario',

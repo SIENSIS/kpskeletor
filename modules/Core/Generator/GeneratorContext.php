@@ -12,7 +12,8 @@ use Modules\Core\Modules\ModuleDiscovery;
  * What the generator needs to know about the installation: the folder of the modules, the
  * installed modules' manifests (dependencies, existing resources, foreign-key targets), whether a
  * table exists in the database, and the groups that can receive default grants. Tests build one
- * with their own values.
+ * with their own values (`faker: false`: numbered demo values, the same on every PHP version —
+ * Faker's seeded sequence differs between PHP 8.2 and 8.3).
  */
 final class GeneratorContext
 {
@@ -25,6 +26,9 @@ final class GeneratorContext
     /** @var list<string>|null */
     private ?array $groups;
 
+    /** @var array<string, string> group name => title (shown next to the name) */
+    private array $titles = [];
+
     /**
      * @param array<string, ModuleManifest>|null $manifests name => manifest (default: discovered)
      * @param (\Closure(string): bool)|null      $tableExists
@@ -36,6 +40,7 @@ final class GeneratorContext
         ?\Closure $tableExists = null,
         ?array $groups = null,
         public readonly string $projectRoot = ROOTPATH,
+        public readonly bool $faker = true,
     ) {
         $this->manifests   = $manifests;
         $this->tableExists = $tableExists ?? static function (string $table): bool {
@@ -82,6 +87,18 @@ final class GeneratorContext
     }
 
     /**
+     * The title of a group as the site shows it (Users › Groups: e.g. "Coordinador" for the
+     * reserved group `editor`), or its name when it has none.
+     */
+    public function groupTitle(string $group): string
+    {
+        $this->groups();
+        $title = trim($this->titles[$group] ?? '');
+
+        return $title !== '' ? $title : $group;
+    }
+
+    /**
      * Column names of an installed table (empty when it does not exist).
      *
      * @return list<string>
@@ -102,7 +119,9 @@ final class GeneratorContext
     {
         if ($this->groups === null) {
             try {
-                $this->groups = array_values(array_map(static fn (array $g): string => (string) $g['name'], (new GroupRegistry())->all()));
+                $all          = (new GroupRegistry())->all();
+                $this->groups = array_values(array_map(static fn (array $g): string => (string) $g['name'], $all));
+                $this->titles = array_map(static fn (array $g): string => (string) $g['title'], $all);
             } catch (\Throwable) {
                 $this->groups = [];
             }

@@ -149,7 +149,7 @@ Results (SQLite, PHP 8.3):
 
 | Check | Result |
 |---|---|
-| `vendor/bin/phpunit` | **OK (1514 tests, 20679 assertions)**, 12 min 19 s (baseline at the start: 1481 tests) |
+| `vendor/bin/phpunit` | **OK (1514 tests, 20679 assertions)**, 12 min 19 s; after the follow-up **OK (1520 tests, 20734 assertions)** (baseline at the start: 1481 tests) |
 | `vendor/bin/phpstan analyse` | No errors (level 6) |
 | `vendor/bin/php-cs-fixer fix --dry-run` | 0 of 1089 files to fix |
 | `php spark modules:sync` | OK |
@@ -158,6 +158,21 @@ Results (SQLite, PHP 8.3):
 | `php spark assets:publish --check` | Up to date |
 | `npm run e2e` (development demo site, Devtools and Tasks enabled) | **200 passed**, 10 skipped (the existing "once at desktop" tests); the generator spec passes at phone/tablet/desktop, light/dark, axe clean |
 | Generated `Library` (from the UI) | its 19 tests pass; `modules:demo Library` loads and `--remove` removes its 27 rows |
+
+## Follow-up after the owner's review (same branch)
+
+- **CI fix:** "Checks (PHP 8.2)" failed: Faker's seeded sequence differs between PHP 8.2 and 8.3/8.4,
+  so the demo rows of the plan fixtures changed. The fixtures are now made without Faker
+  (`GeneratorContext(faker: false)`: numbered values, the same on every PHP version); real plans
+  still use Faker.
+- **Group titles (D-42-04):** the generator's grants matrix shows each group's title (Users ›
+  Groups, e.g. "Coordinador") next to its internal name (`editor`).
+- **`groups:export` / `groups:import` (D-42-04):** copy a site's groups (titles, descriptions,
+  2FA policy, optionally grants; never users or personal data) to a development copy without a
+  full backup (`docs/users.md`). The import keeps wildcard grants, skips permissions the site does
+  not have, never changes `superadmin`, asks for confirmation, and is logged
+  (`groups_imported`, `grants_changed`). Tests: `modules/Core/Tests/GroupTransferTest.php`,
+  `GeneratorWizardTest::testTheGrantsShowEachGroupsTitleAndName`.
 
 ## Known issues and notes for the next session
 

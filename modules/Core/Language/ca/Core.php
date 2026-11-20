@@ -197,6 +197,16 @@ return [
     'groups' => [
         'invalidName' => 'El nom ha de començar amb una lletra i només pot tenir lletres minúscules, xifres, "-" i "_" (de 2 a 50 caràcters).',
         'nameTaken' => 'El grup "{0}" ja existeix o és reservat.',
+        'transfer' => [
+            'invalidFile' => 'El fitxer no és una exportació de grups (groups:export).',
+            'cannotWrite' => 'No es pot escriure el fitxer {0}.',
+            'exported' => 'S\'han exportat {0} grups a {1} (sense usuaris).',
+            'confirm' => 'Vols importar {0} grups (crear els que falten i actualitzar títols, descripcions i política de 2FA)?',
+            'confirmGrants' => 'Vols importar {0} grups i SUBSTITUIR-ne els permisos pels exportats?',
+            'imported' => 'Grups creats: {0}. Grups actualitzats: {1}.',
+            'grantsImported' => 'Permisos substituïts de: {0}.',
+            'skipped' => 'Permís que no existeix en aquest lloc, omès: {0}',
+        ],
     ],
     'rbac' => [
         'unknownGroup' => 'El grup «{0}» no existeix.',
@@ -705,6 +715,7 @@ return [
         'module_disabled' => 'Mòdul desactivat',
         'demo_loaded' => 'Dades de demostració carregades',
         'demo_removed' => 'Dades de demostració esborrades',
+        'groups_imported' => 'Grups importats',
         'grants_changed' => 'Permisos d\'un grup canviats',
         'permissions_granted' => 'Permisos donats a un usuari',
         'permissions_revoked' => 'Permisos retirats a un usuari',

@@ -197,6 +197,16 @@ return [
     'groups' => [
         'invalidName' => 'The name must start with a letter and contain only lower-case letters, digits, "-" and "_" (2 to 50 characters).',
         'nameTaken' => 'The group "{0}" already exists or is reserved.',
+        'transfer' => [
+            'invalidFile' => 'The file is not a groups export (groups:export).',
+            'cannotWrite' => 'The file {0} cannot be written.',
+            'exported' => '{0} groups exported to {1} (no users).',
+            'confirm' => 'Import {0} groups (create the missing ones, update titles, descriptions and 2FA policy)?',
+            'confirmGrants' => 'Import {0} groups and REPLACE their permissions by the exported ones?',
+            'imported' => 'Groups created: {0}. Groups updated: {1}.',
+            'grantsImported' => 'Permissions replaced for: {0}.',
+            'skipped' => 'Permission not in this site, skipped: {0}',
+        ],
     ],
     'rbac' => [
         'unknownGroup' => 'The group "{0}" does not exist.',
@@ -705,6 +715,7 @@ return [
         'module_disabled' => 'Module disabled',
         'demo_loaded' => 'Demo data loaded',
         'demo_removed' => 'Demo data removed',
+        'groups_imported' => 'Groups imported',
         'grants_changed' => 'Group permissions changed',
         'permissions_granted' => 'Permissions granted to a user',
         'permissions_revoked' => 'Permissions revoked from a user',

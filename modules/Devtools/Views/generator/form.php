@@ -10,7 +10,7 @@
  * @var array<string, string>      $errors      path => message
  * @var bool                       $showErrors
  * @var array<string, string>      $modules     installed module => version
- * @var list<string>               $groups
+ * @var array<string, string>      $groups      group name => title
  * @var list<string>               $tables      tables of the database (foreign keys)
  * @var list<list<string>>         $permissions permission names per table
  */

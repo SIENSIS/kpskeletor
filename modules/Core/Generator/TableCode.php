@@ -39,7 +39,7 @@ final class TableCode
         $this->key      = $table->key($this->module);
         $this->resource = $table->resource($this->module);
         $this->class    = ucfirst($this->key);
-        $this->demo     = new DemoValues($table->name);
+        $this->demo     = new DemoValues($table->name, $context->faker);
     }
 
     /**
@@ -1627,7 +1627,7 @@ final class TableCode
 
         $code = <<<PHP
                 /**
-                 * {$this->table->demoRows} demo rows of `{$this->table->name}` (made with Faker when the code was generated).
+                 * {$this->table->demoRows} demo rows of `{$this->table->name}` (made when the code was generated).
                  */
                 private function {$method}(DemoData \$demo): void
                 {

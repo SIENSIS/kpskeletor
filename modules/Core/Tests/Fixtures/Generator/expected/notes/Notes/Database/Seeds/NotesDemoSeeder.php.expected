@@ -19,20 +19,11 @@ final class NotesDemoSeeder extends DemoSeeder
     }
 
     /**
-     * 2 demo rows of `notes_items` (made with Faker when the code was generated).
+     * 2 demo rows of `notes_items` (made when the code was generated).
      */
     private function seedNotesItems(DemoData $demo): void
     {
-        $rows = [
-            [
-                'title' => 'Impedit minus laboriosam ut autem',
-                'body' => 'Asperiores ab eum eveniet modi optio. Non eum in non consequatur. Incidunt architecto officia quod voluptas quidem tempora magni. Sed aut earum laboriosam aliquid voluptatem.',
-            ],
-            [
-                'title' => 'Sunt in impedit qui nihil necessitatibus officia',
-                'body' => 'Sunt animi commodi voluptas labore quia ad. Dolorem ut expedita beatae est dolor quisquam. Sapiente doloremque deserunt inventore est suscipit debitis. Cupiditate est dicta qui illo aut aut. Eligendi doloremque fuga autem sed aut suscipit occaecati eum.',
-            ],
-        ];
+        $rows = [['title' => 'Títol 1', 'body' => 'Text 1'], ['title' => 'Títol 2', 'body' => 'Text 2']];
 
         foreach ($rows as $row) {
             $demo->insert('notes_items', $row);

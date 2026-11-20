@@ -102,7 +102,7 @@ final class AnimalsCrudTest extends AuthTestCase
      */
     private function row(array $values = []): int
     {
-        $this->db->table('zoo_animals')->insert($values + ['keeper_id' => auth()->id()] + ['name' => 'Mar Escamilla', 'species' => 'cat']);
+        $this->db->table('zoo_animals')->insert($values + ['keeper_id' => auth()->id()] + ['name' => 'Nom 1', 'species' => 'cat']);
 
         return (int) $this->db->insertID();
     }
@@ -114,7 +114,7 @@ final class AnimalsCrudTest extends AuthTestCase
      */
     private function form(): array
     {
-        return ['name' => 'Mar Escamilla', 'species' => 'cat', 'keeper_id' => '', 'born_on' => '2026-04-21'];
+        return ['name' => 'Nom 1', 'species' => 'cat', 'keeper_id' => '', 'born_on' => '2026-01-01'];
     }
 
     private function code(int $id): string
