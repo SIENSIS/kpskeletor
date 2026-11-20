@@ -72,6 +72,23 @@ kpcrudy over the Core `groups` table (`GroupRegistry`, D-15-02):
 - only a superadmin edits the `superadmin` group; adding, editing and deleting need a
   re-authentication.
 
+### Copying the groups to another site (D-42-04)
+
+To have a production site's groups on a development copy (for example to give a module made
+with the code generator default grants for them) without restoring a full backup, copy only the
+groups — never users or personal data — from the console:
+
+```bash
+php spark groups:export groups.json --grants     # on the source site (names, titles, descriptions, 2FA policy, grants)
+php spark groups:import groups.json --grants     # on the copy: asks for confirmation (--yes to skip)
+```
+
+The import creates the missing groups (with the common grants), updates the title, description
+and 2FA policy of the existing ones and, with `--grants`, replaces each group's grants by the
+exported permissions that exist on this site (wildcards included; others are listed as skipped).
+`superadmin` keeps every permission. It goes through `GrantManager` (`grants_changed`,
+`privilegesChanged`) and is logged as `groups_imported`. Code: `Modules\Core\Groups\GroupTransfer`.
+
 ## Permission matrix
 
 One card per module, one row per resource, one column per group (`PermissionMatrix`, D-15-05):

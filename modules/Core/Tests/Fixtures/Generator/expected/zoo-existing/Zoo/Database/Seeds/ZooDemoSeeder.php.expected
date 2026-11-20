@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Zoo\Database\Seeds;
+
+use Modules\Core\Demo\DemoData;
+use Modules\Core\Demo\DemoSeeder;
+
+/**
+ * Demo data of the Zoo module, in Catalan, loaded with `php spark modules:demo Zoo`.
+ * Write every row through $demo so that `--remove` deletes exactly these rows.
+ */
+final class ZooDemoSeeder extends DemoSeeder
+{
+    public function load(DemoData $demo): void
+    {
+        $demo->insert('zoo_items', ['name' => 'Element de demostració']);
+        $this->seedZooAnimals($demo);
+    }
+
+    /**
+     * 3 demo rows of `zoo_animals` (made when the code was generated).
+     */
+    private function seedZooAnimals(DemoData $demo): void
+    {
+        $rows = [
+            ['name' => 'Nom 1', 'species' => 'cat', 'keeper_id' => null, 'born_on' => '2026-01-01'],
+            ['name' => 'Nom 2', 'species' => 'dog', 'keeper_id' => null, 'born_on' => '2026-01-02'],
+            ['name' => 'Nom 3', 'species' => 'bird', 'keeper_id' => null, 'born_on' => '2026-01-03'],
+        ];
+
+        foreach ($rows as $row) {
+            $demo->insert('zoo_animals', $row);
+        }
+    }
+}

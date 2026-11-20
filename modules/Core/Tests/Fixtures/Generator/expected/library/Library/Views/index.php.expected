@@ -1,0 +1,17 @@
+<?php
+/**
+ * Main screen of the Library module, rendered in the back-office layout of the active theme.
+ * A theme can override this view in themes/<theme>/Views/overrides/Library/index.php.
+ *
+ * The layout prints the page header (title and breadcrumbs, see BackendController::render()).
+ *
+ * @var string $title
+ * @var string $layout
+ */
+?>
+<?= $this->extend($layout) ?>
+<?= $this->section('content') ?>
+<?= theme_component('empty_state', ['icon' => 'bi-box', 'title' => $title, 'message' => lang('Library.intro')]) ?>
+<?php /* Example ES module (Assets/js/library.js), mounted by core/components.js; never inline scripts. */ ?>
+<p class="text-body-secondary small" data-component="library/library" data-options="<?= esc(json_encode(['message' => lang('Library.component')], JSON_THROW_ON_ERROR)) ?>" hidden></p>
+<?= $this->endSection() ?>

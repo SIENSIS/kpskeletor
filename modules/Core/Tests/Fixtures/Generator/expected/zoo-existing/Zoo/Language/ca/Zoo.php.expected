@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Zoo',
+    'intro' => 'Aquest és el nou mòdul Zoo.',
+    'component' => 'Exemple de component JavaScript del mòdul Zoo.',
+    'menu'  => ['main' => 'Zoo', 'animals' => 'Animals'],
+    'res'   => ['main' => 'Zoo', 'animals' => 'Animals'],
+    'perm'  => [
+        'animals' => ['all' => 'Tots els registres'],
+    ],
+    'settings' => ['perPage' => 'Elements per pàgina', 'perPageHelp' => 'Nombre d’elements de les llistes de Zoo.'],
+    'widget'   => ['title' => 'Zoo'],
+    'task'     => ['description' => 'Tasca programada d’exemple de Zoo'],
+    'animals' => [
+        'singular' => 'Animal',
+        'plural' => 'Animals',
+        'fields' => [
+            'name' => 'Nom',
+            'species' => 'Espècie',
+            'keeper_id' => 'Cuidador',
+            'born_on' => 'Naixement',
+            'created_by' => 'Creat per',
+            'created_at' => 'Creat',
+            'updated_at' => 'Modificat',
+        ],
+        'options' => ['species' => ['cat' => 'Cat', 'dog' => 'Dog', 'bird' => 'Bird']],
+        'api' => ['summary' => 'Animals', 'description' => 'Generat pel generador de codi.'],
+    ],
+];

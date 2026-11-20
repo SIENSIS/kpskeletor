@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Notes',
+    'intro' => 'Este es el nuevo módulo Notes.',
+    'component' => 'Ejemplo de componente JavaScript del módulo Notes.',
+    'menu'  => ['main' => 'Notes', 'items' => 'Notas'],
+    'res'   => ['main' => 'Notes', 'items' => 'Notas'],
+    'perm'  => [],
+    'settings' => ['perPage' => 'Elementos por página', 'perPageHelp' => 'Número de elementos de las listas de Notes.'],
+    'widget'   => ['title' => 'Notes'],
+    'task'     => ['description' => 'Tarea programada de ejemplo de Notes'],
+    'items' => [
+        'singular' => 'Nota',
+        'plural' => 'Notas',
+        'fields' => [
+            'title' => 'Título',
+            'body' => 'Texto',
+            'created_by' => 'Creado por',
+            'created_at' => 'Creado',
+            'updated_at' => 'Modificado',
+        ],
+    ],
+];

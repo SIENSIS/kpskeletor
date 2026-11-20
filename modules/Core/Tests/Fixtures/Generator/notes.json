@@ -1,0 +1,14 @@
+{
+    "module": {"name": "Notes"},
+    "tables": [
+        {
+            "name": "notes_items",
+            "labels": {"singular": {"ca": "Nota", "es": "Nota", "en": "Note"}, "plural": {"ca": "Notes", "es": "Notas", "en": "Notes"}},
+            "demoRows": 2,
+            "columns": [
+                {"name": "title", "type": "string", "length": 120, "label": {"ca": "Títol", "es": "Título", "en": "Title"}},
+                {"name": "body", "type": "text", "nullable": true, "label": {"ca": "Text", "es": "Texto", "en": "Text"}}
+            ]
+        }
+    ]
+}

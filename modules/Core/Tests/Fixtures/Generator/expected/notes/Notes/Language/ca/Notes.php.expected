@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Notes',
+    'intro' => 'Aquest és el nou mòdul Notes.',
+    'component' => 'Exemple de component JavaScript del mòdul Notes.',
+    'menu'  => ['main' => 'Notes', 'items' => 'Notes'],
+    'res'   => ['main' => 'Notes', 'items' => 'Notes'],
+    'perm'  => [],
+    'settings' => ['perPage' => 'Elements per pàgina', 'perPageHelp' => 'Nombre d’elements de les llistes de Notes.'],
+    'widget'   => ['title' => 'Notes'],
+    'task'     => ['description' => 'Tasca programada d’exemple de Notes'],
+    'items' => [
+        'singular' => 'Nota',
+        'plural' => 'Notes',
+        'fields' => [
+            'title' => 'Títol',
+            'body' => 'Text',
+            'created_by' => 'Creat per',
+            'created_at' => 'Creat',
+            'updated_at' => 'Modificat',
+        ],
+    ],
+];

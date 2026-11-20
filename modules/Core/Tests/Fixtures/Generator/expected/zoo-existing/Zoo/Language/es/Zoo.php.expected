@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Zoo',
+    'intro' => 'Este es el nuevo módulo Zoo.',
+    'component' => 'Ejemplo de componente JavaScript del módulo Zoo.',
+    'menu'  => ['main' => 'Zoo', 'animals' => 'Animales'],
+    'res'   => ['main' => 'Zoo', 'animals' => 'Animales'],
+    'perm'  => [
+        'animals' => ['all' => 'Todos los registros'],
+    ],
+    'settings' => ['perPage' => 'Elementos por página', 'perPageHelp' => 'Número de elementos de las listas de Zoo.'],
+    'widget'   => ['title' => 'Zoo'],
+    'task'     => ['description' => 'Tarea programada de ejemplo de Zoo'],
+    'animals' => [
+        'singular' => 'Animal',
+        'plural' => 'Animales',
+        'fields' => [
+            'name' => 'Nombre',
+            'species' => 'Especie',
+            'keeper_id' => 'Cuidador',
+            'born_on' => 'Nacimiento',
+            'created_by' => 'Creado por',
+            'created_at' => 'Creado',
+            'updated_at' => 'Modificado',
+        ],
+        'options' => ['species' => ['cat' => 'Cat', 'dog' => 'Dog', 'bird' => 'Bird']],
+        'api' => ['summary' => 'Animales', 'description' => 'Generado por el generador de código.'],
+    ],
+];

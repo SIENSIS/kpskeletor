@@ -67,8 +67,9 @@ Then sign in as a demo administrator and open `backend/tasks` (the board).
 | 12 | [A public form with email](12-public-form.md) | a public form with captcha, validation, rate limit, a notification to reviewers, a confirmation email in the visitor's language | 5, 6 |
 | 13 | [Releasing a new version of a module](13-releasing-a-version.md) | a schema-change migration, the version, `modules:sync`, a ZIP (signed), `modules:install`, the update notice | 1 |
 | 14 | [Writing tests](14-writing-tests.md) | permission tests with forged POSTs, feature tests, migrations up/down/up, a JavaScript component's endpoint | any |
+| 15 | [Generating a module with the code generator](15-generating-a-module.md) | Devtools' code generator: a definition, the preview, writing, `make:module --definition`, refining the generated code | 1, 2 |
 
-**Recommended order:** 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8, then 9–13 in any order. Read 14 alongside
+**Recommended order:** 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8, then 9–13 in any order; 15 once 1 and 2 are done (it generates what they build by hand). Read 14 alongside
 the others: every tutorial ends with the tests that cover it, and tutorial 14 explains how they
 are built.
 

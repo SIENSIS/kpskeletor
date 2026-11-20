@@ -1,0 +1,57 @@
+{
+    "format": 1,
+    "module": {
+        "name": "Library",
+        "description": {"ca": "Biblioteca de l'escola", "es": "Biblioteca de la escuela", "en": "The school library"},
+        "author": "kpskeletor",
+        "requires": {"Auth": "^0.2"}
+    },
+    "tables": [
+        {
+            "name": "library_shelves",
+            "labels": {"singular": {"ca": "Prestatge", "es": "Estante", "en": "Shelf"}, "plural": {"ca": "Prestatges", "es": "Estantes", "en": "Shelves"}},
+            "demoRows": 3,
+            "columns": [
+                {"name": "code", "type": "string", "length": 20, "unique": true, "label": {"ca": "Codi", "es": "Código", "en": "Code"}, "faker": "slug"},
+                {"name": "room", "type": "string", "length": 80, "nullable": true, "label": {"ca": "Sala", "es": "Sala", "en": "Room"}, "faker": "city"}
+            ],
+            "crud": {"readOnly": true, "operations": ["list", "show", "export"]},
+            "menu": {"icon": "bi bi-bookshelf", "order": 20},
+            "grants": {"admin": ["*"], "editor": ["list", "show"]}
+        },
+        {
+            "name": "library_books",
+            "labels": {"singular": {"ca": "Llibre", "es": "Libro", "en": "Book"}, "plural": {"ca": "Llibres", "es": "Libros", "en": "Books"}},
+            "softDeletes": true,
+            "demoRows": 6,
+            "columns": [
+                {"name": "title", "type": "string", "length": 190, "translated": true, "label": {"ca": "Títol", "es": "Título", "en": "Title"}, "faker": "sentence"},
+                {"name": "summary", "type": "text", "translated": true, "nullable": true, "label": {"ca": "Resum", "es": "Resumen", "en": "Summary"}},
+                {"name": "isbn", "type": "string", "length": 20, "unique": true, "label": "ISBN", "faker": "slug"},
+                {"name": "status", "type": "enum", "options": ["available", "lent", "lost"], "default": "available", "label": {"ca": "Estat", "es": "Estado", "en": "Status"}},
+                {"name": "price", "type": "decimal", "precision": 8, "scale": 2, "nullable": true, "label": {"ca": "Preu", "es": "Precio", "en": "Price"}},
+                {"name": "shelf_id", "type": "integer", "foreign": {"table": "library_shelves", "onDelete": "RESTRICT"}, "label": {"ca": "Prestatge", "es": "Estante", "en": "Shelf"}},
+                {"name": "published_on", "type": "date", "nullable": true, "label": {"ca": "Publicat", "es": "Publicado", "en": "Published"}},
+                {"name": "available", "type": "boolean", "default": "1", "label": {"ca": "Disponible", "es": "Disponible", "en": "Available"}},
+                {"name": "cover", "type": "string", "length": 200, "nullable": true, "label": {"ca": "Coberta", "es": "Portada", "en": "Cover"}},
+                {"name": "notes", "type": "text", "nullable": true, "label": {"ca": "Notes", "es": "Notas", "en": "Notes"}}
+            ],
+            "crud": {
+                "columns": ["title", "isbn", "status", "shelf_id", "available"],
+                "search": ["title", "isbn"],
+                "filters": ["status", "shelf_id", "available"],
+                "customOperations": [
+                    {"key": "lend", "label": {"ca": "Prestar", "es": "Prestar", "en": "Lend"}, "icon": "bi bi-box-arrow-right", "confirm": {"ca": "Prestar aquest llibre?", "es": "¿Prestar este libro?", "en": "Lend this book?"}},
+                    {"key": "writeoff", "label": {"ca": "Donar de baixa", "es": "Dar de baja", "en": "Write off"}, "icon": "bi bi-x-octagon", "reauth": true}
+                ],
+                "recordRule": "own",
+                "hidden": {"price": "prices"},
+                "uploads": ["cover"],
+                "richText": ["summary", "notes"]
+            },
+            "api": {"enabled": true},
+            "menu": {"icon": "bi bi-book", "order": 10},
+            "grants": {"admin": ["*"], "editor": ["list", "show", "add", "edit", "lend"]}
+        }
+    ]
+}

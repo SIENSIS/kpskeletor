@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Notes\Database\Seeds;
+
+use Modules\Core\Demo\DemoData;
+use Modules\Core\Demo\DemoSeeder;
+
+/**
+ * Demo data of the Notes module, loaded with `php spark modules:demo Notes`. Write every
+ * row through $demo so that `--remove` deletes exactly these rows.
+ */
+final class NotesDemoSeeder extends DemoSeeder
+{
+    public function load(DemoData $demo): void
+    {
+        $this->seedNotesItems($demo);
+    }
+
+    /**
+     * 2 demo rows of `notes_items` (made when the code was generated).
+     */
+    private function seedNotesItems(DemoData $demo): void
+    {
+        $rows = [['title' => 'Títol 1', 'body' => 'Text 1'], ['title' => 'Títol 2', 'body' => 'Text 2']];
+
+        foreach ($rows as $row) {
+            $demo->insert('notes_items', $row);
+        }
+    }
+}

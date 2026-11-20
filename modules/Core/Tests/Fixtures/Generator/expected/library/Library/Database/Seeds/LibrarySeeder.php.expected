@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Library\Database\Seeds;
+
+use CodeIgniter\Database\Seeder;
+
+/**
+ * Required initial data of the Library module, run once on first install. Must be idempotent.
+ * Demo data goes in LibraryDemoSeeder instead.
+ */
+final class LibrarySeeder extends Seeder
+{
+    public function run(): void
+    {
+    }
+}

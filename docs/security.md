@@ -418,8 +418,8 @@ administrator enables it (D-29-02). See `docs/installing-modules.md`.
 
 ## Development-only modules (Devtools)
 
-A module whose manifest says `$developmentOnly = true` (the `Devtools` module: CRUD recipes, and
-from sessions 42–43 a code generator and a package builder) is installed and enabled only when
+A module whose manifest says `$developmentOnly = true` (the `Devtools` module: CRUD recipes, the
+code generator, and from session 43 a package builder) is installed and enabled only when
 `CI_ENVIRONMENT` is `development` (D-41-01, D-41-03). Its locks, each with a test:
 
 1. its routes exist only when `ENVIRONMENT === 'development'` (`Config/Routes.php`, a constant):
@@ -434,6 +434,12 @@ from sessions 42–43 a code generator and a package builder) is installed and e
    get 404 (the routes are not even registered for them, and the `devtools` filter checks again);
 5. permissions `devtools.view` and `devtools.write` are granted to nobody (superadmins hold every
    permission); every write needs `reauth` and `ratelimit:forms`.
+
+The code generator is the one place where a web request writes PHP into `modules/` (D-41-02):
+only behind every lock above, only after a preview of every file, refused when a file changed
+after the preview (content hashes), and logged (`activity_log('Devtools', 'generated')`). Its
+form buttons only change the draft in the session (`DevtoolsRoutes::DRAFT`, no re-authentication,
+D-42-02). Everywhere else module code is installed only from the console.
 
 It is part of the repository, so `git archive` and the release archives contain it
 ([`updates.md`](updates.md)); the locks above make it inert there. Never deploy with

@@ -19,12 +19,13 @@ final class TutorialsTest extends CIUnitTestCase
 {
     private const FOLDER = 'docs/tutorials';
 
-    /** The 14 tutorials of the specification ("Tutorials"), in order. */
+    /** The 14 tutorials of the specification ("Tutorials") and the code generator's (session 42), in order. */
     private const TUTORIALS = [
         '01-module-from-scratch.md', '02-extending-a-crud.md', '03-view-with-javascript.md',
         '04-widget.md', '05-public-page.md', '06-talking-to-other-modules.md',
         '07-scheduled-task.md', '08-setting.md', '09-child-theme.md', '10-file-uploads.md',
         '11-json-api.md', '12-public-form.md', '13-releasing-a-version.md', '14-writing-tests.md',
+        '15-generating-a-module.md',
     ];
 
     /**

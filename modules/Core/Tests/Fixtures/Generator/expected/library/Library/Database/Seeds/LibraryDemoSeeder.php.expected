@@ -1,0 +1,160 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Library\Database\Seeds;
+
+use Modules\Core\Demo\DemoData;
+use Modules\Core\Demo\DemoSeeder;
+
+/**
+ * Demo data of the Library module, loaded with `php spark modules:demo Library`. Write every
+ * row through $demo so that `--remove` deletes exactly these rows.
+ */
+final class LibraryDemoSeeder extends DemoSeeder
+{
+    public function load(DemoData $demo): void
+    {
+        $this->seedLibraryShelves($demo);
+        $this->seedLibraryBooks($demo);
+    }
+
+    /**
+     * 3 demo rows of `library_shelves` (made when the code was generated).
+     */
+    private function seedLibraryShelves(DemoData $demo): void
+    {
+        $rows = [
+            ['code' => 'Codi 1', 'room' => 'Sala 1'],
+            ['code' => 'Codi 2', 'room' => 'Sala 2'],
+            ['code' => 'Codi 3', 'room' => 'Sala 3'],
+        ];
+
+        foreach ($rows as $row) {
+            $demo->insert('library_shelves', $row);
+        }
+    }
+
+    /**
+     * 6 demo rows of `library_books` (made when the code was generated).
+     */
+    private function seedLibraryBooks(DemoData $demo): void
+    {
+        $rows = [
+            [
+                'row' => [
+                    'isbn' => 'ISBN 1',
+                    'status' => 'available',
+                    'price' => '10.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-01',
+                    'available' => 1,
+                    'notes' => '<p>Notes 1</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 1', 'summary' => '<p>Resum 1</p>'],
+                    'es' => ['title' => 'Títol 1', 'summary' => '<p>Resum 1</p>'],
+                    'en' => ['title' => 'Títol 1', 'summary' => '<p>Resum 1</p>'],
+                ],
+            ],
+            [
+                'row' => [
+                    'isbn' => 'ISBN 2',
+                    'status' => 'lent',
+                    'price' => '20.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-02',
+                    'available' => 0,
+                    'notes' => '<p>Notes 2</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 2', 'summary' => '<p>Resum 2</p>'],
+                    'es' => ['title' => 'Títol 2', 'summary' => '<p>Resum 2</p>'],
+                    'en' => ['title' => 'Títol 2', 'summary' => '<p>Resum 2</p>'],
+                ],
+            ],
+            [
+                'row' => [
+                    'isbn' => 'ISBN 3',
+                    'status' => 'lost',
+                    'price' => '30.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-03',
+                    'available' => 1,
+                    'notes' => '<p>Notes 3</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 3', 'summary' => '<p>Resum 3</p>'],
+                    'es' => ['title' => 'Títol 3', 'summary' => '<p>Resum 3</p>'],
+                    'en' => ['title' => 'Títol 3', 'summary' => '<p>Resum 3</p>'],
+                ],
+            ],
+            [
+                'row' => [
+                    'isbn' => 'ISBN 4',
+                    'status' => 'available',
+                    'price' => '40.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-04',
+                    'available' => 0,
+                    'notes' => '<p>Notes 4</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 4', 'summary' => '<p>Resum 4</p>'],
+                    'es' => ['title' => 'Títol 4', 'summary' => '<p>Resum 4</p>'],
+                    'en' => ['title' => 'Títol 4', 'summary' => '<p>Resum 4</p>'],
+                ],
+            ],
+            [
+                'row' => [
+                    'isbn' => 'ISBN 5',
+                    'status' => 'lent',
+                    'price' => '50.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-05',
+                    'available' => 1,
+                    'notes' => '<p>Notes 5</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 5', 'summary' => '<p>Resum 5</p>'],
+                    'es' => ['title' => 'Títol 5', 'summary' => '<p>Resum 5</p>'],
+                    'en' => ['title' => 'Títol 5', 'summary' => '<p>Resum 5</p>'],
+                ],
+            ],
+            [
+                'row' => [
+                    'isbn' => 'ISBN 6',
+                    'status' => 'lost',
+                    'price' => '60.00',
+                    'shelf_id' => $this->firstId('library_shelves'),
+                    'published_on' => '2026-01-06',
+                    'available' => 0,
+                    'notes' => '<p>Notes 6</p>',
+                ],
+                'translations' => [
+                    'ca' => ['title' => 'Títol 6', 'summary' => '<p>Resum 6</p>'],
+                    'es' => ['title' => 'Títol 6', 'summary' => '<p>Resum 6</p>'],
+                    'en' => ['title' => 'Títol 6', 'summary' => '<p>Resum 6</p>'],
+                ],
+            ],
+        ];
+
+        foreach ($rows as $item) {
+            $id = $demo->insert('library_books', $item['row']);
+
+            foreach ($item['translations'] as $locale => $texts) {
+                $demo->insert('library_books_translations', ['library_book_id' => $id, 'locale' => $locale] + $texts);
+            }
+        }
+    }
+
+    /**
+     * The first id of a table (a required foreign key of the demo rows).
+     */
+    private function firstId(string $table): int
+    {
+        $row = db_connect()->table($table)->select('id')->orderBy('id')->get(1)->getRowArray();
+
+        return is_array($row) ? (int) $row['id'] : 1;
+    }
+}
