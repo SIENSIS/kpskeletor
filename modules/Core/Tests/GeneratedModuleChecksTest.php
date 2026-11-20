@@ -60,6 +60,8 @@ final class GeneratedModuleChecksTest extends CIUnitTestCase
         yield 'new module' => ['library', 'Library'];
 
         yield 'table added to an existing module' => ['zoo-existing', 'Zoo'];
+
+        yield 'the definition of tutorial 15' => [ROOTPATH . 'docs/tutorials/files/tasks2.definition.json', 'Tasks2'];
     }
 
     #[DataProvider('definitions')]
@@ -67,7 +69,7 @@ final class GeneratedModuleChecksTest extends CIUnitTestCase
     {
         $this->name = 'Gen' . strtoupper(bin2hex(random_bytes(3)));
         $lower      = strtolower($this->name);
-        $json       = (string) file_get_contents(__DIR__ . '/Fixtures/Generator/' . $fixture . '.json');
+        $json       = (string) file_get_contents(str_ends_with($fixture, '.json') ? $fixture : __DIR__ . '/Fixtures/Generator/' . $fixture . '.json');
         $json       = str_replace(['"' . $module . '"', strtolower($module) . '_'], ['"' . $this->name . '"', $lower . '_'], $json);
         $definition = ModuleDefinition::fromJson($json);
 

@@ -72,7 +72,7 @@ final class BooksCrudTest extends AuthTestCase
     public function testWithoutAllAUserChangesOnlyTheirOwnRows(): void
     {
         $this->signIn('library-books.list', 'library-books.show', 'library-books.edit');
-        $other = $this->row(['created_by' => (int) $this->createUser('other@example.com', 'user')->id]);
+        $other = $this->row(['created_by' => (int) $this->createUser('other@example.com')->id]);
 
         // A row outside the user's scope is "not found".
         $this->send('POST', backend_path(self::LIST) . '/delete/' . $this->code($other));
@@ -105,12 +105,13 @@ final class BooksCrudTest extends AuthTestCase
     }
 
     /**
-     * A signed-in user of the `user` group (no default grant on this resource) with these
-     * individual permissions.
+     * A signed-in user with these individual permissions only: no group, so the default grants of
+     * the groups do not count.
      */
     private function signIn(string ...$permissions): User
     {
-        $user = $this->createUser('ana@example.com', 'user');
+        $user = $this->createUser('ana@example.com');
+        $user->syncGroups();
 
         if ($permissions !== []) {
             $user->addPermission(...$permissions);

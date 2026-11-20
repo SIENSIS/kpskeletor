@@ -27,6 +27,8 @@ final class ContentLanguagesTest extends CIUnitTestCase
     private const ALLOWED = [
         'modules/Core/I18n/Locales.php',
         'modules/Core/I18n/Language.php',
+        // The shipped UI languages of the files the code generator writes (not content languages).
+        'modules/Core/Generator/Definition/Texts.php',
     ];
 
     public function testNoModuleCodeNamesAContentLanguage(): void

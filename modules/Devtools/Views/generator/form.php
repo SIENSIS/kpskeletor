@@ -18,11 +18,11 @@
 
 $module   = $data['module'];
 $existing = (bool) ($module['existing'] ?? false);
-$locales  = ['ca', 'es', 'en'];
+$locales  = \Modules\Core\Generator\Definition\Texts::LOCALES;
 $error    = static fn (string $path): ?string => $errors[$path] ?? null;
 $invalid  = static fn (string $path): string => isset($errors[$path]) ? ' is-invalid' : '';
 $feedback = static fn (string $path): string => isset($errors[$path]) ? '<div class="invalid-feedback d-block">' . esc($errors[$path]) . '</div>' : '';
-$recipe   = static fn (string $id): string => '<a class="small" href="' . esc(backend_url('devtools/recipes') . '#recipe-' . $id, 'attr') . '"><i class="bi bi-journal-code" aria-hidden="true"></i> ' . esc(lang('Devtools.generator.recipe')) . '</a>';
+$recipe   = static fn (string $id): string => '<a class="small position-relative" href="' . esc(backend_url('devtools/recipes') . '#recipe-' . $id, 'attr') . '"><i class="bi bi-journal-code" aria-hidden="true"></i> ' . esc(lang('Devtools.generator.recipe')) . '<span class="visually-hidden">: ' . esc(lang('Devtools.recipes.' . $id . '.title')) . '</span></a>';
 $checked  = static fn (bool $on): string => $on ? ' checked' : '';
 $label    = static fn (array $texts, string $locale): string => (string) ($texts[$locale] ?? '');
 ?>

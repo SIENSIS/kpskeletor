@@ -37,7 +37,9 @@ final class {{class}} extends ApiTestCase
 
     public function testAUserWithoutThePermissionIsRefused(): void
     {
+        // No group: the default grants of the groups do not count.
         $user = $this->createUser('ana@example.com', 'user');
+        $user->syncGroups();
 
         $this->api('GET', 'api/v1/{{path}}', null, $this->tokenFor($user))->assertStatus(403);
     }

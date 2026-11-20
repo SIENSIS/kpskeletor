@@ -128,7 +128,7 @@ final class DemoValues
             'datetime'          => sprintf('2026-01-%02d 10:00:00', min($n, 28)),
             'enum'              => $column->options === [] ? null : $column->options[$row % count($column->options)],
             'json'              => '{}',
-            default             => $column->label->get('ca') . ' ' . $n,
+            default             => $column->label->first() . ' ' . $n,
         };
     }
 

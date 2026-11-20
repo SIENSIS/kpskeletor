@@ -148,6 +148,29 @@ final class GeneratorEngineTest extends CIUnitTestCase
         $this->assertSame($first->fingerprint(), $second->fingerprint());
     }
 
+    public function testFreeTextNeverBreaksOutOfTheGeneratedCode(): void
+    {
+        $evil = "x */ eval(\$_GET['a']); /* ' \\ \n";
+        $plan = $this->plan(ModuleDefinition::fromArray(['module' => ['name' => 'Evil', 'description' => $evil, 'author' => $evil], 'tables' => [[
+            'name'    => 'evil_items',
+            'labels'  => ['singular' => $evil, 'plural' => $evil],
+            'columns' => [['name' => 'title', 'type' => 'string', 'label' => $evil, 'default' => "it's"]],
+            'crud'    => ['customOperations' => [['key' => 'go', 'label' => $evil, 'confirm' => $evil, 'icon' => "bi'); exit; ('"]]],
+            'api'     => ['enabled' => true],
+        ]]]));
+
+        foreach ($plan->changes() as $path => $file) {
+            if (! str_ends_with($path, '.php')) {
+                continue;
+            }
+
+            $tokens = token_get_all($file->content);
+            $calls  = array_filter($tokens, static fn ($t): bool => is_array($t) && $t[0] === T_EVAL);
+            $this->assertSame([], $calls, $path . ': free text became code.');
+            $this->assertStringNotContainsString("exit; ('", implode('', array_map(static fn ($t): string => is_array($t) && $t[0] !== T_CONSTANT_ENCAPSED_STRING && $t[0] !== T_COMMENT && $t[0] !== T_DOC_COMMENT ? $t[1] : (is_string($t) ? $t : ''), $tokens)), $path);
+        }
+    }
+
     public function testTheDefinitionSurvivesAJsonRoundTrip(): void
     {
         foreach (['library', 'notes', 'zoo-existing'] as $case) {

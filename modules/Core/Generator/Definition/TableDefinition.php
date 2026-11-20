@@ -204,7 +204,7 @@ final class TableDefinition
         }
 
         if ($this->crud->enabled && $this->crud->ownerColumn() !== null) {
-            $extras['all'] ??= Texts::from(['ca' => 'Tots els registres', 'es' => 'Todos los registros', 'en' => 'Every record'], 'Every record');
+            $extras['all'] ??= Texts::fixed('allRecords');
         }
 
         return $extras;

@@ -25,7 +25,7 @@ $crud     = $table['crud'];
 $columns  = $table['columns'];
 $invalid  = static fn (string $key): string => isset($errors[$key]) ? ' is-invalid' : '';
 $feedback = static fn (string $key): string => isset($errors[$key]) ? '<div class="invalid-feedback d-block">' . esc($errors[$key]) . '</div>' : '';
-$recipe   = static fn (string $id): string => '<a class="small text-nowrap" href="' . esc(backend_url('devtools/recipes') . '#recipe-' . $id, 'attr') . '"><i class="bi bi-journal-code" aria-hidden="true"></i> ' . esc(lang('Devtools.generator.recipe')) . '</a>';
+$recipe   = static fn (string $id): string => '<a class="small text-nowrap position-relative" href="' . esc(backend_url('devtools/recipes') . '#recipe-' . $id, 'attr') . '"><i class="bi bi-journal-code" aria-hidden="true"></i> ' . esc(lang('Devtools.generator.recipe')) . '<span class="visually-hidden">: ' . esc(lang('Devtools.recipes.' . $id . '.title')) . '</span></a>';
 $checked  = static fn (bool $on): string => $on ? ' checked' : '';
 $in       = static fn (string $list, string $name): bool => in_array($name, (array) ($crud[$list] ?? []), true);
 $names    = array_values(array_filter(array_map(static fn (array $c): string => (string) ($c['name'] ?? ''), $columns), static fn (string $n): bool => $n !== ''));

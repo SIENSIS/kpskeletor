@@ -57,12 +57,13 @@ final class {{class}} extends AuthTestCase
     }
 {{tests}}
     /**
-     * A signed-in user of the `{{group}}` group (no default grant on this resource) with these
-     * individual permissions.
+     * A signed-in user with these individual permissions only: no group, so the default grants of
+     * the groups do not count.
      */
     private function signIn(string ...$permissions): User
     {
-        $user = $this->createUser('ana@example.com', '{{group}}');
+        $user = $this->createUser('ana@example.com');
+        $user->syncGroups();
 
         if ($permissions !== []) {
             $user->addPermission(...$permissions);
