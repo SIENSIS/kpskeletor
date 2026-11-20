@@ -161,7 +161,8 @@ final class NotificationScreensTest extends AuthTestCase
             'channels' => [TestNotice::class => ['database'], MandatoryNotice::class => []],
         ])->assertRedirectTo(site_url('backend/profile/notifications'));
 
-        $this->assertSame(['database'], service('notifications')->channelsFor($ana, TestNotice::class));
+        // Push is off for the site: its column is not in the form and its default choice is kept.
+        $this->assertSame(['database', 'push'], service('notifications')->channelsFor($ana, TestNotice::class));
         $this->assertSame(['database'], service('notifications')->channelsFor($ana, MandatoryNotice::class));
         $this->assertSame(0, db_connect()->table('notification_preferences')->where('type', MandatoryNotice::class)->countAllResults());
     }

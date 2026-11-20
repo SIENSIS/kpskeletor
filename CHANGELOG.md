@@ -10,6 +10,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Web Push notifications** (session 44, D-44-01, D-44-02, `docs/notifications.md`): a third
+  notification channel, `push`, to the browsers and installed PWAs (phone or desktop) where each
+  user turns it on in Profile › Notifications ("Activate notifications on this device", devices
+  with "Send a test", "Rename" and "Remove", the logout question "keep or remove this device").
+  Standard Web Push with VAPID, free and without provider accounts, implemented in the Core with
+  OpenSSL only (RFC 8291 `aes128gcm` encryption and RFC 8292 ES256 tokens, checked against the
+  RFC test vectors); tables `push_subscriptions` and `push_queue`; the scheduled task "Send the
+  queued push notifications" sends through `OutboundClient` (gone devices removed, retries with
+  backoff). Settings `Core.pushEnabled` (off) and `Core.pushContent` (`full` | `generic`) in
+  Settings › Security › Notifications; personal routes under `backend/profile/push`; only
+  endpoints of the known push services (`Config\Push::$serviceHosts`) are accepted. `.env` keys
+  `push.vapidPublicKey`, `push.vapidPrivateKey`, `push.subject`, written by `app:install` and
+  `php spark push:keys [--force]`; `security:check` warns when push is on without keys
+  (`secrets.pushKeys`). Theme helper `push_logout_attributes()` for logout forms.
+
 - **Module packages and signing** (session 43, D-43-01, D-43-02, `docs/devtools.md`):
   `php spark modules:package <Name> [--theme] [--out=<dir>] [--sign=<secret key file>]` and
   Devtools › Packages (`backend/devtools/packages`, development only) build `<Name>-<version>.zip`
@@ -83,6 +98,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Changed
 
+- The service worker (`/sw.js`) shows push notifications and is registered while Web Push is on
+  even with the PWA off; `/sw.js` and the PWA icons are served in that case too.
+- `NotificationType::CHANNELS` includes `push` and the default `defaultChannels()` returns it:
+  types that must never reach a lock screen should return only `database`/`email`. Stored
+  preferences with at least one channel get `push` (migration `AddPushToNotificationPreferences`).
+- Existing installations: run `php spark push:keys` (or add the `push.*` keys) before turning push
+  on.
 - `ModuleGenerator::files()` returns `make:module`'s files without writing them (the generator's
   base); `generate()` writes them, with the same output as before.
 - Devtools: `DevtoolsRoutes::DRAFT` for the generator's draft-only POSTs (D-42-02); the lock test

@@ -69,7 +69,8 @@ if (! function_exists('asset_manifest')) {
 if (! function_exists('page_config_json')) {
     /**
      * JSON of the page configuration block `<script type="application/json" id="kp-config">`
-     * read by `core/config.js`: base URL, locale and the UI texts of the scripts (`Core.js.*`).
+     * read by `core/config.js`: base URL, locale, whether Web Push is on and the UI texts of the
+     * scripts (`Core.js.*`).
      * Escaped for HTML (`<`, `>`, `&` and quotes).
      */
     function page_config_json(): string
@@ -92,6 +93,8 @@ if (! function_exists('page_config_json')) {
             'baseUrl'     => rtrim(base_url('/'), '/') . '/',
             'backendPath' => backend_path(),
             'locale'      => service('request')->getLocale(),
+            // Web Push on: core/pwa.js keeps the service worker registered even without the PWA.
+            'push'        => Modules\Core\Push\WebPush::enabled(),
             'i18n'        => $flat,
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
     }

@@ -359,6 +359,19 @@ backslashes, `javascript:`, `data:`, `https://site@evil`, control characters) go
 See `docs/outbound-requests.md`: `OutboundClient` (HTTPS, allow-list, private addresses refused
 after DNS and redirects) and the SMTP host check.
 
+## Web Push
+
+Push subscriptions are URLs the server calls, so they are an SSRF risk (D-44-02): only `https://`
+endpoints on the hosts of `Config\Push::$serviceHosts` (FCM, Mozilla, WNS, Apple) are stored,
+never IP addresses or local names, and the endpoint is checked again before each delivery; those
+hosts join the outbound allow-list only while `Core.pushEnabled` is on and `OutboundClient`
+refuses private addresses after DNS. Messages are sent only by the scheduled task. The VAPID
+private key lives in `.env` (`push.vapidPrivateKey`; `php spark push:keys`, rotating removes
+every subscription); `security:check` warns (`secrets.pushKeys`) when push is on without valid
+keys. Payloads are encrypted for the browser, but lock screens show them: `Core.pushContent =
+generic` sends only "You have a new notification". The service worker opens same-origin URLs
+only. Refused subscriptions are security log entries (`push_subscription_refused`).
+
 ## Maintenance mode
 
 `Modules\Core\Maintenance\MaintenanceMode` (D-27-02) keeps its state in

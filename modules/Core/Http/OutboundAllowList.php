@@ -6,12 +6,14 @@ namespace Modules\Core\Http;
 
 use Closure;
 use Config\Outbound;
+use Modules\Core\Push\WebPush;
 use Modules\Core\Registry\DeclarationRegistry;
 use Throwable;
 
 /**
  * The outbound allow-list: `Config\Outbound` (`allowedHosts` and `.env` `outbound.hosts`), the
- * `$outboundHosts` of enabled modules and the `Core.outboundHosts` setting. Entries are host
+ * `$outboundHosts` of enabled modules, the push service hosts while Web Push is on
+ * (`Config\Push::$serviceHosts`, D-44-02) and the `Core.outboundHosts` setting. Entries are host
  * names (exact match) or `*.example.com` (subdomains of example.com, not example.com itself).
  * Used by OutboundClient for HTTPS and by the mail service for SMTP hosts.
  */
@@ -65,7 +67,7 @@ final class OutboundAllowList
         $hosts  = [...$config->allowedHosts, ...explode(',', $config->hosts)];
 
         try {
-            $hosts = [...$hosts, ...($this->moduleHosts !== null ? ($this->moduleHosts)() : (new DeclarationRegistry())->outboundHosts())];
+            $hosts = [...$hosts, ...($this->moduleHosts !== null ? ($this->moduleHosts)() : [...(new DeclarationRegistry())->outboundHosts(), ...WebPush::outboundHosts()])];
         } catch (Throwable) {
             // not installed yet
         }

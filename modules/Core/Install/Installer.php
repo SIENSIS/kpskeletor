@@ -26,7 +26,8 @@ use Throwable;
  *
  * 1. refuses when the application is configured (`.env` or `writable/install.lock`; the console
  *    may keep a developer's `.env`, see `$keepEnv`) or the database already has tables;
- * 2. generates the encryption key and `app.maskKey` and builds the `.env` content
+ * 2. generates the encryption key, `app.maskKey` and the Web Push VAPID keys and builds the
+ *    `.env` content
  *    (`CI_ENVIRONMENT=production` unless development is chosen);
  * 3. applies it to the running process (RuntimeConfig) and checks the database;
  * 4. runs `modules:sync` (migrations, seeds, permissions, settings, assets);
@@ -138,7 +139,7 @@ final class Installer
         return $values + [
             'app.maskKey'    => $this->keys->maskKey(),
             'encryption.key' => $this->keys->encryptionKey(),
-        ] + $options->databaseEnv();
+        ] + $this->keys->pushKeys($options->adminEmail, $values['app.baseURL'] ?? '') + $options->databaseEnv();
     }
 
     /**
@@ -208,6 +209,10 @@ final class Installer
 
             if ((string) config('Encryption')->key === '') {
                 $keys['encryption.key'] = $this->keys->encryptionKey();
+            }
+
+            if (trim((string) config('Push')->vapidPublicKey) === '' || trim((string) config('Push')->vapidPrivateKey) === '') {
+                $keys += $this->keys->pushKeys($options->adminEmail, (string) config('App')->baseURL);
             }
 
             $result->envCompleted = $keys === [] ? [] : $this->env->complete($this->state->envPath(), $keys);

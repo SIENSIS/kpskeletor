@@ -216,7 +216,33 @@ Si un widget falla, solo esa tarjeta muestra el error; el resto del panel sigue 
 - **Preferencias:** **Preferencias de notificaciones** (desde la lista o la campana;
   `/backend/profile/notifications`) te permite elegir, para cada tipo de notificación, si la
   recibes **En la aplicación**, **Por correo**, de las dos formas o de ninguna. Las marcadas como
-  **Obligatoria** no se pueden desactivar.
+  **Obligatoria** no se pueden desactivar. Cuando el sitio tiene las notificaciones push
+  activadas, una tercera columna, **En mis dispositivos**, elige qué notificaciones llegan a tus
+  teléfonos y ordenadores.
+
+### Notificaciones en mis dispositivos (push)
+
+Si los administradores lo activan, puedes recibir las notificaciones como notificaciones del
+sistema en un teléfono o un ordenador, incluso con el sitio cerrado (gratuito, sin instalar
+ninguna aplicación):
+
+1. Abre **Preferencias de notificaciones** en el navegador de ese dispositivo.
+2. Haz clic en **Activar las notificaciones en este dispositivo** y permite las notificaciones
+   cuando el navegador lo pida.
+3. Usa **Enviar una prueba** para comprobarlo (llega en menos de un minuto).
+
+La lista **Sus dispositivos** muestra cada navegador que recibe las notificaciones («Este
+dispositivo» marca el que estás usando): puedes **Cambiar el nombre**, enviar una prueba o
+**Eliminarlo**. Al cerrar la sesión en un dispositivo que recibe notificaciones se te pregunta si
+quieres mantenerlas o eliminar el dispositivo.
+
+- **iPhone y iPad** (iOS/iPadOS 16.4 o posterior): primero añade el sitio a la pantalla de inicio
+  (Compartir › Añadir a pantalla de inicio), ábrelo desde allí y activa las notificaciones.
+- Si el navegador ha **bloqueado** las notificaciones, permítelas en la configuración del sitio
+  del navegador y vuelve a cargar la página.
+- Los administradores pueden elegir que las notificaciones push solo digan «Tiene una
+  notificación nueva» (las pantallas de bloqueo las muestran); entonces el texto se lee en el
+  sitio.
 
 Ejemplos de notificaciones: un aviso nuevo en las noticias, el recordatorio de un evento que has
 pedido, un restablecimiento de la verificación en dos pasos por parte de un administrador o una

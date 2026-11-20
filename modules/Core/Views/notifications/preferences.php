@@ -5,10 +5,14 @@
  * @var string                                                   $layout
  * @var array<string, array<string, array<string, mixed>>>       $groups   module => class => info
  * @var list<string>                                             $channels
+ * @var array{enabled: bool, devices: list<array<string, mixed>>}|null $push  null while Web Push is off
  */
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
+<?php if ($push !== null): ?>
+    <?= $this->include('Modules\Core\Views\notifications\_push_devices') ?>
+<?php endif ?>
 <?php if ($groups === []): ?>
     <?= theme_component('empty_state', ['title' => lang('Core.notifications.noTypes'), 'icon' => 'bi bi-bell-slash']) ?>
 <?php else: ?>

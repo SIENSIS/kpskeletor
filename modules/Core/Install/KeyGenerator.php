@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Install;
 
+use Modules\Core\Push\WebPush;
 use Modules\Core\Security\MaskKey;
 
 /**
@@ -26,5 +27,15 @@ final class KeyGenerator
     public function maskKey(): string
     {
         return MaskKey::generate();
+    }
+
+    /**
+     * The VAPID keys and contact of the Web Push channel (`push.*`, D-44-02).
+     *
+     * @return array<string, string>
+     */
+    public function pushKeys(string $adminEmail, string $baseUrl): array
+    {
+        return WebPush::newKeys() + ['push.subject' => WebPush::defaultSubject($adminEmail, $baseUrl)];
     }
 }

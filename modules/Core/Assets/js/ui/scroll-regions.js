@@ -6,7 +6,8 @@
  * are reachable anyway and are left alone.
  */
 const SELECTOR = '.table-responsive, [data-scroll-region]';
-const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+// Hidden and disabled controls cannot take the focus (a table of disabled checkboxes still needs it).
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function update(region) {
     const scrolls = region.scrollWidth > region.clientWidth;

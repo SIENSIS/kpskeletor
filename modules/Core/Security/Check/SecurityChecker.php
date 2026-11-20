@@ -9,6 +9,7 @@ use Modules\Core\Security\Check\Checks\ConfigurationCheck;
 use Modules\Core\Security\Check\Checks\DependenciesCheck;
 use Modules\Core\Security\Check\Checks\InstallationCheck;
 use Modules\Core\Security\Check\Checks\OutboundCheck;
+use Modules\Core\Security\Check\Checks\PushCheck;
 use Modules\Core\Security\Check\Checks\SecretsCheck;
 use Modules\Core\Security\Check\Probe\SiteProbe;
 use Throwable;
@@ -90,6 +91,7 @@ final class SecurityChecker
         $checks->add(new InstallationCheck());
         $checks->add(new DependenciesCheck());
         $checks->add(new OutboundCheck());
+        $checks->add(new PushCheck());
 
         try {
             Events::trigger(SecurityChecks::EVENT, $checks);

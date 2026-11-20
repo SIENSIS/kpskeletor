@@ -107,6 +107,9 @@ final class RateLimitTest extends AuthTestCase
         yield 'uploads: module packages' => ['uploads', 'POST', 'backend/modules/packages/upload'];
         yield 'widgets: widget data' => ['widgets', 'GET', 'backend/dashboard/widgets/([^/]+)/data'];
         yield 'forms: backup create' => ['forms', 'POST', 'backend/backups/create'];
+        yield 'forms: push subscribe' => ['forms', 'POST', 'backend/profile/push/subscribe'];
+        yield 'forms: push device delete' => ['forms', 'POST', 'backend/profile/push/delete/([0-9]+)'];
+        yield 'forms: push test' => ['forms', 'POST', 'backend/profile/push/test/([0-9]+)'];
     }
 
     /**

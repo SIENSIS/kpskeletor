@@ -305,8 +305,9 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-42-04 | 42 | Group titles in the generator; `groups:export` / `groups:import` to copy groups without users (owner's request) | Applied (owner's request) |
 | D-43-01 | 43 | Signing packages from the local Devtools form, with safeguards for the key (decide) | Decided |
 | D-43-02 | 43 | How the package builder and the signing form apply D-43-01 (left-out files, request emptied, cleanup page, key upload in memory) | Accepted (proposal) |
-| D-44-01 | 44 | Web Push encryption and VAPID implemented in the Core with OpenSSL, no library (decide) | Decided |
-| D-44-02 | 44 | Web Push: channel name, tables, URLs, settings, keys and the endpoint allow-list (decide) | Decided |
+| D-44-01 | 44 | Web Push encryption and VAPID implemented in the Core with OpenSSL, no library (decide) | Applied (decided) |
+| D-44-02 | 44 | Web Push: channel name, tables, URLs, settings, keys and the endpoint allow-list (decide) | Applied (decided) |
+| D-44-03 | 44 | How session 44 applies D-44-02 (default channels, stored preferences, rename route, logout question, service worker without the PWA, limits) | Accepted (proposal) |
 | D-45-01 | 45 | Pages from sections: section types (`$sectionTypes`), tables, page layout and editor URL (decide) | Applied (decided) |
 | D-46-01 | 46 | Embedded content: allowed hosts in Settings › Security, CSP `frame-src`, click to load (decide) | Applied (decided) |
 | D-46-02 | 46 | Carousel: no automatic rotation by default (decide) | Applied (decided) |
@@ -3113,6 +3114,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) `minishlink/web-push` for encryption and headers only, sending with `OutboundClient` (more dependencies, part of the library unused).
 - **Status:** Decided
 - **Decision (2026-11-19):** «Implementació pròpia (recomanada)». As proposed. **Must change:** session 44.
+- **Applied in:** `modules/Core/Push/` (`PayloadEncryption`, `Vapid`, `EcKey`, `Base64Url`, `PushSender` through `OutboundClient`); test `PushCryptoTest` (RFC 8291 appendix A vectors, round trip, the RFC 8292 example token).
 
 ## D-44-02 — Web Push: channel name, tables, URLs, settings, keys and the endpoint allow-list (decide)
 
@@ -3122,6 +3124,15 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Alternatives:** A) Make the channel list extensible (channels registered by modules, push in its own module): more general, a bigger change to the Core. B) Accept any HTTPS endpoint (works with unknown push services, but an SSRF risk).
 - **Status:** Decided
 - **Decision (2026-11-19):** «Proposta (recomanada)». As proposed: channel `push`, tables `push_subscriptions` and `push_queue`, personal routes under `backend/profile/push`, settings `Core.pushEnabled` (off) and `Core.pushContent`, VAPID keys in `.env`, endpoints only over HTTPS on the hosts of `Config\Push::$serviceHosts` and never private addresses. **Must change:** session 44 (`deploy/44-web-push.md` already describes this; no earlier code changes).
+- **Applied in:** `NotificationType::PUSH`, `modules/Core/Push/`, migrations `CreatePushSubscriptions`/`CreatePushQueue`, `Controllers/PushDevices.php` (routes under `backend/profile/push`), Core settings `pushEnabled`/`pushContent` (group `security.notifications`), `app/Config/Push.php` (`$serviceHosts`: `fcm.googleapis.com`, `updates.push.services.mozilla.com`, `*.notify.windows.com`, `web.push.apple.com`, checked 2026-11-20), `OutboundAllowList` (push hosts while on), `push:keys`, `Installer`, `PushCheck`, `sw.js`, `core/push.js`; tests `PushSubscriptionsTest`, `PushDeliveryTest`, `PushKeysTest`.
+
+## D-44-03 — How session 44 applies D-44-02
+
+- **Where:** `deploy/44-web-push.md` ("default channels of the existing types unchanged", "a device label … editable", "logging out offers to keep or remove the device's subscription", "if the PWA setting is off, register the service worker for push anyway").
+- **Problem:** Several details were left open: whether the base `defaultChannels()` includes `push` and what happens to preferences stored before the channel existed; how a label is edited; how the logout question reaches a theme's logout form; how the worker is registered without the PWA; limits.
+- **Proposal (built):** (1) `NotificationType::CHANNELS` = database, email, push and the base `defaultChannels()` returns the three (the existing types are unchanged; push only reaches devices the user subscribed, so it stays opt-in per device; a type that must not reach a lock screen overrides it). (2) A new migration adds `push` to every stored preference that has at least one channel (a type turned off stays off); `down()` removes it. While push is hidden the preferences form keeps the stored push choice. (3) One more personal route, `POST backend/profile/push/label/<id>`, with the same filters, renames a device. (4) `push_logout_attributes()` (Core helper) puts `data-component="core/push"` (logout mode) on the default theme's logout form; the browser remembers its own device hash in `localStorage` and asks only then. (5) `push: true` in the page configuration makes `core/pwa.js` keep the worker registered; `/sw.js` and the icons are served while the PWA **or** push is on (the manifest only with the PWA). (6) "Send a test" queues a high-urgency message (never sent inline). (7) Endpoints are not resolved at subscription time (no network in a web request): IP literals and local names are refused, and `OutboundClient` checks the resolved addresses on each delivery; the endpoint is re-checked against the hosts before each delivery. (8) A browser already subscribed by another account moves to the new user and its queued messages are dropped. (9) Deleted users' devices are removed when the queue meets them (users are soft-deleted by Shield; no foreign keys). (10) `Config\Push`: TTL 1 day, 5 attempts, a device removed after 10 failures in a row, 20 devices per user, batches of 100, queue rows kept 7 days; VAPID tokens valid 12 h; `generic` content sends the site name, "You have a new notification" and a link to the notifications page.
+- **Alternatives:** A) Push off by default per type (each user would tick every type after subscribing). B) Device labels fixed from the user agent.
+- **Status:** Accepted (proposal)
 
 ## D-45-01 — Pages from sections: section types (`$sectionTypes`), tables, page layout and editor URL (decide)
 

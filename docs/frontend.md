@@ -228,7 +228,22 @@ in both modes ([`development.md`](development.md), "End-to-end and accessibility
 
 The web app manifest, the generated icons and the service worker (which caches nothing) are
 described in [`themes.md`](themes.md) ("PWA manifest"); `core/pwa.js` registers the worker when
-the page links the manifest and unregisters it otherwise.
+the page links the manifest **or Web Push is on** (`push: true` in the page configuration) and
+unregisters it otherwise. `/sw.js` and the icons are served while either is on.
+
+## Service worker and Web Push
+
+`modules/Core/Assets/pwa/sw.js` still caches nothing. It handles `push` (shows the notification:
+title, body, icon and badge of the site, `data.url`, a `tag` per type so a newer one replaces the
+older) and `notificationclick` (focuses an open tab of the site and navigates it, or opens a new
+one). URLs of other origins are never opened: they fall back to the site's root. The payload
+never holds secrets ([`notifications.md`](notifications.md), "Push notifications").
+
+`core/push.js` (`data-component="core/push"`) is the device section of Profile › Notifications:
+the browser's permission is asked only when the user clicks "Activate notifications on this
+device"; it shows clear messages when push is unsupported, denied, or on iPhone/iPad outside the
+installed PWA. Themes add `<?= push_logout_attributes() ?>` to their logout form to get the
+"keep or remove this device" question (empty while push is off).
 
 ## Tutorial: a new view with JavaScript
 

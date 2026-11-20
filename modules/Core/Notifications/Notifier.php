@@ -11,6 +11,7 @@ use CodeIgniter\Shield\Models\UserModel;
 use Config\Database;
 use Modules\Core\Notifications\Channels\DatabaseChannel;
 use Modules\Core\Notifications\Channels\EmailChannel;
+use Modules\Core\Notifications\Channels\PushChannel;
 use Modules\Core\Permissions\Authorization;
 use Modules\Core\Registry\DeclarationRegistry;
 use Throwable;
@@ -22,7 +23,8 @@ use Throwable;
  * - Only types declared by enabled modules are sent (others are logged and dropped).
  * - Banned and deleted users receive nothing; each user once per call.
  * - Channels: the user's preferences for the type, or its default channels; mandatory types
- *   always use their default channels.
+ *   always use their default channels. `push` reaches only the user's subscribed devices and
+ *   only while the channel is on (`Core.pushEnabled`, D-44-02).
  * - Delivery problems are logged and never thrown to the caller.
  */
 final class Notifier
@@ -35,6 +37,7 @@ final class Notifier
         private readonly DeclarationRegistry $registry = new DeclarationRegistry(),
         private readonly DatabaseChannel $database = new DatabaseChannel(),
         private readonly EmailChannel $email = new EmailChannel(),
+        private readonly ?PushChannel $push = null,
     ) {
     }
 
@@ -154,20 +157,25 @@ final class Notifier
 
     /**
      * Stores a user's choices; types not listed keep their defaults, mandatory and unknown types
-     * are ignored.
+     * are ignored. Channels outside `$editable` (the ones the form did not show, e.g. `push`
+     * while it is off for the site) keep their current state.
      *
-     * @param array<string, list<string>> $choices type => channels
+     * @param array<string, list<string>> $choices  type => channels
+     * @param list<string>|null           $editable default: every channel
      */
-    public function savePreferences(int $userId, array $choices): void
+    public function savePreferences(int $userId, array $choices, ?array $editable = null): void
     {
-        $now = Time::now()->toDateTimeString();
+        $now      = Time::now()->toDateTimeString();
+        $editable = $editable === null ? NotificationType::CHANNELS : array_values(array_intersect(NotificationType::CHANNELS, $editable));
 
         foreach ($this->types() as $type => $info) {
             if ($info['mandatory'] || ! array_key_exists($type, $choices)) {
                 continue;
             }
 
-            $channels = implode(',', array_values(array_intersect(NotificationType::CHANNELS, $choices[$type])));
+            $kept     = array_diff($this->channelsFor($userId, $type), $editable);
+            $chosen   = array_intersect($editable, $choices[$type]);
+            $channels = implode(',', array_values(array_intersect(NotificationType::CHANNELS, [...$chosen, ...$kept])));
             $table    = $this->db()->table('notification_preferences');
 
             if ($table->where('user_id', $userId)->where('type', $type)->countAllResults() > 0) {
@@ -243,9 +251,11 @@ final class Notifier
 
         foreach ($this->channelsFor((int) $user->id, $notification::class) as $channel) {
             try {
-                $sent = $channel === NotificationType::DATABASE
-                    ? $this->database->deliver($user, $notification, $module)
-                    : $this->email->deliver($user, $notification);
+                $sent = match ($channel) {
+                    NotificationType::DATABASE => $this->database->deliver($user, $notification, $module),
+                    NotificationType::EMAIL    => $this->email->deliver($user, $notification),
+                    default                    => ($this->push ?? new PushChannel())->deliver($user, $notification),
+                };
                 $reached = $reached || $sent;
             } catch (Throwable $e) {
                 log_message('error', 'Notification {type} to user {id} through {channel} failed: {message}', [

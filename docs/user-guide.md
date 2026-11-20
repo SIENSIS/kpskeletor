@@ -210,7 +210,27 @@ If a widget fails, only that card shows an error; the rest of the dashboard keep
 - **Preferences:** **Notification preferences** (from the list or the bell;
   `/backend/profile/notifications`) lets you choose, for each kind of notification, whether you
   receive it **In the application**, **By email**, both or neither. Notifications marked
-  **Mandatory** cannot be turned off.
+  **Mandatory** cannot be turned off. When the site has push notifications on, a third column,
+  **On my devices**, chooses which notifications reach your phones and computers.
+
+### Notifications on my devices (push)
+
+When the administrators turn it on, you can receive your notifications as system notifications
+on a phone or computer, even with the site closed (free, no app to install):
+
+1. Open **Notification preferences** in the browser of that device.
+2. Click **Activate notifications on this device** and allow notifications when the browser asks.
+3. Use **Send a test** to check it (it arrives within a minute).
+
+The **Your devices** list shows every browser that receives your notifications ("This device"
+marks the one you are using): **Rename** it, send a test or **Remove** it. When you log out on a
+device that receives notifications you are asked whether to keep them or remove the device.
+
+- **iPhone and iPad** (iOS/iPadOS 16.4 or later): first add the site to the home screen (Share ›
+  Add to Home Screen), open it from there and turn notifications on.
+- If the browser **blocked** notifications, allow them in the browser's site settings and reload.
+- The administrators can choose that push notifications only say "You have a new notification"
+  (lock screens show them); then you read the text on the site.
 
 Examples of notifications: a new notice in the news, an event reminder you asked for, a
 two-factor reset by an administrator, a failed scheduled task (for administrators).

@@ -26,7 +26,7 @@ $entries = $user !== null ? backend_menu('user') : [];
             <li><hr class="dropdown-divider"></li>
         <?php endif ?>
         <li>
-            <form action="<?= esc(site_url('logout')) ?>" method="post">
+            <form action="<?= esc(site_url('logout')) ?>" method="post" <?= push_logout_attributes() ?>>
                 <?= csrf_field() ?>
                 <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i><?= esc(lang('Core.user.logout')) ?></button>
             </form>

@@ -206,6 +206,19 @@ return [
         'modulesTitle' => 'Hosts añadidos por los módulos',
         'fix'          => 'Revísela en Configuración › Seguridad (hosts salientes) y en Config\Outbound.',
     ],
+    'push' => [
+        'title'    => 'Claves Web Push',
+        'on'       => 'Las notificaciones push están activadas con un par de claves VAPID válido.',
+        'offReady' => 'Las notificaciones push están desactivadas; las claves VAPID están listas.',
+        'off'      => 'Las notificaciones push están desactivadas y las claves VAPID no están configuradas.',
+        'problem'  => [
+            'missing'  => 'Las notificaciones push están activadas pero el .env no tiene claves VAPID: no se envía nada.',
+            'invalid'  => 'Las notificaciones push están activadas pero las claves VAPID del .env no son válidas: no se envía nada.',
+            'mismatch' => 'Las notificaciones push están activadas pero las claves VAPID pública y privada no se corresponden: no se envía nada.',
+            'subject'  => 'Las notificaciones push están activadas pero push.subject no es un contacto mailto: o https:: no se envía nada.',
+        ],
+        'fix'      => 'Ejecute php spark push:keys (push.subject = mailto:… en el .env) o desactive el push en Configuración › Seguridad › Notificaciones.',
+    ],
     'probe' => [
         'run'                => 'Ejecutar la prueba externa',
         'submit'             => 'Ejecutar la prueba',

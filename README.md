@@ -55,13 +55,20 @@ Before going live, run `php spark security:check` (the production checklist in
 
 ### Cron
 
-One line runs every scheduled task and the email queue (the installer prints it):
+One line runs every scheduled task and the email and push queues (the installer prints it):
 
 ```
 * * * * * cd /path/to/kpskeletor && php spark schedule:run >> /dev/null 2>&1
 ```
 
 Shared hosting, the fallback without cron and troubleshooting: [`docs/scheduler.md`](docs/scheduler.md).
+
+### Push notifications
+
+The installer writes the Web Push (VAPID) keys into `.env` (`push.*`; on an older installation run
+`php spark push:keys`). Turn the channel on in Settings › Security › Notifications. The site must
+be served over HTTPS; iPhone and iPad (iOS/iPadOS 16.4+) receive push only from the site added
+to the home screen, so turn the PWA on too. Details: [`docs/notifications.md`](docs/notifications.md).
 
 ## Documentation
 

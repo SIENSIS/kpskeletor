@@ -8,11 +8,14 @@ use App\Controllers\BaseController;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Core\Frontend\Pwa as PwaService;
+use Modules\Core\Push\WebPush;
 
 /**
  * Minimal PWA routes of the Core: `/manifest.webmanifest`, `/sw.js` (served from the root so the
  * service worker controls the whole site; it caches nothing) and `/pwa/icon-<192|512>.png`.
- * They answer 404 while the setting `Core.pwa` is off.
+ * The manifest answers 404 while the setting `Core.pwa` is off; the service worker and the icons
+ * are also served while Web Push is on (`Core.pushEnabled`: the worker shows push notifications
+ * with the icon, D-44-02).
  */
 final class Pwa extends BaseController
 {
@@ -28,7 +31,7 @@ final class Pwa extends BaseController
 
     public function serviceWorker(): ResponseInterface
     {
-        $this->assertEnabled();
+        $this->assertEnabled(true);
 
         return $this->response
             ->setContentType('text/javascript')
@@ -39,7 +42,7 @@ final class Pwa extends BaseController
 
     public function icon(string $size): ResponseInterface
     {
-        $this->assertEnabled();
+        $this->assertEnabled(true);
 
         if (! in_array((int) $size, PwaService::SIZES, true) || (string) (int) $size !== $size) {
             throw PageNotFoundException::forPageNotFound();
@@ -53,9 +56,9 @@ final class Pwa extends BaseController
             ->setBody((string) file_get_contents($path));
     }
 
-    private function assertEnabled(): void
+    private function assertEnabled(bool $orPush = false): void
     {
-        if (! PwaService::enabled()) {
+        if (! PwaService::enabled() && ! ($orPush && WebPush::enabled())) {
             throw PageNotFoundException::forPageNotFound();
         }
     }
