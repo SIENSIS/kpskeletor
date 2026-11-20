@@ -109,7 +109,18 @@ final class PackageBuilderTest extends CIUnitTestCase
         $result = (new PackageBuilder(null, false))->build(PackageSource::find(PackageInfo::MODULE, $name, $this->work . '/src'));
 
         $info   = (new PackageValidator())->validate($result->zip);
-        $action = $this->installer()->install($result->zip, $info, ['enable' => true]);
+        // The sync registers the new namespace on service('autoloader'); an earlier test of the
+        // suite may have left that service as an instance PHP does not call, so ask it here.
+        $loader = static function (string $class): void {
+            service('autoloader')->loadClass($class);
+        };
+        spl_autoload_register($loader);
+
+        try {
+            $action = $this->installer()->install($result->zip, $info, ['enable' => true]);
+        } finally {
+            spl_autoload_unregister($loader);
+        }
 
         $this->assertSame('install', $action['action']);
         $this->assertFileExists($this->tempRoot() . '/' . $name . '/Config/Module.php');
