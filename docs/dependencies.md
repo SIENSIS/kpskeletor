@@ -26,7 +26,9 @@ raise it only when dropping PHP 8.2. `minimum-stability` is `stable`.
 
 Development: `phpunit/phpunit` `^11.5`, `phpstan/phpstan` `^2.3` with
 `codeigniter/phpstan-codeigniter` `^2.2`, `friendsofphp/php-cs-fixer` `^3.95`,
-`fakerphp/faker` `^1.24` and `mikey179/vfsstream` `^1.6`.
+`fakerphp/faker` `^1.24`, `mikey179/vfsstream` `^1.6` and `nikic/php-parser` `^5` (BSD-3-Clause;
+the Devtools code generator edits existing manifests, routes, language files and demo seeders
+with it, D-42-01; `make:module --definition` needs it, plain `make:module` does not).
 
 Rules (`CLAUDE.md`):
 
