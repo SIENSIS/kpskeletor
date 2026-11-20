@@ -1,7 +1,7 @@
 # Session 42 — Devtools: visual code generator with preview
 
-Branch: `claude/eloquent-archimedes-ljsp0q` (assigned by the environment) · Pull request: see
-`docs/progress.md` · Date: 2026-11-20. Decisions: D-41-02 and D-42-01 applied; D-42-02, D-42-03
+Branch: `claude/eloquent-archimedes-ljsp0q` (assigned by the environment) · Pull request:
+[SIENSIS/kpskeletor#60](https://github.com/SIENSIS/kpskeletor/pull/60) · Date: 2026-11-20. Decisions: D-41-02 and D-42-01 applied; D-42-02, D-42-03
 accepted (`docs/decisions.md`).
 
 ## What was built

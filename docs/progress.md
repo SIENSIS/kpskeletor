@@ -49,7 +49,7 @@ pull request open), *merged* (in `main`).
 | 39 | Web installer progress | merged | `claude/great-knuth-jz5xq8` | [SIENSIS/kpskeletor#57](https://github.com/SIENSIS/kpskeletor/pull/57) | [`deploy-status/39-installer-progress/`](../deploy-status/39-installer-progress/README.md) |
 | 40 | Configurable back-office path | merged | `claude/busy-faraday-4rveyp` | [SIENSIS/kpskeletor#58](https://github.com/SIENSIS/kpskeletor/pull/58) | [`deploy-status/40-backend-path/`](../deploy-status/40-backend-path/README.md) |
 | 41 | Devtools module: development-only tools and their locks | merged | `ccr-b5498d68-5s3wto` | [SIENSIS/kpskeletor#59](https://github.com/SIENSIS/kpskeletor/pull/59) | [`deploy-status/41-devtools/`](../deploy-status/41-devtools/README.md) |
-| 42 | Devtools: visual code generator with preview | done | `claude/eloquent-archimedes-ljsp0q` | | [`deploy-status/42-devtools-generator/`](../deploy-status/42-devtools-generator/README.md) |
+| 42 | Devtools: visual code generator with preview | done | `claude/eloquent-archimedes-ljsp0q` | [SIENSIS/kpskeletor#60](https://github.com/SIENSIS/kpskeletor/pull/60) | [`deploy-status/42-devtools-generator/`](../deploy-status/42-devtools-generator/README.md) |
 
 ## MVP review (session 19)
 
