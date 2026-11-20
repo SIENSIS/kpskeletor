@@ -79,7 +79,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   events with `security_log()` (`<Module>`, action code, labels in `<Module>.activity.<code>`),
   never with `log_message()`; the log is append-only (`docs/activity.md`).
 - **Notifications and scheduled tasks:** types in `Notifications/` (extend `NotificationType`,
-  send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email inline), scheduled
+  send with `notify()` / `notifyGroup()` / `notifyPermission()`, never email or push inline;
+  channels `database`, `email`, `push` — Web Push through `Modules\Core\Push`, D-44-02), scheduled
   tasks in `Tasks/` (`TaskInterface`), both declared in the manifest; one cron line runs
   `php spark schedule:run` (`docs/notifications.md`, `docs/scheduler.md`).
 - **Calendar:** put a module's dates in the calendar through the Core's contracts

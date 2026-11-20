@@ -220,7 +220,32 @@ Si un giny falla, només aquella targeta mostra l'error; la resta del tauler con
 - **Preferències:** **Preferències de notificacions** (des de la llista o la campaneta;
   `/backend/profile/notifications`) et permet triar, per a cada tipus de notificació, si la reps
   **A l'aplicació**, **Per correu**, de les dues maneres o de cap. Les marcades com a
-  **Obligatòria** no es poden desactivar.
+  **Obligatòria** no es poden desactivar. Quan el lloc té les notificacions push activades, una
+  tercera columna, **Als meus dispositius**, tria quines notificacions arriben als teus telèfons i
+  ordinadors.
+
+### Notificacions als meus dispositius (push)
+
+Si els administradors ho activen, pots rebre les notificacions com a notificacions del sistema en
+un telèfon o un ordinador, fins i tot amb el lloc tancat (gratuït, sense instal·lar cap
+aplicació):
+
+1. Obre **Preferències de notificacions** al navegador d'aquest dispositiu.
+2. Fes clic a **Activa les notificacions en aquest dispositiu** i permet les notificacions quan
+   el navegador ho demani.
+3. Fes servir **Envia una prova** per comprovar-ho (arriba en menys d'un minut).
+
+La llista **Els vostres dispositius** mostra cada navegador que rep les notificacions («Aquest
+dispositiu» marca el que fas servir): pots **Canviar el nom**, enviar una prova o **Eliminar-lo**.
+Quan tanques la sessió en un dispositiu que rep notificacions, se't pregunta si vols mantenir-les
+o eliminar el dispositiu.
+
+- **iPhone i iPad** (iOS/iPadOS 16.4 o posterior): primer afegeix el lloc a la pantalla d'inici
+  (Compartir › Afegir a la pantalla d'inici), obre'l des d'allà i activa les notificacions.
+- Si el navegador ha **bloquejat** les notificacions, permet-les a la configuració del lloc del
+  navegador i torna a carregar la pàgina.
+- Els administradors poden triar que les notificacions push només diguin «Teniu una notificació
+  nova» (les pantalles de bloqueig les mostren); llavors el text es llegeix al lloc.
 
 Exemples de notificacions: un avís nou a les notícies, el recordatori d'un esdeveniment que has
 demanat, un restabliment de la verificació en dos passos per part d'un administrador o una tasca

@@ -950,7 +950,10 @@ granularity instead of collapsing it into read/create/update/delete.
   key, title, icon, default channels, a `render()` for the bell and an email template.
 * **Channels:** `database` (the bell) and `email` (queued or sent by the scheduler, never
   inline in the request; transactional security emails are not notifications, see
-  "Authentication"). Users choose per type which channels they want (preferences page);
+  "Authentication") and `push` (Web Push with VAPID to the browsers and installed PWAs each user
+  turns it on in; queued and sent by the scheduler through `OutboundClient`, implemented in the
+  Core with OpenSSL; only endpoints of known push services; off by default, `Core.pushEnabled`;
+  D-44-01, D-44-02). Users choose per type which channels they want (preferences page);
   some types can be marked mandatory.
 * **UI:** bell with unread count in the top bar, dropdown with the latest, "mark all as read",
   and a full list page (kpcrudy, `where(user_id)`; resource `core-notifications`, granted to

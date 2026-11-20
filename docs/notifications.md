@@ -87,6 +87,16 @@ notifyPermission('news-read.view', new NewNotice([...]));                  // ev
   "Send the queued notification emails" sends it within a minute ([`scheduler.md`](scheduler.md)), through the
   `email` service and the outbound allow-list for SMTP. Never sent inline in the request.
 
+- **`push`** (session 44, D-44-01, D-44-02): Web Push to the browsers and installed PWAs the user
+  turned it on in (see "Push notifications" below). Rendered in the recipient's language and
+  **queued** in `push_queue`, one row per device; the scheduled task "Send the queued push
+  notifications" encrypts and sends it within a minute. Only while `Core.pushEnabled` is on and
+  the VAPID keys are valid; a user without devices receives nothing through it.
+
+`NotificationType::CHANNELS` is `['database', 'email', 'push']`; the default `defaultChannels()`
+returns all three (push is opt-in per device anyway). A type that should never reach a lock
+screen returns only `database`/`email`.
+
 Security emails (magic links, password resets, 2FA codes, new-device notices) are **not**
 notifications: they are sent at once by the Auth module's `SecurityMailer` (D-00-15).
 
@@ -95,7 +105,48 @@ notifications: they are sent at once by the Auth module's `SecurityMailer` (D-00
 Back office › user menu › **Notifications** › *Notification preferences*
 (`backend/profile/notifications`): one row per type of the enabled modules, grouped by module,
 with a checkbox per channel. Mandatory types are shown checked and cannot be changed (the server
-ignores them too). No stored choice means the type's default channels.
+ignores them too). No stored choice means the type's default channels. The **On my devices**
+(`push`) column is shown only while push works for the site; saving the form while it is hidden
+keeps the stored push choices (`Notifier::savePreferences(..., $editable)`). The migration that
+added the channel gave `push` to every stored preference that had at least one channel.
+
+## Push notifications
+
+Standard Web Push (RFC 8030) with VAPID: free, no provider account, implemented in the Core with
+PHP's OpenSSL only (D-44-01) and sent through `OutboundClient`.
+
+| Piece | |
+|---|---|
+| `app/Config/Push.php` | `.env` keys `push.vapidPublicKey`, `push.vapidPrivateKey`, `push.subject` (`mailto:` or `https:`); `$serviceHosts`; `ttl` (1 day), `maxAttempts` (5), `maxFailures` (10), `maxDevices` (20 per user), `batch` (100), `keepDays` (7) |
+| Settings | `Core.pushEnabled` (off) and `Core.pushContent` (`full` \| `generic`) in Settings › Security › Notifications |
+| `Modules\Core\Push\PayloadEncryption` | RFC 8291 `aes128gcm` (ECDH P-256, HKDF-SHA256, AES-128-GCM, one record), checked against the RFC's appendix A vectors |
+| `Modules\Core\Push\Vapid` | RFC 8292 JWT ES256 (`aud` = the endpoint's origin, `exp` 12 h, `sub`), `Authorization: vapid t=…, k=…` |
+| `Modules\Core\Push\PushSubscriptions` | `push_subscriptions` (user, endpoint + SHA-256, `p256dh`, `auth`, label, failures, created, last used); every read and change takes the user id |
+| `Modules\Core\Push\PushQueue`, `PushSender` | `push_queue` (subscription, JSON payload before encryption, urgency, attempts, next attempt, status); 2xx sent, 404/410 device deleted, 429/5xx/network retried with backoff, other answers fail and count a failure (a device with `maxFailures` in a row is deleted) |
+| `Modules\Core\Notifications\Channels\PushChannel` | Renders the payload (`title`, `body` ≤ 300 characters, internal `url`, `icon`, a `tag` per type) in the recipient's language; `Urgency: high` for mandatory types; `generic` sends the site name and "You have a new notification" with a link to the notifications page |
+| `Modules\Core\Tasks\SendQueuedPush` | Every minute; nothing is sent while push is off (the queue waits); old rows are deleted |
+| `php spark push:keys [--force] [--yes]` | Generates (or rotates, removing every subscription) the keys; `app:install` writes them |
+
+Routes (personal, `can:core-notifications.list`, CSRF, `ratelimit:forms` on the POSTs):
+
+| URL | |
+|---|---|
+| `GET backend/profile/push` | JSON: `{enabled, publicKey, devices: [{id, label, created, lastUsed, hash}]}` (never endpoints or keys; `hash` is the SHA-256 of the endpoint, for "this device") |
+| `POST backend/profile/push/subscribe` | JSON `PushSubscription.toJSON()`; 422 with the reason when refused, 404 while push is off |
+| `POST backend/profile/push/delete/{id}`, `test/{id}`, `label/{id}` | Own devices only (404 otherwise); JSON for scripts, a redirect back for forms |
+
+Subscriptions are accepted only with an `https://` endpoint on a host of
+`Config\Push::$serviceHosts` (never an IP address or a local name; D-44-02); those hosts join the
+outbound allow-list while push is on, and `OutboundClient` checks the resolved addresses on every
+delivery. A browser subscribed before by another account moves to the new user and its queued
+messages are dropped. Deleted users lose their devices when the queue meets them.
+
+Front end: `core/push.js` (Profile › Notifications; the logout question through
+`push_logout_attributes()` on the theme's logout form) and the service worker (`/sw.js`,
+[`frontend.md`](frontend.md)).
+
+To try it on a phone the site must be on HTTPS with a valid certificate; iPhone and iPad receive
+Web Push only from the site added to the home screen (iOS/iPadOS 16.4+), so turn the PWA on too.
 
 ## Screens
 
@@ -136,4 +187,7 @@ and `POST api/v1/notifications/read-all` (`core-notifications.read`, every group
 `modules/Core/Tests/NotifierTest.php` shows the patterns: declare test types with
 `Tests\Support\Scheduler\DeclaresFixtures`, call `notify()`, check the `notifications` and
 `mail_queue` rows, run `SendQueuedEmails` against CodeIgniter's `MockEmail` (set
-`returnValue = false` to simulate failures).
+`returnValue = false` to simulate failures). Push: `PushCryptoTest` (RFC vectors),
+`PushDeliveryTest` (queue, `FakePushTransport` through the real `OutboundClient`, decrypting with
+the fake browser's keys from `PushFixturesTrait`), `PushSubscriptionsTest` (routes, SSRF
+refusals), `PushKeysTest`.

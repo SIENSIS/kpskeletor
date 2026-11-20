@@ -120,6 +120,13 @@ two-factor authentication. Screens behind `reauth` are left out. A new screen of
 added to `tests/e2e/backoffice.spec.mjs` (or `public.spec.mjs`). In the cloud sessions use the
 pre-installed Chromium (do not run `playwright install`).
 
+`tests/e2e/push.spec.mjs` runs only when the demo site has push on (Settings › Security ›
+Notifications; the installer already wrote the VAPID keys): it uses the full Chromium (the
+headless shell has no notifications), replaces `PushManager.subscribe()` with a subscription with
+real keys (no push service is reachable from a test) and delivers a message to the service worker
+through the DevTools protocol; `E2E_PUSH_DB=writable/e2e.db` makes it deliver the payload the
+server queued for "Send a test".
+
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every push and pull request:
