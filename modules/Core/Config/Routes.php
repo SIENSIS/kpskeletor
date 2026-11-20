@@ -50,6 +50,14 @@ $routes->group(backend_path(), ['namespace' => 'Modules\Core\Controllers'], stat
     $routes->post('notifications/read-all', 'Notifications::readAll', $can);
     $routes->get('profile/notifications', 'NotificationPreferences::index', $can + ['as' => 'core-notification-preferences']);
     $routes->post('profile/notifications', 'NotificationPreferences::save', $can);
+
+    // The user's Web Push devices (D-44-02): own devices only, CSRF, forms rate limit.
+    $post = ['filter' => ['can:core-notifications.list', 'ratelimit:forms']];
+    $routes->get('profile/push', 'PushDevices::index', $can + ['as' => 'core-push-devices']);
+    $routes->post('profile/push/subscribe', 'PushDevices::subscribe', $post);
+    $routes->post('profile/push/delete/(:num)', 'PushDevices::delete/$1', $post);
+    $routes->post('profile/push/test/(:num)', 'PushDevices::test/$1', $post);
+    $routes->post('profile/push/label/(:num)', 'PushDevices::label/$1', $post);
 });
 
 CrudFactory::routes($routes, 'core-notifications', backend_path('notifications'), '\Modules\Core\Controllers\Notifications::index');

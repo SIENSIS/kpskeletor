@@ -6,10 +6,14 @@ namespace Modules\Core\Controllers;
 
 use CodeIgniter\HTTP\RedirectResponse;
 use Modules\Core\Notifications\NotificationType;
+use Modules\Core\Push\PushSubscriptions;
+use Modules\Core\Push\WebPush;
 
 /**
  * The logged-in user's notification preferences (resource `core-notifications`): the channels
- * of each type, by module; mandatory types are shown but cannot be changed.
+ * of each type, by module; mandatory types are shown but cannot be changed. While Web Push is on
+ * (`Core.pushEnabled`) the page also lists the user's push devices (`core/push.js`) and shows the
+ * `push` column; otherwise the stored push choices are kept untouched.
  */
 final class NotificationPreferences extends BackendController
 {
@@ -30,7 +34,11 @@ final class NotificationPreferences extends BackendController
             'title'    => lang('Core.notifications.preferences'),
             'icon'     => 'bi bi-sliders',
             'groups'   => $groups,
-            'channels' => NotificationType::CHANNELS,
+            'channels' => self::visibleChannels(),
+            'push'     => WebPush::switchedOn() ? [
+                'enabled' => WebPush::enabled(),
+                'devices' => (new PushSubscriptions())->forUser($userId),
+            ] : null,
         ]);
     }
 
@@ -50,9 +58,19 @@ final class NotificationPreferences extends BackendController
             $choices[$type] = is_array($selected) ? array_values(array_filter($selected, is_string(...))) : [];
         }
 
-        service('notifications')->savePreferences((int) auth()->id(), $choices);
+        service('notifications')->savePreferences((int) auth()->id(), $choices, self::visibleChannels());
         activity_log('Core', 'preferences_saved', ['resource' => 'core-notifications', 'changes' => ['channels' => $choices]]);
 
         return redirect()->to(backend_url('profile/notifications'))->with('success', lang('Core.notifications.preferencesSaved'));
+    }
+
+    /**
+     * The channels of the form: `push` only while it works for the site.
+     *
+     * @return list<string>
+     */
+    private static function visibleChannels(): array
+    {
+        return WebPush::enabled() ? NotificationType::CHANNELS : array_values(array_diff(NotificationType::CHANNELS, [NotificationType::PUSH]));
     }
 }

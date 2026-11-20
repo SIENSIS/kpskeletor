@@ -44,3 +44,24 @@ if (! function_exists('notifyPermission')) {
         return service('notifications')->toPermission($permission, $notification);
     }
 }
+
+if (! function_exists('push_logout_attributes')) {
+    /**
+     * Attributes for a theme's logout form while Web Push is on: `core/push.js` then asks whether
+     * to keep receiving notifications on this device or remove it before signing out (D-44-02).
+     * Empty while push is off.
+     */
+    function push_logout_attributes(): string
+    {
+        if (! Modules\Core\Push\WebPush::enabled()) {
+            return '';
+        }
+
+        $options = ['mode' => 'logout', 'urls' => [
+            'state'  => backend_url('profile/push'),
+            'delete' => backend_url('profile/push/delete') . '/',
+        ]];
+
+        return 'data-component="core/push" data-options="' . esc(json_encode($options, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR), 'attr') . '"';
+    }
+}
