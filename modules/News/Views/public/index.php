@@ -9,12 +9,18 @@
  * @var string|null                                      $current
  * @var string                                           $pager
  * @var string                                           $feedUrl
+ * @var string|null                                      $bannerUrl the category's banner
  */
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="h2 mb-0"><?= esc($title) ?></h1>
+<?php if (! empty($bannerUrl)): ?>
+    <?= theme_view('Modules\News\Views\public\_banner', ['bannerUrl' => $bannerUrl, 'label' => $title, 'heading' => true, 'link' => '']) ?>
+<?php endif ?>
+<div class="d-flex flex-wrap justify-content-<?= empty($bannerUrl) ? 'between' : 'end' ?> align-items-center gap-2 mb-3">
+    <?php if (empty($bannerUrl)): ?>
+        <h1 class="h2 mb-0"><?= esc($title) ?></h1>
+    <?php endif ?>
     <a class="btn btn-sm btn-outline-secondary" href="<?= esc($feedUrl, 'attr') ?>"><i class="bi bi-rss" aria-hidden="true"></i> <?= esc(lang('News.rss')) ?></a>
 </div>
 <?php if ($categories !== []): ?>

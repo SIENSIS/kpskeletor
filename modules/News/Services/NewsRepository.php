@@ -22,7 +22,7 @@ final class NewsRepository
     /**
      * A page of readable posts, pinned notices first, newest first.
      *
-     * @param array{type?: string, category?: int, unread?: bool} $filters
+     * @param array{type?: string, category?: int, categories?: list<int>, q?: string, unread?: bool} $filters
      *
      * @return array{rows: list<array<string, mixed>>, total: int}
      */
@@ -82,9 +82,9 @@ final class NewsRepository
     }
 
     /**
-     * Active categories with their name in the current language.
+     * Active categories with their name in the current language and their banner (an image key or null).
      *
-     * @return list<array{id: int, slug: string, name: string}>
+     * @return list<array{id: int, slug: string, name: string, banner: string|null}>
      */
     public function categories(): array
     {
@@ -93,14 +93,15 @@ final class NewsRepository
         $names = $this->texts('news_category_translations', 'category_id', array_column($rows, 'id'), ['name']);
 
         return array_map(static fn (array $row): array => [
-            'id'   => (int) $row['id'],
-            'slug' => (string) $row['slug'],
-            'name' => (string) ($names[(int) $row['id']]['name'] ?? $row['slug']),
+            'id'     => (int) $row['id'],
+            'slug'   => (string) $row['slug'],
+            'name'   => (string) ($names[(int) $row['id']]['name'] ?? $row['slug']),
+            'banner' => is_string($row['banner'] ?? null) && $row['banner'] !== '' ? $row['banner'] : null,
         ], $rows);
     }
 
     /**
-     * @return array{id: int, slug: string, name: string}|null
+     * @return array{id: int, slug: string, name: string, banner: string|null}|null
      */
     public function categoryBySlug(string $slug): ?array
     {
@@ -123,7 +124,7 @@ final class NewsRepository
 
     /**
      * @param BaseBuilder<BaseConnection<object|resource, object|resource>> $builder
-     * @param array{type?: string, category?: int, unread?: bool} $filters
+     * @param array{type?: string, category?: int, categories?: list<int>, q?: string, unread?: bool} $filters
      */
     private function filter(BaseBuilder $builder, ?User $user, array $filters): void
     {
@@ -133,6 +134,19 @@ final class NewsRepository
 
         if (($filters['category'] ?? 0) > 0) {
             $builder->where('news.category_id', $filters['category']);
+        }
+
+        // Several categories (a news list section): only those, among the active ones.
+        if (isset($filters['categories']) && $filters['categories'] !== []) {
+            $builder->whereIn('news.category_id', array_map('intval', $filters['categories']));
+        }
+
+        // A search (a news list section's search box): the title or the summary in any language.
+        $q = trim((string) ($filters['q'] ?? ''));
+
+        if ($q !== '') {
+            $builder->whereIn('news.id', static fn (BaseBuilder $sub): BaseBuilder => $sub->select('news_id')->from('news_translations')
+                ->groupStart()->like('title', $q)->orLike('summary', $q)->groupEnd());
         }
 
         if (($filters['unread'] ?? false) && $user !== null) {
@@ -168,6 +182,7 @@ final class NewsRepository
             $category             = $categories[(int) ($row['category_id'] ?? 0)] ?? null;
             $row['category']      = $category['name'] ?? null;
             $row['category_slug'] = $category['slug'] ?? null;
+            $row['category_banner'] = $category['banner'] ?? null;
         }
 
         return $rows;

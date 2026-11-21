@@ -11,6 +11,7 @@ use Modules\Core\Modules\ManifestValidator;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\Core\Text\Slugger;
 use Modules\News\Config\Module;
+use Modules\News\Database\Migrations\AddBannerToNewsCategories;
 use Modules\News\Database\Migrations\AddEventDateToNews;
 use Modules\News\Database\Migrations\CreateNews;
 use Modules\News\Database\Migrations\CreateNewsCategories;
@@ -58,7 +59,7 @@ final class NewsModuleTest extends CIUnitTestCase
 
     public function testUpDownUp(): void
     {
-        $classes    = [CreateNewsCategories::class, CreateNewsCategoryTranslations::class, CreateNews::class, CreateNewsTranslations::class, CreateNewsGroups::class, CreateNewsReads::class, AddEventDateToNews::class];
+        $classes    = [CreateNewsCategories::class, CreateNewsCategoryTranslations::class, CreateNews::class, CreateNewsTranslations::class, CreateNewsGroups::class, CreateNewsReads::class, AddEventDateToNews::class, AddBannerToNewsCategories::class];
         $migrations = array_map(static fn (string $class): Migration => new $class(\Config\Database::forge('tests')), $classes);
         $tables     = ['news_categories', 'news_category_translations', 'news', 'news_translations', 'news_groups', 'news_reads'];
 
@@ -83,6 +84,16 @@ final class NewsModuleTest extends CIUnitTestCase
         }
 
         $this->assertTrue($this->db->fieldExists('event_starts_at', 'news'));
+        $this->assertTrue($this->db->fieldExists('banner', 'news_categories'));
+
+        // The banner's migration alone: down drops the column, up adds it again.
+        $banner = new AddBannerToNewsCategories(\Config\Database::forge('tests'));
+        $banner->down();
+        $this->db->resetDataCache();
+        $this->assertFalse($this->db->fieldExists('banner', 'news_categories'));
+        $banner->up();
+        $this->db->resetDataCache();
+        $this->assertTrue($this->db->fieldExists('banner', 'news_categories'));
     }
 
     public function testTheSanitiserKeepsFormattingAndDropsScripts(): void

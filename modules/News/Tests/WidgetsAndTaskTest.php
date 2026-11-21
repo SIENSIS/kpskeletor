@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\News\Tests;
 
+use Modules\Core\Tests\StorageFixturesTrait;
 use Modules\News\Tasks\ExpireNotices;
 
 /**
@@ -14,6 +15,14 @@ use Modules\News\Tasks\ExpireNotices;
  */
 final class WidgetsAndTaskTest extends NewsTestCase
 {
+    use StorageFixturesTrait;
+
+    protected function tearDown(): void
+    {
+        $this->removeStorageRoot();
+        parent::tearDown();
+    }
+
     public function testNoticesReachTheDashboardOfTheirAudienceOnly(): void
     {
         $this->newsPost('Avís per a tothom', ['type' => 'notice', 'priority' => 'critical', 'pinned' => 1]);
@@ -96,11 +105,13 @@ final class WidgetsAndTaskTest extends NewsTestCase
 
     public function testDemoDataLoadsAndIsRemovedCompletely(): void
     {
+        $this->makeStorage(); // the demo draws banners and covers on the public disk
         $manager = new \Modules\Core\Demo\DemoDataManager(null, 'development');
         $tables  = ['news_categories', 'news_category_translations', 'news', 'news_translations', 'news_groups'];
 
         $this->assertTrue($manager->load('News'));
-        $this->assertSame(9, db_connect()->table('news')->countAllResults());
+        $this->assertSame(14, db_connect()->table('news')->countAllResults());
+        $this->assertSame(2, db_connect()->table('news_categories')->where('banner IS NOT NULL')->countAllResults(), 'Two categories with a banner (session 46).');
         $this->assertSame(1, db_connect()->table('news_groups')->countAllResults(), 'The editors\' notice.');
         $this->assertFalse($manager->load('News'), 'Loading twice does nothing.');
 
