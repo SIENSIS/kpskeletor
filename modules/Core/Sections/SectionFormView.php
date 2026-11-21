@@ -26,7 +26,8 @@ final class SectionFormView
     /**
      * @param array<string, mixed>                  $values  field => posted shape
      * @param array<string, mixed>                  $options the common options
-     * @param array{path: string, message: string}|null $error   the validation error to show
+     * @param array{path: string, message: string, link?: array{url: string, label: string}}|null $error the validation error to show
+     * @param list<array{message: string, link?: array{url: string, label: string}}> $warnings problems of the saved section
      */
     public function __construct(
         private readonly SectionType $type,
@@ -35,6 +36,7 @@ final class SectionFormView
         private readonly array $options,
         private readonly bool $hidden = false,
         private readonly ?array $error = null,
+        private readonly array $warnings = [],
     ) {
     }
 
@@ -56,6 +58,7 @@ final class SectionFormView
             'options'     => SectionOptions::normalise($this->options, $this->type),
             'hidden'      => $this->hidden,
             'error'       => $this->error,
+            'warnings'    => $this->error === null ? $this->warnings : [],
             'icons'       => $this->usesIcons() ? implode(',', array_map(static fn (string $icon): string => substr($icon, 3), Icons::all())) : '',
         ]);
     }

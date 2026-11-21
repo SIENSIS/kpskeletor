@@ -19,7 +19,13 @@ return [
         'moveDown'    => 'Baixa',
         'item'        => 'Element {0}',
         'itemActions' => 'Accions de l’element',
+        'noChoices'   => 'No hi ha cap opció per triar.',
         'itemsLimit'  => 'de {0} a {1}',
+    ],
+    'pager' => [
+        'previous' => 'Pàgina anterior',
+        'next'     => 'Pàgina següent',
+        'page'     => 'Pàgina',
     ],
     'options' => [
         'style'               => 'Estil',

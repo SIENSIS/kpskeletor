@@ -19,7 +19,13 @@ return [
         'moveDown'    => 'Bajar',
         'item'        => 'Elemento {0}',
         'itemActions' => 'Acciones del elemento',
+        'noChoices'   => 'No hay ninguna opción para elegir.',
         'itemsLimit'  => 'de {0} a {1}',
+    ],
+    'pager' => [
+        'previous' => 'Página anterior',
+        'next'     => 'Página siguiente',
+        'page'     => 'Página',
     ],
     'options' => [
         'style'               => 'Estilo',

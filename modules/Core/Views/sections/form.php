@@ -9,7 +9,8 @@
  * @var string                                 $fields  HTML of the fields
  * @var array{style: string, background: string, background_image: string, spacing: string, width: string, anchor: string} $options
  * @var bool                                   $hidden
- * @var array{path: string, message: string}|null $error
+ * @var array{path: string, message: string, link?: array{url: string, label: string}}|null $error
+ * @var list<array{message: string, link?: array{url: string, label: string}}> $warnings problems of the saved section
  * @var string                                 $icons   the icon names (comma separated) when the form has icon fields
  */
 $locales = $view->locales();
@@ -17,7 +18,10 @@ $styles  = $type->styles();
 ?>
 <div class="kp-section-form" data-component="core/sections/form"<?= $icons !== '' ? ' data-icons="' . esc($icons, 'attr') . '"' : '' ?>>
     <?php if ($error !== null): ?>
-        <div class="alert alert-danger" role="alert"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><?= esc($error['message']) ?></div>
+        <div class="alert alert-danger" role="alert"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><?= esc($error['message']) ?><?php if (isset($error['link'])): ?> <a class="alert-link" href="<?= esc($error['link']['url'], 'attr') ?>"><?= esc($error['link']['label']) ?></a><?php endif ?></div>
+    <?php endif ?>
+    <?php if ($warnings !== []): ?>
+        <?= theme_view('Modules\Core\Views\sections\warnings', ['warnings' => $warnings]) ?>
     <?php endif ?>
     <?php if (count($locales) > 1): ?>
         <div class="kp-locale-tabs mb-3" data-locale-tabs hidden><div class="d-flex flex-wrap align-items-center gap-2">

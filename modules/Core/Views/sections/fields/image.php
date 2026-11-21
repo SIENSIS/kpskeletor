@@ -2,7 +2,7 @@
 /**
  * An image: the file picker (upload or choose), "decorative" and the alternative text per language.
  *
- * @var \Modules\Core\Sections\Fields\Field $field
+ * @var \Modules\Core\Sections\Fields\ImageField $field
  * @var string                              $name
  * @var string                              $id
  * @var string                              $path
@@ -18,10 +18,14 @@ $default    = $view->defaultLocale();
 <fieldset class="kp-image-field border rounded p-3" data-image-field>
     <legend class="form-label fs-6 float-none w-auto px-1 mb-1"><?= esc($field->getLabel()) ?><?= $field->isRequired() ? ' <span class="text-danger" aria-hidden="true">*</span>' : '' ?></legend>
     <?= $view->picker($name . '[key]', $id, $key, $view->errorFor($path) ?? null) ?>
-    <div class="form-check mt-2">
-        <input class="form-check-input" type="checkbox" id="<?= esc($id, 'attr') ?>-decorative" name="<?= esc($name, 'attr') ?>[decorative]" value="1"<?= $decorative ? ' checked' : '' ?> data-image-decorative>
-        <label class="form-check-label" for="<?= esc($id, 'attr') ?>-decorative"><?= esc(lang('Sections.image.decorative')) ?></label>
-    </div>
+    <?php if ($field->allowsDecorative()): ?>
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="<?= esc($id, 'attr') ?>-decorative" name="<?= esc($name, 'attr') ?>[decorative]" value="1"<?= $decorative ? ' checked' : '' ?> data-image-decorative>
+            <label class="form-check-label" for="<?= esc($id, 'attr') ?>-decorative"><?= esc(lang('Sections.image.decorative')) ?></label>
+        </div>
+    <?php else: ?>
+        <?php $decorative = false; ?>
+    <?php endif ?>
     <div class="row g-2 mt-1" data-image-alts<?= $decorative ? ' hidden' : '' ?>>
         <?php foreach ($view->locales() as $locale => $language): ?>
             <?php $altPath = $path . '.alt.' . $locale; ?>
