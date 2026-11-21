@@ -47,6 +47,8 @@ final class ThemeValidatorTest extends CIUnitTestCase
             public array $regions = ['public' => ['Bad Region']];
             public array $menuLocations = ['Main' => 'x'];
             public array $pageTemplates = ['Bad Template' => 'x'];
+            public array $zones = ['public.after_header' => 'x', 'nowhere.zone' => 'x', 'public.Bad Zone' => 'x', 'public.empty' => ''];
+            public array $pageModels = ['Not\\A\\Model'];
             public array $styles = ['../secret.css', 'css/missing.css', 'https://cdn.example.com/x.css'];
             public array $options = [
                 'primaryColor' => ['type' => 'string', 'default' => '#000', 'css' => '--bs-primary'],
@@ -64,6 +66,11 @@ final class ThemeValidatorTest extends CIUnitTestCase
         $this->assertStringContainsString("\$regions['public'] has an invalid name \"Bad Region\"", $errors);
         $this->assertStringContainsString("\$menuLocations['Main']", $errors);
         $this->assertStringContainsString("\$pageTemplates['Bad Template']", $errors);
+        $this->assertStringContainsString("\$zones['nowhere.zone']", $errors);
+        $this->assertStringContainsString("\$zones['public.Bad Zone']", $errors);
+        $this->assertStringContainsString("\$zones['public.empty']", $errors);
+        $this->assertStringNotContainsString("\$zones['public.after_header']", $errors);
+        $this->assertStringContainsString('$pageModels', $errors);
         $this->assertStringContainsString('has an invalid path "../secret.css"', $errors);
         $this->assertStringContainsString('has an invalid path "https://cdn.example.com/x.css"', $errors);
         $this->assertStringContainsString('refers to a file that does not exist: css/missing.css', $errors);
