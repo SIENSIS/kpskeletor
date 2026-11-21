@@ -3,7 +3,8 @@
  *
  * - language tabs: only the controls of the chosen language (`[data-locale]`) are shown; without
  *   JavaScript every language is shown with its name;
- * - list fields (`[data-list]`): add an item from the `<template>` (`__i__` becomes a new index),
+ * - list fields (`[data-list]`): add an item from the `<template>` (`__i__` becomes a new index in
+ *   every attribute),
  *   remove it, move it up or down; the add button disappears when the list is full;
  * - link fields: only the control of the chosen kind of target is shown;
  * - the background image picker is shown only for the background "image"; the alternative texts
@@ -153,9 +154,17 @@ export function mount(root) {
 
             counter += 1;
             const index = 'n' + Date.now().toString(36) + counter;
-            const holder = document.createElement('ol');
-            holder.innerHTML = template.innerHTML.replaceAll('__i__', index);
-            const item = holder.firstElementChild;
+            // A copy of the template with `__i__` replaced in every attribute (names, ids, labels,
+            // component options); no HTML is parsed from strings.
+            const fragment = template.content.cloneNode(true);
+            fragment.querySelectorAll('*').forEach((element) => {
+                for (const attribute of Array.from(element.attributes)) {
+                    if (attribute.value.includes('__i__')) {
+                        element.setAttribute(attribute.name, attribute.value.replaceAll('__i__', index));
+                    }
+                }
+            });
+            const item = fragment.firstElementChild;
             list.querySelector('[data-list-items]').append(item);
             item.querySelectorAll('[data-link-field]').forEach(syncLink);
             item.querySelectorAll('[data-image-field]').forEach(syncImage);
