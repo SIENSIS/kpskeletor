@@ -1,6 +1,6 @@
 # Session 48 — Contact module: a contact form protected against spam
 
-Branch: `ccr-f7ba62ed-ukdx9g` · Pull request: PR_LINK · Date: 2026-11-21
+Branch: `ccr-f7ba62ed-ukdx9g` · Pull request: [SIENSIS/kpskeletor#66](https://github.com/SIENSIS/kpskeletor/pull/66) · Date: 2026-11-21
 
 ## What was built
 
