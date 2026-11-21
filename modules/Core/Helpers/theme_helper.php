@@ -86,6 +86,17 @@ if (! function_exists('theme_region')) {
     }
 }
 
+if (! function_exists('theme_zone')) {
+    /**
+     * The content of a theme zone (`public.after_header`, D-47-01): empty when the active theme
+     * does not declare it or nothing is placed there.
+     */
+    function theme_zone(string $zone): string
+    {
+        return theme()->zone($zone);
+    }
+}
+
 if (! function_exists('theme_asset')) {
     /**
      * URL of a theme asset (path relative to the theme's `Assets/`, or `vendor:<path>`), or ''.

@@ -60,6 +60,25 @@ abstract class ThemeManifest
     public array $pageTemplates = [];
 
     /**
+     * Zones where reusable blocks are placed on every page (D-47-01; docs/themes.md, "Zones"):
+     * `<layout>.<name>` => language key of its label (`public.after_header`). The layout prints
+     * each one with `theme_zone('<zone>')`; modules fill them through the Core event `themeZone`
+     * (the Pages module's blocks). A child theme inherits and adds zones.
+     *
+     * @var array<string, string>
+     */
+    public array $zones = [];
+
+    /**
+     * Ready-made page models the theme ships (`Modules\Core\Sections\PageModel` classes, keys
+     * `<theme slug>.<name>`), offered by "New page from a model" next to those of the modules
+     * (D-47-02; docs/sections.md, "Page models").
+     *
+     * @var list<class-string>
+     */
+    public array $pageModels = [];
+
+    /**
      * Stylesheets loaded by the layouts, after the parent's: paths relative to `Assets/`, or
      * `vendor:<path>` for files under `public/assets/vendor/`.
      *
