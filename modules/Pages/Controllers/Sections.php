@@ -49,7 +49,8 @@ final class Sections extends BackendController
             $rows[] = [
                 'section' => $section,
                 'type'    => $type,
-                'summary' => $type?->summary($section, $locale) ?? '',
+                'summary'  => $type?->summary($section, $locale) ?? '',
+                'warnings' => $type?->warnings($section, auth()->user()) ?? [],
             ];
         }
 
@@ -97,7 +98,7 @@ final class Sections extends BackendController
         $type    = $this->type($section->type);
         $form    = new SectionForm($type, FieldContext::current('Pages', $type->fileKeys($section)));
 
-        return $this->form($page, $type, $sectionId, $form->formValues($section), $section->options, $section->hidden);
+        return $this->form($page, $type, $sectionId, $form->formValues($section), $section->options, $section->hidden, null, $type->warnings($section, auth()->user()));
     }
 
     public function save(int $pageId): RedirectResponse|ResponseInterface|string
@@ -121,7 +122,7 @@ final class Sections extends BackendController
 
             $this->response->setStatusCode(422);
 
-            return $this->form($page, $type, $id, $posted, is_array($options) ? $options : [], $hidden, ['path' => $e->path, 'message' => $e->getMessage()]);
+            return $this->form($page, $type, $id, $posted, is_array($options) ? $options : [], $hidden, $e->toArray());
         } catch (RuntimeException $e) {
             return redirect()->to(backend_url('pages/' . $pageId . '/sections'))->with('error', $e->getMessage());
         }
@@ -239,9 +240,10 @@ final class Sections extends BackendController
      * @param array<string, mixed>                       $page
      * @param array<string, mixed>                       $values  field => posted shape
      * @param array<string, mixed>                       $options
-     * @param array{path: string, message: string}|null $error
+     * @param array{path: string, message: string, link?: array{url: string, label: string}}|null $error
+     * @param list<array{message: string, link?: array{url: string, label: string}}> $warnings
      */
-    private function form(array $page, SectionType $type, ?int $sectionId, array $values, array $options, bool $hidden, ?array $error = null): string
+    private function form(array $page, SectionType $type, ?int $sectionId, array $values, array $options, bool $hidden, ?array $error = null, array $warnings = []): string
     {
         $pageId  = (int) $page['id'];
         $context = FieldContext::current('Pages');
@@ -252,7 +254,7 @@ final class Sections extends BackendController
             'icon'      => $type->icon(),
             'type'      => $type,
             'sectionId' => $sectionId,
-            'fields'    => (new SectionFormView($type, $context, $values, $options, $hidden, $error))->render(),
+            'fields'    => (new SectionFormView($type, $context, $values, $options, $hidden, $error, $warnings))->render(),
             'action'    => backend_url('pages/' . $pageId . '/sections/save'),
             'backUrl'   => backend_url('pages/' . $pageId . '/sections'),
         ]);

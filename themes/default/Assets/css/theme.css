@@ -605,3 +605,136 @@ a.kp-link-item:focus-visible { outline: 3px solid var(--bs-focus-ring-color); ou
 .kp-icon-option[aria-selected=true] { outline: 2px solid var(--bs-primary); }
 .kp-icon-preview { min-width: 2.75rem; justify-content: center; }
 .min-w-0 { min-width: 0; }
+
+/* Section types of session 46 (news, events, gallery, carousel, testimonials, logos, embeds). */
+.news-banner,
+.kp-carousel-slide { position: relative; isolation: isolate; }
+.news-banner .kp-hero-body { padding-block: 2rem; }
+.kp-news-row-image { width: 7.5rem; aspect-ratio: 4 / 3; object-fit: cover; height: auto; }
+@media (max-width: 575.98px) {
+    .kp-news-row-image { width: 5rem; }
+}
+.kp-event-date {
+    min-width: 3.5rem;
+    padding: .35rem .25rem;
+    border-radius: var(--bs-border-radius);
+    background: var(--bs-primary);
+    color: #fff;
+    line-height: 1.1;
+}
+.kp-event-day { font-size: 1.5rem; font-weight: 700; }
+.kp-event-month { letter-spacing: .04em; }
+
+/* Gallery (files.gallery): a grid of square thumbnails or a masonry of whole images. */
+.kp-gallery-items { display: grid; gap: .75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 768px) {
+    .kp-gallery-cols-3 .kp-gallery-items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .kp-gallery-cols-4 .kp-gallery-items,
+    .kp-gallery-cols-5 .kp-gallery-items,
+    .kp-gallery-cols-6 .kp-gallery-items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 992px) {
+    .kp-gallery-cols-4 .kp-gallery-items { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .kp-gallery-cols-5 .kp-gallery-items { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .kp-gallery-cols-6 .kp-gallery-items { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+.kp-gallery-link { display: block; border-radius: var(--bs-border-radius); overflow: hidden; }
+.kp-gallery-link:focus-visible { outline: 3px solid var(--bs-primary); outline-offset: 2px; }
+.kp-gallery-image { display: block; width: 100%; height: auto; transition: transform .2s ease; }
+.kp-gallery-grid .kp-gallery-image { aspect-ratio: 1; object-fit: cover; }
+.kp-gallery-link:hover .kp-gallery-image { transform: scale(1.03); }
+.kp-gallery-masonry .kp-gallery-items { display: block; columns: 2; column-gap: .75rem; }
+.kp-gallery-masonry .kp-gallery-item { break-inside: avoid; margin-bottom: .75rem; }
+@media (min-width: 768px) {
+    .kp-gallery-masonry .kp-gallery-items { columns: 3; }
+}
+@media (min-width: 992px) {
+    .kp-gallery-masonry.kp-gallery-cols-4 .kp-gallery-items { columns: 4; }
+    .kp-gallery-masonry.kp-gallery-cols-5 .kp-gallery-items { columns: 5; }
+    .kp-gallery-masonry.kp-gallery-cols-6 .kp-gallery-items { columns: 6; }
+}
+.kp-lightbox {
+    width: min(96vw, 80rem);
+    max-height: 94vh;
+    padding: 0;
+    border: 0;
+    border-radius: var(--bs-border-radius-lg);
+    background: #0b0f16;
+    color: #fff;
+}
+.kp-lightbox::backdrop { background: rgba(0, 0, 0, .82); }
+.kp-lightbox-inner { position: relative; display: flex; align-items: center; justify-content: center; padding: 3rem 3.5rem 1rem; }
+.kp-lightbox-figure { text-align: center; }
+.kp-lightbox-image { max-width: 100%; max-height: 78vh; height: auto; object-fit: contain; }
+.kp-lightbox-caption { margin-top: .5rem; font-size: .9rem; color: #dee2e6; }
+.kp-lightbox-close { position: absolute; top: .5rem; right: .5rem; }
+.kp-lightbox-prev,
+.kp-lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); }
+.kp-lightbox-prev { left: .5rem; }
+.kp-lightbox-next { right: .5rem; }
+@media (max-width: 575.98px) {
+    .kp-lightbox-inner { padding: 3rem .5rem 3.5rem; }
+    .kp-lightbox-prev,
+    .kp-lightbox-next { top: auto; bottom: .5rem; transform: none; }
+}
+
+/* Carousel (pages.carousel, D-46-02): without JavaScript the slides stack. */
+.kp-carousel { position: relative; }
+.kp-carousel-slide + .kp-carousel-slide { margin-top: .25rem; }
+.kp-carousel.is-enhanced .kp-carousel-slide + .kp-carousel-slide { margin-top: 0; }
+.kp-carousel-slide[hidden] { display: none; }
+.kp-carousel-slide .kp-hero-body { padding-block: 2.5rem 4.5rem; }
+.kp-carousel-controls {
+    position: absolute;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .3rem .5rem;
+    border-radius: 2rem;
+    background: rgba(8, 12, 20, .55);
+}
+.kp-carousel-controls[hidden] { display: none; }
+.kp-carousel-dots { display: flex; gap: .15rem; }
+.kp-carousel-dot {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    position: relative;
+}
+.kp-carousel-dot::after {
+    content: "";
+    position: absolute;
+    inset: .5rem;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+.kp-carousel-dot[aria-pressed=true]::after { background: #fff; }
+.kp-carousel-dot:focus-visible,
+.kp-carousel-controls .btn:focus-visible { outline: 3px solid #fff; outline-offset: 1px; }
+
+/* Testimonials and logos. */
+.kp-testimonial { position: relative; background: var(--bs-tertiary-bg); }
+[data-bs-theme=dark] .kp-testimonial { background: rgba(255, 255, 255, .06); }
+.kp-testimonial-mark { font-size: 2.5rem; line-height: 1; color: var(--bs-primary); }
+[data-bs-theme=dark] .kp-testimonial-mark { color: #8bb9fe; }
+.kp-testimonial-quote { font-size: 1.05rem; }
+.kp-testimonial-photo { width: 3.5rem; height: 3.5rem; object-fit: cover; }
+.kp-testimonial-role { color: var(--bs-secondary-color); }
+.kp-logo-image { max-height: 4.5rem; max-width: 10rem; width: auto; height: auto; object-fit: contain; }
+.kp-logos-gray .kp-logo-image { filter: grayscale(1); opacity: .75; transition: filter .2s ease, opacity .2s ease; }
+.kp-logos-gray .kp-logo:hover .kp-logo-image,
+.kp-logos-gray .kp-logo-link:focus-visible .kp-logo-image { filter: none; opacity: 1; }
+
+/* Embedded content (pages.embed, D-46-01): the placeholder until the visitor clicks. */
+.kp-embed { background: #141b26; }
+.kp-embed > iframe { border: 0; }
+.kp-embed-placeholder { color: #fff; background: linear-gradient(135deg, #1f2a3a, #0b0f16); }
+@media (prefers-reduced-motion: reduce) {
+    .kp-gallery-image { transition: none; }
+}

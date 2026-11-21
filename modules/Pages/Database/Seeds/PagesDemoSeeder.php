@@ -98,6 +98,139 @@ final class PagesDemoSeeder extends DemoSeeder
         ]);
 
         $this->sectionsPage($demo, $now, $author, $about);
+        $this->moduleSectionPages($demo, $now, $author);
+    }
+
+    /**
+     * Session 46: "Notícies" and "Sortides" (a banner and the news of one category each), "Agenda"
+     * (a banner, the upcoming events and the calendar) and "Més seccions" (carousel, testimonials,
+     * logos, a gallery and an embed that needs its host allowed in Settings › Security). News,
+     * Events and Files categories and folders are looked up by their demo slugs; without them
+     * the lists show every category.
+     */
+    private function moduleSectionPages(DemoData $demo, Time $now, ?int $author): void
+    {
+        $image   = fn (string $name, array $from, array $to, int $width = 1600, int $height = 520): string => $this->illustration($demo, $name, $width, $height, $from, $to);
+        $tr      = static fn (array $ca, array $es, array $en): array => ['ca' => $ca, 'es' => $es, 'en' => $en];
+        $opts    = static fn (array $options): array => $options + ['style' => '', 'background' => 'none', 'spacing' => 'm', 'width' => 'contained', 'background_image' => '', 'anchor' => ''];
+        $hero    = static fn (string $key): array => ['primary' => null, 'primary_style' => 'primary', 'secondary' => null, 'secondary_style' => 'outline-light', 'background' => ['key' => $key, 'decorative' => true], 'overlay' => 'dark', 'side_image' => null, 'height' => 's', 'align' => 'start', 'edge' => 'wave'];
+        $heroTr  = static fn (string $title, string $text): array => ['title' => $title, 'text' => $text, 'primary' => '', 'secondary' => '', 'background' => '', 'side_image' => ''];
+        $newsCat = static function (string $slug): array {
+            if (! db_connect()->tableExists('news_categories')) {
+                return [];
+            }
+
+            $row = db_connect()->table('news_categories')->select('id')->where('slug', $slug)->get()->getRowArray();
+
+            return is_array($row) ? [(string) $row['id']] : [];
+        };
+        $news    = static fn (string $mode, int $limit, array $categories, bool $search): array => ['mode' => $mode, 'limit' => $limit, 'categories' => $categories, 'columns' => '3', 'show_date' => true, 'show_summary' => true, 'show_image' => true, 'search' => $search, 'more' => null];
+
+        $this->sectionPage($demo, $now, $author, 10, [
+            'ca' => ['Notícies', 'noticies', 'Totes les notícies del centre.'],
+            'es' => ['Noticias', 'noticias', 'Todas las noticias del centro.'],
+            'en' => ['News', 'news-list', 'All the news of the school.'],
+        ], [
+            new SectionData('pages.hero', $hero($image('noticies-banner.png', [28, 60, 120], [40, 120, 170])), $tr($heroTr('Notícies', 'El que passa al centre, explicat per nosaltres.'), $heroTr('Noticias', 'Lo que pasa en el centro.'), $heroTr('News', 'What happens at school, told by us.')), $opts(['background' => 'dark', 'spacing' => 's', 'width' => 'full'])),
+            new SectionData('news.list', $news('full', 6, $newsCat('institucional'), true), $tr(['heading' => 'Comunicats', 'intro' => ''], ['heading' => 'Comunicados', 'intro' => ''], ['heading' => 'Announcements', 'intro' => '']), $opts(['style' => 'cards'])),
+        ]);
+
+        $this->sectionPage($demo, $now, $author, 11, [
+            'ca' => ['Sortides', 'sortides', 'Excursions, colònies i visites del curs.'],
+            'es' => ['Salidas', 'salidas', 'Excursiones, colonias y visitas del curso.'],
+            'en' => ['Outings', 'outings', 'Trips, camps and visits of the year.'],
+        ], [
+            new SectionData('pages.hero', $hero($image('sortides-banner.png', [30, 110, 80], [120, 180, 90])), $tr($heroTr('Sortides', 'Aprenem fora de l’aula durant tot el curs.'), $heroTr('Salidas', 'Aprendemos fuera del aula.'), $heroTr('Outings', 'Learning outside the classroom all year round.')), $opts(['background' => 'dark', 'spacing' => 's', 'width' => 'full'])),
+            new SectionData('news.list', $news('full', 4, $newsCat('sortides'), false), $tr(['heading' => '', 'intro' => ''], ['heading' => '', 'intro' => ''], ['heading' => '', 'intro' => '']), $opts(['style' => 'cards'])),
+        ]);
+
+        $this->sectionPage($demo, $now, $author, 12, [
+            'ca' => ['Agenda', 'agenda', 'Les activitats públiques del centre.'],
+            'es' => ['Agenda', 'agenda', 'Las actividades públicas del centro.'],
+            'en' => ['Diary', 'diary', 'The public activities of the school.'],
+        ], [
+            new SectionData('pages.hero', $hero($image('agenda-banner.png', [90, 60, 140], [200, 110, 90])), $tr($heroTr('Agenda', 'Jornades, festes i cursos oberts a tothom.'), $heroTr('Agenda', 'Jornadas, fiestas y cursos abiertos a todo el mundo.'), $heroTr('Diary', 'Open days, festivals and courses open to everyone.')), $opts(['background' => 'dark', 'spacing' => 's', 'width' => 'full'])),
+            new SectionData('events.list', ['categories' => [], 'limit' => 4, 'days' => 90, 'columns' => '4', 'more' => null], $tr(['heading' => 'Properes activitats', 'intro' => '', 'more' => ''], ['heading' => 'Próximas actividades', 'intro' => '', 'more' => ''], ['heading' => 'Upcoming events', 'intro' => '', 'more' => '']), $opts(['style' => 'cards', 'background' => 'light'])),
+            new SectionData('events.calendar', ['categories' => [], 'view' => 'dayGridMonth', 'filter' => true], $tr(['heading' => 'Calendari', 'intro' => ''], ['heading' => 'Calendario', 'intro' => ''], ['heading' => 'Calendar', 'intro' => '']), $opts([])),
+        ]);
+
+        // "Més seccions": the other types of session 46.
+        $slides = $slidesCa = $slidesEs = $slidesEn = [];
+
+        foreach ([['carrusel-1.png', [24, 52, 104], [18, 120, 140], 'Comença el curs', 'Empieza el curso', 'The school year starts'], ['carrusel-2.png', [120, 60, 30], [220, 150, 60], 'Setmana de la ciència', 'Semana de la ciencia', 'Science week'], ['carrusel-3.png', [40, 100, 60], [140, 190, 90], 'Hort escolar', 'Huerto escolar', 'School garden']] as [$name, $from, $to, $ca, $es, $en]) {
+            $slides[]   = ['image' => ['key' => $image($name, $from, $to), 'decorative' => true], 'link' => null];
+            $slidesCa[] = ['image' => '', 'title' => $ca, 'text' => 'Una diapositiva de demostració.', 'link' => ''];
+            $slidesEs[] = ['image' => '', 'title' => $es, 'text' => 'Una diapositiva de demostración.', 'link' => ''];
+            $slidesEn[] = ['image' => '', 'title' => $en, 'text' => 'A demo slide.', 'link' => ''];
+        }
+
+        $people = $peopleCa = $peopleEs = $peopleEn = [];
+
+        foreach ([['Marta', [240, 190, 160], 'L’escola ha fet créixer la curiositat dels nostres fills.', 'Mare d’alumnes'], ['Jordi', [170, 200, 240], 'Els projectes amb entitats del barri són una gran idea.', 'Veí del barri'], ['Aina', [200, 230, 180], 'Aquí vaig descobrir que m’agrada la ciència.', 'Antiga alumna']] as [$name, $color, $quote, $role]) {
+            $people[]   = ['photo' => ['key' => $this->illustration($demo, 'testimoni-' . strtolower($name) . '.png', 240, 240, $color, $color, true), 'decorative' => true], 'name' => $name];
+            $peopleCa[] = ['photo' => '', 'quote' => $quote, 'role' => $role];
+            $peopleEs[] = ['photo' => '', 'quote' => $quote, 'role' => $role];
+            $peopleEn[] = ['photo' => '', 'quote' => $quote, 'role' => $role];
+        }
+
+        $logos = $logosCa = [];
+
+        foreach (['Ajuntament', 'Biblioteca', 'Centre cívic', 'Club esportiu', 'Escola de música'] as $i => $name) {
+            $logos[]   = ['image' => ['key' => $image('logo-' . ($i + 1) . '.png', [60 + $i * 30, 90, 160 - $i * 20], [30, 50 + $i * 25, 90], 360, 160), 'decorative' => false], 'link' => null];
+            $logosCa[] = ['image' => $name, 'link' => ''];
+        }
+
+        $gallery = db_connect()->tableExists('folders') && db_connect()->table('folders')->where('disk', 'public')->where('path', 'shared/Imatges web')->countAllResults() > 0;
+        $more    = [
+            new SectionData('pages.carousel', ['slides' => $slides, 'overlay' => 'dark', 'height' => 'm', 'button_style' => 'light', 'rotate' => false, 'interval' => 8], $tr(['label' => 'Novetats', 'slides' => $slidesCa], ['label' => 'Novedades', 'slides' => $slidesEs], ['label' => 'News', 'slides' => $slidesEn]), $opts(['background' => 'dark', 'spacing' => 's', 'width' => 'full'])),
+            new SectionData('pages.testimonials', ['items' => $people, 'columns' => '3'], $tr(['heading' => 'Què en diuen', 'intro' => '', 'items' => $peopleCa], ['heading' => 'Qué dicen', 'intro' => '', 'items' => $peopleEs], ['heading' => 'What they say', 'intro' => '', 'items' => $peopleEn]), $opts(['background' => 'dark', 'spacing' => 'l'])),
+            new SectionData('pages.logos', ['logos' => $logos, 'grayscale' => true], $tr(['heading' => 'Hi col·laboren', 'intro' => '', 'logos' => $logosCa], ['heading' => 'Colaboran', 'intro' => '', 'logos' => $logosCa], ['heading' => 'Partners', 'intro' => '', 'logos' => $logosCa]), $opts([])),
+        ];
+
+        if ($gallery) {
+            $more[] = new SectionData('files.gallery', ['folder' => 'public:shared/Imatges web', 'columns' => '4', 'limit' => 24, 'order' => 'name', 'captions' => true], $tr(['heading' => 'Galeria', 'intro' => ''], ['heading' => 'Galería', 'intro' => ''], ['heading' => 'Gallery', 'intro' => '']), $opts(['style' => 'grid', 'background' => 'light']));
+        }
+
+        // Shown only once an administrator allows the host (Settings › Security); until then the
+        // editor and the preview show the warning (D-46-01).
+        $more[] = new SectionData('pages.embed', ['url' => 'https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ', 'ratio' => '16x9', 'click_to_load' => true, 'fullscreen' => true], $tr(['heading' => 'Vídeo', 'intro' => '', 'title' => 'Vídeo de demostració'], ['heading' => 'Vídeo', 'intro' => '', 'title' => 'Vídeo de demostración'], ['heading' => 'Video', 'intro' => '', 'title' => 'Demo video']), $opts([]));
+
+        $this->sectionPage($demo, $now, $author, 13, [
+            'ca' => ['Més seccions', 'mes-seccions', 'Carrusel, testimonis, logotips, galeria i contingut incrustat.'],
+            'es' => ['Más secciones', 'mas-secciones', 'Carrusel, testimonios, logotipos, galería y contenido incrustado.'],
+            'en' => ['More sections', 'more-sections', 'Carousel, testimonials, logos, gallery and embedded content.'],
+        ], $more);
+    }
+
+    /**
+     * A published page in `sections` layout with its sections and first revision.
+     *
+     * @param array<string, array{0: string, 1: string, 2: string}> $texts locale => title, slug, summary
+     * @param list<SectionData>                                     $sections
+     */
+    private function sectionPage(DemoData $demo, Time $now, ?int $author, int $position, array $texts, array $sections): int
+    {
+        $id = $this->page($demo, $now, $author, [
+            'position' => $position, 'layout' => 'sections', 'record' => false,
+            'texts'    => array_map(static fn (array $text): array => [$text[0], $text[1], $text[2], ''], $texts),
+        ]);
+        $repository = new PageSections();
+
+        foreach ($sections as $section) {
+            $demo->record('page_sections', $repository->save($id, $section));
+        }
+
+        foreach (db_connect()->table('page_section_translations')->select('id')->whereIn('section_id', array_map('intval', array_column(db_connect()->table('page_sections')->select('id')->where('page_id', $id)->get()->getResultArray(), 'id')))->get()->getResultArray() as $row) {
+            $demo->record('page_section_translations', (int) $row['id']);
+        }
+
+        $revision = (new Revisions())->record($id, $author, 'create');
+
+        if ($revision !== null) {
+            $demo->record('page_revisions', $revision);
+        }
+
+        return $id;
     }
 
     /**
