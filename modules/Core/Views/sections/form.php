@@ -20,14 +20,14 @@ $styles  = $type->styles();
         <div class="alert alert-danger" role="alert"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><?= esc($error['message']) ?></div>
     <?php endif ?>
     <?php if (count($locales) > 1): ?>
-        <div class="kp-locale-tabs d-flex flex-wrap align-items-center gap-2 mb-3" data-locale-tabs hidden>
+        <div class="kp-locale-tabs mb-3" data-locale-tabs hidden><div class="d-flex flex-wrap align-items-center gap-2">
             <span class="small text-body-secondary" id="kp-locale-tabs-label"><?= esc(lang('Sections.form.languages')) ?></span>
             <div class="btn-group btn-group-sm" role="group" aria-labelledby="kp-locale-tabs-label">
                 <?php foreach ($locales as $locale => $language): ?>
                     <button type="button" class="btn btn-outline-primary" data-locale-tab="<?= esc($locale, 'attr') ?>" aria-pressed="false"><?= esc($language) ?></button>
                 <?php endforeach ?>
             </div>
-        </div>
+        </div></div>
     <?php endif ?>
     <fieldset class="mb-4">
         <legend class="h6 border-bottom pb-1"><?= esc(lang('Sections.form.content')) ?></legend>
