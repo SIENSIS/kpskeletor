@@ -131,6 +131,17 @@ is saved (`event_calendar_preferences`) and works without JavaScript too. Calend
 "Managed by <module>" and "Edit in <module>" in the administration and the details. How modules
 use it: `docs/calendar.md`.
 
+## Events in pages (session 46)
+
+- **`events.calendar`** (`Sections/CalendarSection.php`): the public calendar component in a page,
+  with the categories it shows (none = all; the feed's `categories=<id>,<id>` parameter), its first
+  view (month, week, list) and an optional category filter among them.
+- **`events.list`** (`Sections/EventsListSection.php`): the next N public events (occurrences of
+  recurring ones, cancelled ones left out) within a number of days, as a list or cards with a date
+  badge, each linking to `calendar/event/{code}`; an optional "more" link.
+- Both show **public events only**, like the public calendar, and nothing while
+  `Config\Calendar::$publicCalendar` is off (the editor and the preview show a warning).
+
 ## Configuration
 
 `Modules\Events\Config\Calendar` (not `Config/Events.php`, D-00-04; no manifest settings,

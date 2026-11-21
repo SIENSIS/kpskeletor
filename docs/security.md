@@ -249,6 +249,29 @@ public array $extra = ['Cross-Origin-Resource-Policy' => 'same-origin'];
 `configuration.headers`; `--probe` checks that the web server really sends them
 (`probe.headers`).
 
+## Embedded content
+
+Section `pages.embed` (D-46-01) puts a page of another site (a video, a 360° tour, a map) in an
+iframe. Rules:
+
+- **Allowed hosts** in Settings › Security › *Sites that may be embedded* (`Pages.embedHosts`, one
+  host per line, `*.example.com` for subdomains; rule `outbound_hosts`). **Empty by default**:
+  nothing can be embedded until an administrator adds a host.
+- Only `https://` addresses on those hosts, without user name or password. A URL of another host
+  is refused with a message that names the host and says an administrator must add it, with a
+  direct link to the setting for holders of `settings.security`. A saved section whose host was
+  later removed shows the same warning in the editor and the preview and **renders nothing** on
+  the public page.
+- **CSP per page**: `frame-src` gets exactly the origins of the embeds the page shows, for that
+  response only (`SectionType::cspSources()`); other pages keep `frame-src` closed. (A
+  site-wide `frame-src` origin is still possible with `Core.cspFrameSrc`.)
+- The iframe: a required `title`, `loading="lazy"`,
+  `sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"` (no forms, no top
+  navigation, no downloads), `referrerpolicy="strict-origin-when-cross-origin"`, `allow="fullscreen"`
+  only when chosen.
+- **Click to load** (on by default): nothing is requested from the other site until the visitor
+  presses the button (`pages/embed` builds the iframe then); the placeholder names the host.
+
 ## API
 
 Token authentication only (`Authorization: Bearer`): the API never starts a session nor reads

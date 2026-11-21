@@ -182,6 +182,25 @@ $old['cover'])` in `beforeInsert` / `beforeUpdate` (News cover, Pages featured i
   only for keys that are someone's current avatar; `Cache-Control: private, max-age=31536000,
   immutable` (the key changes with each new avatar, so the URL is versioned). Guests get a 404.
 
+## Galleries in pages (session 46)
+
+Section **`files.gallery`** (`Sections/GallerySection.php`, `Sections/FolderField.php`, view
+`Views/sections/gallery.php`, lightbox `files/gallery`): the images (JPG, PNG, WebP, GIF; **never
+SVG**) of one shared folder (`shared/…`, either disk) as a grid or a masonry, 2–6 columns, ordered
+by name or date, with captions (the alt text, else the file name) and a lightbox (a `<dialog>`:
+arrows, Escape, focus back to the image; without JavaScript the links open the image).
+
+Who sees what (D-46-04):
+
+- the editor chooses only folders they may **view** (folder ACL); the form offers only those and
+  the server checks it again (`GallerySection::check()`);
+- a folder of the **public disk** is shown to everyone who may read the page (its files are public
+  by nature: the web server serves them);
+- a folder of the **private disk** is shown only to signed-in visitors with the `view` right of the
+  folder ACL, never to guests; its images are served by `files/private/{key}`, which checks the ACL
+  again; the editor sees a notice saying so;
+- a folder that is gone: nothing on the page, a warning in the editor.
+
 ## Web server rules
 
 The web server must never execute or list anything in `public/uploads` and must never serve

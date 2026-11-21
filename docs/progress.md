@@ -52,7 +52,8 @@ pull request open), *merged* (in `main`).
 | 42 | Devtools: visual code generator with preview | merged | `claude/eloquent-archimedes-ljsp0q` | [SIENSIS/kpskeletor#60](https://github.com/SIENSIS/kpskeletor/pull/60) | [`deploy-status/42-devtools-generator/`](../deploy-status/42-devtools-generator/README.md) |
 | 43 | Devtools: module packages and signing | merged | `claude/keen-mendel-j3yrq2` | [SIENSIS/kpskeletor#61](https://github.com/SIENSIS/kpskeletor/pull/61) | [`deploy-status/43-devtools-packages/`](../deploy-status/43-devtools-packages/README.md) |
 | 44 | Web Push notifications | merged | `ccr-28ba7acf-il6cdh` | [SIENSIS/kpskeletor#62](https://github.com/SIENSIS/kpskeletor/pull/62) | [`deploy-status/44-web-push/`](../deploy-status/44-web-push/README.md) |
-| 45 | Pages built from sections: registry, editor and the first section types | done | `ccr-79cc038d-az4wo5` | [SIENSIS/kpskeletor#63](https://github.com/SIENSIS/kpskeletor/pull/63) | [`deploy-status/45-page-sections/`](../deploy-status/45-page-sections/README.md) |
+| 45 | Pages built from sections: registry, editor and the first section types | merged | `ccr-79cc038d-az4wo5` | [SIENSIS/kpskeletor#63](https://github.com/SIENSIS/kpskeletor/pull/63) | [`deploy-status/45-page-sections/`](../deploy-status/45-page-sections/README.md) |
+| 46 | Section types from modules: news, calendar, gallery, carousel, logos and embeds | in progress | `ccr-e82442c9-gplsu5` | — | — |
 
 ## MVP review (session 19)
 

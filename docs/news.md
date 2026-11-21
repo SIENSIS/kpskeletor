@@ -69,6 +69,26 @@ the file picker, session 23).
   (`Storage/CoverUploads.php`, D-17-06): public disk, folder `modules/news`, JPG/PNG/WebP up to
   5 MB, re-encoded; the column keeps the file key. Session 23 switches it to the file picker.
 
+## News in pages (session 46)
+
+- **Section `news.list`** (`Sections/NewsListSection.php`, view `Views/sections/list.php`): a page
+  built from sections can show the news. Mode *latest* (the newest N, an optional "more" link) or
+  *full list* (N per page; the page is the query parameter `page-<section id>` and the optional
+  search box `q-<section id>`, so two lists on one page do not clash); one or several categories
+  (none = every category); 2–4 columns; cards or a compact list; date, summary and image
+  optional. It shows **exactly what the public list shows** to the same visitor
+  (`NewsRepository::page(…, $publicOnly = true)`: public, published, not expired, in the reader's
+  language).
+- **Category banners**: a category has an optional banner (column `news_categories.banner`,
+  migration `AddBannerToNewsCategories`; the file picker of the cover, public disk, folder
+  `modules/news`, forged keys refused). The category page (`news/category/{slug}`) shows it as a
+  hero with the category's name as the `<h1>`; an article shows its category's banner above it.
+- **The main news list** (D-46-03): setting `News.listPage` (Settings › News, a page chosen from the
+  site's pages through the link type `pages.page`; News does not depend on Pages). When it is set
+  and the page is published, `GET news` answers a **301** to that page (in the visitor's language);
+  article and category pages keep their URLs. The sitemap lists pages, never `/news`, so the page
+  is the only list in it. With no page chosen (or the page unpublished or gone) nothing changes.
+
 ## Dashboard widgets
 
 | Id | Title | Permission | Options |

@@ -99,6 +99,13 @@ an ordered list of sections edited with forms, shown over the whole width of the
 Switching keeps the other content (the text stays while the page uses sections, and the other
 way round).
 
+Types (session 46 added the last eight; [`sections.md`](sections.md), "The section types"): hero,
+quick links, cards, image and text, call to action, text, carousel, testimonials, logos, embedded
+content (allowed hosts only, `Pages.embedHosts`, D-46-01), news list, calendar, upcoming events and
+gallery. A section with a problem only editors can fix (an embed whose host is no longer allowed,
+a gallery whose folder is gone, the public calendar off) shows a warning in the list, its form and
+the preview, and nothing on the public page.
+
 **For authors.** Row operation **Sections** (or `backend/pages/<id>/sections`):
 
 - the notice at the top says what the page shows and switches the layout ("Use sections" /

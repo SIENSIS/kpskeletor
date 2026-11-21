@@ -349,6 +349,30 @@ blocs de text, una sota l'altra, a tota l'amplada del web. No cal escriure codi.
 5. **Previsualitza** mostra la pàgina tal com és ara. Cada canvi queda a les **Revisions** de la
    pàgina, i restaurar una revisió en recupera les seccions.
 
+#### Més tipus de secció
+
+- **Llista de notícies**: les últimes notícies (unes quantes targetes i un enllaç «més») o la
+  **llista completa** amb pàgines i cercador, d'una o més categories. Només mostra les notícies que
+  mostra el web públic. Per fer d'una pàgina així la llista principal de notícies, trieu-la a
+  Configuració › Notícies › *Pàgina de la llista principal de notícies*: llavors `/news` hi porta
+  els visitants.
+- **Calendari** i **Properes activitats**: el calendari públic, o les properes activitats
+  públiques en llista o targetes, d'unes categories o de totes.
+- **Galeria**: les imatges d'una carpeta compartida del gestor de fitxers, en graella o mosaic; en
+  fer-hi clic, la imatge s'obre gran. Les imatges del disc públic les veu tothom; les d'una carpeta
+  privada, només les persones identificades que poden veure aquella carpeta.
+- **Carrusel**: diapositives amb imatge, títol, text i botó. No es mou sol si no activeu **Gira
+  sola** (llavors els visitants el poden aturar).
+- **Testimonis** (cites amb foto, nom i càrrec) i **Logotips** (cada logotip necessita el text
+  alternatiu, el nom de l'entitat).
+- **Contingut incrustat**: un vídeo, una visita virtual o un mapa d'un altre lloc. Només s'accepten
+  els llocs que un administrador ha permès a Configuració › Seguretat › *Llocs que es poden
+  incrustar*; si el lloc no està permès, el formulari ho diu i l'anomena. Per defecte el contingut
+  només es carrega quan el visitant hi fa clic.
+
+Una categoria de notícies pot tenir un **bàner** (Notícies › Categories › *Bàner*): es mostra a dalt
+de la pàgina de la categoria i de les seves notícies.
+
 ## Menús
 
 Barra lateral › **Menús** (`/backend/menus/public`): els menús del web públic.
