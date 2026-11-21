@@ -266,7 +266,7 @@ final class Module extends ModuleManifest
     /**
      * Resources: one per CRUD or screen (not per table). Permission names are
      * "<module>-<resource>.<operation>" (lower case), e.g. "news-posts.edit". Optional 'name'
-     * overrides the generated prefix, only for Core resources and single-resource modules
+     * overrides the generated prefix, only for Core resources and single-resource modules (a module with several resources may use its own name for one of them, D-47-02)
      * (e.g. 'name' => 'files' gives "files.list"); duplicates in the catalogue are refused.
      *
      *  - type 'crud': kpcrudy's operations (list, show, add, edit, delete, export, import,
@@ -655,7 +655,7 @@ granularity instead of collapsing it into read/create/update/delete.
   `news-categories.delete`, `news-posts.publish`). Two levels on purpose: `news-posts.*` grants a
   whole resource in one go (Shield also matches prefix and multi-segment wildcards; a test checks
   that `news-posts.*` does not match `news-postsx.edit`). A resource may declare `'name'` in the
-  manifest to override the generated prefix, only for Core resources and single-resource modules
+  manifest to override the generated prefix, only for Core resources and single-resource modules (a module with several resources may use its own name for one of them, D-47-02)
   (`settings.update`, `files.list`, `backup.restore`, `modules.toggle`, `security.check`,
   `api.docs`); the validator refuses duplicate names in the catalogue.
 * **The catalogue is generated**, never written by hand: for each resource, kpcrudy's operations

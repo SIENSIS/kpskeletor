@@ -174,3 +174,13 @@ final class CategoryLink implements MenuLinkType
 Types in the skeleton: `pages.page` (Pages), `news.category` (News) and `events.calendar`
 (Events: the public calendar, all categories or one, hidden while the public calendar is off).
 
+### Footer columns (session 47)
+
+The default theme shows the menu of the `footer` location in **columns** when its top-level
+items have children: build the menu with one top-level item per column (its label is the heading;
+give it an address to make the heading a link) and the column's links as its children. Top-level
+items without children (a legal notice, say) go in a row below the columns. The number of columns
+on wide screens is the theme option `footerColumns` (Settings › Theme) and the option
+`footerContact` adds a first column with the address and contact details per language (lines
+separated by `|`). A footer menu without children looks as before (one line of links). Other
+themes decide their own footer; see [`themes.md`](themes.md), "Footer columns".

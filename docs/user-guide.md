@@ -352,6 +352,37 @@ under the other, over the whole width of the site. No code is needed.
 A category of news can have a **banner** (News › Categories › *Banner*): it is shown at the top of
 the category's page and of its news.
 
+### Reusable blocks
+
+Some content belongs on many pages: a strip of partner logos, a notice, the opening hours.
+Sidebar › **Reusable blocks** (`/backend/pages/blocks`) keeps it in one place:
+
+1. **Add** a block with a name (only editors see it) and its status (**Draft** blocks are shown
+   nowhere).
+2. Row menu › **Sections**: fill the block with sections, exactly as a page.
+3. To show it **inside a page**, add the section **Reusable block** to the page and choose the
+   block. To show it **on many pages**, row menu › **Where it is shown**: choose a zone of the
+   site (after the header, before the footer), on which pages (every page, only the home page,
+   only some pages, every page except some) and the order.
+
+Changing the block changes every page that shows it. Deleting a block that is in use asks you to
+use **Delete with its uses**, which also removes it from the pages and zones.
+
+### New page from a model
+
+In the list of pages, **New page from a model** offers ready-made pages: **Centre educatiu**
+(carousel, icon links, quick links, latest news, a place for a virtual tour, logos, image and text)
+and **Empresa** (banner, icon links, cards, testimonials, image and text, call to action). A draft
+page is created with example texts in every language and example images: replace them with your
+own, then publish the page.
+
+### Footer in columns
+
+The footer shows the footer menu in columns when its items have sub-items (Menus › the footer
+menu): each top-level item is a column heading and its sub-items are the links. The number of
+columns and an optional contact column (address and phone, lines separated by `|`) are options of
+the theme (Settings › Theme).
+
 ## Menus
 
 Sidebar › **Menus** (`/backend/menus/public`): the menus of the public website.

@@ -10,6 +10,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Reusable blocks, theme zones, footer columns and page models** (session 47, D-47-01, D-47-02,
+  `docs/sections.md`, `docs/themes.md`, `docs/menus.md`): **reusable blocks** (Pages ›
+  Reusable blocks, `backend/pages/blocks`, resource `pages-blocks`): named lists of sections with
+  the same editor, types, translations and revisions as pages, shown inside pages through the new
+  section type **`pages.block`** or on many pages through **theme zones** (new `Theme.php` key
+  `$zones`, helper `theme_zone()`, Core event `themeZone`; the default theme prints
+  `public.after_header` and `public.before_footer`) with a rule (every page, the home page, only
+  some pages, every page except some) and an order; deleting a block in use goes through "Delete
+  with its uses". New tables `page_blocks`, `page_block_zones`, `page_block_sections`,
+  `page_block_section_translations`, `page_block_revisions`. **New page from a model**
+  (`backend/pages/models`, `pages.add`): generic models "Centre educatiu" and "Empresa" with
+  placeholder texts in every language and placeholder images; new manifest key **`$pageModels`**
+  (also in `Theme.php`), `Modules\Core\Sections\PageModel`, `PageModelRegistry`,
+  `PlaceholderImage`. The default theme's footer shows the footer menu **in columns** when its
+  items have children, with the options `footerColumns` and `footerContact`. Demo data: a
+  "partner logos" block before the footer of every page and a footer menu in columns.
+
 - **Section types from modules** (session 46, D-46-01 … D-46-04, `docs/sections.md`): **News
   list** `news.list` (latest N or the full list with pages `page-<id>` and search `q-<id>`, one or
   several categories, exactly what the public list shows), **Calendar** `events.calendar` and
@@ -131,6 +148,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
   language set.
 
 ### Changed
+
+- A module with several resources may name one of them after the module itself (the Pages
+  module keeps `pages.*` beside the new `pages-blocks.*`, D-47-02).
 
 - The default theme's public layout has a full-width mode (`$fullWidth`, used by pages built from
   sections); a theme with its own public layout should honour it (`docs/themes.md`, "Section views

@@ -152,6 +152,17 @@ Every change records a page revision and an activity entry (`section_added`, `se
 `Services/PageSections.php`; rendering: `PageRenderer` uses the template `templates/sections`
 (full width) with the Core's `SectionRenderer`; the type views are `Views/sections/<name>.php`.
 
+### Reusable blocks and page models (session 47)
+
+- **Reusable blocks** (Pages › Reusable blocks, `backend/pages/blocks`, resource `pages-blocks`):
+  a list of sections edited once and shown inside pages with the section "Reusable block"
+  (`pages.block`) or on many pages from a theme zone ("Where it is shown": every page, the home
+  page, only some pages, every page except some). See [`sections.md`](sections.md), "Reusable
+  blocks" (D-47-01, D-47-02).
+- **New page from a model** (`backend/pages/models`, `pages.add`): a draft page in `sections`
+  layout from the generic models "Centre educatiu" or "Empresa", with placeholder texts in every
+  language and placeholder images to replace. See [`sections.md`](sections.md), "Page models".
+
 ## Home page
 
 Settings › Pages › **Home page** (`Pages.homePage`): the page to show at `/`, chosen from a list
@@ -188,6 +199,10 @@ body, meta title, meta description, canonical per language), `page_groups`, `pag
 Section images are files of the same folder. Featured images
 are files of the Storage service (public disk, folder `modules/pages`, backed up through
 `$backup`).
+
+Session 47 adds `page_blocks`, `page_block_zones`, `page_block_sections`,
+`page_block_section_translations` and `page_block_revisions` (reusable blocks, D-47-02); page
+model images are files of the same folder.
 
 ## Try it
 

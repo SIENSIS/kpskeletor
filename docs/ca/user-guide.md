@@ -373,6 +373,38 @@ blocs de text, una sota l'altra, a tota l'amplada del web. No cal escriure codi.
 Una categoria de notícies pot tenir un **bàner** (Notícies › Categories › *Bàner*): es mostra a dalt
 de la pàgina de la categoria i de les seves notícies.
 
+### Blocs reutilitzables
+
+Alguns continguts han d’aparèixer a moltes pàgines: una franja de logotips de col·laboradors, un
+avís, l’horari. Barra lateral › **Blocs reutilitzables** (`/backend/pages/blocks`) els guarda en un
+sol lloc:
+
+1. **Afegeix** un bloc amb un nom (només el veuen els editors) i l’estat (els blocs en
+   **Esborrany** no es mostren enlloc).
+2. Menú de la fila › **Seccions**: omple el bloc amb seccions, igual que una pàgina.
+3. Per mostrar-lo **dins d’una pàgina**, afegeix-hi la secció **Bloc reutilitzable** i tria el
+   bloc. Per mostrar-lo **a moltes pàgines**, menú de la fila › **On es mostra**: tria una zona
+   del web (després de la capçalera, abans del peu), en quines pàgines (totes, només la d’inici,
+   només algunes, totes excepte algunes) i l’ordre.
+
+Si canvies el bloc, canvia a totes les pàgines que el mostren. Per esborrar un bloc que s’usa cal
+fer servir **Esborra amb els seus usos**, que també el treu de les pàgines i zones.
+
+### Pàgina nova a partir d’un model
+
+A la llista de pàgines, **Pàgina nova a partir d’un model** ofereix pàgines fetes: **Centre
+educatiu** (carrusel, franja d’icones, accés ràpid, últimes notícies, un espai per a una visita
+virtual, logotips, imatge i text) i **Empresa** (bàner, enllaços amb icones, targetes, testimonis,
+imatge i text, crida a l’acció). Es crea una pàgina en esborrany amb textos d’exemple en tots els
+idiomes i imatges d’exemple: substitueix-los pels teus i publica la pàgina.
+
+### Peu de pàgina en columnes
+
+El peu mostra el menú del peu en columnes quan els elements tenen subelements (Menús › el menú del
+peu): cada element de primer nivell és el títol d’una columna i els subelements en són els
+enllaços. El nombre de columnes i una columna opcional de contacte (adreça i telèfon, línies
+separades amb `|`) són opcions del tema (Configuració › Tema).
+
 ## Menús
 
 Barra lateral › **Menús** (`/backend/menus/public`): els menús del web públic.
