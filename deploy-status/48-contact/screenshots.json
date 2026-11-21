@@ -1,0 +1,24 @@
+{
+  "baseURL": "http://localhost:8080",
+  "outDir": "deploy-status/48-contact/screenshots",
+  "deviceScaleFactor": 2,
+  "login": {
+    "url": "/login", "user": "admin@example.com", "password": "set with the demo password",
+    "userField": "input[name=email]", "passwordField": "input[name=password]",
+    "submit": "button[type=submit]", "waitFor": "/backend"
+  },
+  "shots": [
+    { "url": "/contact", "name": "01-contact-page", "login": false, "fullPage": true },
+    { "url": "/contact", "name": "02-contact-page-phone", "login": false, "fullPage": true, "width": 390, "height": 844 },
+    { "url": "/contact", "name": "03-contact-page-dark", "login": false, "fullPage": true, "dark": true },
+    { "url": "/es/contact", "name": "04-contact-page-spanish", "login": false, "fullPage": false },
+    { "url": "/escriu-nos", "name": "05-section-in-a-page", "login": false, "fullPage": true },
+    { "url": "/escriu-nos", "name": "06-section-phone-dark", "login": false, "fullPage": true, "width": 390, "height": 844, "dark": true },
+    { "url": "/backend/contact/messages", "name": "07-messages" },
+    { "url": "/backend/contact/messages", "name": "08-message-details", "click": ["a[href*='/contact/messages/show/']"], "wait": 1500 },
+    { "url": "/backend/contact/recipients", "name": "09-recipients" },
+    { "url": "/backend/contact/recipients", "name": "10-recipient-form", "click": ["a[href*='/contact/recipients/edit/']"], "wait": 1500, "fullPage": true },
+    { "url": "/backend/settings/security", "name": "11-settings-security", "fullPage": true },
+    { "url": "/backend/contact/messages", "name": "12-messages-phone-dark", "width": 390, "height": 844, "dark": true }
+  ]
+}

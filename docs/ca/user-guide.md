@@ -448,6 +448,22 @@ Barra lateral › **Notícies**:
 
 Un avís amb **Data de l'esdeveniment** també apareix al calendari, per al mateix públic.
 
+## Missatges de contacte
+
+Barra lateral › **Missatges de contacte** (`/backend/contact/messages`) mostra els missatges que
+els visitants han enviat amb el formulari de contacte del web (`/contact`, o una secció
+**Formulari de contacte** d'una pàgina). Hi veieu els missatges adreçats als destinataris dels
+**vostres grups** (l'administració els veu tots). Obriu un missatge per llegir-lo; **Respon per
+correu** obre el vostre programa de correu adreçat al visitant; després, **Marca com a respost**.
+**Arxiva** l'aparta. Els missatges s'esborren automàticament passat el termini de Configuració ›
+Contacte (un any per defecte). El web no respon mai els visitants pel seu compte.
+
+**Destinataris** (`/backend/contact/recipients`, administració): la llista que ofereix el
+formulari, amb un nom per llengua, les adreces que reben cada missatge (no es mostren mai al web),
+el grup que en rep l'avís i els llegeix, l'ordre i si s'ofereix. Les proteccions contra el correu
+brossa (captcha, missatges per hora, enllaços permesos, paraules bloquejades) són a Configuració ›
+Seguretat.
+
 ## Calendari i esdeveniments
 
 ### El calendari

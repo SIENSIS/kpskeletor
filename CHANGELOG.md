@@ -10,6 +10,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Contact module** (session 48, D-48-01, D-48-02, D-48-03, `docs/contact.md`): a public contact
+  form at `contact` (with the language prefix) and the section type **`contact.form`** (may offer
+  only some recipients); recipients kept in the back office (`backend/contact/recipients`,
+  resource `contact-recipients`: name per language, up to five addresses never shown on the site,
+  a group to notify, order, active); messages (`backend/contact/messages`, resource
+  `contact-messages`: list, details, delete, **Mark answered** `answer`, **Archive** `archive`,
+  and **`all`** to read every recipient's messages; others read only those of their groups'
+  recipients). Spam layers, each refusal a `security_log()` entry with its reason: signed time
+  trap, honeypot, the Auth module's local captcha (always, or `Contact.captcha = suspicious`),
+  recipients checked against the signed list, content rules (header injection, `Contact.maxLinks`,
+  `Contact.blockedWords`, `Contact.latinScriptOnly`) and rate limits per IP and email
+  (`Contact.rateLimit`). Emails from the site's address with the visitor only in `Reply-To`; no
+  automatic reply. Notification type "New contact message", widget `contact.new`, scheduled task
+  deleting messages after `Contact.retentionDays` (365, minimum 30); no IP stored. Tables
+  `contact_recipients`, `contact_recipient_translations`, `contact_messages`. Pages demo page
+  "Escriu-nos" with the form section.
+- `Modules\Core\Mail\MailQueue::push()` takes an optional `$replyTo` (one valid address without
+  control characters, else the email is not queued) and `MailQueue::validAddress()`; column
+  `mail_queue.reply_to` (Core migration `AddReplyToToMailQueue`, D-48-03).
+
 - **Reusable blocks, theme zones, footer columns and page models** (session 47, D-47-01, D-47-02,
   `docs/sections.md`, `docs/themes.md`, `docs/menus.md`): **reusable blocks** (Pages ›
   Reusable blocks, `backend/pages/blocks`, resource `pages-blocks`): named lists of sections with

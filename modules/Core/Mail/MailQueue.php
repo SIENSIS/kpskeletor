@@ -33,13 +33,23 @@ final class MailQueue
     {
     }
 
-    public function push(string $to, string $subject, string $body, ?int $userId = null): bool
+    /**
+     * Queues an email. `$replyTo` (optional) is the address answers go to; the sender is always
+     * the site's address. It must be a single valid address without line breaks, otherwise the
+     * email is not queued.
+     */
+    public function push(string $to, string $subject, string $body, ?int $userId = null, ?string $replyTo = null): bool
     {
         $now = Time::now()->toDateTimeString();
+
+        if ($replyTo !== null && ! self::validAddress($replyTo)) {
+            return false;
+        }
 
         return (bool) $this->db()->table('mail_queue')->insert([
             'user_id'      => $userId,
             'to_email'     => mb_substr($to, 0, 255),
+            'reply_to'     => $replyTo,
             'subject'      => mb_substr(str_replace(["\r", "\n"], ' ', $subject), 0, 255),
             'body'         => $body,
             'status'       => 'pending',
@@ -130,6 +140,12 @@ final class MailQueue
             $email->initialize(['mailType' => 'html', 'SMTPTimeout' => self::TIMEOUT]);
             $email->setFrom((string) setting('Email.fromEmail'), (string) (setting('Email.fromName') ?? ''));
             $email->setTo((string) $row['to_email']);
+
+            $replyTo = (string) ($row['reply_to'] ?? '');
+
+            if ($replyTo !== '' && self::validAddress($replyTo)) {
+                $email->setReplyTo($replyTo);
+            }
             $email->setSubject((string) $row['subject']);
             $email->setMessage((string) $row['body']);
 
@@ -145,6 +161,18 @@ final class MailQueue
         } catch (Throwable $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * One email address, at most 255 characters, without control characters (no header
+     * injection through a `Reply-To`).
+     */
+    public static function validAddress(string $address): bool
+    {
+        return $address !== ''
+            && strlen($address) <= 255
+            && preg_match('/[\x00-\x1F\x7F]/', $address) !== 1
+            && filter_var($address, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**

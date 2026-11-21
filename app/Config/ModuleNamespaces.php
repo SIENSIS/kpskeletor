@@ -15,6 +15,7 @@ return [
     'Modules\Api' => __DIR__ . '/../../modules/Api',
     'Modules\Auth' => __DIR__ . '/../../modules/Auth',
     'Modules\Backup' => __DIR__ . '/../../modules/Backup',
+    'Modules\Contact' => __DIR__ . '/../../modules/Contact',
     'Modules\Core' => __DIR__ . '/../../modules/Core',
     'Modules\Dashboard' => __DIR__ . '/../../modules/Dashboard',
     'Modules\Devtools' => __DIR__ . '/../../modules/Devtools',

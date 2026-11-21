@@ -148,7 +148,8 @@ final class PagesDemoSeeder extends DemoSeeder
     /**
      * Session 46: "Notícies" and "Sortides" (a banner and the news of their categories), "Agenda"
      * (a banner, the upcoming events and the calendar) and "Més seccions" (carousel, testimonials,
-     * logos, a gallery and an embed that needs its host allowed in Settings › Security). News,
+     * logos, a gallery and an embed that needs its host allowed in Settings › Security); session 48:
+     * "Escriu-nos" (the Contact module's form section, `contact.form`). News,
      * Events and Files categories and folders are looked up by their demo slugs; without them
      * the lists show every category.
      */
@@ -244,6 +245,15 @@ final class PagesDemoSeeder extends DemoSeeder
             'es' => ['Más secciones', 'mas-secciones', 'Carrusel, testimonios, logotipos, galería y contenido incrustado.'],
             'en' => ['More sections', 'more-sections', 'Carousel, testimonials, logos, gallery and embedded content.'],
         ], $more);
+
+        // The contact form as a section (Contact module, session 48): every active recipient.
+        $this->sectionPage($demo, $now, $author, 14, [
+            'ca' => ['Escriu-nos', 'escriu-nos', 'Envieu-nos un missatge amb el formulari de contacte.'],
+            'es' => ['Escríbenos', 'escribenos', 'Envíanos un mensaje con el formulario de contacto.'],
+            'en' => ['Write to us', 'write-to-us', 'Send us a message with the contact form.'],
+        ], [
+            new SectionData('contact.form', ['recipients' => []], $tr(['heading' => 'Escriu-nos', 'intro' => 'Us respondrem tan aviat com puguem.'], ['heading' => 'Escríbenos', 'intro' => 'Te responderemos tan pronto como podamos.'], ['heading' => 'Write to us', 'intro' => 'We will answer you as soon as we can.']), $opts(['background' => 'light'])),
+        ]);
     }
 
     /**

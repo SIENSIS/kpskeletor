@@ -445,6 +445,22 @@ Barra lateral › **Noticias**:
 
 Un aviso con **Fecha del evento** también aparece en el calendario, para el mismo público.
 
+## Mensajes de contacto
+
+Barra lateral › **Mensajes de contacto** (`/backend/contact/messages`) muestra los mensajes que los
+visitantes han enviado con el formulario de contacto de la web (`/contact`, o una sección
+**Formulario de contacto** de una página). Ves los mensajes dirigidos a los destinatarios de **tus
+grupos** (la administración los ve todos). Abre un mensaje para leerlo; **Responder por correo**
+abre tu programa de correo dirigido al visitante; después, **Marcar como respondido**. **Archivar**
+lo aparta. Los mensajes se borran automáticamente pasado el plazo de Configuración › Contacto (un
+año por defecto). La web nunca responde a los visitantes por su cuenta.
+
+**Destinatarios** (`/backend/contact/recipients`, administración): la lista que ofrece el
+formulario, con un nombre por idioma, las direcciones que reciben cada mensaje (nunca se muestran
+en la web), el grupo que recibe el aviso y los lee, el orden y si se ofrece. Las protecciones
+contra el spam (captcha, mensajes por hora, enlaces permitidos, palabras bloqueadas) están en
+Configuración › Seguridad.
+
 ## Calendario y eventos
 
 ### El calendario
