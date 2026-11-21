@@ -107,11 +107,62 @@ up/down/up), `ContactSectionTest.php` (2); `modules/Core/Tests/NotifierTest.php`
 (`testAQueuedEmailMayAnswerToAReplyToAddress`), `CoreMigrationsTest` (the new migration). E2E:
 `tests/e2e/contact.spec.mjs`.
 
-CHECKS_OUTPUT
+```
+vendor/bin/phpunit                         OK (1686 tests, 98154 assertions), 12 min 0 s
+vendor/bin/phpstan analyse                 [OK] No errors
+vendor/bin/php-cs-fixer fix --dry-run      0 of 1257 files to fix
+php spark modules:sync                     Mòduls sincronitzats.
+php spark permissions:check                Permisos correctes: 187 permisos, 406 rutes comprovades
+php spark csp:check                        No hi ha scripts, gestors ni estils en línia
+php spark assets:publish --check           Els recursos publicats estan al dia
+php spark security:check                   13 correctes, 7 informatives, 7 avisos, 6 errors (all of a
+                                           development demo site: CI_ENVIRONMENT, CI_DEBUG, HTTP base URL,
+                                           forceGlobalSecureRequests, Secure cookies, demo data)
+npm run e2e (demo site, Tasks enabled)     276 passed, 60 skipped, 0 failed (10.2 min)
+```
+
+The first full PHPUnit run found 6 failures, all counts or lists that grow with a new module
+(CRUD routes 21 → 23, Core migrations 18 → 19, permissions 175 → 187, the Contact widget and
+task in the registry, `contact-*` in the admin's Shield matrix) and one documentation link
+written while the run was going; they were updated.
 
 ## Screenshots
 
-SCREENSHOTS
+![01-contact-page](screenshots/01-contact-page.png)
+*01 — The contact page `/contact` as a guest: recipients to choose, the captcha, the privacy checkbox and the retention notice (the demo "partner logos" block and the footer below).*
+
+![02-contact-page-phone](screenshots/02-contact-page-phone.png)
+*02 — The same page at phone width.*
+
+![03-contact-page-dark](screenshots/03-contact-page-dark.png)
+*03 — The same page in dark mode.*
+
+![04-contact-page-spanish](screenshots/04-contact-page-spanish.png)
+*04 — `/es/contact`: the page and the recipients' names in Spanish.*
+
+![05-section-in-a-page](screenshots/05-section-in-a-page.png)
+*05 — The Pages demo page "Escriu-nos" with the section `contact.form` (heading, introduction, the form).*
+
+![06-section-phone-dark](screenshots/06-section-phone-dark.png)
+*06 — The same page at phone width in dark mode.*
+
+![07-messages](screenshots/07-messages.png)
+*07 — Contact messages as the administrator: subject, name, recipient, status, date.*
+
+![08-message-details](screenshots/08-message-details.png)
+*08 — A message's details with **Reply by email** (the user's mail program) and Delete.*
+
+![09-recipients](screenshots/09-recipients.png)
+*09 — Recipients: name, group notified, order, offered on the form.*
+
+![10-recipient-form](screenshots/10-recipient-form.png)
+*10 — A recipient's form: name per language, addresses (never shown on the site), group, order, active.*
+
+![11-settings-security](screenshots/11-settings-security.png)
+*11 — Settings › Security, including the group "Contact form (spam)": captcha mode, messages per hour, links allowed, blocked words, Latin script only.*
+
+![12-messages-phone-dark](screenshots/12-messages-phone-dark.png)
+*12 — Contact messages at phone width in dark mode.*
 
 ## Known issues
 
