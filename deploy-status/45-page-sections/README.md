@@ -118,7 +118,23 @@ restore sections, layout switch keeps content and uses full width, markup of eac
 rules, translations fallback, page duplicate); `PagesModuleTest` (7 migrations up/down/up);
 e2e `tests/e2e/sections.spec.mjs`.
 
-RESULTS_PLACEHOLDER
+Results (2026-11-21):
+
+```
+vendor/bin/phpunit                  OK (1612 tests, 89398 assertions)  15:22
+vendor/bin/phpstan analyse          [OK] No errors
+vendor/bin/php-cs-fixer --dry-run   Found 0 of 1180 files that can be fixed
+php spark modules:sync              Mòduls sincronitzats.
+php spark permissions:check         Permisos correctes: 171 permís(os) al catàleg, 377 ruta(es) comprovades.
+php spark csp:check                 No hi ha scripts, gestors ni estils en línia a les vistes del projecte.
+php spark assets:publish --check    Els recursos publicats estan al dia.
+php spark security:check            13 ok, 7 info, 7 warnings, 6 errors — all expected on the development
+                                    demo site (development, debug, HTTP, cookies, base URL, demo data)
+npm run e2e (demo site)             201 passed, 39 skipped (push off; flows that run in one project only)
+```
+
+The first full run had one failure (`FrontendAssetsTest`: `.innerHTML =` in `core/sections/form.js`);
+new list items are now built from a cloned `<template>`, and the second run is green.
 
 ## Screenshots
 
