@@ -54,7 +54,7 @@ pull request open), *merged* (in `main`).
 | 44 | Web Push notifications | merged | `ccr-28ba7acf-il6cdh` | [SIENSIS/kpskeletor#62](https://github.com/SIENSIS/kpskeletor/pull/62) | [`deploy-status/44-web-push/`](../deploy-status/44-web-push/README.md) |
 | 45 | Pages built from sections: registry, editor and the first section types | merged | `ccr-79cc038d-az4wo5` | [SIENSIS/kpskeletor#63](https://github.com/SIENSIS/kpskeletor/pull/63) | [`deploy-status/45-page-sections/`](../deploy-status/45-page-sections/README.md) |
 | 46 | Section types from modules: news, calendar, gallery, carousel, logos and embeds | merged | `ccr-e82442c9-gplsu5` | [SIENSIS/kpskeletor#64](https://github.com/SIENSIS/kpskeletor/pull/64) | [`deploy-status/46-module-sections/`](../deploy-status/46-module-sections/README.md) |
-| 47 | Reusable blocks, theme zones, footer columns and home page models | done | `ccr-f7b57744-2ahzoo` (started on `ccr-e8cb6c4c-zykzfx`) | pull request "Session 47: …" | [`deploy-status/47-reusable-blocks/`](../deploy-status/47-reusable-blocks/README.md) |
+| 47 | Reusable blocks, theme zones, footer columns and home page models | done | `ccr-f7b57744-2ahzoo` (started on `ccr-e8cb6c4c-zykzfx`) | [SIENSIS/kpskeletor#65](https://github.com/SIENSIS/kpskeletor/pull/65) | [`deploy-status/47-reusable-blocks/`](../deploy-status/47-reusable-blocks/README.md) |
 
 ## MVP review (session 19)
 
