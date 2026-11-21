@@ -205,7 +205,8 @@ setting (administrator).*
 Settings › Security.*
 
 ![The setting](screenshots/16-setting-embed-hosts.png)
-*16 — Settings › Security › *Sites that may be embedded* (empty by default).*
+*16 — Settings › Security › *Sites that may be embedded* (empty by default), with the demo
+video's host typed in before saving.*
 
 ![Click to load](screenshots/17-embed-click-to-load.png)
 *17 — Once the host is allowed: the placeholder names the other site; nothing is loaded from it
