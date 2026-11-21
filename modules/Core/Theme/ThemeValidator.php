@@ -65,6 +65,7 @@ final class ThemeValidator
         $this->checkRegions($manifest);
         $this->checkMenuLocations($manifest);
         $this->checkPageTemplates($manifest);
+        $this->checkZones($manifest);
         $this->checkAssets($manifest, $chain);
         $this->checkOptions($chain);
 
@@ -127,6 +128,23 @@ final class ThemeValidator
         foreach (self::entries($manifest->pageTemplates) as $template => $label) {
             if (preg_match('/^[a-z][a-z0-9_-]*$/', (string) $template) !== 1 || ! is_string($label) || $label === '') {
                 $this->error("\$pageTemplates['{$template}']", 'name', [(string) $template]);
+            }
+        }
+    }
+
+    private function checkZones(ThemeManifest $manifest): void
+    {
+        foreach (self::entries($manifest->zones) as $zone => $label) {
+            [$layout] = explode('.', (string) $zone, 2);
+
+            if (preg_match('/^[a-z]+\.[a-z][a-z0-9_]*$/', (string) $zone) !== 1 || ! in_array($layout, ThemeManifest::LAYOUTS, true) || ! is_string($label) || $label === '') {
+                $this->error("\$zones['{$zone}']", 'name', [(string) $zone]);
+            }
+        }
+
+        foreach (self::values($manifest->pageModels) as $class) {
+            if (! is_string($class) || ! class_exists($class) || ! is_subclass_of($class, \Modules\Core\Sections\PageModel::class)) {
+                $this->error('$pageModels', 'name', [is_string($class) ? $class : '?']);
             }
         }
     }
