@@ -191,13 +191,18 @@ final class SectionsTest extends AuthTestCase
         $this->assertRefused($cards, $post('evil.type', '1'), 'cards.0.link.value');
         $this->assertRefused($cards, $post('url', 'https://example.com/', ''), 'cards.0.link.label.ca');
 
-        $ok = $this->validate($cards, $post('url', 'https://example.com/a?b=1'));
-        $this->assertSame(['type' => 'url', 'value' => 'https://example.com/a?b=1'], $ok->values['cards'][0]['link']);
+        $ok = $this->validate($cards, $post('url', 'https://partner.example.org/a?b=1'));
+        $this->assertSame(['type' => 'url', 'value' => 'https://partner.example.org/a?b=1'], $ok->values['cards'][0]['link']);
         $this->assertSame('/contacte', SectionLinks::checkUrl('/contacte'));
         $this->assertNull(SectionLinks::checkUrl('http://example.com/'));
 
         $resolved = (new CardsSection())->resolve($ok, 'en', 'ca');
-        $this->assertSame(['href' => 'https://example.com/a?b=1', 'label' => 'Més', 'external' => true], $resolved['cards'][0]['link'], 'The label falls back to the default language.');
+        $this->assertSame(['href' => 'https://partner.example.org/a?b=1', 'label' => 'Més', 'external' => true], $resolved['cards'][0]['link'], 'The label falls back to the default language.');
+
+        // An absolute address of the site itself is not external (whatever the configured base URL).
+        $own      = 'https://' . parse_url(site_url(), PHP_URL_HOST) . '/qui-som';
+        $internal = $this->validate($cards, $post('url', $own));
+        $this->assertFalse((new CardsSection())->resolve($internal, 'ca', 'ca')['cards'][0]['link']['external'] ?? true);
     }
 
     public function testImagesMustBeFilesTheEditorMayUse(): void
