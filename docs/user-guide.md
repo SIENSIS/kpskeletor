@@ -423,6 +423,21 @@ Sidebar › **News**:
 
 A notice with an **Event date** also appears in the calendar, for the same audience.
 
+## Contact messages
+
+Sidebar › **Contact messages** (`/backend/contact/messages`) lists the messages visitors sent with
+the site's contact form (`/contact`, or a **Contact form** section in a page). You see the
+messages addressed to the recipients of **your groups** (administrators see them all). Open a
+message to read it; **Reply by email** opens your own mail program addressed to the visitor; then
+**Mark answered**. **Archive** keeps it out of the way. Messages are deleted automatically after
+the period set in Settings › Contact (one year by default). The site never answers visitors by
+itself.
+
+**Recipients** (`/backend/contact/recipients`, administrators): the list offered in the form, with
+a name per language, the addresses that receive each message (never shown on the site), the
+group that is notified and reads them, the order and whether it is offered. The spam protections
+(captcha, messages per hour, links allowed, blocked words) are in Settings › Security.
+
 ## Calendar and events
 
 ### The calendar

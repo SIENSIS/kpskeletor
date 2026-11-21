@@ -42,6 +42,7 @@ reusable blocks in `page_block_sections`, `page_block_section_translations`; ser
 | `events.list` | Events | the next N public events as a list or cards | |
 | `files.gallery` | Files | the images of a shared folder, grid or masonry, lightbox | `files/gallery`; [`files.md`](files.md), "Galleries in pages" |
 | `pages.block` | Pages | a **reusable block** chosen from a list (session 47, D-47-01); replaced by the block's own sections when the page is shown | not offered inside a block |
+| `contact.form` | Contact | the contact form; may offer only some recipients (none = every active one) | session 48; posts to `contact` with every spam layer ([`contact.md`](contact.md)); the signed token carries the recipients offered and the page's path |
 
 Types that show data of their module (news, events, files) override `render()` and show exactly
 what the module's public pages show to the same visitor: public news and events only, a private

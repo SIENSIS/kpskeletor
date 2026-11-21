@@ -272,6 +272,26 @@ iframe. Rules:
 - **Click to load** (on by default): nothing is requested from the other site until the visitor
   presses the button (`pages/embed` builds the iframe then); the placeholder names the host.
 
+## Public forms: the contact form
+
+The Contact module's form (session 48, `docs/contact.md`) is the model for a public form that
+accepts text from anyone:
+
+- **Layers against spam**, each refusal a `security_log()` entry with its reason and a generic
+  message to the visitor: a **signed time trap** (HMAC token with the time shown, the choices
+  offered and the return path; < 3 s or > 2 h refused), a **honeypot** input, the Auth module's
+  **local captcha** (always by default), the offered **choices checked against the signed list**,
+  **content rules** (no control characters in single-line fields, at most N links, blocked words,
+  optionally only Latin script) and **rate limits** per IP and per email (`RateLimiter`), plus CSRF
+  and `ratelimit:forms`. No third-party captcha (D-48-02).
+- **Mail safety**: emails go **from the site's address**; the visitor's address only in
+  `Reply-To` (`MailQueue::push(..., $replyTo)` refuses anything but one valid address without
+  control characters); **no automatic reply** and no copy to the visitor (it would let anyone
+  send mail to any address); no attachments; everything typed is escaped in the email and in
+  the back office.
+- **Data**: no IP stored with the message (hashed cache counters for one hour); messages deleted
+  after `Contact.retentionDays` (minimum 30).
+
 ## API
 
 Token authentication only (`Authorization: Bearer`): the API never starts a session nor reads
