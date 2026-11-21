@@ -54,6 +54,7 @@ final class CoreMigrationsTest extends CIUnitTestCase
         '2026-11-20-000001_CreatePushSubscriptions',
         '2026-11-20-000002_CreatePushQueue',
         '2026-11-20-000003_AddPushToNotificationPreferences',
+        '2026-11-21-000001_AddReplyToToMailQueue',
     ];
 
     public function testUpDownUp(): void
@@ -64,6 +65,7 @@ final class CoreMigrationsTest extends CIUnitTestCase
         $this->assertSame($count, $migrator->migrate('Modules\Core'));
         $this->assertTablesExist(true);
         $this->assertTrue($this->db->fieldExists('grants_applied', 'modules'));
+        $this->assertTrue($this->db->fieldExists('reply_to', 'mail_queue'));
         $this->assertSame([], $migrator->pending('Modules\Core'));
 
         $this->assertSame($count, $migrator->rollback('Modules\Core'));

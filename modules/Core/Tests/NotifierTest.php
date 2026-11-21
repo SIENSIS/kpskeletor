@@ -168,6 +168,23 @@ final class NotifierTest extends RbacTestCase
         $this->assertStringContainsString('Sent: 0.', (new SendQueuedEmails())->run()->output, 'Not sent twice.');
     }
 
+    public function testAQueuedEmailMayAnswerToAReplyToAddress(): void
+    {
+        $queue = new MailQueue();
+
+        $this->assertTrue($queue->push('office@example.com', 'Hello', '<p>Body</p>', null, 'visitor@example.org'));
+        $this->assertFalse($queue->push('office@example.com', 'Hello', '<p>Body</p>', null, "visitor@example.org\r\nBcc: spam@example.net"), 'Line breaks are refused.');
+        $this->assertFalse($queue->push('office@example.com', 'Hello', '<p>Body</p>', null, 'not an address'));
+        $this->assertCount(1, $this->queued());
+        $this->assertSame('visitor@example.org', $this->queued()[0]['reply_to']);
+
+        $this->assertSame(['sent' => 1, 'failed' => 0, 'retry' => 0], $queue->sendPending());
+        $sent = $this->sentEmails()[0];
+        $this->assertSame('visitor@example.org', $sent['replyTo'] ?? null);
+        $this->assertSame(['office@example.com'], $sent['recipients']);
+        $this->assertStringNotContainsString('visitor@example.org', (string) ($sent['headers']['From'] ?? ''), 'The sender is the site, never the visitor.');
+    }
+
     public function testAFailedEmailIsRetriedThenGivenUp(): void
     {
         $ana = $this->createUser('ana@example.com');
