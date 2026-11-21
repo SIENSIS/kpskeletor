@@ -9,7 +9,7 @@ use CodeIgniter\Database\Migration;
 /**
  * Table `page_blocks` (D-47-01; docs/sections.md, "Reusable blocks"): a named list of sections
  * edited once and shown inside pages (section type `pages.block`) or in theme zones
- * (`page_block_zones`). Its sections are rows of `page_sections` whose `block_id` is set. A
+ * (`page_block_zones`). Its sections are in `page_block_sections` (D-47-02). A
  * `draft` block is shown nowhere.
  */
 final class CreatePageBlocks extends Migration

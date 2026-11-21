@@ -17,11 +17,16 @@ use Modules\Core\Config\ModuleManifest;
  *
  * No `import`: pages are written through the form (sanitised body, slugs checked per parent
  * and language, revisions).
+ *
+ * Session 47 (D-47-01, D-47-02): the resource `blocks` (reusable blocks, `backend/pages/blocks`):
+ * `pages-blocks.{list,add,edit,delete}`; the resource `pages` keeps its own prefix (a module with
+ * several resources may name one after itself). Section type `pages.block`, page models
+ * `pages.school` and `pages.company` ("New page from a model", `pages.add`).
  */
 final class Module extends ModuleManifest
 {
     public string $name    = 'Pages';
-    public string $version = '0.1.0';
+    public string $version = '0.2.0';
     public string $icon    = 'bi bi-file-earmark-richtext';
     public array $requires = ['Core' => '^1.0', 'Auth' => '^0.2'];
 
@@ -35,15 +40,22 @@ final class Module extends ModuleManifest
                 'publish' => 'Pages.perm.publish',
             ],
         ],
+        // Reusable blocks (D-47-01): edited once, shown in pages and in the theme's zones.
+        'blocks' => [
+            'label'  => 'Pages.res.blocks',
+            'type'   => 'crud',
+            'except' => ['show', 'export', 'import', 'trash', 'restore', 'purge'],
+        ],
     ];
 
     public array $defaultGrants = [
-        'admin'  => ['pages.*'],
-        'editor' => ['pages.list', 'pages.show', 'pages.add', 'pages.edit', 'pages.publish'],
+        'admin'  => ['pages.*', 'pages-blocks.*'],
+        'editor' => ['pages.list', 'pages.show', 'pages.add', 'pages.edit', 'pages.publish', 'pages-blocks.list', 'pages-blocks.add', 'pages-blocks.edit'],
     ];
 
     public array $menu = [
         ['resource' => 'pages', 'label' => 'Pages.menu.pages', 'icon' => 'bi bi-file-earmark-richtext', 'order' => 25],
+        ['resource' => 'blocks', 'label' => 'Pages.menu.blocks', 'icon' => 'bi bi-bricks', 'order' => 26],
     ];
 
     /** Link types of the public menu editor (Menus, session 21). */
@@ -65,6 +77,13 @@ final class Module extends ModuleManifest
         \Modules\Pages\Sections\TestimonialsSection::class,
         \Modules\Pages\Sections\LogosSection::class,
         \Modules\Pages\Sections\EmbedSection::class,
+        \Modules\Pages\Sections\BlockSection::class,
+    ];
+
+    /** Ready-made page models ("New page from a model", D-47-02): generic only (D-47-01). */
+    public array $pageModels = [
+        \Modules\Pages\Models\SchoolModel::class,
+        \Modules\Pages\Models\CompanyModel::class,
     ];
 
     public array $settings = [

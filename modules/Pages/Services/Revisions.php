@@ -362,7 +362,7 @@ final class Revisions
      *
      * @param list<mixed> $sections
      */
-    private static function describeSections(array $sections): string
+    public static function describeSections(array $sections): string
     {
         $registry = new SectionRegistry();
         $locale   = service('request')->getLocale();

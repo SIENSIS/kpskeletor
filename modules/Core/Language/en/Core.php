@@ -23,7 +23,7 @@ return [
         'exceptCrudOnly'    => 'is only allowed for crud resources',
         'operation'         => 'has an invalid operation name "{0}"',
         'prefix'            => 'has an invalid permission prefix "{0}"',
-        'resourceName'      => 'can only be set by Core and by modules with a single resource',
+        'resourceName'      => 'can only be set by Core and by modules with a single resource (or to the module’s own name)',
         'group'             => 'has an invalid group name "{0}"',
         'permission'        => 'grants "{0}", which is not a permission of this module',
         'unknownResource'   => 'refers to an unknown resource "{0}"',

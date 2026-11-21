@@ -218,6 +218,11 @@ final class Pages extends BackendController
             'target'     => '_blank',
         ]);
 
+        $crud->addHeaderAction(lang('Pages.models.new'), backend_url('pages/models'), [
+            'icon'       => 'bi bi-file-earmark-plus',
+            'permission' => 'add',
+        ]);
+
         $crud->addOperation('sections', static fn (string $id): ResponseInterface => redirect()->to(backend_url('pages/' . (int) $id . '/sections')), [
             'method'     => 'get',
             'permission' => 'edit',
