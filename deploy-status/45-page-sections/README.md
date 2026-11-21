@@ -1,6 +1,6 @@
 # Session 45 — Pages built from sections: registry, editor and the first section types
 
-Branch: `ccr-79cc038d-az4wo5` · Pull request: (opened at the end of the session) · Date: 2026-11-21
+Branch: `ccr-79cc038d-az4wo5` · Pull request: [SIENSIS/kpskeletor#63](https://github.com/SIENSIS/kpskeletor/pull/63) · Date: 2026-11-21
 
 ## What was built
 
