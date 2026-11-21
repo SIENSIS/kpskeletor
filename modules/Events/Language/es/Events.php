@@ -249,4 +249,38 @@ return [
         'calendars' => 'Los calendarios que puede ver el usuario.',
         'unknownCategory' => 'Esta categoría no existe.',
     ],
+    'sections' => [
+        'calendar'    => ['label' => 'Calendario', 'description' => 'El calendario público de actividades, de unas categorías o de todas.'],
+        'list'        => [
+            'label'       => 'Próximas actividades',
+            'description' => 'Las próximas actividades públicas como lista o tarjetas.',
+            'styles'      => ['list' => 'Lista', 'cards' => 'Tarjetas'],
+            'empty'       => 'No hay ninguna actividad prevista.',
+            'moreDefault' => 'Todo el calendario',
+        ],
+        'calendarOff' => 'El calendario público está desactivado: esta sección no se muestra en la web.',
+        'fields'      => [
+            'heading'    => 'Encabezado',
+            'intro'      => 'Introducción',
+            'categories' => 'Categorías',
+            'view'       => 'Vista inicial',
+            'filter'     => 'Mostrar el filtro de categorías',
+            'limit'      => 'Número de actividades',
+            'days'       => 'Días hacia delante',
+            'columns'    => 'Columnas (tarjetas)',
+            'more'       => 'Enlace «más»',
+        ],
+        'views' => [
+            'dayGridMonth' => 'Mes',
+            'timeGridWeek' => 'Semana',
+            'listMonth'    => 'Lista del mes',
+        ],
+        'help' => [
+            'categories' => 'Ninguna marcada: todas las categorías.',
+            'view'       => 'En los móviles empieza siempre con la lista.',
+            'days'       => 'Hasta cuántos días desde hoy.',
+            'columns'    => 'Solo para el estilo «Tarjetas».',
+            'more'       => 'Opcional: p. ej. la página del calendario.',
+        ],
+    ],
 ];

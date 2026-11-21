@@ -12,6 +12,7 @@
  *   locale    page language (ca, es, en)
  *   view      first view on larger screens; phones start with the list
  *   category  select element id of the category filter (optional)
+ *   categories ids of the only categories shown (optional; a calendar section of a page)
  *   toggles   form id of the calendar toggles (optional; back office): a change, "only this
  *             one" or "show all" is saved with a POST to the form's action and the events are
  *             reloaded; each toggle gets its calendar's colour (data-color)
@@ -110,6 +111,8 @@ export async function mount(element, options) {
 
             if (filter && filter.value !== '') {
                 params.set('category', filter.value);
+            } else if (Array.isArray(options.categories) && options.categories.length > 0) {
+                params.set('categories', options.categories.join(','));
             }
 
             get(options.feed + '?' + params.toString(), { silent: true })

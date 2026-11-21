@@ -249,4 +249,38 @@ return [
         'calendars' => 'Els calendaris que pot veure l’usuari.',
         'unknownCategory' => 'Aquesta categoria no existeix.',
     ],
+    'sections' => [
+        'calendar'    => ['label' => 'Calendari', 'description' => 'El calendari públic d\'activitats, d\'unes categories o de totes.'],
+        'list'        => [
+            'label'       => 'Properes activitats',
+            'description' => 'Les properes activitats públiques com a llista o targetes.',
+            'styles'      => ['list' => 'Llista', 'cards' => 'Targetes'],
+            'empty'       => 'No hi ha cap activitat prevista.',
+            'moreDefault' => 'Tot el calendari',
+        ],
+        'calendarOff' => 'El calendari públic està desactivat: aquesta secció no es mostra al web.',
+        'fields'      => [
+            'heading'    => 'Encapçalament',
+            'intro'      => 'Introducció',
+            'categories' => 'Categories',
+            'view'       => 'Vista inicial',
+            'filter'     => 'Mostra el filtre de categories',
+            'limit'      => 'Nombre d\'activitats',
+            'days'       => 'Dies endavant',
+            'columns'    => 'Columnes (targetes)',
+            'more'       => 'Enllaç «més»',
+        ],
+        'views' => [
+            'dayGridMonth' => 'Mes',
+            'timeGridWeek' => 'Setmana',
+            'listMonth'    => 'Llista del mes',
+        ],
+        'help' => [
+            'categories' => 'Cap marcada: totes les categories.',
+            'view'       => 'Als mòbils comença sempre amb la llista.',
+            'days'       => 'Fins a quants dies des d\'avui.',
+            'columns'    => 'Només per a l\'estil «Targetes».',
+            'more'       => 'Opcional: p. ex. la pàgina del calendari.',
+        ],
+    ],
 ];

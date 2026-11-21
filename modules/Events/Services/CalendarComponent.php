@@ -23,7 +23,7 @@ final class CalendarComponent
      *
      * @return array<string, mixed>
      */
-    public static function options(string $feedUrl, ?string $categorySelectId = null): array
+    public static function options(string $feedUrl, ?string $categorySelectId = null, ?string $view = null): array
     {
         helper('asset');
 
@@ -35,7 +35,7 @@ final class CalendarComponent
             $scripts[] = asset('vendor::fullcalendar/locales/' . $locale . '.global.js');
         }
 
-        $view = (string) config(\Modules\Events\Config\Calendar::class)->defaultView;
+        $view ??= (string) config(\Modules\Events\Config\Calendar::class)->defaultView;
 
         return [
             'feed'     => $feedUrl,

@@ -249,4 +249,38 @@ return [
         'calendars' => 'The calendars the user may see.',
         'unknownCategory' => 'This category does not exist.',
     ],
+    'sections' => [
+        'calendar'    => ['label' => 'Calendar', 'description' => 'The public calendar of events, of some categories or all of them.'],
+        'list'        => [
+            'label'       => 'Upcoming events',
+            'description' => 'The next public events as a list or as cards.',
+            'styles'      => ['list' => 'List', 'cards' => 'Cards'],
+            'empty'       => 'There are no upcoming events.',
+            'moreDefault' => 'The whole calendar',
+        ],
+        'calendarOff' => 'The public calendar is off: this section is not shown on the site.',
+        'fields'      => [
+            'heading'    => 'Heading',
+            'intro'      => 'Introduction',
+            'categories' => 'Categories',
+            'view'       => 'First view',
+            'filter'     => 'Show the category filter',
+            'limit'      => 'Number of events',
+            'days'       => 'Days ahead',
+            'columns'    => 'Columns (cards)',
+            'more'       => '"More" link',
+        ],
+        'views' => [
+            'dayGridMonth' => 'Month',
+            'timeGridWeek' => 'Week',
+            'listMonth'    => 'List of the month',
+        ],
+        'help' => [
+            'categories' => 'None ticked: every category.',
+            'view'       => 'Phones always start with the list.',
+            'days'       => 'Up to how many days from today.',
+            'columns'    => 'Only for the "Cards" style.',
+            'more'       => 'Optional: e.g. the calendar\'s page.',
+        ],
+    ],
 ];
