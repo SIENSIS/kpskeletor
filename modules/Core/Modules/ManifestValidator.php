@@ -100,6 +100,7 @@ final class ManifestValidator
         $this->checkCalendars();
         $this->checkClassList('calendarProviders', \Modules\Core\Calendar\CalendarProvider::class);
         $this->checkClassList('sectionTypes', \Modules\Core\Sections\SectionType::class);
+        $this->checkClassList('pageModels', \Modules\Core\Sections\PageModel::class);
         $this->checkApi();
         $this->checkCsp();
         $this->checkOutboundHosts();
@@ -275,7 +276,9 @@ final class ManifestValidator
                     $this->error("{$key}['name']", 'prefix', [is_string($prefix) ? $prefix : get_debug_type($prefix)]);
                 }
 
-                if ($this->module !== 'Core' && count($resources) > 1) {
+                // Core and single-resource modules may rename a prefix; a module with several
+                // resources only to its own name (`pages` of Pages, beside `pages-blocks`, D-47-02).
+                if ($this->module !== 'Core' && count($resources) > 1 && $prefix !== strtolower($this->module)) {
                     $this->error("{$key}['name']", 'resourceName');
                 }
             }

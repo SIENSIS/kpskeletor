@@ -24,7 +24,7 @@ use Modules\Core\Menus\MenuDefinitions;
  */
 final class DeclarationRegistry
 {
-    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'sectionType', 'api', 'csp', 'menu', 'outbound'];
+    public const KINDS = ['setting', 'widget', 'task', 'notification', 'menuLink', 'calendar', 'calendarProvider', 'sectionType', 'pageModel', 'api', 'csp', 'menu', 'outbound'];
 
     /** Kinds declared as maps: their keys are qualified with the module ("News.perPage"). */
     public const MAP_KINDS = ['setting', 'calendar', 'api', 'csp', 'outbound'];
@@ -61,6 +61,7 @@ final class DeclarationRegistry
                 'menuLink'         => $manifest->menuLinks,
                 'calendarProvider' => $manifest->calendarProviders,
                 'sectionType'      => $manifest->sectionTypes,
+                'pageModel'        => $manifest->pageModels,
             ];
             $maps = [
                 'setting'  => $manifest->settings,
@@ -218,6 +219,12 @@ final class DeclarationRegistry
     public function sectionTypes(): array
     {
         return array_map(static fn (array $declaration): string => $declaration['module'], $this->all('sectionType'));
+    }
+
+    /** @return array<string, string> Page model classes of enabled modules => the declaring module */
+    public function pageModels(): array
+    {
+        return array_map(static fn (array $declaration): string => $declaration['module'], $this->all('pageModel'));
     }
 
     /** @return array<string, array{module: string, definition: array<array-key, mixed>}> Back-office menu entries of enabled modules (key => definition) */
