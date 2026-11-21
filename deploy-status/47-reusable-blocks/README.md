@@ -1,8 +1,7 @@
 # Session 47 — Reusable blocks, theme zones, footer columns and home page models
 
 Branch: `ccr-f7b57744-2ahzoo` (the work started on `ccr-e8cb6c4c-zykzfx`, whose container stopped
-answering; its commits are merged here) · Pull request: "Session 47: Reusable blocks, theme zones,
-footer columns and home page models" · Date: 2026-11-21
+answering; its commits are merged here) · Pull request: [SIENSIS/kpskeletor#65](https://github.com/SIENSIS/kpskeletor/pull/65) · Date: 2026-11-21
 
 ## What was built
 
