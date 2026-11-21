@@ -15,13 +15,43 @@ use RuntimeException;
  * hidden) and `page_section_translations` (one row per section and language with the translated
  * values as JSON).
  *
- * Every method takes the page id and touches only that page's sections. Translations of a
+ * Owners (D-47-01, D-47-02): the sections of a page (the default) or of a reusable block
+ * (`PageSections::forBlocks()`: tables `page_block_sections` and
+ * `page_block_section_translations`, the same columns with `block_id`); the same code, editor,
+ * section types and translations. Every method takes the owner's id and touches only that owner's sections. Translations of a
  * language the site no longer offers are kept when a section is saved (neither shown nor edited).
  * The sections are part of the page's revisions (`snapshot()` / `replace()`).
  */
 final class PageSections
 {
     public const MAX_SECTIONS = 60;
+
+    /** Owner type => [sections table, translations table, owner column] (D-47-02). */
+    public const OWNERS = [
+        'page'  => ['page_sections', 'page_section_translations', 'page_id'],
+        'block' => ['page_block_sections', 'page_block_section_translations', 'block_id'],
+    ];
+
+    private readonly string $table;
+
+    private readonly string $texts;
+
+    private readonly string $column;
+
+    public function __construct(public readonly string $owner = 'page')
+    {
+        if (! isset(self::OWNERS[$owner])) {
+            throw new RuntimeException('Unknown section owner: ' . $owner);
+        }
+
+        [$this->table, $this->texts, $this->column] = self::OWNERS[$owner];
+    }
+
+    /** The sections of reusable blocks. */
+    public static function forBlocks(): self
+    {
+        return new self('block');
+    }
 
     /**
      * The sections of a page in order (hidden ones included).
@@ -30,7 +60,7 @@ final class PageSections
      */
     public function all(int $pageId): array
     {
-        $rows = db_connect()->table('page_sections')->where('page_id', $pageId)
+        $rows = db_connect()->table($this->table)->where($this->column, $pageId)
             ->orderBy('position')->orderBy('id')->get()->getResultArray();
 
         if ($rows === []) {
@@ -44,7 +74,7 @@ final class PageSections
 
     public function find(int $pageId, int $sectionId): ?SectionData
     {
-        $row = db_connect()->table('page_sections')->where('page_id', $pageId)->where('id', $sectionId)->get(1)->getRowArray();
+        $row = db_connect()->table($this->table)->where($this->column, $pageId)->where('id', $sectionId)->get(1)->getRowArray();
 
         if (! is_array($row)) {
             return null;
@@ -55,7 +85,7 @@ final class PageSections
 
     public function count(int $pageId): int
     {
-        return db_connect()->table('page_sections')->where('page_id', $pageId)->countAllResults();
+        return db_connect()->table($this->table)->where($this->column, $pageId)->countAllResults();
     }
 
     /**
@@ -66,6 +96,10 @@ final class PageSections
      */
     public function save(int $pageId, SectionData $section, ?int $sectionId = null): int
     {
+        if (! $this->accepts($section->type)) {
+            throw new RuntimeException(lang('Pages.blocks.errors.nested'));
+        }
+
         $db  = db_connect();
         $now = Time::now()->toDateTimeString();
         $row = [
@@ -84,9 +118,9 @@ final class PageSections
                     throw new RuntimeException(lang('Pages.sections.errors.full', [self::MAX_SECTIONS]));
                 }
 
-                $last = $db->table('page_sections')->selectMax('position')->where('page_id', $pageId)->get()->getRowArray();
-                $db->table('page_sections')->insert($row + [
-                    'page_id'    => $pageId,
+                $last = $db->table($this->table)->selectMax('position')->where($this->column, $pageId)->get()->getRowArray();
+                $db->table($this->table)->insert($row + [
+                    $this->column => $pageId,
                     'position'   => (int) ($last['position'] ?? 0) + 10,
                     'created_at' => $now,
                 ]);
@@ -96,7 +130,7 @@ final class PageSections
                     throw new RuntimeException(lang('Pages.sections.errors.notFound'));
                 }
 
-                $db->table('page_sections')->where('id', $sectionId)->where('page_id', $pageId)->update($row);
+                $db->table($this->table)->where('id', $sectionId)->where($this->column, $pageId)->update($row);
             }
 
             $this->writeTexts($sectionId, $section->texts);
@@ -189,7 +223,7 @@ final class PageSections
             throw new RuntimeException(lang('Pages.sections.errors.notFound'));
         }
 
-        db_connect()->table('page_sections')->where('id', $sectionId)->where('page_id', $pageId)
+        db_connect()->table($this->table)->where('id', $sectionId)->where($this->column, $pageId)
             ->update(['hidden' => $hidden ? 1 : 0, 'updated_at' => Time::now()->toDateTimeString()]);
     }
 
@@ -203,8 +237,8 @@ final class PageSections
         }
 
         $db = db_connect();
-        $db->table('page_section_translations')->where('section_id', $sectionId)->delete();
-        $db->table('page_sections')->where('id', $sectionId)->where('page_id', $pageId)->delete();
+        $db->table($this->texts)->where('section_id', $sectionId)->delete();
+        $db->table($this->table)->where('id', $sectionId)->where($this->column, $pageId)->delete();
     }
 
     /** Deletes every section of a page (the page is purged). */
@@ -213,8 +247,8 @@ final class PageSections
         $ids = $this->ids($pageId);
 
         if ($ids !== []) {
-            db_connect()->table('page_section_translations')->whereIn('section_id', $ids)->delete();
-            db_connect()->table('page_sections')->where('page_id', $pageId)->delete();
+            db_connect()->table($this->texts)->whereIn('section_id', $ids)->delete();
+            db_connect()->table($this->table)->where($this->column, $pageId)->delete();
         }
     }
 
@@ -226,7 +260,7 @@ final class PageSections
      */
     public function snapshot(int $pageId): array
     {
-        $rows = db_connect()->table('page_sections')->where('page_id', $pageId)
+        $rows = db_connect()->table($this->table)->where($this->column, $pageId)
             ->orderBy('position')->orderBy('id')->get()->getResultArray();
         $all  = $this->translations(array_map('intval', array_column($rows, 'id')), false);
         $list = [];
@@ -259,13 +293,13 @@ final class PageSections
             $position = 0;
 
             foreach ($snapshot as $entry) {
-                if (! is_array($entry) || ! is_string($entry['type'] ?? null) || $position >= self::MAX_SECTIONS * 10) {
+                if (! is_array($entry) || ! is_string($entry['type'] ?? null) || ! $this->accepts($entry['type']) || $position >= self::MAX_SECTIONS * 10) {
                     continue;
                 }
 
                 $position += 10;
-                $db->table('page_sections')->insert([
-                    'page_id'    => $pageId,
+                $db->table($this->table)->insert([
+                    $this->column => $pageId,
                     'position'   => $position,
                     'type'       => substr($entry['type'], 0, 101),
                     'options'    => json_encode(is_array($entry['options'] ?? null) ? $entry['options'] : [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
@@ -278,7 +312,7 @@ final class PageSections
 
                 foreach (is_array($entry['texts'] ?? null) ? $entry['texts'] : [] as $locale => $data) {
                     if (is_string($locale) && preg_match('/^[a-z]{2,3}(?:[-_][A-Za-z]{2,4})?$/', $locale) === 1 && is_array($data)) {
-                        $db->table('page_section_translations')->insert([
+                        $db->table($this->texts)->insert([
                             'section_id' => $id,
                             'locale'     => $locale,
                             'data'       => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
@@ -294,11 +328,20 @@ final class PageSections
     }
 
     /**
+     * Whether a section type may belong to this owner: a block never contains a block section
+     * (no nesting, no loops).
+     */
+    public function accepts(string $type): bool
+    {
+        return $this->owner !== 'block' || $type !== \Modules\Pages\Sections\BlockSection::KEY;
+    }
+
+    /**
      * @return list<int> the page's section ids in order
      */
     private function ids(int $pageId): array
     {
-        return array_map('intval', array_column(db_connect()->table('page_sections')->select('id')->where('page_id', $pageId)
+        return array_map('intval', array_column(db_connect()->table($this->table)->select('id')->where($this->column, $pageId)
             ->orderBy('position')->orderBy('id')->get()->getResultArray(), 'id'));
     }
 
@@ -310,7 +353,7 @@ final class PageSections
         $db = db_connect();
 
         foreach ($ids as $index => $id) {
-            $db->table('page_sections')->where('id', $id)->where('page_id', $pageId)->update(['position' => ($index + 1) * 10]);
+            $db->table($this->table)->where('id', $id)->where($this->column, $pageId)->update(['position' => ($index + 1) * 10]);
         }
     }
 
@@ -331,7 +374,7 @@ final class PageSections
         $codes = ContentTranslations::codes();
         $texts = [];
 
-        foreach (db_connect()->table('page_section_translations')->whereIn('section_id', $ids)->get()->getResultArray() as $row) {
+        foreach (db_connect()->table($this->texts)->whereIn('section_id', $ids)->get()->getResultArray() as $row) {
             if ($availableOnly && ! in_array((string) $row['locale'], $codes, true)) {
                 continue;
             }
@@ -351,14 +394,14 @@ final class PageSections
     {
         $db    = db_connect();
         $codes = ContentTranslations::codes();
-        $db->table('page_section_translations')->where('section_id', $sectionId)->whereIn('locale', $codes)->delete();
+        $db->table($this->texts)->where('section_id', $sectionId)->whereIn('locale', $codes)->delete();
 
         foreach ($texts as $locale => $data) {
             if (! in_array((string) $locale, $codes, true)) {
                 continue;
             }
 
-            $db->table('page_section_translations')->insert([
+            $db->table($this->texts)->insert([
                 'section_id' => $sectionId,
                 'locale'     => (string) $locale,
                 'data'       => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
@@ -371,8 +414,8 @@ final class PageSections
         $db    = db_connect();
         $codes = ContentTranslations::codes();
 
-        foreach ($db->table('page_section_translations')->where('section_id', $from)->whereNotIn('locale', $codes)->get()->getResultArray() as $row) {
-            $db->table('page_section_translations')->insert(['section_id' => $to, 'locale' => (string) $row['locale'], 'data' => (string) $row['data']]);
+        foreach ($db->table($this->texts)->where('section_id', $from)->whereNotIn('locale', $codes)->get()->getResultArray() as $row) {
+            $db->table($this->texts)->insert(['section_id' => $to, 'locale' => (string) $row['locale'], 'data' => (string) $row['data']]);
         }
     }
 }

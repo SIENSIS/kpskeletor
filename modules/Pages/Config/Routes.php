@@ -20,6 +20,31 @@ use Modules\Core\Crud\CrudFactory;
  *
  * @var RouteCollection $routes
  */
+// Reusable blocks (D-47-01): the section editor and the zone placements of a block
+// (`pages-blocks.edit`, the CRUD's resolver in the controllers), then the blocks CRUD; and
+// "New page from a model" (`pages.add`, D-47-02). Declared before the pages CRUD.
+$routes->group(backend_path('pages/blocks'), ['namespace' => 'Modules\Pages\Controllers', 'filter' => 'can:pages-blocks.edit'], static function (RouteCollection $routes): void {
+    $routes->get('(:num)/sections', 'BlockSections::index/$1', ['as' => 'pages-blocks-sections']);
+    $routes->get('(:num)/sections/add', 'BlockSections::gallery/$1');
+    $routes->get('(:num)/sections/new/(:segment)', 'BlockSections::create/$1/$2');
+    $routes->get('(:num)/sections/(:num)', 'BlockSections::edit/$1/$2');
+    $routes->post('(:num)/sections/save', 'BlockSections::save/$1');
+    $routes->post('(:num)/sections/order', 'BlockSections::order/$1');
+    $routes->post('(:num)/sections/(:num)/duplicate', 'BlockSections::duplicate/$1/$2');
+    $routes->post('(:num)/sections/(:num)/hide', 'BlockSections::hide/$1/$2');
+    $routes->post('(:num)/sections/(:num)/delete', 'BlockSections::delete/$1/$2');
+    $routes->get('(:num)/zones', 'BlockPlacements::index/$1', ['as' => 'pages-blocks-zones']);
+    $routes->post('(:num)/zones/save', 'BlockPlacements::save/$1');
+    $routes->post('(:num)/zones/(:num)/delete', 'BlockPlacements::delete/$1/$2');
+});
+
+CrudFactory::routes($routes, 'pages-blocks', backend_path('pages/blocks'), '\Modules\Pages\Controllers\Blocks::index');
+
+$routes->group(backend_path('pages/models'), ['namespace' => 'Modules\Pages\Controllers', 'filter' => 'can:pages.add'], static function (RouteCollection $routes): void {
+    $routes->get('/', 'PageModels::index', ['as' => 'pages-models']);
+    $routes->post('create', 'PageModels::create');
+});
+
 // The section editor of a page (D-45-01): `pages.edit` here, the page's record rules in the
 // controller. Declared before the CRUD so that `backend/pages/(:any)` does not shadow it.
 $routes->group(backend_path('pages'), ['namespace' => 'Modules\Pages\Controllers', 'filter' => 'can:pages.edit'], static function (RouteCollection $routes): void {

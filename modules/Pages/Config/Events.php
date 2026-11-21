@@ -15,11 +15,19 @@ use CodeIgniter\Events\Events;
 use Modules\Core\Frontend\HomePage;
 use Modules\Core\Registry\ModuleState;
 use Modules\Core\Routing\BackendPathCheck;
+use Modules\Core\Theme\ZoneContent;
+use Modules\Pages\Services\BlockRenderer;
 use Modules\Pages\Services\HomePageResolver;
 
 Events::on(HomePage::EVENT, static function (HomePage $home): void {
     if ((new ModuleState())->isEnabled('Pages')) {
         (new HomePageResolver())->answer($home);
+    }
+});
+
+Events::on('themeZone', static function (ZoneContent $content): void {
+    if ((new ModuleState())->isEnabled('Pages') && db_connect()->tableExists('page_block_zones')) {
+        (new BlockRenderer())->fillZone($content);
     }
 });
 

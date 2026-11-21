@@ -19,8 +19,9 @@ enabled modules. There are no shortcodes: editors pick a section, fill in a form
 | `SectionData` | `modules/Core/Sections/SectionData.php` | one stored section: type, values, texts per language, options, hidden |
 | `SectionLinks` | `modules/Core/Sections/SectionLinks.php` | link targets, checked like menu items |
 
-The Pages module stores sections (`page_sections`, `page_section_translations`; service
-`Modules\Pages\Services\PageSections`) and offers the editor.
+The Pages module stores sections (`page_sections`, `page_section_translations`; the sections of
+reusable blocks in `page_block_sections`, `page_block_section_translations`; service
+`Modules\Pages\Services\PageSections`, `PageSections::forBlocks()`) and offers the editor.
 
 ## The section types
 
@@ -40,6 +41,7 @@ The Pages module stores sections (`page_sections`, `page_section_translations`; 
 | `events.calendar` | Events | the public calendar component, categories, first view, filter | [`events.md`](events.md), "Events in pages" |
 | `events.list` | Events | the next N public events as a list or cards | |
 | `files.gallery` | Files | the images of a shared folder, grid or masonry, lightbox | `files/gallery`; [`files.md`](files.md), "Galleries in pages" |
+| `pages.block` | Pages | a **reusable block** chosen from a list (session 47, D-47-01); replaced by the block's own sections when the page is shown | not offered inside a block |
 
 Types that show data of their module (news, events, files) override `render()` and show exactly
 what the module's public pages show to the same visitor: public news and events only, a private
@@ -197,3 +199,67 @@ A theme overrides a section's view in `themes/<slug>/Views/overrides/<Module>/se
 (e.g. `overrides/Pages/sections/hero.php`) and the form controls in
 `overrides/Core/sections/fields/<type>.php`. Colours come from the theme's CSS variables
 ([`themes.md`](themes.md), "Section views and palette").
+
+## Reusable blocks (D-47-01, D-47-02)
+
+A **reusable block** is a named list of sections edited once (`backend/pages/blocks`, resource
+`pages-blocks`: `list`, `add`, `edit`, `delete`; the same grants as pages without `delete` for
+editors) and shown in two ways:
+
+- **inside a page**, with the section type `pages.block` (a select of the blocks): the page
+  renderer replaces it with the block's visible sections (`BlockRenderer::expand()`), so each one
+  keeps its own `<section>`, options and CSP sources; changing the block changes every page that
+  shows it;
+- **in a theme zone** (see [`themes.md`](themes.md), "Zones"): a placement is a zone, a
+  visibility rule and an order (table `page_block_zones`): `all` (every public page, also those of
+  other modules), `home` (the home page), `only` (the pages chosen) or `except` (every page but
+  those). Screen `backend/pages/blocks/<id>/zones`.
+
+Blocks use the same editor, section types (without `pages.block`: no nesting), translations and
+revisions as pages: tables `page_blocks` (name, `published` | `draft`), `page_block_sections`,
+`page_block_section_translations`, `page_block_revisions` (D-47-02: tables of their own with the
+same columns, because making `page_sections.page_id` nullable would rebuild the table on SQLite
+and lose its `ON DELETE` actions). A draft block is shown nowhere; blocks follow the visitor's
+language with the sections' fallback to the site's default language and the sections' hidden
+state. Every change records a block revision (restore from the block's "Revisions") and an
+activity entry (`block_section_*`, `block_placed`, `block_unplaced`).
+
+Deleting a block that is used somewhere is refused by the plain delete; **Delete with its uses**
+(`delete`, a confirmation) removes its placements and the block sections of the pages that show
+it (a page revision each) and then the block.
+
+| Piece | Where |
+|---|---|
+| `PageBlocks` (repository, uses, delete with uses) | `modules/Pages/Services/PageBlocks.php` |
+| `BlockZones` (placements and rules) | `modules/Pages/Services/BlockZones.php` |
+| `BlockRenderer` (expand a page's block sections, fill a zone) | `modules/Pages/Services/BlockRenderer.php` |
+| `CurrentPage` (the page a request shows, set by `PageRenderer`) | `modules/Pages/Services/CurrentPage.php` |
+| `BlockRevisions` | `modules/Pages/Services/BlockRevisions.php` |
+| Controllers | `Blocks` (kpcrudy), `BlockSections` (the shared `SectionEditor`), `BlockPlacements` |
+
+## Page models (D-47-02)
+
+"New page from a model" (`backend/pages/models`, `pages.add`; a button in the pages list) creates
+a **draft** page in `sections` layout from a ready-made model, with neutral placeholder texts in
+every language of the site and placeholder images drawn for the skeleton
+(`Modules\Core\Sections\PlaceholderImage`, stored on the public disk, folder `modules/pages`).
+Every section goes through its type's form (`SectionForm::validate()`), exactly as if an editor
+had filled it in; sections of a type that is not offered (a disabled module) are left out.
+
+The Pages module ships two **generic** models (D-47-01: never the texts, images or
+institution-specific content of a real organisation, no funding notices; a test checks the shipped
+files for a list of forbidden words):
+
+| Key | Name | Sections |
+|---|---|---|
+| `pages.school` | "Centre educatiu" | carousel, a band of icon links, illustrated quick links, latest news (`news.list`), a place for an embedded tour, logos, image and text |
+| `pages.company` | "Empresa" | hero with a wavy edge and a cut-out image, icon links, cards, testimonials (dark band), image and text, call to action |
+
+A module adds models in the manifest key `$pageModels` and a theme in `Theme.php` (`$pageModels`):
+classes extending `Modules\Core\Sections\PageModel` with a key `<module or theme slug>.<name>`,
+`label()`, `description()`, `thumbnail()`, `icon()`, `title($locale)` and
+`sections(PageModelContext $context)`, which returns `SectionData` with texts for every language in
+`$context->locales` (`$context->texts(fn ($locale) => […])`) and images from
+`$context->image($name, $width, $height, $from, $to, 'gradient'|'figure'|'logo')`.
+`PageModelRegistry` offers the models of the enabled modules and of the public theme chain; a
+class with an invalid, foreign or repeated key is skipped and logged.

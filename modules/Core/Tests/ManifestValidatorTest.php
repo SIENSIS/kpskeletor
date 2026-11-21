@@ -175,6 +175,12 @@ final class ManifestValidatorTest extends CIUnitTestCase
         yield 'csp directive' => [static function (ModuleManifest $m): void {
             $m->csp = ['sandbox' => []];
         }, '$csp must be one of'];
+        yield 'page model class' => [static function (ModuleManifest $m): void {
+            $m->pageModels = [\stdClass::class];
+        }, '$pageModels'];
+        yield 'foreign prefix with several resources' => [static function (ModuleManifest $m): void {
+            $m->resources['posts']['name'] = 'articles';
+        }, "\$resources['posts']['name']"];
         yield 'outbound host' => [static function (ModuleManifest $m): void {
             $m->outboundHosts = ['https://api.example.com'];
         }, '$outboundHosts has an invalid host name'];
@@ -214,6 +220,17 @@ final class ManifestValidatorTest extends CIUnitTestCase
 
         $this->assertSame([], (new ManifestValidator())->validate($manifest, '/modules/News'));
         $this->assertSame('files', $manifest->permissionPrefix('files'));
+    }
+
+    public function testAModuleWithSeveralResourcesMayNameOneAfterItself(): void
+    {
+        $manifest                             = $this->valid();
+        $manifest->resources['posts']['name'] = 'news';
+        $manifest->defaultGrants              = ['admin' => ['news.*', 'news-stats.*']];
+
+        $this->assertSame([], (new ManifestValidator())->validate($manifest, '/modules/News'));
+        $this->assertSame('news', $manifest->permissionPrefix('posts'));
+        $this->assertSame('news-stats', $manifest->permissionPrefix('stats'));
     }
 
     public function testConfigClassesWithSpecialFileNamesAreRefused(): void

@@ -1,38 +1,44 @@
 <?php
 /**
- * The section editor of a page (`backend/pages/<id>/sections`): the layout switch, the toolbar
- * and the ordered list of sections (`pages/section-list`: drag and drop and keyboard; the up/down
- * buttons also work without JavaScript, one move per request).
+ * The section editor of a page (`backend/pages/<id>/sections`) or of a reusable block
+ * (`backend/pages/blocks/<id>/sections`): a page's layout switch, the toolbar and the ordered
+ * list of sections (`pages/section-list`: drag and drop and keyboard; the up/down buttons also
+ * work without JavaScript, one move per request).
  *
  * @var string                     $layout
- * @var array<string, mixed>       $page
+ * @var array<string, mixed>|null  $page   the page (null for a block)
+ * @var string|null                $notice a block's help text
  * @var list<array{section: \Modules\Core\Sections\SectionData, type: \Modules\Core\Sections\SectionType|null, summary: string, warnings: list<array{message: string, link?: array{url: string, label: string}}>}> $rows
  * @var string                     $baseUrl
- * @var string                     $previewUrl
- * @var string                     $editUrl
- * @var string                     $revisionsUrl
+ * @var list<array{url: string, label: string, icon: string, newTab?: bool}> $links
  * @var bool                       $full
  */
-$sectionsMode = ($page['layout'] ?? 'article') === 'sections';
+$page   ??= null;
+$notice ??= null;
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
-<form method="post" action="<?= esc($baseUrl . '/layout', 'attr') ?>" class="alert <?= $sectionsMode ? 'alert-success' : 'alert-info' ?> d-flex flex-wrap align-items-center gap-2" role="status">
-    <?= csrf_field() ?>
-    <i class="bi <?= $sectionsMode ? 'bi-check-circle' : 'bi-info-circle' ?>" aria-hidden="true"></i>
-    <span class="me-auto"><?= esc(lang($sectionsMode ? 'Pages.sections.modeSections' : 'Pages.sections.modeArticle')) ?></span>
-    <input type="hidden" name="layout" value="<?= $sectionsMode ? 'article' : 'sections' ?>">
-    <button type="submit" class="btn btn-sm <?= $sectionsMode ? 'btn-outline-secondary' : 'btn-primary' ?>" data-confirm="<?= esc(lang($sectionsMode ? 'Pages.sections.useArticleConfirm' : 'Pages.sections.useSectionsConfirm'), 'attr') ?>">
-        <?= esc(lang($sectionsMode ? 'Pages.sections.useArticle' : 'Pages.sections.useSections')) ?>
-    </button>
-</form>
+<?php if (is_array($page)): ?>
+    <?php $sectionsMode = ($page['layout'] ?? 'article') === 'sections'; ?>
+    <form method="post" action="<?= esc($baseUrl . '/layout', 'attr') ?>" class="alert <?= $sectionsMode ? 'alert-success' : 'alert-info' ?> d-flex flex-wrap align-items-center gap-2" role="status">
+        <?= csrf_field() ?>
+        <i class="bi <?= $sectionsMode ? 'bi-check-circle' : 'bi-info-circle' ?>" aria-hidden="true"></i>
+        <span class="me-auto"><?= esc(lang($sectionsMode ? 'Pages.sections.modeSections' : 'Pages.sections.modeArticle')) ?></span>
+        <input type="hidden" name="layout" value="<?= $sectionsMode ? 'article' : 'sections' ?>">
+        <button type="submit" class="btn btn-sm <?= $sectionsMode ? 'btn-outline-secondary' : 'btn-primary' ?>" data-confirm="<?= esc(lang($sectionsMode ? 'Pages.sections.useArticleConfirm' : 'Pages.sections.useSectionsConfirm'), 'attr') ?>">
+            <?= esc(lang($sectionsMode ? 'Pages.sections.useArticle' : 'Pages.sections.useSections')) ?>
+        </button>
+    </form>
+<?php elseif (is_string($notice) && $notice !== ''): ?>
+    <p class="alert alert-info d-flex gap-2"><i class="bi bi-info-circle" aria-hidden="true"></i><span><?= esc($notice) ?></span></p>
+<?php endif ?>
 <div class="d-flex flex-wrap gap-2 mb-3">
     <?php if (! $full): ?>
         <a class="btn btn-primary" href="<?= esc($baseUrl . '/add', 'attr') ?>"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i><?= esc(lang('Pages.sections.add')) ?></a>
     <?php endif ?>
-    <a class="btn btn-outline-secondary" href="<?= esc($previewUrl, 'attr') ?>" target="_blank" rel="noopener"><i class="bi bi-eye me-1" aria-hidden="true"></i><?= esc(lang('Pages.preview')) ?><span class="visually-hidden"> <?= esc(lang('Pages.sections.newTab')) ?></span></a>
-    <a class="btn btn-outline-secondary" href="<?= esc($editUrl, 'attr') ?>"><i class="bi bi-pencil me-1" aria-hidden="true"></i><?= esc(lang('Pages.sections.editPage')) ?></a>
-    <a class="btn btn-outline-secondary" href="<?= esc($revisionsUrl, 'attr') ?>"><i class="bi bi-clock-history me-1" aria-hidden="true"></i><?= esc(lang('Pages.revisions')) ?></a>
+    <?php foreach ($links as $link): ?>
+        <a class="btn btn-outline-secondary" href="<?= esc($link['url'], 'attr') ?>"<?= ! empty($link['newTab']) ? ' target="_blank" rel="noopener"' : '' ?>><i class="<?= esc($link['icon'], 'attr') ?> me-1" aria-hidden="true"></i><?= esc($link['label']) ?><?php if (! empty($link['newTab'])): ?><span class="visually-hidden"> <?= esc(lang('Pages.sections.newTab')) ?></span><?php endif ?></a>
+    <?php endforeach ?>
 </div>
 <?php if ($rows === []): ?>
     <?= theme_component('empty_state', ['icon' => 'bi bi-layout-text-window-reverse', 'title' => lang('Pages.sections.none'), 'message' => lang('Pages.sections.noneHelp')]) ?>

@@ -15,7 +15,8 @@ use Modules\Pages\Storage\FeaturedImages;
  * Renders a page through the public theme with its template (`Modules\Pages\Views\templates\<key>`,
  * overridable by themes), for the public routes, the home page and the back office's preview.
  * A page in `sections` layout (D-45-01) uses the template `sections`: its visible sections in
- * order (`SectionRenderer`) over the whole width of the public layout (`fullWidth`).
+ * order (`SectionRenderer`) over the whole width of the public layout (`fullWidth`); a block
+ * section shows its reusable block's sections (`BlockRenderer::expand()`, D-47-01).
  *
  * Meta: title and description (SEO fields, else title and summary), the canonical URL (the SEO
  * field, else the page's own path, `/` for the home page) and `noindex` for pages marked so, for
@@ -54,10 +55,13 @@ final class PageRenderer
 
         $sections = ($page['layout'] ?? 'article') === 'sections';
 
+        // The theme zones' visibility rules (D-47-01) need to know which page this is.
+        CurrentPage::set($id, $home);
+
         return theme_view($sections ? 'Modules\Pages\Views\templates\sections' : $this->view((string) $page['template']), [
             'layout'      => theme_layout('public'),
             'fullWidth'   => $sections,
-            'sections'    => $sections ? (new SectionRenderer())->render((new PageSections())->all($id), RenderContext::current($user, $preview)) : '',
+            'sections'    => $sections ? (new SectionRenderer())->render((new BlockRenderer())->expand((new PageSections())->all($id)), RenderContext::current($user, $preview)) : '',
             'meta'        => $meta,
             'title'       => (string) ($page['meta_title'] !== '' ? $page['meta_title'] : $page['title']),
             'page'        => $page,

@@ -57,7 +57,8 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   `modules:install`; never edit it by hand). A module copied by hand needs `php spark modules:sync`.
 - **Permissions:** `<module>-<resource>.<operation>` (e.g. `news-posts.edit`), generated from the
   manifest, never written by hand. Only Core and single-resource modules may override the prefix
-  with the resource `'name'` (e.g. `backup.*`); duplicates are rejected and `Security`/`Update` are
+  with the resource `'name'` (e.g. `backup.*`), and a module with several resources only with its
+  own name (`pages.*` beside `pages-blocks.*`, D-47-02); duplicates are rejected and `Security`/`Update` are
   reserved module names. Every back-office route has a `can:` filter, personal screens included
   (their own resources, granted to every group by `defaultGrants`); every `api/v1/` route has the
   `kpapy` filter or is declared public. Default deny. `can:a,b` = any, `can:all,a,b` = all; the
@@ -90,7 +91,10 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   directly (`docs/calendar.md`).
 - **Page sections:** section types in `Sections/` extending `Modules\Core\Sections\SectionType`
   (key `<module>.<name>`, a field schema of the Core's field types, a view `Views/sections/<name>.php`),
-  declared in the manifest `$sectionTypes`; never shortcodes (D-45-01, `docs/sections.md`).
+  declared in the manifest `$sectionTypes`; never shortcodes (D-45-01, `docs/sections.md`). Page
+  models (`$pageModels`, `Modules\Core\Sections\PageModel`) stay generic (D-47-01); content shown
+  on many pages is a Pages reusable block placed in a theme zone (`$zones`, `theme_zone()`, Core
+  event `themeZone`, D-47-02), never hard-coded in a layout.
 - **Dashboard widgets:** classes in `Widgets/` extending `Modules\Core\Widgets\Widget` (or
   `AsyncWidget`), declared in the manifest `$widgets`, id `<module>.<name>`, a `permission()`;
   shown only with the permission **and** enabled for one of the user's groups (`docs/widgets.md`).

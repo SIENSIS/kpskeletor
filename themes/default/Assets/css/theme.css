@@ -444,6 +444,18 @@ a:not([class]):hover { color: var(--bs-link-hover-color); }
    kp-width-<contained|full> [kp-style-<style>]">`; dark, primary and image backgrounds also get
    `data-bs-theme="dark"` so Bootstrap's text colours turn light. Colours come from variables. */
 .site-main-full { padding: 0; }
+
+/* Theme zones (D-47-01): blocks placed before the footer sit at the bottom of <main>, right
+   above the footer, also on short pages; the main area's own bottom padding is dropped. */
+.site-main:has(> .site-zone-before-footer) { display: flex; flex-direction: column; padding-bottom: 0 !important; }
+.site-main:has(> .site-zone-before-footer) > .container,
+.site-main:has(> .site-zone-before-footer) > .site-zone { width: 100%; }
+.site-zone-before-footer { margin-top: auto; }
+.site-main:not(.site-main-full) > .site-zone-before-footer { padding-top: 1.5rem; }
+
+/* Footer columns (session 47). */
+.site-footer-heading { font-weight: 600; margin-bottom: .75rem; }
+.site-footer-columns a { text-underline-offset: .2em; }
 .site-main-notices:empty { display: none; }
 .page-sections { overflow-x: clip; }
 .kp-section {

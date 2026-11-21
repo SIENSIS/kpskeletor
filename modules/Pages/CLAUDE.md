@@ -27,6 +27,14 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
   "Notícies", "Sortides", "Agenda", "Més seccions" (`PagesDemoSeeder::moduleSectionPages()`).
   Tests `Tests/ModuleSectionsTest.php` (also the News and Events section types).
 
+- Session 47 (D-47-01, D-47-02): resource `blocks` (crud − show, export, import, trash, restore,
+  purge) → `pages-blocks.{list,add,edit,delete}` (admin all; editor list, add, edit); menu
+  "Reusable blocks" (sidebar, 26). Tables `page_blocks`, `page_block_zones`,
+  `page_block_sections`, `page_block_section_translations`, `page_block_revisions`. Section type
+  `BlockSection` (`pages.block`), page models `Models/SchoolModel.php` (`pages.school`) and
+  `Models/CompanyModel.php` (`pages.company`), thumbnails `Assets/img/models/`. Event
+  `themeZone` in `Config/Events.php`.
+
 ## Main pieces
 
 - `Services/PageVisibility.php` (who reads what; Core `PublishWorkflow` + `Audience`),
@@ -44,6 +52,15 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
   `Assets/js/section-list.js` (`pages/section-list`), template `templates/sections.php` (full width).
   The Core gives the registry, fields, forms and renderer (`modules/Core/Sections`, docs/sections.md).
 
+- Reusable blocks (session 47): `Services/PageBlocks.php` (repository, uses, delete with uses),
+  `BlockZones.php` (placements, rules `all|home|only|except`), `BlockRenderer.php` (expands
+  `pages.block` sections, fills zones), `CurrentPage.php` (set by `PageRenderer`),
+  `BlockRevisions.php`; controllers `Blocks.php` (kpcrudy, `backend/pages/blocks`),
+  `BlockSections.php` and `Sections.php` (both extend `SectionEditor.php`), `BlockPlacements.php`
+  (`backend/pages/blocks/<id>/zones`), `PageModels.php` (`backend/pages/models`) with
+  `Services/PageModelBuilder.php`; views `Views/blocks/zones.php`, `Views/editor/models.php`.
+  Demo: `PagesDemoSeeder::partnerLogos()` (block in `public.before_footer`).
+
 ## Decisions
 
 D-20-01 decided by the owner (names and URLs as built; the home page chosen from a list of pages,
@@ -60,6 +77,9 @@ Session 37 (D-37-01): translated texts use the site's languages and require its 
   language's slug to the URL language's path; `PageTree::translatedPaths()`; the sitemap lists every
   translation; language codes are reserved slugs.
 
+Session 47: D-47-01 decided (blocks, zones, `pages-blocks`, generic models), D-47-02 accepted
+(block tables of their own, `pages` prefix beside `pages-blocks`, page models, zones, footer).
+
 Session 45: D-45-01 decided (layout, tables, `$sectionTypes`, editor URL), D-45-02 accepted (how it was built).
 
 ## How to test
@@ -68,4 +88,6 @@ Session 45: D-45-01 decided (layout, tables, `$sectionTypes`, editor URL), D-45-
 `form()`, `code()`, `text()`, `editor()`). By hand: `php spark modules:demo Pages`, then
 `backend/pages`, `/qui-som`, `/intranet`, `/sitemap.xml`, `/portada-seccions` and its editor
 (`backend/pages/<id>/sections`). Tests of sections: `Tests/PageSectionsTest.php` and
-`modules/Core/Tests/SectionsTest.php`.
+`modules/Core/Tests/SectionsTest.php`. Session 47: `Tests/BlocksTest.php`,
+`Tests/PageModelsTest.php` (also the forbidden-words check), `modules/Menus/Tests/FooterColumnsTest.php`,
+`modules/Core/Tests/ThemeZonesTest.php`; by hand `backend/pages/blocks`, `backend/pages/models`.

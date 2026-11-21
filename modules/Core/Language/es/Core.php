@@ -23,7 +23,7 @@ return [
         'exceptCrudOnly'    => 'solo se permite en recursos crud',
         'operation'         => 'tiene un nombre de operación no válido "{0}"',
         'prefix'            => 'tiene un prefijo de permiso no válido "{0}"',
-        'resourceName'      => 'solo lo pueden definir el Core y los módulos con un solo recurso',
+        'resourceName'      => 'solo lo pueden definir el Core y los módulos con un solo recurso (o un recurso con el nombre del propio módulo)',
         'group'             => 'tiene un nombre de grupo no válido "{0}"',
         'permission'        => 'concede "{0}", que no es un permiso de este módulo',
         'unknownResource'   => 'hace referencia a un recurso desconocido "{0}"',

@@ -370,6 +370,38 @@ acción y bloques de texto, una debajo de otra, a toda la anchura de la web. No 
 Una categoría de noticias puede tener un **banner** (Noticias › Categorías › *Banner*): se muestra
 arriba de la página de la categoría y de sus noticias.
 
+### Bloques reutilizables
+
+Algunos contenidos deben aparecer en muchas páginas: una franja de logotipos de colaboradores, un
+aviso, el horario. Barra lateral › **Bloques reutilizables** (`/backend/pages/blocks`) los guarda
+en un solo sitio:
+
+1. **Añade** un bloque con un nombre (solo lo ven los editores) y su estado (los bloques en
+   **Borrador** no se muestran en ningún sitio).
+2. Menú de la fila › **Secciones**: llena el bloque de secciones, igual que una página.
+3. Para mostrarlo **dentro de una página**, añade la sección **Bloque reutilizable** y elige el
+   bloque. Para mostrarlo **en muchas páginas**, menú de la fila › **Dónde se muestra**: elige una
+   zona de la web (después de la cabecera, antes del pie), en qué páginas (todas, solo la de
+   inicio, solo algunas, todas excepto algunas) y el orden.
+
+Si cambias el bloque, cambia en todas las páginas que lo muestran. Para borrar un bloque que se
+usa hay que usar **Borrar con sus usos**, que también lo quita de las páginas y zonas.
+
+### Página nueva a partir de un modelo
+
+En la lista de páginas, **Página nueva a partir de un modelo** ofrece páginas hechas: **Centro
+educativo** (carrusel, franja de iconos, acceso rápido, últimas noticias, un espacio para una
+visita virtual, logotipos, imagen y texto) y **Empresa** (banner, enlaces con iconos, tarjetas,
+testimonios, imagen y texto, llamada a la acción). Se crea una página en borrador con textos de
+ejemplo en todos los idiomas e imágenes de ejemplo: sustitúyelos por los tuyos y publica la página.
+
+### Pie de página en columnas
+
+El pie muestra el menú del pie en columnas cuando sus elementos tienen subelementos (Menús › el
+menú del pie): cada elemento de primer nivel es el título de una columna y sus subelementos son
+los enlaces. El número de columnas y una columna opcional de contacto (dirección y teléfono,
+líneas separadas con `|`) son opciones del tema (Configuración › Tema).
+
 ## Menús
 
 Barra lateral › **Menús** (`/backend/menus/public`): los menús de la web pública.

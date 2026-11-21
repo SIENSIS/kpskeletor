@@ -23,7 +23,7 @@ return [
         'exceptCrudOnly'    => 'només es permet en recursos crud',
         'operation'         => 'té un nom d’operació no vàlid "{0}"',
         'prefix'            => 'té un prefix de permís no vàlid "{0}"',
-        'resourceName'      => 'només el poden definir el Core i els mòduls amb un sol recurs',
+        'resourceName'      => 'només el poden definir el Core i els mòduls amb un sol recurs (o un recurs amb el nom del mateix mòdul)',
         'group'             => 'té un nom de grup no vàlid "{0}"',
         'permission'        => 'concedeix "{0}", que no és un permís d’aquest mòdul',
         'unknownResource'   => 'fa referència a un recurs desconegut "{0}"',

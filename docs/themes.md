@@ -74,6 +74,30 @@ location and the layout prints it with `menu('<location>')` through the partial
 `partials/public_menu` (`primary` as the navbar with dropdowns, any other location as a list of
 links). See [`menus.md`](menus.md).
 
+## Zones (D-47-01)
+
+**Zones** are places of a layout where the site's **reusable blocks** are shown on every page
+(the Pages module; [`sections.md`](sections.md), "Reusable blocks"). A theme declares them in
+`$zones` (`<layout>.<name>` → label key; a child theme inherits and adds zones) and the layout
+prints each one with `theme_zone('<layout>.<name>')`, which returns '' when nothing is placed
+there. The default theme declares `public.after_header` and `public.before_footer`, printed
+inside `<main>` (so the landmarks stay right) before and after the content.
+
+Modules fill zones through the Core event `themeZone`: a listener receives a
+`Modules\Core\Theme\ZoneContent` (`$zone`, `add($html, $order)`) and adds already-escaped HTML.
+A zone the active theme does not declare prints nothing, and a failing listener is logged and
+leaves the zone empty (a broken block never takes a page down).
+
+## Footer columns
+
+The default theme's footer (partial `partials/footer`) shows the `footer` menu **in columns** when
+its top-level items have children: each such item is a column (its label as an `<h2>` heading,
+a link when it has an address, inside a labelled `<nav>`) with its children as the links; items
+without children go in a row of links under the columns, next to the footer text. Options:
+`footerColumns` (2–6 columns on wide screens, default 4) and `footerContact` (translated: an
+optional first column with the address and contact details, lines separated by `|`). A footer menu
+without children keeps the single line of links. See [`menus.md`](menus.md), "Footer columns".
+
 ## Which theme is active
 
 `setting('Theme.backend')` and `setting('Theme.public')` (defaults in `Modules\Core\Config\Theme`,

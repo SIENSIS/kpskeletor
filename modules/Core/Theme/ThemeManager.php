@@ -293,6 +293,65 @@ final class ThemeManager
     }
 
     /**
+     * Zones of the active theme and its ancestors (`<layout>.<name>` => label key, D-47-01).
+     *
+     * @return array<string, string>
+     */
+    public function zones(?string $area = null): array
+    {
+        $zones = [];
+
+        foreach (array_reverse($this->manifests($area)) as $manifest) {
+            $zones = array_merge($zones, $manifest->zones);
+        }
+
+        return $zones;
+    }
+
+    /**
+     * The HTML of a zone for this request: empty when the theme does not declare it; otherwise
+     * what the listeners of the Core event `themeZone` add to the `ZoneContent` (the Pages
+     * module's blocks), in order. A failing listener is logged and leaves the zone empty, so a
+     * broken block never takes a page down.
+     */
+    public function zone(string $zone, ?string $area = null): string
+    {
+        if (! array_key_exists($zone, $this->zones($area))) {
+            return '';
+        }
+
+        $content = new ZoneContent($zone);
+
+        try {
+            \CodeIgniter\Events\Events::trigger('themeZone', $content);
+        } catch (Throwable $e) {
+            log_message('error', 'Zone {zone} could not be filled: {message}', ['zone' => $zone, 'message' => $e->getMessage()]);
+
+            return '';
+        }
+
+        return $content->render();
+    }
+
+    /**
+     * Page model classes of the active theme and its ancestors (class => theme slug, D-47-02).
+     *
+     * @return array<string, string>
+     */
+    public function pageModels(?string $area = null): array
+    {
+        $models = [];
+
+        foreach (array_reverse($this->chain($area)) as $slug) {
+            foreach ($this->registry->get($slug)->pageModels as $class) {
+                $models[ltrim($class, '\\')] = $slug;
+            }
+        }
+
+        return $models;
+    }
+
+    /**
      * URLs of the stylesheets to load: the root theme's first, the active theme's last.
      *
      * @return list<string>

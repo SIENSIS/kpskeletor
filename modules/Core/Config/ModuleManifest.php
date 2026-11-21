@@ -136,6 +136,14 @@ abstract class ModuleManifest
     public array $sectionTypes = [];
 
     /**
+     * Ready-made page models offered by "New page from a model" (`Modules\Core\Sections\PageModel`
+     * classes, keys `<module>.<name>`; D-47-02, docs/sections.md "Page models").
+     *
+     * @var list<string>
+     */
+    public array $pageModels = [];
+
+    /**
      * API resources (kpapy) under /api/v1: key => [path, handler]; checked against Config/Routes.php.
      *
      * @var array<string, array<string, string>>
