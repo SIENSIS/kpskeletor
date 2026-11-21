@@ -1,0 +1,20 @@
+{
+  "baseURL": "http://localhost:8089",
+  "outDir": "deploy-status/47-reusable-blocks/screenshots",
+  "deviceScaleFactor": 2,
+  "login": { "url": "/login", "user": "admin@example.com", "password": "set with E2E_PASSWORD", "userField": "input[name=email]", "passwordField": "input[name=password]", "submit": "button[type=submit]", "waitFor": "/backend" },
+  "shots": [
+    { "url": "/qui-som", "name": "01-zone-and-footer-columns", "login": false, "fullPage": true },
+    { "url": "/qui-som", "name": "02-zone-and-footer-phone", "login": false, "fullPage": true, "width": 390, "height": 844 },
+    { "url": "/qui-som", "name": "03-zone-and-footer-dark", "login": false, "fullPage": true, "dark": true },
+    { "url": "/backend/pages/blocks", "name": "04-blocks-list" },
+    { "url": "/backend/pages/blocks/1/sections", "name": "05-block-sections" },
+    { "url": "/backend/pages/blocks/1/zones", "name": "06-block-placements" },
+    { "url": "/backend/pages/models", "name": "07-page-models" },
+    { "url": "/inici-4", "name": "08-model-school", "login": false, "fullPage": true },
+    { "url": "/inici-4", "name": "09-model-school-phone", "login": false, "fullPage": true, "width": 390, "height": 844 },
+    { "url": "/inici-5", "name": "10-model-company", "login": false, "fullPage": true },
+    { "url": "/inici-5", "name": "11-model-company-phone-dark", "login": false, "fullPage": true, "width": 390, "height": 844, "dark": true },
+    { "url": "/backend/pages/18/sections", "name": "12-model-page-in-the-editor" }
+  ]
+}
