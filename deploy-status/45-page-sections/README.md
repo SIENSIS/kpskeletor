@@ -170,6 +170,13 @@ with "decorative", appearance and advanced options.*
 
 ## Known issues
 
+- The first CI run of the pull request failed in `SectionsTest::testLinksAreCheckedLikeMenuItems`
+  (all PHPUnit jobs): the test linked to `https://example.com/`, which is the site's own host under
+  CI's `app.baseURL = http://example.com/`, so the link was rightly not external. It passed here
+  because the local demo site's `.env` changes the base URL for the tests too. Fixed in the test
+  (another host, and an explicit check of the site's own host); run the tests without the demo
+  `.env` (or with its `app.baseURL`) to match CI.
+
 - `modules:demo Pages --remove` deletes the demo images' rows but leaves their files in
   `public/uploads/modules/pages` (demo removal only deletes files under `writable/`).
 - The order of sections is saved with "Save the order"; duplicate/hide/delete buttons pressed
