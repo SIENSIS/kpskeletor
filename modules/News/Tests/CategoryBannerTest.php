@@ -66,6 +66,8 @@ final class CategoryBannerTest extends NewsTestCase
         $this->assertStringContainsString('news-banner', $list);
         $this->assertStringContainsString($url, $list);
         $this->assertMatchesRegularExpression('#<h1[^>]*>Sortides</h1>#', $list, 'The category name is the hero title.');
+        $this->assertSame(1, substr_count($list, '<h1'), 'One <h1>: the layout does not add its own.');
+        $this->assertStringContainsString('breadcrumb', $list);
 
         $article = $this->body('GET', 'news/sortida-al-bosc');
         $this->assertStringContainsString($url, $article);

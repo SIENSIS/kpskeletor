@@ -72,6 +72,8 @@ export function mount(element) {
         }
     });
 
+    element.dataset.ready = '1';
+
     dialog.addEventListener('close', () => {
         image.removeAttribute('src');
 

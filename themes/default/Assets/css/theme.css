@@ -514,6 +514,9 @@ a:not([class]):hover { color: var(--bs-link-hover-color); }
     .kp-hero-side-image { max-height: 14rem; }
 }
 .kp-section-hero:has(.kp-edge-wave) { padding-bottom: calc(var(--kp-wave-height, 4rem) + 1rem); }
+/* The page's own background, resolved on the root: a dark section (data-bs-theme="dark")
+   redefines --bs-body-bg, and the wave must take the colour of the page below it. */
+:root { --kp-page-bg: var(--bs-body-bg); }
 .kp-edge-wave {
     --kp-wave-height: 4rem;
     position: absolute;
@@ -521,7 +524,7 @@ a:not([class]):hover { color: var(--bs-link-hover-color); }
     right: 0;
     bottom: -1px;
     height: var(--kp-wave-height);
-    background-color: var(--bs-body-bg);
+    background-color: var(--kp-page-bg);
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0 64c180 40 360 56 540 40S900 24 1080 24s300 32 360 48v48H0z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath d='M0 64c180 40 360 56 540 40S900 24 1080 24s300 32 360 48v48H0z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
     pointer-events: none;

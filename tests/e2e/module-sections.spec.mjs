@@ -51,6 +51,7 @@ test('the carousel does not rotate by default and works with the keyboard', asyn
     const carousel = page.locator('[data-component="pages/carousel"]');
     test.skip((await carousel.count()) === 0, 'No carousel on the demo page.');
 
+    await expect(carousel).toHaveClass(/is-enhanced/);
     const slides = carousel.locator('[data-carousel-slide]');
     await expect(carousel).toHaveAttribute('data-rotate', '0');
     await expect(carousel.locator('[data-carousel-pause]')).toHaveCount(0);
@@ -77,6 +78,7 @@ test('the gallery opens its images in a lightbox', async ({ page }) => {
     const gallery = page.locator('[data-component="files/gallery"]');
     test.skip((await gallery.count()) === 0, 'No gallery on the demo page (php spark modules:demo Files).');
 
+    await expect(gallery).toHaveAttribute('data-ready', '1'); // the lightbox is mounted
     const first = gallery.locator('[data-gallery-item]').first();
     await first.click();
     const dialog = gallery.locator('[data-lightbox]');

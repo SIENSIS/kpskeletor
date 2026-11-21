@@ -102,7 +102,7 @@ final class PagesDemoSeeder extends DemoSeeder
     }
 
     /**
-     * Session 46: "Notícies" and "Sortides" (a banner and the news of one category each), "Agenda"
+     * Session 46: "Notícies" and "Sortides" (a banner and the news of their categories), "Agenda"
      * (a banner, the upcoming events and the calendar) and "Més seccions" (carousel, testimonials,
      * logos, a gallery and an embed that needs its host allowed in Settings › Security). News,
      * Events and Files categories and folders are looked up by their demo slugs; without them
@@ -124,7 +124,7 @@ final class PagesDemoSeeder extends DemoSeeder
 
             return is_array($row) ? [(string) $row['id']] : [];
         };
-        $news    = static fn (string $mode, int $limit, array $categories, bool $search): array => ['mode' => $mode, 'limit' => $limit, 'categories' => $categories, 'columns' => '3', 'show_date' => true, 'show_summary' => true, 'show_image' => true, 'search' => $search, 'more' => null];
+        $news    = static fn (string $mode, int $limit, array $categories, bool $search, string $columns = '3'): array => ['mode' => $mode, 'limit' => $limit, 'categories' => $categories, 'columns' => $columns, 'show_date' => true, 'show_summary' => true, 'show_image' => true, 'search' => $search, 'more' => null];
 
         $this->sectionPage($demo, $now, $author, 10, [
             'ca' => ['Notícies', 'noticies', 'Totes les notícies del centre.'],
@@ -132,7 +132,7 @@ final class PagesDemoSeeder extends DemoSeeder
             'en' => ['News', 'news-list', 'All the news of the school.'],
         ], [
             new SectionData('pages.hero', $hero($image('noticies-banner.png', [28, 60, 120], [40, 120, 170])), $tr($heroTr('Notícies', 'El que passa al centre, explicat per nosaltres.'), $heroTr('Noticias', 'Lo que pasa en el centro.'), $heroTr('News', 'What happens at school, told by us.')), $opts(['background' => 'dark', 'spacing' => 's', 'width' => 'full'])),
-            new SectionData('news.list', $news('full', 6, $newsCat('institucional'), true), $tr(['heading' => 'Comunicats', 'intro' => ''], ['heading' => 'Comunicados', 'intro' => ''], ['heading' => 'Announcements', 'intro' => '']), $opts(['style' => 'cards'])),
+            new SectionData('news.list', $news('full', 6, [...$newsCat('institucional'), ...$newsCat('activitats')], true), $tr(['heading' => 'Comunicats', 'intro' => ''], ['heading' => 'Comunicados', 'intro' => ''], ['heading' => 'Announcements', 'intro' => '']), $opts(['style' => 'cards'])),
         ]);
 
         $this->sectionPage($demo, $now, $author, 11, [
@@ -141,7 +141,7 @@ final class PagesDemoSeeder extends DemoSeeder
             'en' => ['Outings', 'outings', 'Trips, camps and visits of the year.'],
         ], [
             new SectionData('pages.hero', $hero($image('sortides-banner.png', [30, 110, 80], [120, 180, 90])), $tr($heroTr('Sortides', 'Aprenem fora de l’aula durant tot el curs.'), $heroTr('Salidas', 'Aprendemos fuera del aula.'), $heroTr('Outings', 'Learning outside the classroom all year round.')), $opts(['background' => 'dark', 'spacing' => 's', 'width' => 'full'])),
-            new SectionData('news.list', $news('full', 4, $newsCat('sortides'), false), $tr(['heading' => '', 'intro' => ''], ['heading' => '', 'intro' => ''], ['heading' => '', 'intro' => '']), $opts(['style' => 'cards'])),
+            new SectionData('news.list', $news('full', 4, $newsCat('sortides'), false, '4'), $tr(['heading' => '', 'intro' => ''], ['heading' => '', 'intro' => ''], ['heading' => '', 'intro' => '']), $opts(['style' => 'cards'])),
         ]);
 
         $this->sectionPage($demo, $now, $author, 12, [

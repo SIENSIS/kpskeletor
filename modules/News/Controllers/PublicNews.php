@@ -120,6 +120,9 @@ final class PublicNews extends FrontendController
             'canonical'   => site_url($path) . ($page > 1 ? '?page=' . $page : ''),
         ]);
 
+        $crumbs = $category === null ? [] : [['label' => lang('News.publicTitle'), 'url' => site_url('news')], ['label' => $title]];
+        $banner = $category === null ? null : CoverUploads::urlOf($category['banner']);
+
         return $this->render('Modules\News\Views\public\index', [
             'title'       => $title,
             'items'       => $result['rows'],
@@ -127,8 +130,10 @@ final class PublicNews extends FrontendController
             'current'     => $category['slug'] ?? null,
             'pager'       => $result['total'] > $perPage ? $pager->makeLinks($page, $perPage, $result['total']) : '',
             'feedUrl'     => site_url('news/feed.xml'),
-            'bannerUrl'   => $category === null ? null : CoverUploads::urlOf($category['banner']),
-            'breadcrumbs' => $category === null ? [] : [['label' => lang('News.publicTitle'), 'url' => site_url('news')], ['label' => $title]],
+            'bannerUrl'   => $banner,
+            // With a banner, its title is the page's <h1> and the view draws the breadcrumbs.
+            'trail'       => $banner === null ? [] : $crumbs,
+            'breadcrumbs' => $banner === null ? $crumbs : [],
         ]);
     }
 }

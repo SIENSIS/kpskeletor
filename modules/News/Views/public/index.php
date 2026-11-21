@@ -10,11 +10,13 @@
  * @var string                                           $pager
  * @var string                                           $feedUrl
  * @var string|null                                      $bannerUrl the category's banner
+ * @var list<array{label: string, url?: string}>         $trail     breadcrumbs drawn here (with a banner)
  */
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
 <?php if (! empty($bannerUrl)): ?>
+    <?php if (! empty($trail)): ?><div class="mb-3"><?= theme_component('breadcrumbs', ['items' => $trail]) ?></div><?php endif ?>
     <?= theme_view('Modules\News\Views\public\_banner', ['bannerUrl' => $bannerUrl, 'label' => $title, 'heading' => true, 'link' => '']) ?>
 <?php endif ?>
 <div class="d-flex flex-wrap justify-content-<?= empty($bannerUrl) ? 'between' : 'end' ?> align-items-center gap-2 mb-3">
