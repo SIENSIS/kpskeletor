@@ -7,9 +7,12 @@ namespace Modules\Pages\Database\Seeds;
 use CodeIgniter\I18n\Time;
 use Modules\Core\Demo\DemoData;
 use Modules\Core\Demo\DemoSeeder;
+use Modules\Core\Sections\PlaceholderImage;
 use Modules\Core\Sections\SectionData;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\Core\Storage\Storage;
+use Modules\Core\Storage\UploadRules;
+use Modules\Pages\Services\BlockRevisions;
 use Modules\Pages\Services\PageSections;
 use Modules\Pages\Services\Revisions;
 
@@ -99,6 +102,47 @@ final class PagesDemoSeeder extends DemoSeeder
 
         $this->sectionsPage($demo, $now, $author, $about);
         $this->moduleSectionPages($demo, $now, $author);
+        $this->partnerLogos($demo, $now, $author);
+    }
+
+    /**
+     * Session 47 (D-47-01): a neutral "partner logos" reusable block (placeholder logos drawn for
+     * the skeleton) shown on every page in the theme zone `public.before_footer`.
+     */
+    private function partnerLogos(DemoData $demo, Time $now, ?int $author): void
+    {
+        $block = (int) $demo->insert('page_blocks', ['name' => 'Logotips de col·laboradors', 'status' => 'published', 'created_at' => $now->toDateTimeString(), 'updated_at' => $now->toDateTimeString()]);
+        $logos = $ca = $es = $en = [];
+
+        foreach ([[[13, 110, 253], [120, 170, 250]], [[25, 135, 84], [130, 200, 160]], [[214, 51, 132], [240, 150, 190]], [[253, 126, 20], [250, 190, 120]], [[102, 16, 242], [180, 140, 250]]] as $i => [$from, $to]) {
+            /** @var Storage $storage */
+            $storage = service('storage');
+            $stored  = $storage->storeContents(PlaceholderImage::png('logo-' . ($i + 1), 360, 140, $from, $to, 'logo'), 'logo-' . ($i + 1) . '.png', 'public', 'modules/pages', UploadRules::make(['png']));
+            $demo->record('stored_files', $stored->id);
+            $logos[] = ['image' => ['key' => $stored->key, 'decorative' => false], 'link' => null];
+            $ca[]    = ['image' => 'Entitat col·laboradora ' . ($i + 1), 'link' => ''];
+            $es[]    = ['image' => 'Entidad colaboradora ' . ($i + 1), 'link' => ''];
+            $en[]    = ['image' => 'Partner organisation ' . ($i + 1), 'link' => ''];
+        }
+
+        $sections = PageSections::forBlocks();
+        $section  = $sections->save($block, new SectionData('pages.logos', ['logos' => $logos, 'grayscale' => true], [
+            'ca' => ['heading' => 'Hi col·laboren', 'intro' => '', 'logos' => $ca],
+            'es' => ['heading' => 'Colaboran', 'intro' => '', 'logos' => $es],
+            'en' => ['heading' => 'Our partners', 'intro' => '', 'logos' => $en],
+        ], ['style' => '', 'background' => 'light', 'spacing' => 'm', 'width' => 'contained', 'background_image' => '', 'anchor' => '']));
+        $demo->record('page_block_sections', $section);
+
+        foreach (db_connect()->table('page_block_section_translations')->select('id')->where('section_id', $section)->get()->getResultArray() as $row) {
+            $demo->record('page_block_section_translations', (int) $row['id']);
+        }
+
+        $demo->insert('page_block_zones', ['block_id' => $block, 'zone' => 'public.before_footer', 'rule' => 'all', 'pages' => '[]', 'position' => 10, 'created_at' => $now->toDateTimeString(), 'updated_at' => $now->toDateTimeString()]);
+        $revision = (new BlockRevisions())->record($block, $author, 'create');
+
+        if ($revision !== null) {
+            $demo->record('page_block_revisions', $revision);
+        }
     }
 
     /**

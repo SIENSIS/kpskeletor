@@ -15,8 +15,9 @@ use Modules\Menus\Services\LinkTypes;
  *
  * - "Menú principal" in the `primary` location: Inici, Qui som (with Equip and Història), Notícies
  *   (with a news category), Contacte and Intranet (signed-in users only);
- * - "Peu de pàgina" in the `footer` location: the legal notice, contact and an external link
- *   opening in a new tab;
+ * - "Peu de pàgina" in the `footer` location, in columns (session 47): "Qui som", "Actualitat"
+ *   and "Enllaços" (external links opening in a new tab) with their links, and the legal notice
+ *   below them;
  * - the back-office menu: a custom group "Contingut" gathering News, Pages and Menus, a custom
  *   link to the public site, and for the `editor` group the group "Contingut" first.
  *
@@ -47,10 +48,19 @@ final class MenusDemoSeeder extends DemoSeeder
         $this->item($demo, $main, null, 40, $this->page('contacte'), ['ca' => 'Contacte', 'es' => 'Contacto', 'en' => 'Contact']);
         $this->item($demo, $main, null, 50, $this->page(backend_path() === 'intranet' ? 'area-interna' : 'intranet'), ['ca' => 'Intranet'], ['visibility' => 'users', 'icon' => 'bi bi-lock']);
 
+        // The footer in columns (session 47): each top-level item with children is a column.
         $footer = (int) $demo->insert('menus', ['name' => 'Peu de pàgina', 'location' => 'footer', 'created_at' => $now, 'updated_at' => $now]);
-        $this->item($demo, $footer, null, 10, $this->page('avis-legal'), ['ca' => 'Avís legal', 'es' => 'Aviso legal', 'en' => 'Legal notice']);
-        $this->item($demo, $footer, null, 20, $this->page('contacte'), ['ca' => 'Contacte', 'es' => 'Contacto', 'en' => 'Contact']);
-        $this->item($demo, $footer, null, 30, ['url', 'https://www.example.com/'], ['ca' => 'Xarxa d’entitats', 'es' => 'Red de entidades', 'en' => 'Partner network'], ['target' => '_blank', 'icon' => 'bi bi-box-arrow-up-right']);
+        $about  = $this->item($demo, $footer, null, 10, $this->page('qui-som'), ['ca' => 'Qui som', 'es' => 'Quiénes somos', 'en' => 'About us']);
+        $this->item($demo, $footer, $about, 10, $this->page('equip', '/qui-som/equip'), ['ca' => 'Equip', 'es' => 'Equipo', 'en' => 'Team']);
+        $this->item($demo, $footer, $about, 20, $this->page('historia', '/qui-som/historia'), ['ca' => 'Història', 'es' => 'Historia', 'en' => 'History']);
+        $this->item($demo, $footer, $about, 30, $this->page('contacte'), ['ca' => 'Contacte', 'es' => 'Contacto', 'en' => 'Contact']);
+        $current = $this->item($demo, $footer, null, 20, ['route', 'news-public'], ['ca' => 'Actualitat', 'es' => 'Actualidad', 'en' => 'What’s on']);
+        $this->item($demo, $footer, $current, 10, ['route', 'news-public'], ['ca' => 'Notícies', 'es' => 'Noticias', 'en' => 'News']);
+        $this->item($demo, $footer, $current, 20, $this->page('portada-seccions'), ['ca' => 'Portada amb seccions', 'es' => 'Portada con secciones', 'en' => 'Sections home']);
+        $links = $this->item($demo, $footer, null, 30, ['url', 'https://www.example.com/'], ['ca' => 'Enllaços', 'es' => 'Enlaces', 'en' => 'Links'], ['target' => '_blank']);
+        $this->item($demo, $footer, $links, 10, ['url', 'https://www.example.com/'], ['ca' => 'Xarxa d’entitats', 'es' => 'Red de entidades', 'en' => 'Partner network'], ['target' => '_blank', 'icon' => 'bi bi-box-arrow-up-right']);
+        $this->item($demo, $footer, $links, 20, ['url', 'https://www.example.org/'], ['ca' => 'Recursos', 'es' => 'Recursos', 'en' => 'Resources'], ['target' => '_blank', 'icon' => 'bi bi-box-arrow-up-right']);
+        $this->item($demo, $footer, null, 40, $this->page('avis-legal'), ['ca' => 'Avís legal', 'es' => 'Aviso legal', 'en' => 'Legal notice']);
 
         // Back-office menu: a custom group and link, and a few relocations.
         $content = (int) $demo->insert('backend_menu_links', [
