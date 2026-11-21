@@ -110,7 +110,20 @@ words in models and demo data), `modules/Menus/Tests/FooterColumnsTest.php` (4),
 (public page with a zone and the footer at three widths, light and dark, with axe; the blocks
 screens; both models previewed and checked).
 
-RESULTS
+```
+vendor/bin/phpunit                       OK (1659 tests, 83562 assertions), 11 min 55 s
+vendor/bin/phpstan analyse               [OK] No errors
+vendor/bin/php-cs-fixer fix --dry-run    0 of 1229 files to fix
+php spark modules:sync                   Mòduls sincronitzats.
+php spark permissions:check              Permisos correctes: 175 permisos, 395 rutes comprovades
+php spark csp:check                      No hi ha scripts, gestors ni estils en línia
+php spark assets:publish --check         Els recursos publicats estan al dia
+npm run e2e (demo site, Tasks enabled)   257 passed, 55 skipped, 0 failed (9.5 min)
+```
+
+The first full PHPUnit run found 5 failures, all counts or lists that grow with the new resource
+and section type (CRUD routes 20 → 21, permissions 171 → 175, `pages.block` in the registry,
+`pages-blocks.*` in the Shield matrix); they were updated.
 
 ## Screenshots
 
