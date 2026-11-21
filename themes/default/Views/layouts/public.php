@@ -4,6 +4,9 @@
  * partial `public_menu`), content with an optional sidebar region, footer with the `footer` menu
  * location, SEO meta tags ($meta) and the
  * cookie notice (theme option), language switch, theme switch. Regions: header, sidebar, footer, home.
+ * Zones (D-47-01): `public.after_header` and `public.before_footer` inside `<main>`, filled by
+ * the Pages module's reusable blocks (`theme_zone()`); the footer (partial `footer`) shows the
+ * footer menu in columns when its items have children.
  * Full-width mode (`$fullWidth`, pages built from sections, D-45-01): no outer container, no
  * sidebar and no vertical padding, so banners reach the edges; each section adds its own container.
  *
@@ -37,6 +40,9 @@ $hasSidebar = ! $fullWidth && theme()->regions()->has('sidebar') && theme()->has
     </nav>
 </header>
 <main id="main" class="site-main flex-grow-1<?= $fullWidth ? ' site-main-full' : ' py-4' ?>" tabindex="-1">
+    <?php if (($zone = theme_zone('public.after_header')) !== ''): ?>
+        <div class="site-zone site-zone-after-header<?= $fullWidth ? '' : ' mb-4' ?>"><?= $zone ?></div>
+    <?php endif ?>
     <?php if ($fullWidth): ?>
         <div class="container site-main-notices">
             <?= $this->include(theme_resolve('partials/flash')) ?>
@@ -57,19 +63,11 @@ $hasSidebar = ! $fullWidth && theme()->regions()->has('sidebar') && theme()->has
         <?php endif ?>
     </div>
     <?php endif ?>
+    <?php if (($zone = theme_zone('public.before_footer')) !== ''): ?>
+        <div class="site-zone site-zone-before-footer"><?= $zone ?></div>
+    <?php endif ?>
 </main>
-<footer class="site-footer border-top py-4 mt-auto">
-    <div class="container d-flex flex-wrap justify-content-between gap-3 small text-body-secondary">
-        <div data-menu-location="footer"><?= theme_partial('public_menu', ['location' => 'footer']) ?><?= theme_region('public', 'footer') ?></div>
-        <div>
-            <?php if ((string) theme_option('footerText') !== ''): ?>
-                <?= esc((string) theme_option('footerText')) ?>
-            <?php else: ?>
-                &copy; <?= date('Y') ?> <?= esc(site_name()) ?>
-            <?php endif ?>
-        </div>
-    </div>
-</footer>
+<?= theme_partial('footer') ?>
 <?= $this->include(theme_resolve('partials/cookie_notice')) ?>
 <?= $this->include(theme_resolve('partials/scripts')) ?>
 </body>

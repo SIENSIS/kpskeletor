@@ -14,6 +14,11 @@ return [
         'footer'  => 'Footer menu',
         'social'  => 'Social networks',
     ],
+    'zones'   => [
+        'afterHeader'  => 'Reusable blocks after the header',
+        'beforeFooter' => 'Reusable blocks before the footer',
+    ],
+    'footer'  => ['contact' => 'Contact'],
     'options' => [
         'logo'         => 'Logo',
         'logoHelp'     => 'Path or URL of the logo image. Empty: the site name with an icon.',
@@ -36,6 +41,10 @@ return [
         'fontSerif'    => 'Serif',
         'fontMono'     => 'Monospace',
         'footerText'   => 'Footer text',
+        'footerColumns'     => 'Footer columns (on wide screens)',
+        'footerColumnsHelp' => 'When the footer menu has items with sub-items, each one is a column with its links.',
+        'footerContact'     => 'Footer contact column',
+        'footerContactHelp' => 'Address and contact details shown as the first footer column. Separate lines with |. Empty: no column.',
         'cookieNotice' => 'Show the cookie notice',
     ],
     'cookies' => [

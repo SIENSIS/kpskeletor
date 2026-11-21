@@ -14,6 +14,11 @@ return [
         'footer'  => 'Menú del peu',
         'social'  => 'Xarxes socials',
     ],
+    'zones'   => [
+        'afterHeader'  => 'Blocs reutilitzables després de la capçalera',
+        'beforeFooter' => 'Blocs reutilitzables abans del peu de pàgina',
+    ],
+    'footer'  => ['contact' => 'Contacte'],
     'options' => [
         'logo'         => 'Logotip',
         'logoHelp'     => 'Camí o URL de la imatge del logotip. Buit: el nom del lloc amb una icona.',
@@ -36,6 +41,10 @@ return [
         'fontSerif'    => 'Amb serif',
         'fontMono'     => 'Monoespaiat',
         'footerText'   => 'Text del peu',
+        'footerColumns'     => 'Columnes del peu de pàgina (en pantalles amples)',
+        'footerColumnsHelp' => 'Quan el menú del peu té elements amb subelements, cadascun és una columna amb els seus enllaços.',
+        'footerContact'     => 'Columna de contacte del peu',
+        'footerContactHelp' => 'Adreça i dades de contacte mostrades com a primera columna del peu. Separa les línies amb |. Buit: sense columna.',
         'cookieNotice' => 'Mostra l\'avís de galetes',
     ],
     'cookies' => [

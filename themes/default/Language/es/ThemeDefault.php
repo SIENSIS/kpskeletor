@@ -14,6 +14,11 @@ return [
         'footer'  => 'Menú del pie',
         'social'  => 'Redes sociales',
     ],
+    'zones'   => [
+        'afterHeader'  => 'Bloques reutilizables después de la cabecera',
+        'beforeFooter' => 'Bloques reutilizables antes del pie de página',
+    ],
+    'footer'  => ['contact' => 'Contacto'],
     'options' => [
         'logo'         => 'Logotipo',
         'logoHelp'     => 'Ruta o URL de la imagen del logotipo. Vacío: el nombre del sitio con un icono.',
@@ -36,6 +41,10 @@ return [
         'fontSerif'    => 'Con serifa',
         'fontMono'     => 'Monoespaciado',
         'footerText'   => 'Texto del pie',
+        'footerColumns'     => 'Columnas del pie de página (en pantallas anchas)',
+        'footerColumnsHelp' => 'Cuando el menú del pie tiene elementos con subelementos, cada uno es una columna con sus enlaces.',
+        'footerContact'     => 'Columna de contacto del pie',
+        'footerContactHelp' => 'Dirección y datos de contacto mostrados como primera columna del pie. Separa las líneas con |. Vacío: sin columna.',
         'cookieNotice' => 'Mostrar el aviso de cookies',
     ],
     'cookies' => [

@@ -37,6 +37,15 @@ final class Theme extends ThemeManifest
         'sidebar' => 'ThemeDefault.pageTemplates.sidebar',
     ];
 
+    /**
+     * Zones for reusable blocks (D-47-01; docs/themes.md, "Zones"), printed by the public layout
+     * inside `<main>`: right after the header and right before the footer.
+     */
+    public array $zones = [
+        'public.after_header'  => 'ThemeDefault.zones.afterHeader',
+        'public.before_footer' => 'ThemeDefault.zones.beforeFooter',
+    ];
+
     public array $styles = [
         'vendor:bootstrap/css/bootstrap.min.css',
         'vendor:bootstrap-icons/font/bootstrap-icons.min.css',
@@ -135,6 +144,22 @@ final class Theme extends ThemeManifest
             'type'    => 'text',
             'default' => '',
             'label'   => 'ThemeDefault.options.footerText',
+        ],
+        // The footer in columns (session 47; docs/menus.md, "Footer columns"): each top-level
+        // item of the `footer` menu with children is a column (its heading and its links).
+        'footerColumns' => [
+            'type'    => 'select',
+            'default' => '4',
+            'label'   => 'ThemeDefault.options.footerColumns',
+            'help'    => 'ThemeDefault.options.footerColumnsHelp',
+            'options' => ['2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6'],
+        ],
+        // An optional first column with the address and contact details, per language.
+        'footerContact' => [
+            'type'    => 'translated',
+            'default' => '',
+            'label'   => 'ThemeDefault.options.footerContact',
+            'help'    => 'ThemeDefault.options.footerContactHelp',
         ],
         'cookieNotice' => [
             'type'    => 'bool',
