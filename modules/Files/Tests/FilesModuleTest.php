@@ -55,8 +55,9 @@ final class FilesModuleTest extends FilesTestCase
         $acl    = new FolderAcl();
         $this->assertSame(['view', 'upload', 'edit'], $acl->rights($editor, 'private', 'shared/Secretaria/Circulars'), 'Inherited from Secretaria.');
         $this->assertSame([], $acl->rights($editor, 'private', 'shared/Secretaria/Actes'), 'Own permissions: admins only.');
-        $this->assertSame(6, db_connect()->table('files')->countAllResults());
-        $this->assertSame(2, db_connect()->table('files')->where('thumbnail IS NOT NULL')->countAllResults());
+        $this->assertSame(14, db_connect()->table('files')->countAllResults());
+        $this->assertSame(8, db_connect()->table('files')->where('disk', 'public')->where('folder', 'shared/Imatges web')->countAllResults(), 'Images for the demo gallery (session 46).');
+        $this->assertSame(10, db_connect()->table('files')->where('thumbnail IS NOT NULL')->countAllResults());
 
         $manager->remove('Files');
 

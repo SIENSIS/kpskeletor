@@ -47,6 +47,12 @@ final class FilesDemoSeeder extends DemoSeeder
         $this->file($demo, 'shared/Secretaria/Actes', 'Acta claustre setembre.txt', "Acta del claustre de setembre (demo).\n", 'actes');
         $this->file($demo, 'shared/Documents comuns', 'Logotip.png', self::png(640, 360, [32, 96, 168]), 'logotip,imatge', 'Logotip del centre');
         $this->file($demo, 'shared/Documents comuns', 'Pati.png', self::png(800, 600, [60, 150, 90]), 'imatge,pati', 'Fotografia del pati');
+        // Session 46: images of the public folder for the gallery of the demo page "Més seccions"
+        // (public disk: `modules:demo Files --remove` deletes their rows, not the files).
+        foreach ([['Biblioteca.png', [70, 110, 170], 'La biblioteca'], ['Laboratori.png', [40, 140, 120], 'El laboratori'], ['Pati gran.png', [200, 140, 60], 'El pati gran'], ['Gimnàs.png', [170, 70, 90], 'El gimnàs'], ['Aula de música.png', [110, 80, 170], 'L’aula de música'], ['Hort.png', [80, 150, 60], 'L’hort escolar'], ['Menjador.png', [210, 110, 70], 'El menjador'], ['Entrada.png', [60, 90, 120], 'L’entrada del centre']] as [$name, $rgb, $alt]) {
+            $this->file($demo, 'shared/Imatges web', $name, self::png(900, 600, $rgb), 'web', $alt, 'public');
+        }
+
         $this->file($demo, 'shared/Documents comuns', 'Normes de convivència.txt', "1. Respecte.\n2. Puntualitat.\n3. Cura dels espais.\n", 'normes');
 
     }
@@ -69,11 +75,11 @@ final class FilesDemoSeeder extends DemoSeeder
         return $id;
     }
 
-    private function file(DemoData $demo, string $folder, string $name, string $contents, string $tags, string $alt = ''): void
+    private function file(DemoData $demo, string $folder, string $name, string $contents, string $tags, string $alt = '', string $disk = 'private'): void
     {
         /** @var Storage $storage */
         $storage = service('storage');
-        $stored  = $storage->storeContents($contents, $name, 'private', $folder);
+        $stored  = $storage->storeContents($contents, $name, $disk, $folder);
         $demo->record('stored_files', $stored->id);
         $this->recordFile($demo, $storage, $stored->path);
         $thumbnail = (new ThumbnailService($storage))->make($stored);
@@ -84,8 +90,8 @@ final class FilesDemoSeeder extends DemoSeeder
 
         $now = Time::now()->toDateTimeString();
         $demo->insert('files', [
-            'stored_file_id' => $stored->id, 'disk' => 'private', 'folder' => $folder, 'name' => $stored->originalName,
-            'visibility' => 'private', 'alt' => $alt, 'tags' => $tags, 'thumbnail' => $thumbnail, 'created_at' => $now, 'updated_at' => $now,
+            'stored_file_id' => $stored->id, 'disk' => $disk, 'folder' => $folder, 'name' => $stored->originalName,
+            'visibility' => $disk, 'alt' => $alt, 'tags' => $tags, 'thumbnail' => $thumbnail, 'created_at' => $now, 'updated_at' => $now,
         ]);
     }
 

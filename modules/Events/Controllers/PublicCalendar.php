@@ -19,7 +19,8 @@ use Modules\Events\Services\IcalFeeds;
  * (otherwise every page is a 404).
  *
  * - `GET calendar` (`?category=<slug>`);
- * - `GET calendar/feed?start=&end=[&category=<id>]` (JSON, rate limit `feeds`);
+ * - `GET calendar/feed?start=&end=[&category=<id>][&categories=<id>,<id>]` (JSON, rate limit
+ *   `feeds`; `categories`: the categories a calendar section shows);
  * - `GET calendar/event/{code}[?date=YYYY-MM-DD]`, `calendar/event/{code}/export.ics`.
  */
 final class PublicCalendar extends FrontendController
@@ -53,7 +54,8 @@ final class PublicCalendar extends FrontendController
         }
 
         $rows = (new EventRepository())->occurrences(null, $range[0], $range[1], true, [
-            'category' => max(0, (int) $this->request->getGet('category')),
+            'category'   => max(0, (int) $this->request->getGet('category')),
+            'categories' => self::categories($this->request->getGet('categories')),
         ]);
         $base = site_url('calendar/event');
 
@@ -99,6 +101,23 @@ final class PublicCalendar extends FrontendController
         }
 
         return IcalExport::download((new IcalFeeds())->single($event, site_url('calendar/event/' . $code)), (string) $event['title'], $this->response);
+    }
+
+    /**
+     * The `categories` parameter of the feed (a calendar section restricted to some categories):
+     * ids separated by commas, at most 50.
+     *
+     * @return list<int>
+     */
+    public static function categories(mixed $value): array
+    {
+        if (! is_string($value) || $value === '') {
+            return [];
+        }
+
+        $ids = array_filter(array_map('intval', explode(',', $value)), static fn (int $id): bool => $id > 0);
+
+        return array_slice(array_values(array_unique($ids)), 0, 50);
     }
 
     private function enabled(): void

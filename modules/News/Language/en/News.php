@@ -32,6 +32,9 @@ return [
     'menuLink' => ['category' => 'News category'],
     'settingGroups' => ['public' => 'Public site'],
     'settings'      => [
+        'listPage'      => 'Page of the main news list',
+        'listPageNone'  => 'None (the list of /news itself)',
+        'listPageHelp'  => 'A page with a "News list" section: /news redirects to it and the sitemap shows only that page.',
         'perPage'       => 'News per page',
         'perPageHelp'   => 'Number of news items on each page of the public list.',
         'feedItems'     => 'Items in the RSS feed',
@@ -43,6 +46,7 @@ return [
     'category'   => 'Category',
     'categories' => 'Categories',
     'fields'     => [
+        'banner'       => 'Banner',
         'title'        => 'Title',
         'summary'      => 'Summary',
         'body'         => 'Text',
@@ -69,6 +73,7 @@ return [
         'event_all_day' => 'All-day event',
     ],
     'help' => [
+        'banner'       => 'Optional. A wide image shown as a header on the category\'s page and on its news.',
         'slug'         => 'Lower-case words separated by hyphens. Leave it blank to build it from the title in {0}.',
         'categorySlug' => 'Used in news/category/{slug}. Leave it blank to build it from the name in {0}.',
         'visibility'   => 'Public: anyone, on the public site. Private: signed-in users. Groups: only the selected groups.',
@@ -160,5 +165,39 @@ return [
     ],
     'cal' => [
         'notices' => 'Notices',
+    ],
+    'sections' => [
+        'list' => [
+            'label'             => 'News list',
+            'description'       => 'The latest news or the full list, with pages and a search box, of one or more categories.',
+            'styles'            => ['cards' => 'Cards', 'list' => 'Compact list'],
+            'modes'             => ['latest' => 'The latest', 'full' => 'Full list (with pages)'],
+            'searchLabel'       => 'Search the news',
+            'searchPlaceholder' => 'Search…',
+            'searchButton'      => 'Search',
+            'noResults'         => 'No news matches the search.',
+            'pages'             => 'Pages of "{0}"',
+            'moreDefault'       => 'All the news',
+        ],
+        'fields' => [
+            'heading'     => 'Heading',
+            'intro'       => 'Introduction',
+            'mode'        => 'Mode',
+            'limit'       => 'Number of news items',
+            'categories'  => 'Categories',
+            'columns'     => 'Columns',
+            'showDate'    => 'Show the date',
+            'showSummary' => 'Show the summary',
+            'showImage'   => 'Show the image',
+            'search'      => 'Search box (full list)',
+            'more'        => '"More" link',
+        ],
+        'help' => [
+            'mode'       => '"The latest" shows the N newest; "Full list" shows them all, N per page.',
+            'limit'      => 'How many it shows (per page, in the full list).',
+            'categories' => 'None ticked: every category.',
+            'search'     => 'Only in the full list.',
+            'more'       => 'Optional, in "The latest" mode: e.g. the page with the full list.',
+        ],
     ],
 ];

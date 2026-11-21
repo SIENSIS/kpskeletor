@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Sections;
 
+use Modules\Core\Filters\ContentSecurity;
 use Throwable;
 
 /**
@@ -11,7 +12,10 @@ use Throwable;
  * sections of a type that is no longer offered (a disabled module) are left out; each one is
  * wrapped in a `<section>` whose classes come from its options (`SectionOptions::classes()`),
  * with its anchor as id, the background image as a decorative `<img>` (no inline styles: strict
- * CSP) and its content in the theme's `.container` unless its width is `full`.
+ * CSP) and its content in the theme's `.container` unless its width is `full`. A section whose
+ * type renders nothing (e.g. an embed whose host is no longer allowed) is left out; in a preview,
+ * the type's `warnings()` are shown above it. The CSP sources a shown section needs
+ * (`SectionType::cspSources()`) are added to this response's policy only.
  */
 final class SectionRenderer
 {
@@ -52,12 +56,24 @@ final class SectionRenderer
         }
 
         try {
-            $content = $type->render($section, $context);
+            $content  = $type->render($section, $context);
+            $warnings = $context->preview ? $type->warnings($section, $context->user) : [];
         } catch (Throwable $e) {
             log_message('error', 'Section {type} could not be rendered: {message}', ['type' => $section->type, 'message' => $e->getMessage()]);
 
             return '';
         }
+
+        // Problems only the editor sees (the preview); a section with nothing to show is left out.
+        if ($warnings !== []) {
+            $content = theme_view('Modules\Core\Views\sections\warnings', ['warnings' => $warnings]) . $content;
+        }
+
+        if (trim($content) === '') {
+            return '';
+        }
+
+        ContentSecurity::apply(service('csp'), $type->cspSources($section));
 
         $options = SectionOptions::normalise($section->options, $type);
         $dark    = in_array($options['background'], SectionOptions::DARK_BACKGROUNDS, true);

@@ -29,6 +29,12 @@ events* widget and the "Calendar" menu link type. Full description: `docs/events
 
 ## Main pieces
 
+- Session 46: section types `events.calendar` (`Sections/CalendarSection.php`) and `events.list`
+  (`Sections/EventsListSection.php`, base `EventsSectionType`): public events only, nothing while
+  `Config\Calendar::$publicCalendar` is off (editor warning). The public feed accepts
+  `categories=<id>,<id>`; `_filter.php` takes a `filterId`. Tests in
+  `modules/Pages/Tests/ModuleSectionsTest.php`.
+
 - `Services/EventVisibility.php` (who sees what; the only place the rule lives; admins follow it
   in the calendar), `AssignableGroups.php` (groups a user may target), `Recurrence.php`
   (expansion), `EventRepository.php` (occurrences in a range, details, categories, feed JSON),

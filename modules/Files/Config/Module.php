@@ -55,6 +55,9 @@ final class Module extends ModuleManifest
         ['resource' => 'files', 'label' => 'Files.menu.files', 'icon' => 'bi bi-folder2-open', 'order' => 30],
     ];
 
+    /** Section types of pages built from sections (session 46; docs/sections.md): a gallery of a folder's images. */
+    public array $sectionTypes = [\Modules\Files\Sections\GallerySection::class];
+
     public array $settings = [
         // Groups whose members see their personal space (`users/{user_id}/`) in the file manager.
         'personalSpaceGroups' => [

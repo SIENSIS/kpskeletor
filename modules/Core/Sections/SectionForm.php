@@ -51,7 +51,10 @@ final class SectionForm
             }
         }
 
-        return new SectionData($this->type->key(), $values, $texts, SectionOptions::clean($options, $this->type, $this->context), $hidden, $id);
+        $section = new SectionData($this->type->key(), $values, $texts, SectionOptions::clean($options, $this->type, $this->context), $hidden, $id);
+        $this->type->check($section, $this->context);
+
+        return $section;
     }
 
     /**

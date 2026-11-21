@@ -20,8 +20,30 @@ enabled modules. There are no shortcodes: editors pick a section, fill in a form
 | `SectionLinks` | `modules/Core/Sections/SectionLinks.php` | link targets, checked like menu items |
 
 The Pages module stores sections (`page_sections`, `page_section_translations`; service
-`Modules\Pages\Services\PageSections`) and offers the editor and the first six types: `pages.hero`,
-`pages.links`, `pages.cards`, `pages.media_text`, `pages.cta`, `pages.text`.
+`Modules\Pages\Services\PageSections`) and offers the editor.
+
+## The section types
+
+| Key | Module | What | Notes |
+|---|---|---|---|
+| `pages.hero` | Pages | hero banner: image under an overlay, title, text, two buttons, side image, wave edge | session 45 |
+| `pages.links` | Pages | quick links: icons, tiles or a band | session 45 |
+| `pages.cards` | Pages | cards with image, title, text, button | session 45 |
+| `pages.media_text` | Pages | image and text side by side | session 45 |
+| `pages.cta` | Pages | call to action band | session 45 |
+| `pages.text` | Pages | rich text | session 45 |
+| `pages.carousel` | Pages | slides like the hero; arrows, dots, keyboard; **no rotation by default** (D-46-02) | `pages/carousel` |
+| `pages.testimonials` | Pages | quotes with photo, name and role (dark band by default) | |
+| `pages.logos` | Pages | logos with required alt text and optional link; grayscale option | |
+| `pages.embed` | Pages | an iframe of an **allowed host** (`Pages.embedHosts`), click to load (D-46-01) | `pages/embed`; [`security.md`](security.md), "Embedded content" |
+| `news.list` | News | latest N news or the full list (pages, search), one or several categories | [`news.md`](news.md), "News in pages" |
+| `events.calendar` | Events | the public calendar component, categories, first view, filter | [`events.md`](events.md), "Events in pages" |
+| `events.list` | Events | the next N public events as a list or cards | |
+| `files.gallery` | Files | the images of a shared folder, grid or masonry, lightbox | `files/gallery`; [`files.md`](files.md), "Galleries in pages" |
+
+Types that show data of their module (news, events, files) override `render()` and show exactly
+what the module's public pages show to the same visitor: public news and events only, a private
+folder only to visitors with its `view` right.
 
 ## Adding a section type to a module
 
@@ -93,6 +115,14 @@ refused with the field's message (`SectionValidationException`), and unknown fie
 | `NumberField` | `between()`, `default()` | int | int or null |
 | `BooleanField` | — | bool | bool |
 | `ListField` | `fields()`, `items(min, max)` | items (non-translated parts) + items per language | list of items, each `[field => value]` |
+| `ChoicesField` | `options()` or `optionsFrom()`, `max()` | list of option keys (in the options' order) | list of keys still offered |
+
+- **Options read when needed**: `SelectField::optionsFrom(fn (): array => …)` (and `ChoicesField`)
+  reads its options once, when they are first needed: e.g. a module's categories. Their labels
+  are names, not language keys. A stored key that is no longer offered is left out when shown.
+- **Booleans** are off by default; `BooleanField::default(true)` ticks a new section's box (and is
+  the value of sections saved before the field existed).
+- **Images** that always need their alternative text (a logo): `ImageField::withoutDecorative()`.
 
 - **Images**: chosen with the Core's file picker (upload or choose, JPG/PNG/WebP/GIF, the public
   disk, folder `modules/<module>` and the public shared folders the editor may view). A key the
@@ -110,6 +140,31 @@ refused with the field's message (`SectionValidationException`), and unknown fie
 Posted values: `f[<field>]` (`f[title][ca]`, `f[items][3][label][es]`, `f[image][key]`,
 `f[image][alt][ca]`, `f[link][type]`, `f[link][value][<type>]`, `f[link][label][ca]`); the common
 options `o[...]`; `hidden`.
+
+## Rules of a whole section, warnings and CSP
+
+Three optional methods of `SectionType`:
+
+- `check(SectionData $section, FieldContext $context): void` — rules a field cannot check alone,
+  run by `SectionForm::validate()` after the fields; throw
+  `SectionValidationException::at($path, $message, $link)` (`$link`: `['url' => …, 'label' => …]`,
+  shown after the message, e.g. the setting an administrator must change).
+- `warnings(SectionData $section, ?User $user): list<array{message, link?}>` — problems of a saved
+  section only editors see: in the section list, its form and the preview. The public page never
+  shows them; the type renders nothing it cannot show (a section that renders nothing is left out
+  with its `<section>`).
+- `cspSources(SectionData $section): array<directive, list<origin>>` — sources the rendered section
+  needs in the Content-Security-Policy, added by `SectionRenderer` **to that response only**
+  (through `ContentSecurity::apply()`), e.g. an embed's `frame-src`.
+
+## Query parameters
+
+A section that pages or searches names its parameters after its id with
+`Modules\Core\Sections\SectionQuery` (`page-<id>`, `q-<id>`), so two lists on one page never clash:
+`$query->page()`, `$query->get('q')`, `$query->url(['page' => 2])` (keeps the rest of the query
+string and jumps back to `#kp-s<id>`, `$query->anchor()`), and the Core's pager view
+`Modules\Core\Views\sections\pager`. Section views of any module can use the Core's heading
+view `Modules\Core\Views\sections\heading` (heading `<h2>` and introduction).
 
 ## Common options
 

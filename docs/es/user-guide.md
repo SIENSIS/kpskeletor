@@ -346,6 +346,30 @@ acción y bloques de texto, una debajo de otra, a toda la anchura de la web. No 
 5. **Previsualizar** muestra la página tal como es ahora. Cada cambio queda en las **Revisiones**
    de la página, y restaurar una revisión recupera sus secciones.
 
+#### Más tipos de sección
+
+- **Lista de noticias**: las últimas noticias (unas cuantas tarjetas y un enlace «más») o la
+  **lista completa** con páginas y buscador, de una o más categorías. Solo muestra las noticias que
+  muestra la web pública. Para que una página así sea la lista principal de noticias, elegidla en
+  Configuración › Noticias › *Página de la lista principal de noticias*: entonces `/news` lleva a
+  ella a los visitantes.
+- **Calendario** y **Próximas actividades**: el calendario público, o las próximas actividades
+  públicas en lista o tarjetas, de unas categorías o de todas.
+- **Galería**: las imágenes de una carpeta compartida del gestor de archivos, en cuadrícula o
+  mosaico; al hacer clic, la imagen se abre grande. Las imágenes del disco público las ve todo el
+  mundo; las de una carpeta privada, solo las personas identificadas que pueden ver esa carpeta.
+- **Carrusel**: diapositivas con imagen, título, texto y botón. No se mueve solo si no activáis
+  **Gira sola** (entonces los visitantes lo pueden detener).
+- **Testimonios** (citas con foto, nombre y cargo) y **Logotipos** (cada logotipo necesita su
+  texto alternativo, el nombre de la entidad).
+- **Contenido incrustado**: un vídeo, una visita virtual o un mapa de otro sitio. Solo se aceptan
+  los sitios que un administrador ha permitido en Configuración › Seguridad › *Sitios que se pueden
+  incrustar*; si el sitio no está permitido, el formulario lo dice y lo nombra. Por defecto el
+  contenido solo se carga cuando el visitante hace clic.
+
+Una categoría de noticias puede tener un **banner** (Noticias › Categorías › *Banner*): se muestra
+arriba de la página de la categoría y de sus noticias.
+
 ## Menús
 
 Barra lateral › **Menús** (`/backend/menus/public`): los menús de la web pública.

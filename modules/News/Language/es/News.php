@@ -32,6 +32,9 @@ return [
     'menuLink' => ['category' => 'Categoría de noticias'],
     'settingGroups' => ['public' => 'Web pública'],
     'settings'      => [
+        'listPage'      => 'Página de la lista principal de noticias',
+        'listPageNone'  => 'Ninguna (la lista propia de /news)',
+        'listPageHelp'  => 'Una página con una sección «Lista de noticias»: /news redirige a ella y el mapa del sitio solo muestra esa página.',
         'perPage'       => 'Noticias por página',
         'perPageHelp'   => 'Número de noticias en cada página del listado público.',
         'feedItems'     => 'Elementos del canal RSS',
@@ -43,6 +46,7 @@ return [
     'category'   => 'Categoría',
     'categories' => 'Categorías',
     'fields'     => [
+        'banner'       => 'Banner',
         'title'        => 'Título',
         'summary'      => 'Resumen',
         'body'         => 'Texto',
@@ -69,6 +73,7 @@ return [
         'event_all_day' => 'Todo el día',
     ],
     'help' => [
+        'banner'       => 'Opcional. Una imagen ancha que se muestra como cabecera en la página de la categoría y en sus noticias.',
         'slug'         => 'Palabras en minúsculas separadas por guiones. Déjelo en blanco para crearla a partir del título en {0}.',
         'categorySlug' => 'Se usa en news/category/{slug}. Déjelo en blanco para crearlo a partir del nombre en {0}.',
         'visibility'   => 'Pública: todo el mundo, en la web pública. Privada: usuarios identificados. Grupos: solo los grupos seleccionados.',
@@ -160,5 +165,39 @@ return [
     ],
     'cal' => [
         'notices' => 'Avisos',
+    ],
+    'sections' => [
+        'list' => [
+            'label'             => 'Lista de noticias',
+            'description'       => 'Las últimas noticias o la lista completa, con páginas y buscador, de una o más categorías.',
+            'styles'            => ['cards' => 'Tarjetas', 'list' => 'Lista compacta'],
+            'modes'             => ['latest' => 'Las últimas', 'full' => 'Lista completa (con páginas)'],
+            'searchLabel'       => 'Buscar en las noticias',
+            'searchPlaceholder' => 'Buscar…',
+            'searchButton'      => 'Buscar',
+            'noResults'         => 'Ninguna noticia coincide con la búsqueda.',
+            'pages'             => 'Páginas de «{0}»',
+            'moreDefault'       => 'Todas las noticias',
+        ],
+        'fields' => [
+            'heading'     => 'Encabezado',
+            'intro'       => 'Introducción',
+            'mode'        => 'Modo',
+            'limit'       => 'Número de noticias',
+            'categories'  => 'Categorías',
+            'columns'     => 'Columnas',
+            'showDate'    => 'Mostrar la fecha',
+            'showSummary' => 'Mostrar el resumen',
+            'showImage'   => 'Mostrar la imagen',
+            'search'      => 'Buscador (lista completa)',
+            'more'        => 'Enlace «más»',
+        ],
+        'help' => [
+            'mode'       => '«Las últimas» muestra las N más nuevas; «Lista completa» las muestra todas, N por página.',
+            'limit'      => 'Cuántas muestra (por página, en la lista completa).',
+            'categories' => 'Ninguna marcada: todas las categorías.',
+            'search'     => 'Solo en la lista completa.',
+            'more'       => 'Opcional, en el modo «Las últimas»: p. ej. la página con la lista completa.',
+        ],
     ],
 ];

@@ -105,7 +105,19 @@ final class Module extends ModuleManifest
             'help'    => 'News.settings.feedItemsHelp',
             'group'   => 'public',
         ],
+        // The page that is the main news list (D-46-03): `/news` redirects to it.
+        'listPage' => [
+            'type'            => 'select',
+            'default'         => '',
+            'optionsProvider' => \Modules\News\Settings\ListPageOptions::class,
+            'label'           => 'News.settings.listPage',
+            'help'            => 'News.settings.listPageHelp',
+            'group'           => 'public',
+        ],
     ];
+
+    /** Section types of pages built from sections (session 46; docs/sections.md): a list of news. */
+    public array $sectionTypes = [\Modules\News\Sections\NewsListSection::class];
 
     public array $widgets = [
         \Modules\News\Widgets\Notices::class,

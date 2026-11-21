@@ -79,6 +79,12 @@ final class Module extends ModuleManifest
     /** No manifest settings: `setting('Events.*')` would autoload `app/Config/Events.php` (D-24-05). */
     public array $settings = [];
 
+    /** Section types of pages built from sections (session 46; docs/sections.md): calendar and upcoming events. */
+    public array $sectionTypes = [
+        \Modules\Events\Sections\CalendarSection::class,
+        \Modules\Events\Sections\EventsListSection::class,
+    ];
+
     public array $widgets = [\Modules\Events\Widgets\UpcomingEvents::class];
 
     public array $tasks = [\Modules\Events\Tasks\SendReminders::class];

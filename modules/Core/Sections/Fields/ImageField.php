@@ -22,6 +22,21 @@ class ImageField extends Field
 {
     public const ALT_MAX = 250;
 
+    protected bool $decorativeAllowed = true;
+
+    /** The image always needs its alternative text (e.g. a logo, which names an organisation). */
+    public function withoutDecorative(): static
+    {
+        $this->decorativeAllowed = false;
+
+        return $this;
+    }
+
+    public function allowsDecorative(): bool
+    {
+        return $this->decorativeAllowed;
+    }
+
     public function type(): string
     {
         return 'image';
@@ -50,7 +65,7 @@ class ImageField extends Field
             throw SectionValidationException::at($path, lang('Sections.errors.required', [$this->getLabel()]));
         }
 
-        $decorative = in_array($posted['decorative'] ?? null, ['1', 1, true, 'on'], true);
+        $decorative = $this->decorativeAllowed && in_array($posted['decorative'] ?? null, ['1', 1, true, 'on'], true);
         $alts       = $posted['alt'] ?? [];
 
         if (! is_array($alts)) {

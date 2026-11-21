@@ -20,6 +20,12 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
 - Section types (`$sectionTypes`, D-45-01): `Sections/` (`HeroSection`, `LinksSection`, `CardsSection`,
   `MediaTextSection`, `CtaSection`, `TextSection`, base `PagesSectionType`), views `Views/sections/`,
   thumbnails `Assets/img/sections/`.
+- Session 46: `CarouselSection` (`pages/carousel`, no rotation by default, D-46-02),
+  `TestimonialsSection`, `LogosSection`, `EmbedSection` (`pages/embed`, click to load; hosts in
+  `Embeds/EmbedHosts.php`, setting `Pages.embedHosts` in Settings › Security, group
+  `security.embeds`; CSP `frame-src` per page through `cspSources()`, D-46-01). Demo pages
+  "Notícies", "Sortides", "Agenda", "Més seccions" (`PagesDemoSeeder::moduleSectionPages()`).
+  Tests `Tests/ModuleSectionsTest.php` (also the News and Events section types).
 
 ## Main pieces
 

@@ -51,7 +51,8 @@ final class Module extends ModuleManifest
 
     /**
      * Section types of pages built from sections (D-45-01; docs/sections.md): hero banner, quick
-     * links, cards, image and text, call to action and text.
+     * links, cards, image and text, call to action and text; session 46: carousel, testimonials,
+     * logos and embedded content (D-46-01, D-46-02).
      */
     public array $sectionTypes = [
         \Modules\Pages\Sections\HeroSection::class,
@@ -60,6 +61,10 @@ final class Module extends ModuleManifest
         \Modules\Pages\Sections\MediaTextSection::class,
         \Modules\Pages\Sections\CtaSection::class,
         \Modules\Pages\Sections\TextSection::class,
+        \Modules\Pages\Sections\CarouselSection::class,
+        \Modules\Pages\Sections\TestimonialsSection::class,
+        \Modules\Pages\Sections\LogosSection::class,
+        \Modules\Pages\Sections\EmbedSection::class,
     ];
 
     public array $settings = [
@@ -71,12 +76,25 @@ final class Module extends ModuleManifest
             'help'            => 'Pages.settings.homePageHelp',
             'group'           => 'public',
         ],
+        // Hosts whose pages may be embedded (D-46-01): Settings › Security, empty = none. Each one
+        // adds `frame-src https://<host>` to the pages that embed it, and only to those.
+        'embedHosts' => [
+            'type'    => 'list',
+            'default' => [],
+            'rules'   => 'outbound_hosts',
+            'label'   => 'Pages.settings.embedHosts',
+            'help'    => 'Pages.settings.embedHostsHelp',
+            'group'   => 'security.embeds',
+        ],
     ];
 
     /** Featured images: files of the Storage service in the folder `modules/pages` (public disk). */
     public array $backup = ['files' => ['modules/pages']];
 
-    /** No extra Content-Security-Policy sources: the editor is vendored and served by the site. */
+    /**
+     * No extra Content-Security-Policy sources for every page: the editor is vendored and served
+     * by the site; an embed section adds `frame-src` for its own origin to its page only.
+     */
     public array $csp = [];
 
     /** No outbound requests. */

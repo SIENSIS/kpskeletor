@@ -6,7 +6,7 @@
  *
  * @var string                     $layout
  * @var array<string, mixed>       $page
- * @var list<array{section: \Modules\Core\Sections\SectionData, type: \Modules\Core\Sections\SectionType|null, summary: string}> $rows
+ * @var list<array{section: \Modules\Core\Sections\SectionData, type: \Modules\Core\Sections\SectionType|null, summary: string, warnings: list<array{message: string, link?: array{url: string, label: string}}>}> $rows
  * @var string                     $baseUrl
  * @var string                     $previewUrl
  * @var string                     $editUrl
@@ -62,6 +62,9 @@ $sectionsMode = ($page['layout'] ?? 'article') === 'sections';
                                 <?php if ($section->hidden): ?>
                                     <?= ui_badge(lang('Pages.sections.hidden'), 'secondary', 'bi bi-eye-slash') ?>
                                 <?php endif ?>
+                                <?php foreach ($row['warnings'] as $warning): ?>
+                                    <span class="d-block small text-warning-emphasis mt-1"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><?= esc($warning['message']) ?><?php if (isset($warning['link'])): ?> <a href="<?= esc($warning['link']['url'], 'attr') ?>"><?= esc($warning['link']['label']) ?></a><?php endif ?></span>
+                                <?php endforeach ?>
                                 <?php if ($type === null): ?>
                                     <?= ui_badge(lang('Pages.sections.unavailable'), 'warning', 'bi bi-exclamation-triangle') ?>
                                 <?php endif ?>

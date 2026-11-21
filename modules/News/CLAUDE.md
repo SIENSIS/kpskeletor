@@ -23,6 +23,11 @@ description: `docs/news.md`.
   `Controllers/Api/PublicNews.php` (`api/v1/public/news`, no token, D-26-02).
 - Tables: `news_categories`, `news_category_translations`, `news`, `news_translations`,
   `news_groups` (surrogate `id`, unique pair), `news_reads` (one migration each).
+- Session 46: section type `news.list` (`Sections/NewsListSection.php`), category banners
+  (`news_categories.banner`, migration `AddBannerToNewsCategories`, view `Views/public/_banner.php`),
+  setting `News.listPage` (`Services/ListPage.php`, `Settings/ListPageOptions.php`: `/news` → 301
+  to that page, D-46-03). Tests `Tests/CategoryBannerTest.php`; the section in
+  `modules/Pages/Tests/ModuleSectionsTest.php`.
 
 ## Main pieces
 

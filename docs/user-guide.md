@@ -329,6 +329,29 @@ under the other, over the whole width of the site. No code is needed.
 5. **Preview** shows the page as it is now. Every change is kept in the page's **Revisions**,
    and restoring a revision brings its sections back.
 
+#### More kinds of section
+
+- **News list**: the latest news (a few cards and a "more" link) or the **full list** with pages
+  and a search box, of one or more categories. It shows only the news the public website shows.
+  To make such a page the main news list, choose it in Settings › News › *Page of the main news
+  list*: `/news` then takes visitors there.
+- **Calendar** and **Upcoming events**: the public calendar, or the next public events as a list
+  or cards, of some categories or all of them.
+- **Gallery**: the images of a shared folder of the file manager, as a grid or a masonry; a click
+  opens the image large. Images of the public disk are seen by everyone; those of a private folder
+  only by signed-in people allowed to see that folder.
+- **Carousel**: slides with an image, a title, a text and a button. It does not move by itself
+  unless you turn on **Rotate by itself** (visitors can then pause it).
+- **Testimonials** (quotes with a photo, name and role) and **Logos** (each logo needs its
+  alternative text, the name of the organisation).
+- **Embedded content**: a video, a virtual tour or a map of another site. Only sites an
+  administrator has allowed in Settings › Security › *Sites that may be embedded* are accepted; if
+  the site is not allowed, the form says so and names it. By default the content loads only when
+  the visitor clicks.
+
+A category of news can have a **banner** (News › Categories › *Banner*): it is shown at the top of
+the category's page and of its news.
+
 ## Menus
 
 Sidebar › **Menus** (`/backend/menus/public`): the menus of the public website.

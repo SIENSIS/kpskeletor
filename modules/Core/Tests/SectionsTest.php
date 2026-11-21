@@ -98,7 +98,7 @@ final class SectionsTest extends AuthTestCase
     public function testTheRegistryOffersTheTypesOfEnabledModulesOnly(): void
     {
         $registry = new SectionRegistry();
-        $this->assertSame(['pages.hero', 'pages.links', 'pages.cards', 'pages.media_text', 'pages.cta', 'pages.text'], array_keys($registry->all()));
+        $this->assertSame(['pages.hero', 'pages.links', 'pages.cards', 'pages.media_text', 'pages.cta', 'pages.text', 'pages.carousel', 'pages.testimonials', 'pages.logos', 'pages.embed'], array_keys($registry->all()));
         $this->assertSame('Pages', $registry->module('pages.cards'));
         $this->assertSame('Modules\Pages\Views\sections\media_text', $registry->get('pages.media_text')?->view());
 
@@ -117,7 +117,7 @@ final class SectionsTest extends AuthTestCase
         self::declare(['Pages' => new PagesModule(), 'Core' => $manifest]);
 
         $this->assertEqualsCanonicalizing(
-            ['core.sample', 'pages.hero', 'pages.links', 'pages.cards', 'pages.media_text', 'pages.cta', 'pages.text'],
+            ['core.sample', 'pages.hero', 'pages.links', 'pages.cards', 'pages.media_text', 'pages.cta', 'pages.text', 'pages.carousel', 'pages.testimonials', 'pages.logos', 'pages.embed'],
             array_keys((new SectionRegistry())->all()),
             'Core may not declare pages.*, repeat a key or name a missing class.',
         );

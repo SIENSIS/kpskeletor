@@ -18,7 +18,13 @@ return [
         'moveDown'    => 'Move down',
         'item'        => 'Item {0}',
         'itemActions' => 'Actions of the item',
+        'noChoices'   => 'There is nothing to choose yet.',
         'itemsLimit'  => 'from {0} to {1}',
+    ],
+    'pager' => [
+        'previous' => 'Previous page',
+        'next'     => 'Next page',
+        'page'     => 'Page',
     ],
     'options' => [
         'style'               => 'Style',

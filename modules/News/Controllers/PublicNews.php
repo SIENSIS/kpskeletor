@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Modules\News\Controllers;
 
 use CodeIgniter\Exceptions\PageNotFoundException;
+use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Core\Controllers\FrontendController;
 use Modules\Core\Security\HtmlSanitizer;
 use Modules\News\Services\FeedWriter;
+use Modules\News\Services\ListPage;
 use Modules\News\Services\NewsRepository;
 use Modules\News\Storage\CoverUploads;
 
@@ -19,12 +21,21 @@ use Modules\News\Storage\CoverUploads;
  * - `GET news` (`?page=`), `GET news/category/{slug}`, `GET news/{slug}`;
  * - `GET news/feed.xml`: RSS 2.0 of the latest public posts (`News.feedItems`).
  *
- * Page size: `News.perPage`. Anything not public is a 404.
+ * Page size: `News.perPage`. Anything not public is a 404. When a page is marked as the main news
+ * list (`News.listPage`, D-46-03), `GET news` redirects to it (301); categories and articles keep
+ * their URLs.
  */
 final class PublicNews extends FrontendController
 {
-    public function index(): string
+    public function index(): RedirectResponse|string
     {
+        // A page marked as the main news list (D-46-03): `/news` sends the visitor there.
+        $page = (new ListPage())->url();
+
+        if ($page !== null) {
+            return redirect()->to($page, 301);
+        }
+
         return $this->listing(null);
     }
 
@@ -62,6 +73,7 @@ final class PublicNews extends FrontendController
             'post'        => $post,
             'body'        => HtmlSanitizer::clean((string) $post['body']),
             'cover'       => $cover,
+            'bannerUrl'   => CoverUploads::urlOf(is_string($post['category_banner'] ?? null) ? $post['category_banner'] : null),
             'breadcrumbs' => [['label' => lang('News.publicTitle'), 'url' => site_url('news')], ['label' => (string) $post['title']]],
         ]);
     }
@@ -84,7 +96,7 @@ final class PublicNews extends FrontendController
     }
 
     /**
-     * @param array{id: int, slug: string, name: string}|null $category
+     * @param array{id: int, slug: string, name: string, banner: string|null}|null $category
      */
     private function listing(?array $category): string
     {
@@ -108,6 +120,9 @@ final class PublicNews extends FrontendController
             'canonical'   => site_url($path) . ($page > 1 ? '?page=' . $page : ''),
         ]);
 
+        $crumbs = $category === null ? [] : [['label' => lang('News.publicTitle'), 'url' => site_url('news')], ['label' => $title]];
+        $banner = $category === null ? null : CoverUploads::urlOf($category['banner']);
+
         return $this->render('Modules\News\Views\public\index', [
             'title'       => $title,
             'items'       => $result['rows'],
@@ -115,7 +130,10 @@ final class PublicNews extends FrontendController
             'current'     => $category['slug'] ?? null,
             'pager'       => $result['total'] > $perPage ? $pager->makeLinks($page, $perPage, $result['total']) : '',
             'feedUrl'     => site_url('news/feed.xml'),
-            'breadcrumbs' => $category === null ? [] : [['label' => lang('News.publicTitle'), 'url' => site_url('news')], ['label' => $title]],
+            'bannerUrl'   => $banner,
+            // With a banner, its title is the page's <h1> and the view draws the breadcrumbs.
+            'trail'       => $banner === null ? [] : $crumbs,
+            'breadcrumbs' => $banner === null ? $crumbs : [],
         ]);
     }
 }

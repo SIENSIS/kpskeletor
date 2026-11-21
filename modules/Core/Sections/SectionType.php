@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Sections;
 
+use CodeIgniter\Shield\Entities\User;
 use Modules\Core\I18n\Locales;
 use Modules\Core\Sections\Fields\Field;
 
@@ -158,6 +159,39 @@ abstract class SectionType
         }
 
         return $values;
+    }
+
+    /**
+     * Rules of the whole section that its fields cannot check alone (e.g. an embed's host must be
+     * allowed by a setting). Called by `SectionForm::validate()` after the fields.
+     *
+     * @throws SectionValidationException
+     */
+    public function check(SectionData $section, FieldContext $context): void
+    {
+    }
+
+    /**
+     * Problems of a saved section that the editor must see (in the section list, the form and the
+     * preview), e.g. an embed whose host was later removed from the allowed list. The public page
+     * shows none of them: a type renders nothing it cannot show.
+     *
+     * @return list<array{message: string, link?: array{url: string, label: string}}>
+     */
+    public function warnings(SectionData $section, ?User $user = null): array
+    {
+        return [];
+    }
+
+    /**
+     * Sources a rendered section needs in the page's Content-Security-Policy (directive =>
+     * origins), added for that response only (`SectionRenderer`; e.g. an embed's `frame-src`).
+     *
+     * @return array<string, list<string>>
+     */
+    public function cspSources(SectionData $section): array
+    {
+        return [];
     }
 
     /**

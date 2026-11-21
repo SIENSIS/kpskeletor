@@ -10,6 +10,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The versi
 
 ### Added
 
+- **Section types from modules** (session 46, D-46-01 … D-46-04, `docs/sections.md`): **News
+  list** `news.list` (latest N or the full list with pages `page-<id>` and search `q-<id>`, one or
+  several categories, exactly what the public list shows), **Calendar** `events.calendar` and
+  **Upcoming events** `events.list` (public events only), **Gallery** `files.gallery` (a shared
+  folder's images, grid or masonry, lightbox; private folders only for visitors with the ACL's
+  `view` right, never SVG), **Carousel** `pages.carousel` (no rotation by default, pause button,
+  reduced motion and keyboard), **Testimonials** `pages.testimonials`, **Logos** `pages.logos`
+  and **Embedded content** `pages.embed` (allowed hosts in Settings › Security
+  `Pages.embedHosts`, empty by default; refused hosts named with a link to the setting; CSP
+  `frame-src` per page; sandboxed iframe; click to load). News categories get an optional
+  **banner** (column `news_categories.banner`, a new migration) shown as a hero on the category
+  page and its articles; setting **`News.listPage`** makes `/news` redirect (301) to a page with
+  the full list (D-46-03). Core: `SectionType::check()`, `warnings()`, `cspSources()`,
+  `ChoicesField`, `SelectField::optionsFrom()`, `BooleanField::default()`,
+  `ImageField::withoutDecorative()`, `SectionQuery` and the views `sections/pager`,
+  `sections/heading`; the public calendar feed accepts `categories=<id>,<id>`. Demo pages
+  "Notícies", "Sortides", "Agenda" and "Més seccions", a News category "Sortides" with outings and
+  images in the public folder "Imatges web".
+
 - **Pages built from sections** (session 45, D-45-01, `docs/pages.md`, `docs/sections.md`): a
   page's layout is `article` (its text) or `sections`, an ordered list of sections edited with
   forms (no shortcodes), shown over the whole width of the public layout. Section editor at

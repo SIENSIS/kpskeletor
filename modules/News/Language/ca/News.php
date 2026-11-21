@@ -32,6 +32,9 @@ return [
     'menuLink' => ['category' => 'Categoria de notícies'],
     'settingGroups' => ['public' => 'Web pública'],
     'settings'      => [
+        'listPage'      => 'Pàgina de la llista principal de notícies',
+        'listPageNone'  => 'Cap (la llista pròpia de /news)',
+        'listPageHelp'  => 'Una pàgina amb una secció «Llista de notícies»: /news hi redirigeix i el mapa del lloc només mostra aquesta pàgina.',
         'perPage'       => 'Notícies per pàgina',
         'perPageHelp'   => 'Nombre de notícies a cada pàgina del llistat públic.',
         'feedItems'     => 'Elements del canal RSS',
@@ -43,6 +46,7 @@ return [
     'category'   => 'Categoria',
     'categories' => 'Categories',
     'fields'     => [
+        'banner'       => 'Bàner',
         'title'        => 'Títol',
         'summary'      => 'Resum',
         'body'         => 'Text',
@@ -69,6 +73,7 @@ return [
         'event_all_day' => 'Tot el dia',
     ],
     'help' => [
+        'banner'       => 'Opcional. Una imatge ampla que es mostra com a capçalera a la pàgina de la categoria i a les seves notícies.',
         'slug'         => 'Paraules en minúscules separades per guions. Deixeu-ho en blanc per crear-la a partir del títol en {0}.',
         'categorySlug' => 'S’usa a news/category/{slug}. Deixeu-ho en blanc per crear-lo a partir del nom en {0}.',
         'visibility'   => 'Pública: tothom, a la web pública. Privada: usuaris identificats. Grups: només els grups seleccionats.',
@@ -160,5 +165,39 @@ return [
     ],
     'cal' => [
         'notices' => 'Avisos',
+    ],
+    'sections' => [
+        'list' => [
+            'label'             => 'Llista de notícies',
+            'description'       => 'Les últimes notícies o la llista completa, amb pàgines i cercador, d\'una o més categories.',
+            'styles'            => ['cards' => 'Targetes', 'list' => 'Llista compacta'],
+            'modes'             => ['latest' => 'Les últimes', 'full' => 'Llista completa (amb pàgines)'],
+            'searchLabel'       => 'Cerca a les notícies',
+            'searchPlaceholder' => 'Cerca…',
+            'searchButton'      => 'Cerca',
+            'noResults'         => 'Cap notícia coincideix amb la cerca.',
+            'pages'             => 'Pàgines de «{0}»',
+            'moreDefault'       => 'Totes les notícies',
+        ],
+        'fields' => [
+            'heading'     => 'Encapçalament',
+            'intro'       => 'Introducció',
+            'mode'        => 'Mode',
+            'limit'       => 'Nombre de notícies',
+            'categories'  => 'Categories',
+            'columns'     => 'Columnes',
+            'showDate'    => 'Mostra la data',
+            'showSummary' => 'Mostra el resum',
+            'showImage'   => 'Mostra la imatge',
+            'search'      => 'Cercador (llista completa)',
+            'more'        => 'Enllaç «més»',
+        ],
+        'help' => [
+            'mode'       => '«Les últimes» mostra les N més noves; «Llista completa» les mostra totes, N per pàgina.',
+            'limit'      => 'Quantes en mostra (per pàgina, a la llista completa).',
+            'categories' => 'Cap marcada: totes les categories.',
+            'search'     => 'Només a la llista completa.',
+            'more'       => 'Opcional, al mode «Les últimes»: p. ex. la pàgina amb la llista completa.',
+        ],
     ],
 ];

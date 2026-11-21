@@ -22,6 +22,11 @@ session 23): folders on demand, quotas, `files` rows and browsing through the fo
 
 ## Main pieces
 
+- Session 46: section type `files.gallery` (`Sections/GallerySection.php`, `Sections/FolderField.php`,
+  lightbox `Assets/js/gallery.js` = `files/gallery`): shared folders only; public-disk folders for
+  everyone, private-disk folders only with the ACL's `view` right (never guests), D-46-04. The demo
+  adds images to the public folder "Imatges web". Tests `Tests/GallerySectionTest.php`.
+
 - `Services/Spaces.php` (paths of the spaces), `Rights.php`, `FolderRepository.php` (folders and
   ACL rows), `FolderAcl.php` (`rights()` = ACL, `managerRights()` = ACL capped by RBAC and the
   space rules), `FileRepository.php` (listing, filters, tags), `QuotaService.php`,

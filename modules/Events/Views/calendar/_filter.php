@@ -5,13 +5,15 @@
  * @var list<array{id: int, slug: string, name: string, color: string|null}> $categories
  * @var int                                                                   $selected
  * @var array<string, mixed>                                                  $options
+ * @var string|null                                                           $filterId the select's id (default `events-category`)
  */
+$filterId ??= 'events-category';
 ?>
 <?php if ($categories !== []): ?>
     <div class="row g-2 align-items-end mb-3 events-filters">
         <div class="col-12 col-sm-6 col-lg-4">
-            <label class="form-label small mb-1" for="events-category"><?= esc(lang('Events.fields.category_id')) ?></label>
-            <select class="form-select form-select-sm" id="events-category">
+            <label class="form-label small mb-1" for="<?= esc($filterId, 'attr') ?>"><?= esc(lang('Events.fields.category_id')) ?></label>
+            <select class="form-select form-select-sm" id="<?= esc($filterId, 'attr') ?>">
                 <option value=""><?= esc(lang('Events.allCategories')) ?></option>
                 <?php foreach ($categories as $category): ?>
                     <option value="<?= (int) $category['id'] ?>"<?= $selected === $category['id'] ? ' selected' : '' ?>><?= esc($category['name']) ?></option>

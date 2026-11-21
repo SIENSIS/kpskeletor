@@ -6,10 +6,14 @@
  * @var array<string, mixed> $post
  * @var string               $body
  * @var string|null          $cover
+ * @var string|null          $bannerUrl the banner of the post's category
  */
 ?>
 <?= $this->extend($layout) ?>
 <?= $this->section('content') ?>
+<?php if (! empty($bannerUrl)): ?>
+    <?= theme_view('Modules\News\Views\public\_banner', ['bannerUrl' => $bannerUrl, 'label' => (string) $post['category'], 'heading' => false, 'link' => site_url('news/category/' . rawurlencode((string) $post['category_slug']))]) ?>
+<?php endif ?>
 <article class="news-article mx-auto">
     <header class="mb-4">
         <h1 class="display-6 text-break"><?= esc((string) $post['title']) ?></h1>

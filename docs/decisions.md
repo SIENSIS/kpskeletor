@@ -313,6 +313,7 @@ questions") and from each session's report; they are answered with `deploy/decid
 | D-46-01 | 46 | Embedded content: allowed hosts in Settings › Security, CSP `frame-src`, click to load (decide) | Applied (decided) |
 | D-46-02 | 46 | Carousel: no automatic rotation by default (decide) | Applied (decided) |
 | D-46-03 | 46 | A page marked as the main news list: `/news` redirects to it (decide) | Applied (decided) |
+| D-46-04 | 46 | How session 46 applies D-46-01 … D-46-03 (gallery visibility, embed hosts and CSP per page, section hooks, the main list page) | Accepted (proposal) |
 | D-47-01 | 47 | Reusable blocks and theme zones: tables, the theme's `$zones`, URLs and permissions (decide) | Applied (decided) |
 | D-48-01 | 48 | Contact module: names, URLs, settings and who reads the messages (decide) | Applied (decided) |
 | D-48-02 | 48 | Contact form: captcha policy, no third-party captcha, retention of messages (decide) | Applied (decided) |
@@ -3182,6 +3183,14 @@ questions") and from each session's report; they are answered with `deploy/decid
 - **Status:** Decided
 - **Decision (2026-11-19):** «Envia'l a la meva pàgina (recomanada)». As proposed: a News setting marks a page as the main news list; `/news` then answers a 301 redirect to it (with the language prefix) and the sitemap lists only that page; with no page chosen nothing changes; article and category pages keep their URLs. **Must change:** session 46 (already described), `docs/news.md`.
 - **Applied in:** `docs/specification.md` ("Pages"), `deploy/46-module-sections.md`; the code is the session's.
+
+## D-46-04 — How session 46 applies D-46-01 … D-46-03
+
+- **Where:** `deploy/46-module-sections.md`; D-46-01 … D-46-03; `docs/sections.md`, `docs/files.md`, `docs/security.md`.
+- **Problem:** The decisions fix the behaviour; several details were open: who sees a gallery of a private folder, the format of the allowed embed hosts, whether `frame-src` is site-wide or per page, how the Core lets a type refuse a value with a link and warn editors, how two lists on a page page independently, and how News finds the page chosen as its main list without depending on Pages.
+- **Proposal (built):** (1) **Galleries:** shared folders only (`shared/…`); the editor chooses only folders they may view (the form offers those, `check()` refuses others); a folder of the **public disk** is shown to everyone who may read the page (its files are public by nature), a folder of the **private disk** only to signed-in visitors with the folder ACL's `view` right, never to guests (the editor sees a notice); SVG is never shown. (2) **Embed hosts** are host names (`www.youtube-nocookie.com`, `*.example.com` for subdomains), validated with the existing rule `outbound_hosts`, in the group `security.embeds`; the address must be `https://` without credentials. (3) **CSP per page**: `frame-src` gets only the origins of the embeds a page shows, for that response (new `SectionType::cspSources()`, applied by `SectionRenderer`), instead of every allowed host on every page. (4) **Core hooks**: `SectionType::check()` (rules of a whole section; `SectionValidationException` can carry a link), `warnings()` (shown in the section list, the form and the preview; a section that renders nothing is left out with its `<section>`), new field `ChoicesField`, `SelectField::optionsFrom()`, `BooleanField::default()`, `ImageField::withoutDecorative()` (logos), `SectionQuery` (`page-<id>`, `q-<id>`) and the Core views `sections/pager` and `sections/heading`. (5) **Main news list:** `News.listPage` offers the pages through the link type `pages.page` (Core link registry) and `/news` redirects with a 301 only when that link resolves (published page); the sitemap already lists pages only. (6) The events sections show nothing while the public calendar is off. (7) The carousel's pause button is hidden under `prefers-reduced-motion` (it never rotates then). (8) Demo pages: "Notícies", "Sortides", "Agenda" and "Més seccions"; the embed of the demo stays hidden until its host is allowed.
+- **Alternatives:** A) `frame-src` for every allowed host on every page (simpler, wider). B) Galleries of private folders shown to every signed-in user (less precise than the ACL). C) A page id stored and resolved by News reading Pages' tables (a hard dependency).
+- **Status:** Accepted (proposal)
 
 ## D-47-01 — Reusable blocks and theme zones: tables, the theme's `$zones`, URLs and permissions (decide)
 
