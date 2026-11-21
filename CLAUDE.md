@@ -50,7 +50,7 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
 
 - Everything lives in **modules** (`modules/<Name>/`), described by a typed manifest
   `Config/Module.php` (resources, menus, settings, widgets, tasks, notifications, api, csp,
-  outboundHosts, `enabledByDefault`, `developmentOnly`). Never hard-code a module in the Core.
+  outboundHosts, sectionTypes, `enabledByDefault`, `developmentOnly`). Never hard-code a module in the Core.
 - Loading only through CodeIgniter discovery; never `require` route files; `Routes.php` never
   queries the database. Each module has its own namespace (`Modules\News` → `modules/News`) listed
   in the generated `app/Config/ModuleNamespaces.php` (written by `make:module`, `modules:sync` and
@@ -88,6 +88,9 @@ Run the tests, PHPStan and php-cs-fixer before every commit; show the results.
   `policy`, `source`) and publish with `service('calendar')->publish()` / `unpublish()` on every
   change, or declare a `CalendarProvider` in `$calendarProviders`; never write to `events`
   directly (`docs/calendar.md`).
+- **Page sections:** section types in `Sections/` extending `Modules\Core\Sections\SectionType`
+  (key `<module>.<name>`, a field schema of the Core's field types, a view `Views/sections/<name>.php`),
+  declared in the manifest `$sectionTypes`; never shortcodes (D-45-01, `docs/sections.md`).
 - **Dashboard widgets:** classes in `Widgets/` extending `Modules\Core\Widgets\Widget` (or
   `AsyncWidget`), declared in the manifest `$widgets`, id `<module>.<name>`, a `permission()`;
   shown only with the permission **and** enabled for one of the user's groups (`docs/widgets.md`).

@@ -30,6 +30,7 @@
 // "allowOverflow": true) or when the browser reports a Content-Security-Policy violation (except
 // those of CodeIgniter's development debug toolbar script, `?debugbar`).
 // "click": selectors clicked in order before the capture ("wait": extra milliseconds).
+// Full-page shots scroll through the page first, so lazy images are loaded.
 // "locale": the browser's language for a shot or the whole config (default ca-ES).
 //
 // --shot syntax: "<url>=<name>[@<width>x<height>][:dark][:full][:guest]".
@@ -148,6 +149,17 @@ async function main() {
                 }
                 if (shot.waitFor) await page.waitForSelector(shot.waitFor);
                 if (shot.wait) await page.waitForTimeout(shot.wait);
+                if (shot.fullPage) {
+                    // Scroll through the page so lazy images (loading="lazy") are in the capture.
+                    await page.evaluate(async () => {
+                        for (let y = 0; y < document.body.scrollHeight; y += 400) {
+                            window.scrollTo(0, y);
+                            await new Promise((resolve) => setTimeout(resolve, 40));
+                        }
+                        window.scrollTo(0, 0);
+                    });
+                    await page.waitForLoadState('networkidle');
+                }
                 const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
                 if (overflow > 0 && !shot.allowOverflow) throw new Error(`horizontal overflow of ${overflow}px at ${width}px`);
                 if (violations.length) throw new Error(`CSP violation: ${violations[0]}`);

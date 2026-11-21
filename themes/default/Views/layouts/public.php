@@ -4,11 +4,15 @@
  * partial `public_menu`), content with an optional sidebar region, footer with the `footer` menu
  * location, SEO meta tags ($meta) and the
  * cookie notice (theme option), language switch, theme switch. Regions: header, sidebar, footer, home.
+ * Full-width mode (`$fullWidth`, pages built from sections, D-45-01): no outer container, no
+ * sidebar and no vertical padding, so banners reach the edges; each section adds its own container.
  *
  * @var string|null $title
+ * @var bool|null   $fullWidth
  */
 $font       = preg_replace('/[^a-z0-9-]/', '', (string) theme_option('font'));
-$hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public', 'sidebar');
+$fullWidth  = ! empty($fullWidth);
+$hasSidebar = ! $fullWidth && theme()->regions()->has('sidebar') && theme()->hasRegion('public', 'sidebar');
 ?>
 <!doctype html>
 <html lang="<?= esc(service('request')->getLocale()) ?>"<?= theme_mode()->attributes() ?>>
@@ -32,7 +36,14 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
         <?= theme_partial('theme_switch', ['switchClass' => 'site-theme-switch ms-md-1']) ?>
     </nav>
 </header>
-<main id="main" class="site-main flex-grow-1 py-4" tabindex="-1">
+<main id="main" class="site-main flex-grow-1<?= $fullWidth ? ' site-main-full' : ' py-4' ?>" tabindex="-1">
+    <?php if ($fullWidth): ?>
+        <div class="container site-main-notices">
+            <?= $this->include(theme_resolve('partials/flash')) ?>
+            <?= $this->include(theme_resolve('partials/page_top')) ?>
+        </div>
+        <?= $this->renderSection('content') ?>
+    <?php else: ?>
     <div class="container">
         <?= $this->include(theme_resolve('partials/flash')) ?>
         <?= $this->include(theme_resolve('partials/page_top')) ?>
@@ -45,6 +56,7 @@ $hasSidebar = theme()->regions()->has('sidebar') && theme()->hasRegion('public',
             <?= $this->renderSection('content') ?>
         <?php endif ?>
     </div>
+    <?php endif ?>
 </main>
 <footer class="site-footer border-top py-4 mt-auto">
     <div class="container d-flex flex-wrap justify-content-between gap-3 small text-body-secondary">

@@ -312,6 +312,23 @@ Sidebar › **Pages** (`/backend/pages`): the pages of the public website.
 
 Publishing usually needs a specific permission; an editor who cannot publish saves drafts.
 
+### Pages built from sections
+
+A page can show its text (**Layout: Article**) or be built from **sections** (**Layout:
+Sections**): banners, quick links, cards, image and text, calls to action and text blocks, one
+under the other, over the whole width of the site. No code is needed.
+
+1. In the list of pages, open the row menu › **Sections**.
+2. If the notice says the page shows its text, press **Use sections** (the text is kept).
+3. **Add a section**, choose a kind in the gallery, fill in its form and **Save**. Use the
+   language buttons at the top of the form to write the texts in each language; images need an
+   **alternative text** (what the image shows) unless you mark them **decorative**.
+4. Change the order by dragging a section by its handle (or focus the handle and use the up and
+   down arrows) and press **Save the order**. **Hide** keeps a section without showing it;
+   **Duplicate** and **Delete** do what they say.
+5. **Preview** shows the page as it is now. Every change is kept in the page's **Revisions**,
+   and restoring a revision brings its sections back.
+
 ## Menus
 
 Sidebar › **Menus** (`/backend/menus/public`): the menus of the public website.

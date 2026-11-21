@@ -128,6 +128,14 @@ abstract class ModuleManifest
     public array $calendarProviders = [];
 
     /**
+     * Section types of pages built from sections (`Modules\Core\Sections\SectionType` classes,
+     * keys `<module>.<name>`; D-45-01, docs/sections.md).
+     *
+     * @var list<string>
+     */
+    public array $sectionTypes = [];
+
+    /**
      * API resources (kpapy) under /api/v1: key => [path, handler]; checked against Config/Routes.php.
      *
      * @var array<string, array<string, string>>

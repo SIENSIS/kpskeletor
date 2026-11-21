@@ -122,7 +122,7 @@ final class PagesModuleTest extends PagesTestCase
             $migrations[] = new $class(Database::forge('tests'));
         }
 
-        $this->assertCount(4, $migrations);
+        $this->assertCount(7, $migrations);
 
         foreach (array_reverse($migrations) as $migration) {
             \assert($migration instanceof Migration);
@@ -131,6 +131,8 @@ final class PagesModuleTest extends PagesTestCase
 
         $this->db->resetDataCache();
         $this->assertFalse($this->db->tableExists('pages'));
+        $this->assertFalse($this->db->tableExists('page_sections'));
+        $this->assertFalse($this->db->tableExists('page_section_translations'));
 
         foreach ($migrations as $migration) {
             $migration->up();
@@ -138,8 +140,10 @@ final class PagesModuleTest extends PagesTestCase
 
         $this->db->resetDataCache();
 
-        foreach (['pages', 'page_translations', 'page_groups', 'page_revisions'] as $table) {
+        foreach (['pages', 'page_translations', 'page_groups', 'page_revisions', 'page_sections', 'page_section_translations'] as $table) {
             $this->assertTrue($this->db->tableExists($table), $table);
         }
+
+        $this->assertTrue($this->db->fieldExists('layout', 'pages'));
     }
 }

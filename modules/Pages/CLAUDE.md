@@ -15,7 +15,11 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
 - Setting `Pages.homePage` (page id, a `select` with `optionsProvider` `Settings/HomePageOptions.php`). Menu "Pages" (sidebar, order 25). Link type
   `Menu/PageLink.php`. Events `Config/Events.php` (`homePage`). No API, widgets, tasks or
   notifications yet.
-- Tables: `pages`, `page_translations`, `page_groups`, `page_revisions` (one migration each).
+- Tables: `pages` (+ `layout`, a later migration), `page_translations`, `page_groups`,
+  `page_revisions`, `page_sections`, `page_section_translations` (one migration each).
+- Section types (`$sectionTypes`, D-45-01): `Sections/` (`HeroSection`, `LinksSection`, `CardsSection`,
+  `MediaTextSection`, `CtaSection`, `TextSection`, base `PagesSectionType`), views `Views/sections/`,
+  thumbnails `Assets/img/sections/`.
 
 ## Main pieces
 
@@ -27,6 +31,12 @@ with restore, preview and duplicate, the home page setting, the XML sitemap and 
   `Sitemap.php`; views `templates/{default,wide,sidebar}.php`, `partials/article.php`,
   `revisions.php`; `Storage/FeaturedImages.php` (the featured image's file picker, Core `CrudUploadHandler`,
   session 23); "Insert image" in the body (`RichTextEditor::images('pages')`).
+
+- Pages built from sections (session 45): `Services/PageSections.php` (storage, order, snapshot /
+  replace for revisions and duplicates), `Controllers/Sections.php` (the editor at
+  `backend/pages/<id>/sections`, routes before the CRUD), views `Views/editor/{list,gallery,form}.php`,
+  `Assets/js/section-list.js` (`pages/section-list`), template `templates/sections.php` (full width).
+  The Core gives the registry, fields, forms and renderer (`modules/Core/Sections`, docs/sections.md).
 
 ## Decisions
 
@@ -44,8 +54,12 @@ Session 37 (D-37-01): translated texts use the site's languages and require its 
   language's slug to the URL language's path; `PageTree::translatedPaths()`; the sitemap lists every
   translation; language codes are reserved slugs.
 
+Session 45: D-45-01 decided (layout, tables, `$sectionTypes`, editor URL), D-45-02 accepted (how it was built).
+
 ## How to test
 
 `vendor/bin/phpunit modules/Pages` (base `Tests/PagesTestCase.php`: Auth fixture, `page()`,
 `form()`, `code()`, `text()`, `editor()`). By hand: `php spark modules:demo Pages`, then
-`backend/pages`, `/qui-som`, `/intranet`, `/sitemap.xml`.
+`backend/pages`, `/qui-som`, `/intranet`, `/sitemap.xml`, `/portada-seccions` and its editor
+(`backend/pages/<id>/sections`). Tests of sections: `Tests/PageSectionsTest.php` and
+`modules/Core/Tests/SectionsTest.php`.

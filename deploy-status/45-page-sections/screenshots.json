@@ -1,0 +1,73 @@
+{
+  "baseURL": "http://localhost:8089",
+  "outDir": "deploy-status/45-page-sections/screenshots",
+  "deviceScaleFactor": 2,
+  "login": {
+    "url": "/login",
+    "user": "admin@example.com",
+    "password": "__PASSWORD__",
+    "waitFor": "/backend"
+  },
+  "shots": [
+    {
+      "url": "/portada-seccions",
+      "name": "01-demo-page-desktop",
+      "login": false,
+      "fullPage": true
+    },
+    {
+      "url": "/portada-seccions",
+      "name": "02-demo-page-phone",
+      "login": false,
+      "fullPage": true,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "url": "/portada-seccions",
+      "name": "03-demo-page-dark",
+      "login": false,
+      "fullPage": true,
+      "dark": true
+    },
+    {
+      "url": "/backend/pages/11/sections",
+      "name": "04-editor-list",
+      "fullPage": true
+    },
+    {
+      "url": "/backend/pages/11/sections/add",
+      "name": "05-gallery",
+      "fullPage": true
+    },
+    {
+      "url": "/backend/pages/11/sections/1",
+      "name": "06-hero-form",
+      "fullPage": true
+    },
+    {
+      "url": "/backend/pages/11/sections/new/pages.links",
+      "name": "07-links-form-icon-grid",
+      "click": [
+        "[data-list-add]",
+        "[data-icon-toggle]"
+      ],
+      "wait": 300
+    },
+    {
+      "url": "/backend/pages/11/sections/2",
+      "name": "08-links-form-phone-dark",
+      "width": 390,
+      "height": 844,
+      "dark": true,
+      "fullPage": true
+    },
+    {
+      "url": "/es/portada-secciones",
+      "name": "09-demo-page-spanish-tablet",
+      "login": false,
+      "width": 820,
+      "height": 1180
+    }
+  ]
+}

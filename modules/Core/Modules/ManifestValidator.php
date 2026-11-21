@@ -99,6 +99,7 @@ final class ManifestValidator
         $this->checkBackup();
         $this->checkCalendars();
         $this->checkClassList('calendarProviders', \Modules\Core\Calendar\CalendarProvider::class);
+        $this->checkClassList('sectionTypes', \Modules\Core\Sections\SectionType::class);
         $this->checkApi();
         $this->checkCsp();
         $this->checkOutboundHosts();

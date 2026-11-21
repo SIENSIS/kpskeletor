@@ -93,6 +93,7 @@ key. News' values:
 | `$backup` | array | `['files' => ['modules/news']]` (Storage folders backed up beyond its tables) |
 | `$calendars` | key => definition | `['notices' => ['label' => 'News.cal.notices', 'color' => '#dc3545', 'source' => NoticeCalendar::class]]` |
 | `$calendarProviders` | list of classes | `[]` (on-the-fly `CalendarProvider`s) |
+| `$sectionTypes` | list of classes | `[]`; Pages declares six (`Sections\HeroSection::class`…): section types of pages built from sections, keys `<module>.<name>` ([`sections.md`](sections.md), D-45-01) |
 | `$api` | key => [path, handler] | `news` (`api/v1/news`) and `public-news` (`api/v1/public/news`) |
 | `$csp` | directive => sources | `[]` (covers and images are served by the site) |
 | `$outboundHosts` | list of hosts | `[]` (the RSS feed is generated, not fetched) |
@@ -200,6 +201,11 @@ settings zone".
 `Modules\Core\Widgets\Widget` with `id()` (`news.latest`), `title()`, `permission()`
 (`news-read.view`), `settings()` (a `limit` option) and `render()` with a widget view. An
 asynchronous widget extends `AsyncWidget` (the `Tasks` module's activity chart).
+
+**Section types** ([`sections.md`](sections.md)): a class in `Sections/` extends
+`Modules\Core\Sections\SectionType` (`key()` `<module>.<name>`, `label()`, `schema()` with the
+Core's field types, `styles()`), with its view in `Views/sections/<name>.php`; declared in
+`$sectionTypes`, it appears in the gallery of the page section editor.
 
 **Scheduled tasks** ([`scheduler.md`](scheduler.md)): `Tasks/ExpireNotices.php` implements
 `TaskInterface` (`name()`, `schedule()` → `Schedule::everyMinutes(5)->withoutOverlapping()`,

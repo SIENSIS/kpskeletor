@@ -520,6 +520,16 @@ return [
             'edit'      => 'Edita',
             'remove'    => 'Elimina',
         ],
+        'sections' => [
+            'item'       => 'Element {n}',
+            'added'      => 'Element afegit.',
+            'removed'    => 'Element eliminat.',
+            'moved'      => 'Element mogut a la posició {n}.',
+            'full'       => 'La llista és plena.',
+            'iconCount'  => '{count} icona(es)',
+            'iconNone'   => 'Cap icona no coincideix.',
+            'iconChosen' => 'Icona {name} triada.',
+        ],
         'picker' => [
             'title'     => 'Tria un fitxer',
             'choose'    => 'Tria',

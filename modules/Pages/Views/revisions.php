@@ -79,8 +79,8 @@ $short = static fn (string $text): string => mb_strlen($text) > 600 ? mb_substr(
                                 <?php foreach ($diff as $key => [$before, $after]): ?>
                                     <tr>
                                         <th scope="row" class="text-nowrap"><?= esc($label($key)) ?></th>
-                                        <td class="text-break"><del class="text-danger-emphasis"><?= esc($short($before)) ?></del></td>
-                                        <td class="text-break"><ins class="text-success-emphasis"><?= esc($short($after)) ?></ins></td>
+                                        <td class="text-break"><del class="text-danger-emphasis"><?= nl2br(esc($short($before))) ?></del></td>
+                                        <td class="text-break"><ins class="text-success-emphasis"><?= nl2br(esc($short($after))) ?></ins></td>
                                     </tr>
                                 <?php endforeach ?>
                             </tbody>

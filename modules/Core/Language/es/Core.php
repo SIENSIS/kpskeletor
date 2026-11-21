@@ -520,6 +520,16 @@ return [
             'edit'      => 'Editar',
             'remove'    => 'Eliminar',
         ],
+        'sections' => [
+            'item'       => 'Elemento {n}',
+            'added'      => 'Elemento añadido.',
+            'removed'    => 'Elemento eliminado.',
+            'moved'      => 'Elemento movido a la posición {n}.',
+            'full'       => 'La lista está llena.',
+            'iconCount'  => '{count} icono(s)',
+            'iconNone'   => 'Ningún icono coincide.',
+            'iconChosen' => 'Icono {name} elegido.',
+        ],
         'picker' => [
             'title'     => 'Elige un archivo',
             'choose'    => 'Elige',

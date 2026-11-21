@@ -331,6 +331,24 @@ Barra lateral › **Pàgines** (`/backend/pages`): les pàgines del web públic.
 
 Publicar sol requerir un permís específic; qui no pot publicar desa esborranys.
 
+### Pàgines fetes amb seccions
+
+Una pàgina pot mostrar el seu text (**Disposició: Article**) o fer-se amb **seccions**
+(**Disposició: Seccions**): bàners, enllaços ràpids, targetes, imatge i text, crides a l'acció i
+blocs de text, una sota l'altra, a tota l'amplada del web. No cal escriure codi.
+
+1. A la llista de pàgines, obriu el menú de la fila › **Seccions**.
+2. Si l'avís diu que la pàgina mostra el seu text, premeu **Fes servir seccions** (el text es
+   conserva).
+3. **Afegeix una secció**, trieu-ne el tipus a la galeria, ompliu el formulari i **Desa**. Amb els
+   botons d'idioma de dalt del formulari escriviu els textos de cada idioma; les imatges necessiten
+   un **text alternatiu** (què mostra la imatge) si no les marqueu com a **decoratives**.
+4. Canvieu l'ordre arrossegant una secció per la nansa (o enfoqueu la nansa i feu servir les
+   fletxes amunt i avall) i premeu **Desa l'ordre**. **Amaga** conserva una secció sense
+   mostrar-la; **Duplica** i **Elimina** fan el que diuen.
+5. **Previsualitza** mostra la pàgina tal com és ara. Cada canvi queda a les **Revisions** de la
+   pàgina, i restaurar una revisió en recupera les seccions.
+
 ## Menús
 
 Barra lateral › **Menús** (`/backend/menus/public`): els menús del web públic.
