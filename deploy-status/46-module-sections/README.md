@@ -1,6 +1,6 @@
 # Session 46 — Section types from modules: news, calendar, gallery, carousel, logos and embeds
 
-Branch: `ccr-e82442c9-gplsu5` · Pull request: PR_LINK · Date: 2026-11-21
+Branch: `ccr-e82442c9-gplsu5` · Pull request: [SIENSIS/kpskeletor#64](https://github.com/SIENSIS/kpskeletor/pull/64) · Date: 2026-11-21
 
 ## What was built
 
@@ -151,7 +151,19 @@ lightbox, and click to load with no request to the other site before the click).
 Results (2026-11-21):
 
 ```
-RESULTS
+vendor/bin/phpunit                  OK (1634 tests, 76678 assertions)  13:30  (without the demo .env, as in CI)
+vendor/bin/phpstan analyse          [OK] No errors
+vendor/bin/php-cs-fixer --dry-run   Found 0 of 1200 files that can be fixed
+php spark modules:sync              No cal fer res: tots els mòduls estan al dia.
+php spark permissions:check         Permisos correctes: 171 permís(os) al catàleg, 377 ruta(es) comprovades.
+php spark csp:check                 No hi ha scripts, gestors ni estils en línia a les vistes del projecte.
+php spark assets:publish --check    Els recursos publicats estan al dia.
+php spark security:check            13 ok, 7 info, 7 warnings, 6 errors — all expected on the development
+                                    demo site (development, debug, HTTP, cookies, base URL, demo data)
+npm run e2e (demo site)             237 passed, 39 skipped, 12 failed: the 12 were /backend/tasks and
+                                    /backend/tasks/tasks (Tasks tutorial module disabled on a fresh
+                                    install, D-32-01); after modules:enable Tasks + modules:demo Tasks,
+                                    backoffice.spec: 133 passed, 5 skipped. New spec: 48 passed.
 ```
 
 ## Screenshots
